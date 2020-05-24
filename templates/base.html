@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <title>{% block title %}ʕ•ᴥ•ʔ Bear Blog{% endblock %}</title>
+  {% block seo %}
+  {% endblock %}
+  <style>
+    body {
+      font-family: 'Garamond';
+      margin: auto;
+      padding: 20px;
+      max-width: 720px;
+      text-align: left;
+      background-color: white;
+    }
+
+    a {
+      /* color: #eba613; */
+      color: #3273dc;
+    }
+
+    h2 a {
+      font-weight: 400;
+      color: #000;
+      text-decoration: none;
+    }
+
+    nav a {
+      margin-right: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      font-size: 0.9em;
+    }
+
+    table {
+      width: 100%;
+    }
+    img {
+      max-width: 100%;
+    }
+
+    footer {
+      padding: 25px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h2>
+      {% block heading %}
+      <a href="/">ʕ•ᴥ•ʔ</a> Bear
+      {% endblock %}
+    </h2>
+    <nav>
+      {% block nav %}
+      {% endblock %}
+    </nav>
+  </header>
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
+  <footer>
+    {% block footer %}
+    Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+    {% endblock %}
+  </footer>
+  </div>
+</body>
+
+</html>

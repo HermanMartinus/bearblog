@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+<a href="/dashboard">Dashboard</a>
+{% if blog %}
+<a href="/dashboard/posts">Posts</a>
+{% endif %}
+<a href="/accounts/logout">Sign out</a>
+{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+{% if blog %}
+<p>
+    <a href="{{ root }}" target="_blank">View site</a>
+</p>
+{% endif %}
+<form method="POST" class="post-form">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="save btn btn-default">Save</button>
+</form>
+<p>
+    <i>{{ message }}</i>
+</p>
+{% endblock %}

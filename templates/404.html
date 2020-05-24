@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+404
+{% endblock %}
+
+{% block heading %}
+<a href="/">ʕ•ᴥ•ʔ</a> Bear
+{% endblock %}
+
+{% block nav %}
+<a href="/">Home</a>
+{% for item in nav %}
+<a href="/{{ item.slug }}">{{ item.title }}</a>
+{% endfor %}
+<a href="/blog">Blog</a>
+{% endblock %}
+
+{% block content %}
+<h1>404</h1>
+<h2>ʕノ•ᴥ•ʔノ ︵ ┻━┻</h2>
+{% endblock %}

@@ -1,0 +1,33 @@
+
+{% extends 'base.html' %}
+
+{% block nav %}
+<a href="/dashboard">Dashboard</a>
+<a href="/dashboard/posts">Posts</a>
+<a href="/accounts/logout">Sign out</a>
+{% endblock %}
+
+{% block content %}
+<h1>
+    {% if post %}
+    Edit post
+    {% else %}
+    New post
+    {% endif %}
+</h1>
+<form method="POST" class="post-form">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="save btn btn-default">Save</button>
+</form>
+<p>
+    <i>{{ message }}</i>
+</p>
+{% if post %}
+<p>
+    {% if post %}
+    <a href="{{ root }}/{{ post.slug }}" target="_blank">View post</a> |
+    {% endif %} 
+    <a href="/dashboard/posts/{{ post.pk }}/delete">Delete post</a>
+</p>
+{% endif %}
+{% endblock %}

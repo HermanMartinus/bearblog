@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+<a href="/dashboard">Dashboard</a>
+<a href="/dashboard/posts">Posts</a>
+<a href="/accounts/logout">Sign out</a>
+{% endblock %}
+
+{% block content %}
+<h1>Posts</h1>
+<a href="/dashboard/posts/new">New post</a>
+<ul>
+    {% for post in posts %}
+    <li>
+        #{{ forloop.revcounter }}
+        <i>
+            <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
+                - {{ post.published_date|date:'d M, Y' }} -
+            </time>
+        </i>
+        <a href="/dashboard/posts/{{ post.pk }}">{{ post.title }}</a>
+        {% if not post.publish %}
+        (not published)
+        {% endif %}
+    </li>
+    {% empty %}
+    <li>
+        No posts yet
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

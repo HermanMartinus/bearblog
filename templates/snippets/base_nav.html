@@ -1,0 +1,8 @@
+<!-- <a href="/">Home</a> -->
+<!-- <a href="/about">Getting started</a> -->
+{% if  user.is_authenticated %}
+<a href="/dashboard">Dashboard</a>
+{% else %}
+<!-- <a href="/accounts/login">Sign up</a> -->
+<!-- <a href="/accounts/login">Sign in</a> -->
+{% endif %}
