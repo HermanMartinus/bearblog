@@ -4,7 +4,7 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('mothership/', admin.site.urls),
     url(r'^accounts/', include('allauth.urls')),
     path('', include('blogs.urls')),
     path(

@@ -1,3 +1,4 @@
 User-Agent: *
 Disallow: /accounts/
 Disallow: /dashboard/
+Disallow: /mothership/
