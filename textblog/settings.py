@@ -15,6 +15,8 @@ if DEBUG:
 else:
     ALLOWED_HOSTS = ['.localhost', '.bearblog.dev']
 
+ADMINS = (('Webmaster', 'hfbmartinus@gmail.com'),)
+
 # Application definition
 SITE_ID = 1
 INSTALLED_APPS = [
@@ -107,7 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -125,11 +126,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LOGIN_REDIRECT_URL = '/dashboard'
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY', False)
