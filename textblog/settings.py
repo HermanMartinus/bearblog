@@ -17,7 +17,7 @@ DEFAULT_LOGGING['handlers']['console']['filters'] = []
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['.localhost', '.bearblog.dev']
+    ALLOWED_HOSTS = ['.wordbutter.online', '.localhost', '.bearblog.dev']
 
 ADMINS = (('Webmaster', 'hfbmartinus@gmail.com'),)
 
