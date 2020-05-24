@@ -12,6 +12,7 @@ from .models import Blog, Post
 from .helpers import *
 
 def home(request):
+    print(request.META['HTTP_HOST'])
     extracted = tldextract.extract(request.META['HTTP_HOST'])
 
     try:
@@ -102,7 +103,8 @@ def dashboard(request):
                 blog_info.save()
 
                 if blog_info.subdomain != old_subdomain:
-                    set_dns_record("CNAME", blog_info.subdomain)
+                    # TODO: Get old record and update to new content
+                    set_dns_record("POST", "CNAME", blog_info.subdomain)
                     print('changed')
                     message = 'It may take ~5 minutes to activate your new subdomain'
         else:
@@ -123,7 +125,7 @@ def dashboard(request):
                 blog.user = request.user
                 blog.created_date = timezone.now()
                 blog.save()
-                set_dns_record("CNAME", blog.subdomain)
+                set_dns_record("POST", "CNAME", blog.subdomain)
                 return render(request, 'dashboard/dashboard.html', {
                     'form': form,
                     'blog': blog,

@@ -1,5 +1,6 @@
 import requests
 import json
+from django.conf import settings
 from markdown import Markdown
 from io import StringIO
 
@@ -15,7 +16,7 @@ def get_base_root(extracted):
     else:
         return "http://{}:{}".format(extracted.domain, '8000')
 
-def set_dns_record(record_type, name):
+def set_dns_record(request_type, record_type, name):
     url = "https://api.cloudflare.com/client/v4/zones/2076fad18ca9cebee92de5a65942f9fe/dns_records"
 
     payload = {
@@ -27,12 +28,12 @@ def set_dns_record(record_type, name):
     }
     headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer SWCl5sHFnx8SAqowIM0ZrpntrS9aeaGfB40Di1gv',
+    'Authorization': f'Bearer {settings.BEARER_TOKEN}',
     'Content-Type': 'text/plain',
     'Cookie': '__cfduid=dc242bd25444397766d1abf29dd6672ed1590168756'
     }
 
-    response = requests.request("POST", url, headers=headers, data = json.dumps(payload))
+    response = requests.request(request_type, url, headers=headers, data = json.dumps(payload))
 
     print(response.text.encode('utf8'))
 
