@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block seo %}
-  {% include 'snippets/seo_tags.html' with title='ʕ•ᴥ•ʔ Bear Blog' url='https://bearblog.dev' description='Free, no-nonsense, super fast blogging.' %}
+  {% include 'snippets/seo_tags.html' with title='ʕ•ᴥ•ʔ Bear Blog' url='https://bearblog.dev' description='Free, no-nonsense, super-fast blogging.' %}
 {% endblock %}
 
 {% block nav %}
 {% endblock %}
 
 {% block content %}
-<h1>Free, no-nonsense, super fast blogging</h1>
+<h1>Free, no-nonsense, super-fast blogging</h1>
 <h3>No javascript, no stylesheets, no trackers. Just your words.</h3>
 {% if  user.is_authenticated %}
 <a href="/dashboard">Dashboard</a>
@@ -72,5 +72,11 @@
 {% endblock %}
 
 {% block footer %}
+<p>
 <i>Built and maintained by <a href="https://herman.bearblog.dev">Herman</a>.</i>
+</p>
+<small>
+<a href="https://github.com/HermanMartinus/bearblog/blob/master/PRIVACY_POLICY.md" target="_blank">Privacy Policy</a> | 
+<a href="https://github.com/HermanMartinus/bearblog/blob/master/TERMS_OF_SERVICE.md" target="_blank">Terms of Service</a>
+</small>
 {% endblock %}
