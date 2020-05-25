@@ -13,7 +13,6 @@ HEROKU_BEARER_TOKEN = os.getenv('HEROKU_BEARER_TOKEN')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.environ.get('DEBUG') == 'True')
 
-
 DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
 if DEBUG:
@@ -78,10 +77,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'textblog.wsgi.application'
 
+# All-auth setup
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
