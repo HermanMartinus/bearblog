@@ -10,11 +10,6 @@
 
 {% block content %}
 <h1>Dashboard</h1>
-{% if blog %}
-<p>
-    <a href="{{ root }}" target="_blank">View site</a>
-</p>
-{% endif %}
 <form method="POST" class="post-form">{% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="save btn btn-default">Save</button>
@@ -22,4 +17,11 @@
 <p>
     <i>{{ message }}</i>
 </p>
+
+{% if blog %}
+<p>
+    <a href="{{ root }}" target="_blank">View site</a> |
+    <a href="mailto:hfbmartinus@gmail.com?subject='Delete account {{user.email}}'">Delete account</a>
+</p>
+{% endif %}
 {% endblock %}

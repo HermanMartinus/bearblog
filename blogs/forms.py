@@ -6,9 +6,10 @@ from .models import Blog, Post
 subdomain_validator = RegexValidator(r"[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?", "Please enter a valid subdomain")
 link_validator = RegexValidator(r"[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?", "Please enter a valid link slug")
 domain_validator = RegexValidator(r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$", "Please enter a valid domain")
+script_validator = RegexValidator(r"<[^>]*script", "No script tags allowed", inverse_match=True)
 
 class BlogForm(forms.ModelForm):
-    content = forms.CharField(label="Homepage content (markdown)", widget=forms.Textarea(), required=False)
+    content = forms.CharField(label="Homepage content (markdown)", widget=forms.Textarea(), required=False, validators=[script_validator])
     subdomain = forms.SlugField(label="Subdomain", help_text=".bearblog.dev", validators=[subdomain_validator])
     domain = forms.CharField(max_length=128, label="Custom domain (optional)", help_text="eg: 'example.com'", validators=[domain_validator], required=False)
 
@@ -37,7 +38,7 @@ class PostForm(forms.ModelForm):
         super(PostForm, self).__init__(*args, **kwargs)
 
     slug = forms.SlugField(label="Permalink", help_text="(eg: 'why-i-like-bears')", validators=[link_validator])
-    content = forms.CharField(label="Content (markdown)", widget=forms.Textarea())
+    content = forms.CharField(label="Content (markdown)", widget=forms.Textarea(), validators=[script_validator])
 
     def clean_slug(self):
         slug = self.cleaned_data['slug']
