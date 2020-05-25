@@ -15,6 +15,9 @@ class BlogForm(forms.ModelForm):
     def clean_domain(self):
         domain = self.cleaned_data['domain']
         
+        if domain == '':
+            return domain
+            
         matching_blogs = Blog.objects.filter(domain=domain)
 
         if self.instance:
