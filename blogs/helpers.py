@@ -63,12 +63,13 @@ def update_dns_record(id, name):
 
     response = requests.request("PUT", url, headers=headers, data = json.dumps(payload))
 
+    print(response.text.encode('utf8'))
+
     json_response = json.loads(response.text)
     id = ''
     if json_response['result']:
         id = json_response['result']['id']
 
-    print(response.text.encode('utf8'))
     return id
 
 def add_new_domain(domain):
