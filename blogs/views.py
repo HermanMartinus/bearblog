@@ -149,10 +149,11 @@ def dashboard(request):
                 blog = form.save(commit=False)
                 blog.user = request.user
                 blog.created_date = timezone.now()
-                blog.save()
                 blog.subdomain_id = create_dns_record(blog.subdomain)
                 if blog.domain:
                     add_new_domain(blog.domain)
+                blog.save()
+                
                 return render(request, 'dashboard/dashboard.html', {
                     'form': form,
                     'blog': blog,
