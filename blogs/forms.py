@@ -12,6 +12,18 @@ class BlogForm(forms.ModelForm):
     subdomain = forms.SlugField(label="Subdomain", help_text=".bearblog.dev", validators=[subdomain_validator])
     domain = forms.CharField(max_length=128, label="Custom domain (optional)", help_text="eg: 'example.com'", validators=[domain_validator], required=False)
 
+    def clean_domain(self):
+        domain = self.cleaned_data['domain']
+        
+        matching_blogs = Blog.objects.filter(domain=domain)
+
+        if self.instance:
+            matching_blogs = matching_blogs.exclude(pk=self.instance.pk)
+        if matching_blogs.exists():
+            raise ValidationError(f"Blog domain: '{domain}'  already exist.")
+        else:
+            return domain
+        
     class Meta:
         model = Blog
         fields = ('title', 'subdomain', 'domain', 'content',)
