@@ -15,10 +15,7 @@ DEBUG = (os.environ.get('DEBUG') == 'True')
 
 DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
-if DEBUG:
-    ALLOWED_HOSTS = ['*']
-else:
-    ALLOWED_HOSTS = ['.wordbutter.online', '.localhost', '.bearblog.dev']
+ALLOWED_HOSTS = ['*']
 
 ADMINS = (('Webmaster', 'hfbmartinus@gmail.com'),)
 
