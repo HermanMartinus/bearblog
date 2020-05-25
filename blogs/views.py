@@ -124,7 +124,7 @@ def dashboard(request):
                 
                 if blog_info.domain != old_domain:
                     delete_domain(old_domain)
-                    if blog_info.domain:
+                    if blog_info.domain != '':
                         add_new_domain(blog_info.domain)
                         message = f'Set the CNAME record to point at bearblog.dev for {blog_info.domain}'
                 if blog_info.subdomain != old_subdomain:
