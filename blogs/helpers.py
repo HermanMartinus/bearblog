@@ -87,12 +87,8 @@ def add_new_domain(domain):
 
     response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
 
-    json_response = json.loads(response.text)
-    id = ''
-    if json_response['app']:
-        id = json_response['app']['id']
-
     print(response.text)
+
     return id
 
 def delete_domain(domain):
