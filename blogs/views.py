@@ -48,7 +48,7 @@ def posts(request):
     http_host = request.META['HTTP_HOST']
 
     if http_host == 'bearblog.dev' or http_host == 'localhost:8000':
-        return render(request, 'landing.html')
+        return redirect('/')
     elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
         extracted = tldextract.extract(http_host)
         blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
@@ -77,7 +77,7 @@ def post(request, slug):
     http_host = request.META['HTTP_HOST']
 
     if http_host == 'bearblog.dev' or http_host == 'localhost:8000':
-        return render(request, 'landing.html')
+        return redirect('/')
     elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
         extracted = tldextract.extract(http_host)
         blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
