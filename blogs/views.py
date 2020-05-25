@@ -121,13 +121,17 @@ def dashboard(request):
             form = BlogForm(request.POST, instance=blog)
             if form.is_valid():
                 blog_info = form.save(commit=False)
-                blog_info.save()
-                if blog_info.domain and blog_info.domain != old_domain:
-                    add_new_domain(blog_info.domain)
+                
+                if blog_info.domain != old_domain:
+                    delete_domain(old_domain)
+                    if blog_info.domain:
+                        add_new_domain(blog_info.domain)
+                        message = f'Set the CNAME record to point at bearblog.dev for {blog_info.domain}'
                 if blog_info.subdomain != old_subdomain:
-                    # TODO: Get old record and update to new content
-                    set_dns_record("POST", "CNAME", blog_info.subdomain)
+                    blog_info.subdomain_id = update_dns_record(blog.subdomain_id, blog_info.subdomain)
                     message = 'It may take ~5 minutes to activate your new subdomain'
+                
+                blog_info.save()
         else:
             form = BlogForm(instance=blog)
 
@@ -146,7 +150,7 @@ def dashboard(request):
                 blog.user = request.user
                 blog.created_date = timezone.now()
                 blog.save()
-                set_dns_record("POST", "CNAME", blog.subdomain)
+                create_dns_record(blog.subdomain)
                 if blog.domain:
                     add_new_domain(blog.domain)
                 return render(request, 'dashboard/dashboard.html', {

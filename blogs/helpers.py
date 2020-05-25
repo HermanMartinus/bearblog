@@ -16,11 +16,11 @@ def get_base_root(extracted):
     else:
         return "http://{}:{}".format(extracted.domain, '8000')
 
-def set_dns_record(request_type, record_type, name):
+def create_dns_record(name):
     url = "https://api.cloudflare.com/client/v4/zones/2076fad18ca9cebee92de5a65942f9fe/dns_records"
 
     payload = {
-        "type": record_type,
+        "type": "CNAME",
         "name": name,
         "content": "intense-shallot-9foagelzs54op9wrom8ybsbn.herokudns.com",
         "ttl": "120",
@@ -33,9 +33,43 @@ def set_dns_record(request_type, record_type, name):
     'Cookie': '__cfduid=dc242bd25444397766d1abf29dd6672ed1590168756'
     }
 
-    response = requests.request(request_type, url, headers=headers, data = json.dumps(payload))
+    response = requests.request("POST", url, headers=headers, data = json.dumps(payload))
+
+    json_response = json.loads(response.text)
+    id = ''
+    if json_response['result']:
+        id = json_response['result']['id']
 
     print(response.text.encode('utf8'))
+    return id
+
+def update_dns_record(id, name):
+    url = f"https://api.cloudflare.com/client/v4/zones/2076fad18ca9cebee92de5a65942f9fe/dns_records/{id}"
+
+    payload = {
+        "type": "CNAME",
+        "name": name,
+        "content": "intense-shallot-9foagelzs54op9wrom8ybsbn.herokudns.com",
+        "ttl": "120",
+        "proxied": "true"
+    }
+
+    headers = {
+    'Content-Type': 'application/json',
+    'Authorization': f'Bearer {settings.CLOUDFLARE_BEARER_TOKEN}',
+    'Content-Type': 'text/plain',
+    'Cookie': '__cfduid=dc242bd25444397766d1abf29dd6672ed1590168756'
+    }
+
+    response = requests.request("PUT", url, headers=headers, data = json.dumps(payload))
+
+    json_response = json.loads(response.text)
+    id = ''
+    if json_response['result']:
+        id = json_response['result']['id']
+
+    print(response.text.encode('utf8'))
+    return id
 
 def add_new_domain(domain):
     url = "https://api.heroku.com/apps/bear-blog/domains"
@@ -51,6 +85,29 @@ def add_new_domain(domain):
         }
 
     response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
+
+    json_response = json.loads(response.text)
+    id = ''
+    if json_response['app']:
+        id = json_response['app']['id']
+
+    print(response.text)
+    return id
+
+def delete_domain(domain):
+    url = f"https://api.heroku.com/apps/bear-blog/domains/{domain}"
+
+    payload = {
+        "hostname": domain
+    }
+
+    headers = {
+        'content-type': "application/json",
+        'accept': "application/vnd.heroku+json; version=3",
+        'authorization': f'Bearer {settings.HEROKU_BEARER_TOKEN}',
+        }
+
+    response = requests.request("DELETE", url, data=json.dumps(payload), headers=headers)
 
     print(response.text)
 

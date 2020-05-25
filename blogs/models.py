@@ -6,6 +6,7 @@ class Blog(models.Model):
     title = models.CharField(max_length=200)
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
     subdomain = models.SlugField(max_length=100, unique=True)
+    subdomain_id = models.CharField(max_length=128, unique=True, blank=True, null=True)
     domain = models.CharField(max_length=128, unique=True, blank=True, null=True)
     content = models.TextField(blank=True)
 
