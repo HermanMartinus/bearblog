@@ -45,10 +45,18 @@ def home(request):
 
 
 def posts(request):
-    extracted = tldextract.extract(request.META['HTTP_HOST'])
-    subdomain = extracted.subdomain
+    http_host = request.META['HTTP_HOST']
 
-    blog = get_object_or_404(Blog, subdomain=subdomain)
+    if http_host == 'bearblog.dev' or http_host == 'localhost:8000':
+        return render(request, 'landing.html')
+    elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
+        extracted = tldextract.extract(http_host)
+        blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
+        root = get_root(extracted, blog.subdomain)
+    else:
+        blog = get_object_or_404(Blog, domain=http_host)
+        root = http_host
+
     all_posts = Post.objects.filter(blog=blog, publish=True).order_by('-published_date')
     nav = all_posts.filter(is_page=True)
     posts = all_posts.filter(is_page=False)
@@ -60,16 +68,24 @@ def posts(request):
             'blog': blog,
             'posts': posts,
             'nav': nav,
-            'root': get_root(extracted, blog.subdomain),
+            'root': root,
             'meta_description':  unmark(blog.content)[:160]
         }
     )
 
 def post(request, slug):
-    extracted = tldextract.extract(request.META['HTTP_HOST'])
-    subdomain = extracted.subdomain
+    http_host = request.META['HTTP_HOST']
 
-    blog = get_object_or_404(Blog, subdomain=subdomain)
+    if http_host == 'bearblog.dev' or http_host == 'localhost:8000':
+        return render(request, 'landing.html')
+    elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
+        extracted = tldextract.extract(http_host)
+        blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
+        root = get_root(extracted, blog.subdomain)
+    else:
+        blog = get_object_or_404(Blog, domain=http_host)
+        root = http_host
+
     all_posts = Post.objects.filter(blog=blog, publish=True).order_by('-published_date')
     nav = all_posts.filter(is_page=True)
     post = get_object_or_404(all_posts, slug=slug)
@@ -83,7 +99,7 @@ def post(request, slug):
             'content': content,
             'post': post,
             'nav': nav,
-            'root': get_root(extracted, blog.subdomain),
+            'root': root,
             'meta_description': unmark(post.content)[:160]
         }
     )
