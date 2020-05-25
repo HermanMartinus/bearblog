@@ -150,7 +150,7 @@ def dashboard(request):
                 blog.user = request.user
                 blog.created_date = timezone.now()
                 blog.save()
-                blog_info.subdomain_id = create_dns_record(blog.subdomain)
+                blog.subdomain_id = create_dns_record(blog.subdomain)
                 if blog.domain != '':
                     add_new_domain(blog.domain)
                 return render(request, 'dashboard/dashboard.html', {
