@@ -12,33 +12,37 @@ from .models import Blog, Post
 from .helpers import *
 
 def home(request):
-    print(request.META['HTTP_HOST'])
-    extracted = tldextract.extract(request.META['HTTP_HOST'])
+    http_host = request.META['HTTP_HOST']
 
-    try:
-        blog = Blog.objects.get(subdomain=extracted.subdomain)
-        all_posts = Post.objects.filter(blog=blog, publish=True).order_by('-published_date')
-        nav = all_posts.filter(is_page=True)
-        posts = all_posts.filter(is_page=False)
-        content = markdown(blog.content)
+    if http_host == 'bearblog.dev' or http_host == 'localhost:8000':
+        return render(request, 'landing.html')
+    elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
+        extracted = tldextract.extract(http_host)
+        blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
+        root = get_root(extracted, blog.subdomain)
+    else:
+        blog = get_object_or_404(Blog, domain=http_host)
+        root = http_host
 
-        return render(
-            request,
-            'home.html',
-            {
-                'blog': blog,
-                'content': content,
-                'posts': posts,
-                'nav': nav,
-                'root': get_root(extracted, blog.subdomain),
-                'meta_description': unmark(blog.content)[:160]
-            })
+    all_posts = Post.objects.filter(blog=blog, publish=True).order_by('-published_date')
+    nav = all_posts.filter(is_page=True)
+    posts = all_posts.filter(is_page=False)
+    content = markdown(blog.content)
 
-    except Blog.DoesNotExist:
-        return render(
-            request,
-            'landing.html',
-        )
+    return render(
+        request,
+        'home.html',
+        {
+            'blog': blog,
+            'content': content,
+            'posts': posts,
+            'nav': nav,
+            'root': root,
+            'meta_description': unmark(blog.content)[:160]
+        })
+        
+
+
 
 def posts(request):
     extracted = tldextract.extract(request.META['HTTP_HOST'])
@@ -96,16 +100,17 @@ def dashboard(request):
 
         message = ''
         old_subdomain = blog.subdomain
+        old_domain = blog.domain
         if request.method == "POST":
             form = BlogForm(request.POST, instance=blog)
             if form.is_valid():
                 blog_info = form.save(commit=False)
                 blog_info.save()
-
+                if blog_info.domain and blog_info.domain != old_domain:
+                    add_new_domain(blog_info.domain)
                 if blog_info.subdomain != old_subdomain:
                     # TODO: Get old record and update to new content
                     set_dns_record("POST", "CNAME", blog_info.subdomain)
-                    print('changed')
                     message = 'It may take ~5 minutes to activate your new subdomain'
         else:
             form = BlogForm(instance=blog)
@@ -126,6 +131,8 @@ def dashboard(request):
                 blog.created_date = timezone.now()
                 blog.save()
                 set_dns_record("POST", "CNAME", blog.subdomain)
+                if blog.domain:
+                    add_new_domain(blog.domain)
                 return render(request, 'dashboard/dashboard.html', {
                     'form': form,
                     'blog': blog,

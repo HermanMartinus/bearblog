@@ -5,13 +5,16 @@ from .models import Blog, Post
 
 subdomain_validator = RegexValidator(r"[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?", "Please enter a valid subdomain")
 link_validator = RegexValidator(r"[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?", "Please enter a valid link slug")
+domain_validator = RegexValidator(r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$", "Please enter a valid domain")
 
 class BlogForm(forms.ModelForm):
-    content = forms.CharField(label="Homepage content (markdown)", widget=forms.Textarea())
+    content = forms.CharField(label="Homepage content (markdown)", widget=forms.Textarea(), required=False)
     subdomain = forms.SlugField(label="Subdomain", help_text=".bearblog.dev", validators=[subdomain_validator])
+    domain = forms.CharField(max_length=128, label="Custom domain (optional)", help_text="eg: 'example.com'", validators=[domain_validator], required=False)
+
     class Meta:
         model = Blog
-        fields = ('title', 'subdomain', 'content',)
+        fields = ('title', 'subdomain', 'domain', 'content',)
 
 class PostForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
