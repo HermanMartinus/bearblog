@@ -12,7 +12,7 @@ Once you have a domain registered, add the following DNS record:
 
 |Type|Name|Content|TTL|
 |---|---|---|---|
-|CNAME|{your domain or subdomain}|{user subdomain}.bearblog.dev|3600|
+|CNAME|{your domain or subdomain}|intense-shallot-9foagelzs54op9wrom8ybsbn.herokudns.com|3600|
 
 Back in the bearblog dashboard, add the domain to the Custom Domain field. 
 

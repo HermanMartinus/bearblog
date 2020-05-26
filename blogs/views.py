@@ -124,7 +124,7 @@ def dashboard(request):
                     delete_domain(old_domain)
                     if blog_info.domain:
                         add_new_domain(blog_info.domain)
-                        message = f'Set the CNAME record for {blog_info.domain} to point at bearblog.dev'
+                        message = f'Set the CNAME record for {blog_info.domain} to point at intense-shallot-9foagelzs54op9wrom8ybsbn.herokudns.com'
                 if blog_info.subdomain != old_subdomain:
                     blog_info.subdomain_id = update_dns_record(blog.subdomain_id, blog_info.subdomain)
                     message = 'It may take ~5 minutes to activate your new subdomain'
