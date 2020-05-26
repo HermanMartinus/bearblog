@@ -50,7 +50,7 @@ def update_dns_record(id, name):
     payload = {
         "type": "CNAME",
         "name": name,
-        "content": "intense-shallot-9foagelzs54op9wrom8ybsbn.herokudns.com",
+        "content": "shaped-krill-fusn49u0rpoovwvgh0i6za5w.herokudns.com",
         "ttl": "120",
         "proxied": "true"
     }
