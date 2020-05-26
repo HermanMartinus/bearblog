@@ -12,6 +12,12 @@ class Blog(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        self.subdomain = self.subdomain.lower()
+        if self.domain:
+            self.domain = self.domain.lower()
+        return super(Blog, self).save(*args, **kwargs)
 
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
@@ -24,3 +30,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        self.slug = self.slug.lower()
+        return super(Post, self).save(*args, **kwargs)
