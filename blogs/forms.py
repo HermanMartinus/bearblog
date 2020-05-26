@@ -11,26 +11,26 @@ script_validator = RegexValidator(r"<[^>]*script", "No script tags allowed", inv
 class BlogForm(forms.ModelForm):
     content = forms.CharField(label="Homepage content (markdown)", widget=forms.Textarea(), required=False, validators=[script_validator])
     subdomain = forms.SlugField(label="Subdomain", help_text=".bearblog.dev", validators=[subdomain_validator])
-    domain = forms.CharField(max_length=128, label="Custom domain (beta & optional)", help_text="eg: 'example.com' (.dev and .app not supported yet, but will be soon)", validators=[domain_validator], required=False)
+    # domain = forms.CharField(max_length=128, label="Custom domain (optional)", help_text="eg: 'example.com'", validators=[domain_validator], required=False)
 
-    def clean_domain(self):
-        domain = self.cleaned_data['domain']
+    # def clean_domain(self):
+    #     domain = self.cleaned_data['domain']
         
-        if domain == '':
-            return domain
+    #     if domain == '':
+    #         return domain
             
-        matching_blogs = Blog.objects.filter(domain=domain)
+    #     matching_blogs = Blog.objects.filter(domain=domain)
 
-        if self.instance:
-            matching_blogs = matching_blogs.exclude(pk=self.instance.pk)
-        if matching_blogs.exists():
-            raise ValidationError(f"Blog domain '{domain}'  already exists.")
-        else:
-            return domain
+    #     if self.instance:
+    #         matching_blogs = matching_blogs.exclude(pk=self.instance.pk)
+    #     if matching_blogs.exists():
+    #         raise ValidationError(f"Blog domain '{domain}'  already exists.")
+    #     else:
+    #         return domain
         
     class Meta:
         model = Blog
-        fields = ('title', 'subdomain', 'domain', 'content',)
+        fields = ('title', 'subdomain', 'content',)
 
 class PostForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
