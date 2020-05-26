@@ -40,8 +40,6 @@ def home(request):
             'root': root,
             'meta_description': unmark(blog.content)[:160]
         })
-        
-
 
 
 def posts(request):
