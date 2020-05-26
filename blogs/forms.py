@@ -11,7 +11,7 @@ script_validator = RegexValidator(r"<[^>]*script", "No script tags allowed", inv
 class BlogForm(forms.ModelForm):
     content = forms.CharField(label="Homepage content (markdown)", widget=forms.Textarea(), required=False, validators=[script_validator])
     subdomain = forms.SlugField(label="Subdomain", help_text=".bearblog.dev", validators=[subdomain_validator])
-    domain = forms.CharField(max_length=128, label="Custom domain (optional)", help_text="eg: 'example.com' (.dev and .app not supported yet, but will be soon)", validators=[domain_validator], required=False)
+    domain = forms.CharField(max_length=128, label="Custom domain (beta & optional)", help_text="eg: 'example.com' (.dev and .app not supported yet, but will be soon)", validators=[domain_validator], required=False)
 
     def clean_domain(self):
         domain = self.cleaned_data['domain']
