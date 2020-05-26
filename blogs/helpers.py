@@ -16,6 +16,7 @@ def get_base_root(extracted):
     else:
         return "http://{}:{}".format(extracted.domain, '8000')
 
+
 def create_dns_record(name):
     url = "https://api.cloudflare.com/client/v4/zones/2076fad18ca9cebee92de5a65942f9fe/dns_records"
 
@@ -72,6 +73,9 @@ def update_dns_record(id, name):
 
     return id
 
+def delete_dns_record():
+    print("Working ;)")
+
 def add_new_domain(domain):
     url = "https://api.heroku.com/apps/bear-blog/domains"
 
@@ -118,7 +122,6 @@ def unmark_element(element, stream=None):
     if element.tail:
         stream.write(element.tail)
     return stream.getvalue()
-
 
 # patching Markdown
 Markdown.output_formats["plain"] = unmark_element

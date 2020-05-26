@@ -223,19 +223,6 @@ def post_edit(request, pk):
         'message': message
     })
 
-@login_required
-def post_delete(request, pk):
-    extracted = tldextract.extract(request.META['HTTP_HOST'])
-    blog = get_object_or_404(Blog, user=request.user)
-    if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return redirect("{}/dashboard/posts".format(get_root(extracted, blog.subdomain)))
-
-    post = get_object_or_404(Post, pk=pk)
-    return render(request, 'dashboard/post_delete.html', {
-        'blog': blog,
-        'post': post
-    })
-
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
