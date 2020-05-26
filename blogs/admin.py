@@ -12,7 +12,7 @@ class BlogAdmin(admin.ModelAdmin):
 
     post_count.short_description = ('Post count')
 
-    list_display = ('title', 'user', 'post_count', 'created_date')
+    list_display = ('title', 'subdomain', 'domain', 'user', 'post_count', 'created_date')
     search_fields = ('title', 'user__email')
     ordering = ('-created_date',)
 
