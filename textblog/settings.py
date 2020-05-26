@@ -81,10 +81,10 @@ WSGI_APPLICATION = 'textblog.wsgi.application'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 if not DEBUG:
     ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-    ACCOUNT_EMAIL_REQUIRED = True
+    ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
