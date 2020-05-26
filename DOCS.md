@@ -16,6 +16,8 @@ Once you have a domain registered, add the following DNS record:
 
 Back in the bearblog dashboard, add the domain to the Custom Domain field. 
 
+**Note: We don't currently support SSL, so .dev and .app domains will only work if set up through a CDN like [Cloudflare](https://cloudflare.com).
+
 ## Contributing and contact
 
 This project is free to use. To contribute to the codebase, open a PR.
