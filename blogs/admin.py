@@ -19,7 +19,7 @@ class BlogAdmin(admin.ModelAdmin):
     domain_url.short_description = "Domain"
 
     def subdomain_url(self, obj):
-        return format_html("<a href='http://{url}.bear.blog' target='_blank'>{url}.bear.blog</a>", url=obj.subdomain)
+        return format_html("<a href='http://{url}.bearblog.dev' target='_blank'>{url}.bearblog.dev</a>", url=obj.subdomain)
 
     subdomain_url.short_description = "Subomain"
 
