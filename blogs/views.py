@@ -227,7 +227,7 @@ def post_edit(request, pk):
 @login_required
 def delete_user(request):
     """
-    Delete's the currently logged in user
+    Delete the currently logged in user
     :param request:
     :return:
     """
