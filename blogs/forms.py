@@ -3,7 +3,7 @@ from django.core.validators import RegexValidator, ValidationError
 
 from .models import Blog, Post
 
-subdomain_validator = RegexValidator(r"[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?", "Please enter a valid subdomain")
+subdomain_validator = RegexValidator(r"^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{,63}(?<!-)$", "Please enter a valid subdomain")
 link_validator = RegexValidator(r"[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?", "Please enter a valid link slug")
 domain_validator = RegexValidator(r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$", "Please enter a valid domain")
 script_validator = RegexValidator(r"<[^>]*script", "No script tags allowed", inverse_match=True)
