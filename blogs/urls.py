@@ -11,5 +11,6 @@ urlpatterns = [
     path('dashboard/posts/<pk>/', views.post_edit, name='post_edit'),
     path('dashboard/posts/<pk>/delete/', views.PostDelete.as_view(), name='post_delete'),
     path('blog/', views.posts, name='posts'),
+    path('accounts/delete/', views.delete_user, name='user_delete'),
     path('<slug>/', views.post, name='post'),
 ]

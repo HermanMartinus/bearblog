@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.edit import DeleteView
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from markdown import markdown
 import tldextract
 
@@ -223,9 +224,30 @@ def post_edit(request, pk):
         'message': message
     })
 
+@login_required
+def delete_user(request):
+    """
+    Delete's the currently logged in user
+    :param request:
+    :return:
+    """
+
+    if request.method == "POST":
+        user = get_object_or_404(get_user_model(), pk=request.user.pk)
+        email = user.email
+        user.delete()
+        try:
+            delete_dns_record()
+        except:
+            print(f"Something went wrong deleting the DNS for {email}")
+        return redirect('/')
+
+    return render(request, 'account/account_confirm_delete.html')
+
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
+
 
 def not_found(request, *args, **kwargs):
     return render(request,'404.html', status=404)
