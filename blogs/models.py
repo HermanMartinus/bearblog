@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 
 class Blog(models.Model):
@@ -18,6 +20,14 @@ class Blog(models.Model):
         if self.domain:
             self.domain = self.domain.lower()
         return super(Blog, self).save(*args, **kwargs)
+
+
+@receiver(pre_delete, sender=Blog, dispatch_uid='blog_delete_signal')
+def delete_blog_receiver(sender, instance, using, **kwargs):
+    try:
+        print("Delete Domain and subdomain DNS records")
+    except:
+        print(f"Something went wrong deleting the DNS records")
 
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
