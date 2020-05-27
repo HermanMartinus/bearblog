@@ -73,8 +73,21 @@ def update_dns_record(id, name):
 
     return id
 
-def delete_dns_record():
-    print("Working ;)")
+def delete_dns_record(id):
+    url = f"https://api.cloudflare.com/client/v4/zones/2076fad18ca9cebee92de5a65942f9fe/dns_records/{id}"
+
+    headers = {
+    'Content-Type': 'application/json',
+    'Authorization': f'Bearer {settings.CLOUDFLARE_BEARER_TOKEN}',
+    'Content-Type': 'text/plain',
+    'Cookie': '__cfduid=dc242bd25444397766d1abf29dd6672ed1590168756'
+    }
+
+    response = requests.request("DELETE", url, headers=headers)
+
+    print(response.text.encode('utf8'))
+ 
+
 
 def add_new_domain(domain):
     url = "https://api.heroku.com/apps/bear-blog/domains"

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+<a href="/dashboard">Dashboard</a>
+<a href="/dashboard/posts">Posts</a>
+<a href="https://github.com/HermanMartinus/bearblog/blob/master/DOCS.md" target="_blank">Docs</a>
+<a href="/accounts/logout">Sign out</a>
+{% endblock %}
+
+{% block content %}
+<h1 class="title">Delete account</h1>
+<form action="" method="post">{% csrf_token %}
+    <p>Are you sure you want to delete "{{ request.user.email }}"?</p>
+    <input type="submit" value="Confirm" />
+</form>
+<p>
+<a href="/dashboard/">Cancel</a>
+</p>
+{% endblock %}
