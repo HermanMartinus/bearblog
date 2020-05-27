@@ -27,7 +27,8 @@ class Blog(models.Model):
 def delete_blog_receiver(sender, instance, using, **kwargs):
     print("Delete Domain and subdomain DNS records")
     delete_dns_record(instance.subdomain_id)
-    delete_domain(instance.domain)
+    if instance.domain:
+        delete_domain(instance.domain)
 
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
