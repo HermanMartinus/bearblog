@@ -203,7 +203,7 @@ def post_edit(request, pk):
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
         return redirect("{}/dashboard/posts".format(get_root(extracted, blog.subdomain)))
 
-    post = get_object_or_404(Post, pk=pk)
+    post = get_object_or_404(Post, blog=blog, pk=pk)
     message = ''
     if request.method == "POST":
         form = PostForm(request.user, request.POST, instance=post)
