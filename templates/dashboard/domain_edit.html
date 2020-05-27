@@ -11,7 +11,22 @@
 {% endblock %}
 
 {% block content %}
-<h1>Dashboard</h1>
+<h1>Custom domain</h1>
+<table>
+<tr>
+    <th>Type</th>
+    <th>Name</th>
+    <th>Content</th>
+    <th>TTL</th>
+</tr>
+<tr>
+    <td>CNAME</td>
+    <td><small>{your domain}</small></td>
+    <td><small>shaped-krill-fusn49u0rpoovwvgh0i6za5w.herokudns.com<small></td>
+    <td>3600</td>
+</tr>
+</table>
+<p>Then add your domain below</p>
 <form method="POST" class="post-form">{% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="save btn btn-default">Save</button>
@@ -20,10 +35,4 @@
     <i>{{ message }}</i>
 </p>
 
-{% if blog %}
-<p>
-    <a href="{{ root }}" target="_blank">View site</a> |
-    <a href="{% url 'user_delete' %}">Delete account</a>
-</p>
-{% endif %}
 {% endblock %}
