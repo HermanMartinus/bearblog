@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count
 from .models import *
+from django.utils.html import format_html
 
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
@@ -12,7 +13,18 @@ class BlogAdmin(admin.ModelAdmin):
 
     post_count.short_description = ('Post count')
 
-    list_display = ('title', 'subdomain', 'domain', 'user', 'post_count', 'created_date')
+    def domain_url(self, obj):
+        return format_html("<a href='http://{url}' target='_blank'>{url}</a>", url=obj.domain)
+
+    domain_url.short_description = "Domain"
+
+    def subdomain_url(self, obj):
+        return format_html("<a href='http://{url}.bear.blog' target='_blank'>{url}.bear.blog</a>", url=obj.subdomain)
+
+    subdomain_url.short_description = "Subomain"
+
+    list_display = ('title', 'subdomain_url', 'domain_url', 'user', 'post_count', 'created_date')
+
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
     ordering = ('-created_date',)
 
