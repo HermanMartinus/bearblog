@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from markdown import markdown
 import tldextract
 
-from .forms import BlogForm, PostForm
+from .forms import *
 from .models import Blog, Post
 from .helpers import *
 
@@ -225,13 +225,37 @@ def post_edit(request, pk):
     })
 
 @login_required
-def delete_user(request):
-    """
-    Delete the currently logged in user
-    :param request:
-    :return:
-    """
+def domain_edit(request):
+    extracted = tldextract.extract(request.META['HTTP_HOST'])
+    blog = Blog.objects.get(user=request.user)
 
+    if extracted.subdomain and extracted.subdomain != blog.subdomain:
+        return redirect("{}/dashboard".format(get_root(extracted, blog.subdomain)))
+
+    old_domain = blog.domain
+
+    if request.method == "POST":
+        form = DomainForm(request.POST, instance=blog)
+        if form.is_valid():
+            blog_info = form.save(commit=False)
+            
+            if blog_info.domain != old_domain:
+                delete_domain(old_domain)
+                if blog_info.domain:
+                    add_new_domain(blog_info.domain)
+            
+            blog_info.save()
+    else:
+        form = DomainForm(instance=blog)
+
+    return render(request, 'dashboard/domain_edit.html', {
+        'form': form,
+        'blog': blog,
+        'root': get_root(extracted, blog.subdomain),
+    })
+
+@login_required
+def delete_user(request):
     if request.method == "POST":
         user = get_object_or_404(get_user_model(), pk=request.user.pk)
         user.delete()
