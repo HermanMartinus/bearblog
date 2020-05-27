@@ -19,6 +19,9 @@ def home(request):
         return render(request, 'landing.html')
     elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
         extracted = tldextract.extract(http_host)
+        if is_protected(extracted.subdomain):
+            return redirect(get_base_root(extracted))
+
         blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
         root = get_root(extracted, blog.subdomain)
     else:
@@ -50,6 +53,9 @@ def posts(request):
         return redirect('/')
     elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
         extracted = tldextract.extract(http_host)
+        if is_protected(extracted.subdomain):
+            return redirect(get_base_root(extracted))
+
         blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
         root = get_root(extracted, blog.subdomain)
     else:
@@ -79,6 +85,9 @@ def post(request, slug):
         return redirect('/')
     elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
         extracted = tldextract.extract(http_host)
+        if is_protected(extracted.subdomain):
+            return redirect(get_base_root(extracted))
+
         blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
         root = get_root(extracted, blog.subdomain)
     else:

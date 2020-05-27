@@ -16,6 +16,20 @@ def get_base_root(extracted):
     else:
         return "http://{}:{}".format(extracted.domain, '8000')
 
+def is_protected(subdomain):
+    protected_subdomains = [
+        'login',
+        'www',
+        'api',
+        'signup',
+        'signin',
+        'register',
+        'post',
+        'http',
+        'https',
+    ]
+
+    return subdomain in protected_subdomains
 
 def create_dns_record(name):
     url = "https://api.cloudflare.com/client/v4/zones/2076fad18ca9cebee92de5a65942f9fe/dns_records"
