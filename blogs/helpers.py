@@ -27,6 +27,7 @@ def is_protected(subdomain):
         'post',
         'http',
         'https',
+        'account',
     ]
 
     return subdomain in protected_subdomains
