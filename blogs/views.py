@@ -122,23 +122,12 @@ def dashboard(request):
         if extracted.subdomain and extracted.subdomain != blog.subdomain:
             return redirect("{}/dashboard".format(get_root(extracted, blog.subdomain)))
 
-        message = ''
         old_subdomain = blog.subdomain
         old_domain = blog.domain
         if request.method == "POST":
             form = BlogForm(request.POST, instance=blog)
             if form.is_valid():
                 blog_info = form.save(commit=False)
-                
-                if blog_info.domain != old_domain:
-                    delete_domain(old_domain)
-                    if blog_info.domain:
-                        add_new_domain(blog_info.domain)
-                        message = f'Set the CNAME record for {blog_info.domain} to point at shaped-krill-fusn49u0rpoovwvgh0i6za5w.herokudns.com'
-                if blog_info.subdomain != old_subdomain:
-                    blog_info.subdomain_id = update_dns_record(blog.subdomain_id, blog_info.subdomain)
-                    message = 'It may take ~5 minutes to activate your new subdomain'
-                
                 blog_info.save()
         else:
             form = BlogForm(instance=blog)
@@ -147,7 +136,6 @@ def dashboard(request):
             'form': form,
             'blog': blog,
             'root': get_root(extracted, blog.subdomain),
-            'message': message
         })
 
     except Blog.DoesNotExist:
@@ -157,16 +145,12 @@ def dashboard(request):
                 blog = form.save(commit=False)
                 blog.user = request.user
                 blog.created_date = timezone.now()
-                blog.subdomain_id = create_dns_record(blog.subdomain)
-                if blog.domain:
-                    add_new_domain(blog.domain)
                 blog.save()
                 
                 return render(request, 'dashboard/dashboard.html', {
                     'form': form,
                     'blog': blog,
                     'root': get_root(extracted, blog.subdomain),
-                    'message': 'It may take ~5 minutes to activate your new subdomain'
                 })
             return render(request, 'dashboard/dashboard.html', {'form': form})
             
@@ -192,7 +176,6 @@ def post_new(request):
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
         return redirect("{}/dashboard/posts/new".format(get_root(extracted, blog.subdomain)))
 
-    message = ''
     if request.method == "POST":
         form = PostForm(request.user, request.POST)
         if form.is_valid():
@@ -203,7 +186,7 @@ def post_new(request):
             return redirect(f"/dashboard/posts/{post.id}/")
     else:
         form = PostForm(request.user)
-    return render(request, 'dashboard/post_edit.html', {'form': form, 'blog': blog, 'message': message})
+    return render(request, 'dashboard/post_edit.html', {'form': form, 'blog': blog})
 
 @login_required
 def post_edit(request, pk):

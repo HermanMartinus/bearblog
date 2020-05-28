@@ -28,81 +28,10 @@ def is_protected(subdomain):
         'http',
         'https',
         'account',
+        'router',
     ]
 
     return subdomain in protected_subdomains
-
-def create_dns_record(name):
-    url = "https://api.cloudflare.com/client/v4/zones/2076fad18ca9cebee92de5a65942f9fe/dns_records"
-
-    payload = {
-        "type": "CNAME",
-        "name": name,
-        "content": "shaped-krill-fusn49u0rpoovwvgh0i6za5w.herokudns.com",
-        "ttl": "120",
-        "proxied": "true"
-    }
-    headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Bearer {settings.CLOUDFLARE_BEARER_TOKEN}',
-    'Content-Type': 'text/plain',
-    'Cookie': '__cfduid=dc242bd25444397766d1abf29dd6672ed1590168756'
-    }
-
-    response = requests.request("POST", url, headers=headers, data = json.dumps(payload))
-
-    json_response = json.loads(response.text)
-    id = ''
-    if json_response['result']:
-        id = json_response['result']['id']
-
-    print(response.text.encode('utf8'))
-    return id
-
-def update_dns_record(id, name):
-    url = f"https://api.cloudflare.com/client/v4/zones/2076fad18ca9cebee92de5a65942f9fe/dns_records/{id}"
-
-    payload = {
-        "type": "CNAME",
-        "name": name,
-        "content": "shaped-krill-fusn49u0rpoovwvgh0i6za5w.herokudns.com",
-        "ttl": "120",
-        "proxied": "true"
-    }
-
-    headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Bearer {settings.CLOUDFLARE_BEARER_TOKEN}',
-    'Content-Type': 'text/plain',
-    'Cookie': '__cfduid=dc242bd25444397766d1abf29dd6672ed1590168756'
-    }
-
-    response = requests.request("PUT", url, headers=headers, data = json.dumps(payload))
-
-    print(response.text.encode('utf8'))
-
-    json_response = json.loads(response.text)
-    id = ''
-    if json_response['result']:
-        id = json_response['result']['id']
-
-    return id
-
-def delete_dns_record(id):
-    url = f"https://api.cloudflare.com/client/v4/zones/2076fad18ca9cebee92de5a65942f9fe/dns_records/{id}"
-
-    headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Bearer {settings.CLOUDFLARE_BEARER_TOKEN}',
-    'Content-Type': 'text/plain',
-    'Cookie': '__cfduid=dc242bd25444397766d1abf29dd6672ed1590168756'
-    }
-
-    response = requests.request("DELETE", url, headers=headers)
-
-    print(response.text.encode('utf8'))
- 
-
 
 def add_new_domain(domain):
     url = "https://api.heroku.com/apps/bear-blog/domains"

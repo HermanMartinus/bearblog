@@ -25,8 +25,8 @@ class Blog(models.Model):
 
 @receiver(pre_delete, sender=Blog, dispatch_uid='blog_delete_signal')
 def delete_blog_receiver(sender, instance, using, **kwargs):
-    print("Delete Domain and subdomain DNS records")
-    delete_dns_record(instance.subdomain_id)
+    print("Delete domain from Heroku")
+
     if instance.domain:
         delete_domain(instance.domain)
 

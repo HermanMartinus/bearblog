@@ -12,11 +12,11 @@ Once you have a domain registered, add the following DNS record:
 
 |Type|Name|Content|TTL|
 |---|---|---|---|
-|CNAME|{your domain or subdomain}|shaped-krill-fusn49u0rpoovwvgh0i6za5w.herokudns.com|3600|
+|CNAME|{your domain or subdomain}|router.bearblog.dev|3600|
 
 Back in the bearblog dashboard, add the domain to the Custom Domain field. 
 
-**Note: We don't currently provide SSL cetificates, so .dev and .app domains will only work if set up through a CDN like [Cloudflare](https://cloudflare.com) with proxy enabled.**
+**Note: We don't currently provide SSL cetificates, so .dev and .app domains will only work if set up through a CDN like [Cloudflare](https://cloudflare.com) with proxy enabled and set to Flexible.**
 
 ## Contributing and contact
 

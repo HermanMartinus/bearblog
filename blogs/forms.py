@@ -37,7 +37,7 @@ class DomainForm(forms.ModelForm):
         if self.instance:
             matching_blogs = matching_blogs.exclude(pk=self.instance.pk)
         if matching_blogs.exists():
-            raise ValidationError(f"Blog domain '{domain}'  already exists.")
+            raise ValidationError(f"Domain '{domain}'  already exists.")
         else:
             return domain
         
