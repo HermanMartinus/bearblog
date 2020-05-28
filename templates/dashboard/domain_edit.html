@@ -26,7 +26,7 @@
     <td>3600</td>
 </tr>
 </table>
-<p>Then add your domain below</p>
+<p>Then add your domain below.</p>
 <form method="POST" class="post-form">{% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="save btn btn-default">Save</button>
@@ -34,5 +34,9 @@
 <p>
     <i>{{ message }}</i>
 </p>
-
+<p>
+    <small>
+        Bear does not provide SSL certificates for custom domains. Use a CDN like Cloudflare and set the SSL connection type to Flexible to achieve this.
+    </small>
+</p>
 {% endblock %}
