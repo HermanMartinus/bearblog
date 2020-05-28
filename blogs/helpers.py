@@ -23,12 +23,14 @@ def is_protected(subdomain):
         'api',
         'signup',
         'signin',
+        'profile',
         'register',
         'post',
         'http',
         'https',
         'account',
         'router',
+        'settings',
     ]
 
     return subdomain in protected_subdomains

@@ -18,7 +18,7 @@ ALLOWED_HOSTS = ['*']
 
 INTERNAL_IPS = ['127.0.0.1']
 
-ADMINS = (('Webmaster', 'hfbmartinus@gmail.com'),)
+ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 # Application definition
 SITE_ID = 1
@@ -144,4 +144,4 @@ LOGIN_REDIRECT_URL = '/dashboard'
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY', False)
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-DEFAULT_FROM_EMAIL = "reset@somewordsfor.me"
+DEFAULT_FROM_EMAIL = "bear@somewordsfor.me"
