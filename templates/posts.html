@@ -21,23 +21,25 @@
 {% endblock %}
 
 {% block content %}
-<ul>
-    {% for post in posts %}
-    <li>
-        #{{ forloop.revcounter }}
-        <i>
-            <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
-                - {{ post.published_date|date:'d M, Y' }} -
-            </time>
-        </i>
-        <a href="/{{ post.slug }}">{{ post.title }}</a>
-    </li>
-    {% empty %}
-    <li>
-        No posts yet
-    </li>
-    {% endfor %}
-</ul>
+<content>
+    <ul>
+        {% for post in posts %}
+        <li>
+            #{{ forloop.revcounter }}
+            <i>
+                <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
+                    - {{ post.published_date|date:'d M, Y' }} -
+                </time>
+            </i>
+            <a href="/{{ post.slug }}">{{ post.title }}</a>
+        </li>
+        {% empty %}
+        <li>
+            No posts yet
+        </li>
+        {% endfor %}
+    </ul>
+</content>
 
 {% endblock %}
 
