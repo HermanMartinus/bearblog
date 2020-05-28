@@ -122,8 +122,6 @@ def dashboard(request):
         if extracted.subdomain and extracted.subdomain != blog.subdomain:
             return redirect("{}/dashboard".format(get_root(extracted, blog.subdomain)))
 
-        old_subdomain = blog.subdomain
-        old_domain = blog.domain
         if request.method == "POST":
             form = BlogForm(request.POST, instance=blog)
             if form.is_valid():
@@ -224,18 +222,10 @@ def domain_edit(request):
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
         return redirect("{}/dashboard".format(get_root(extracted, blog.subdomain)))
 
-    old_domain = blog.domain
-
     if request.method == "POST":
         form = DomainForm(request.POST, instance=blog)
         if form.is_valid():
             blog_info = form.save(commit=False)
-            
-            if blog_info.domain != old_domain:
-                delete_domain(old_domain)
-                if blog_info.domain:
-                    add_new_domain(blog_info.domain)
-            
             blog_info.save()
     else:
         form = DomainForm(instance=blog)

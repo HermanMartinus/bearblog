@@ -17,9 +17,17 @@ class Blog(models.Model):
         return self.title
     
     def save(self, *args, **kwargs):
+        if self.pk:
+            if self.domain:
+                self.domain = self.domain.lower()
+            old_domain = Blog.objects.get(pk=self.pk).domain
+            if old_domain != self.domain:
+                delete_domain(old_domain)
+                if self.domain:
+                    add_new_domain(self.domain)
+
         self.subdomain = self.subdomain.lower()
-        if self.domain:
-            self.domain = self.domain.lower()
+        
         return super(Blog, self).save(*args, **kwargs)
 
 
