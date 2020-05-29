@@ -43,7 +43,7 @@ class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=100)
-    published_date = models.DateTimeField(auto_now_add=True, blank=True)
+    published_date = models.DateTimeField(blank=True)
     publish = models.BooleanField(default=True)
     is_page = models.BooleanField(default=False)
     content = models.TextField()

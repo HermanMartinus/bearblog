@@ -78,7 +78,7 @@ class PostForm(forms.ModelForm):
 
     slug = forms.SlugField(
         label="Permalink",
-        help_text="(eg: 'why-i-like-bears')",
+        help_text="eg: 'why-i-like-bears'",
         validators=[link_validator]
     )
     content = forms.CharField(
@@ -88,8 +88,8 @@ class PostForm(forms.ModelForm):
     )
 
     tags = forms.CharField(
-        label="Tags/Categories",
-        help_text="A comma-separated list of tags.",
+        label="Categories (optional)",
+        help_text="A comma-separated list of tags",
         required=False,
         validators=[tags_validator]
     )
