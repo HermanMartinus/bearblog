@@ -23,9 +23,11 @@
 </form>
 {% if post %}
 <p>
-    {% if post %}
+    {% if post.publish == True %}
     <a href="{{ root }}/{{ post.slug }}" target="_blank">View post</a> |
-    {% endif %} 
+    {% elif post %}
+    <a href="{{ root }}/{{ post.slug }}?preview=true" target="_blank">Preview post</a> |
+    {% endif %}
     <a href="/dashboard/posts/{{ post.pk }}/delete">Delete post</a>
 </p>
 {% endif %}

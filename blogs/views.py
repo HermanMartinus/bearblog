@@ -98,8 +98,13 @@ def post(request, slug):
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
 
-    all_posts = Post.objects.filter(
-        blog=blog, publish=True).order_by('-published_date')
+    if request.GET.get('preview'):
+        all_posts = Post.objects.filter(
+            blog=blog).order_by('-published_date')
+    else: 
+        all_posts = Post.objects.filter(
+            blog=blog, publish=True).order_by('-published_date')
+        
     nav = all_posts.filter(is_page=True)
     post = get_object_or_404(all_posts, slug=slug)
     content = markdown(post.content)
