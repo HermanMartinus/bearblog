@@ -12,6 +12,7 @@ from .forms import *
 from .models import Blog, Post
 from .helpers import *
 
+
 def home(request):
     http_host = request.META['HTTP_HOST']
 
@@ -28,7 +29,8 @@ def home(request):
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
 
-    all_posts = Post.objects.filter(blog=blog, publish=True).order_by('-published_date')
+    all_posts = Post.objects.filter(
+        blog=blog, publish=True).order_by('-published_date')
     nav = all_posts.filter(is_page=True)
     posts = all_posts.filter(is_page=False)
     content = markdown(blog.content)
@@ -62,7 +64,8 @@ def posts(request):
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
 
-    all_posts = Post.objects.filter(blog=blog, publish=True).order_by('-published_date')
+    all_posts = Post.objects.filter(
+        blog=blog, publish=True).order_by('-published_date')
     nav = all_posts.filter(is_page=True)
     posts = all_posts.filter(is_page=False)
 
@@ -77,6 +80,7 @@ def posts(request):
             'meta_description':  unmark(blog.content)[:160]
         }
     )
+
 
 def post(request, slug):
     http_host = request.META['HTTP_HOST']
@@ -94,7 +98,8 @@ def post(request, slug):
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
 
-    all_posts = Post.objects.filter(blog=blog, publish=True).order_by('-published_date')
+    all_posts = Post.objects.filter(
+        blog=blog, publish=True).order_by('-published_date')
     nav = all_posts.filter(is_page=True)
     post = get_object_or_404(all_posts, slug=slug)
     content = markdown(post.content)
@@ -116,7 +121,7 @@ def post(request, slug):
 @login_required
 def dashboard(request):
     extracted = tldextract.extract(request.META['HTTP_HOST'])
-    
+
     try:
         blog = Blog.objects.get(user=request.user)
         if extracted.subdomain and extracted.subdomain != blog.subdomain:
@@ -144,17 +149,18 @@ def dashboard(request):
                 blog.user = request.user
                 blog.created_date = timezone.now()
                 blog.save()
-                
+
                 return render(request, 'dashboard/dashboard.html', {
                     'form': form,
                     'blog': blog,
                     'root': get_root(extracted, blog.subdomain),
                 })
             return render(request, 'dashboard/dashboard.html', {'form': form})
-            
+
         else:
             form = BlogForm()
             return render(request, 'dashboard/dashboard.html', {'form': form})
+
 
 @login_required
 def posts_edit(request):
@@ -166,6 +172,7 @@ def posts_edit(request):
     posts = Post.objects.filter(blog=blog).order_by('-published_date')
 
     return render(request, 'dashboard/posts.html', {'posts': posts, 'blog': blog})
+
 
 @login_required
 def post_new(request):
@@ -186,6 +193,7 @@ def post_new(request):
         form = PostForm(request.user)
     return render(request, 'dashboard/post_edit.html', {'form': form, 'blog': blog})
 
+
 @login_required
 def post_edit(request, pk):
     extracted = tldextract.extract(request.META['HTTP_HOST'])
@@ -194,7 +202,6 @@ def post_edit(request, pk):
         return redirect("{}/dashboard/posts".format(get_root(extracted, blog.subdomain)))
 
     post = get_object_or_404(Post, blog=blog, pk=pk)
-    message = ''
     if request.method == "POST":
         form = PostForm(request.user, request.POST, instance=post)
         if form.is_valid():
@@ -202,17 +209,16 @@ def post_edit(request, pk):
             post.blog = blog
             post.published_date = timezone.now()
             post.save()
-            message = 'Saved'
     else:
         form = PostForm(request.user, instance=post)
-    
+
     return render(request, 'dashboard/post_edit.html', {
         'form': form,
         'blog': blog,
         'post': post,
         'root': get_root(extracted, blog.subdomain),
-        'message': message
     })
+
 
 @login_required
 def domain_edit(request):
@@ -236,6 +242,7 @@ def domain_edit(request):
         'root': get_root(extracted, blog.subdomain),
     })
 
+
 @login_required
 def delete_user(request):
     if request.method == "POST":
@@ -245,10 +252,11 @@ def delete_user(request):
 
     return render(request, 'account/account_confirm_delete.html')
 
+
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
 
 
 def not_found(request, *args, **kwargs):
-    return render(request,'404.html', status=404)
+    return render(request, '404.html', status=404)

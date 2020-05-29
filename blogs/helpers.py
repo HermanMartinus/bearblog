@@ -4,17 +4,20 @@ from django.conf import settings
 from markdown import Markdown
 from io import StringIO
 
+
 def get_root(extracted, subdomain):
     if extracted.suffix:
         return "https://{}.{}.{}".format(subdomain, extracted.domain, extracted.suffix)
     else:
         return "http://{}.{}:{}".format(subdomain, extracted.domain, '8000')
 
+
 def get_base_root(extracted):
     if extracted.suffix:
         return "https://{}.{}".format(extracted.domain, extracted.suffix)
     else:
         return "http://{}:{}".format(extracted.domain, '8000')
+
 
 def is_protected(subdomain):
     protected_subdomains = [
@@ -35,6 +38,7 @@ def is_protected(subdomain):
 
     return subdomain in protected_subdomains
 
+
 def add_new_domain(domain):
     url = "https://api.heroku.com/apps/bear-blog/domains"
 
@@ -46,13 +50,15 @@ def add_new_domain(domain):
         'content-type': "application/json",
         'accept': "application/vnd.heroku+json; version=3",
         'authorization': f'Bearer {settings.HEROKU_BEARER_TOKEN}',
-        }
+    }
 
-    response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
+    response = requests.request(
+        "POST", url, data=json.dumps(payload), headers=headers)
 
     print(response.text)
 
     return id
+
 
 def delete_domain(domain):
     url = f"https://api.heroku.com/apps/bear-blog/domains/{domain}"
@@ -65,11 +71,13 @@ def delete_domain(domain):
         'content-type': "application/json",
         'accept': "application/vnd.heroku+json; version=3",
         'authorization': f'Bearer {settings.HEROKU_BEARER_TOKEN}',
-        }
+    }
 
-    response = requests.request("DELETE", url, data=json.dumps(payload), headers=headers)
+    response = requests.request(
+        "DELETE", url, data=json.dumps(payload), headers=headers)
 
     print(response.text)
+
 
 def unmark_element(element, stream=None):
     if stream is None:
@@ -81,6 +89,7 @@ def unmark_element(element, stream=None):
     if element.tail:
         stream.write(element.tail)
     return stream.getvalue()
+
 
 # patching Markdown
 Markdown.output_formats["plain"] = unmark_element

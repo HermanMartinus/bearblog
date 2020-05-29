@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+
 from .helpers import *
 
 class Blog(models.Model):
@@ -9,13 +10,12 @@ class Blog(models.Model):
     title = models.CharField(max_length=200)
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
     subdomain = models.SlugField(max_length=100, unique=True)
-    subdomain_id = models.CharField(max_length=128, unique=True, blank=True, null=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
     content = models.TextField(blank=True)
 
     def __str__(self):
         return self.title
-    
+
     def save(self, *args, **kwargs):
         if self.pk:
             if self.domain:
@@ -27,7 +27,7 @@ class Blog(models.Model):
                     add_new_domain(self.domain)
 
         self.subdomain = self.subdomain.lower()
-        
+
         return super(Blog, self).save(*args, **kwargs)
 
 
@@ -38,18 +38,20 @@ def delete_blog_receiver(sender, instance, using, **kwargs):
     if instance.domain:
         delete_domain(instance.domain)
 
+
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=100)
     published_date = models.DateTimeField(auto_now_add=True, blank=True)
-    publish =  models.BooleanField(default=True)
+    publish = models.BooleanField(default=True)
     is_page = models.BooleanField(default=False)
     content = models.TextField()
+    tags = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.title
-    
+
     def save(self, *args, **kwargs):
         self.slug = self.slug.lower()
         return super(Post, self).save(*args, **kwargs)
