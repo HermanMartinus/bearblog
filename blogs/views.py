@@ -33,7 +33,7 @@ def home(request):
         blog=blog, publish=True).order_by('-published_date')
     nav = all_posts.filter(is_page=True)
     posts = all_posts.filter(is_page=False)
-    content = markdown(blog.content)
+    content = markdown(blog.content, extensions=['fenced_code'])
 
     return render(
         request,
@@ -107,7 +107,7 @@ def post(request, slug):
         
     nav = all_posts.filter(is_page=True)
     post = get_object_or_404(all_posts, slug=slug)
-    content = markdown(post.content)
+    content = markdown(post.content, extensions=['fenced_code'])
 
     return render(
         request,
