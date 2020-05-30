@@ -4,6 +4,7 @@ import tldextract
 
 from .models import Blog, Post
 from .helpers import unmark, get_base_root, get_root, is_protected
+from blogs.helpers import get_nav, get_posts
 
 
 def home(request):
@@ -24,8 +25,7 @@ def home(request):
 
     all_posts = Post.objects.filter(
         blog=blog, publish=True).order_by('-published_date')
-    nav = all_posts.filter(is_page=True)
-    posts = all_posts.filter(is_page=False)
+
     content = markdown(blog.content, extensions=['fenced_code'])
 
     return render(
@@ -34,8 +34,8 @@ def home(request):
         {
             'blog': blog,
             'content': content,
-            'posts': posts,
-            'nav': nav,
+            'posts': get_posts(all_posts),
+            'nav': get_nav(all_posts),
             'root': root,
             'meta_description': unmark(blog.content)[:160]
         })
@@ -59,16 +59,14 @@ def posts(request):
 
     all_posts = Post.objects.filter(
         blog=blog, publish=True).order_by('-published_date')
-    nav = all_posts.filter(is_page=True)
-    posts = all_posts.filter(is_page=False)
 
     return render(
         request,
         'posts.html',
         {
             'blog': blog,
-            'posts': posts,
-            'nav': nav,
+            'posts': get_posts(all_posts),
+            'nav': get_nav(all_posts),
             'root': root,
             'meta_description':  unmark(blog.content)[:160]
         }
@@ -98,8 +96,8 @@ def post(request, slug):
         all_posts = Post.objects.filter(
             blog=blog, publish=True).order_by('-published_date')
 
-    nav = all_posts.filter(is_page=True)
     post = get_object_or_404(all_posts, slug=slug)
+
     content = markdown(post.content, extensions=['fenced_code'])
 
     return render(
@@ -109,7 +107,7 @@ def post(request, slug):
             'blog': blog,
             'content': content,
             'post': post,
-            'nav': nav,
+            'nav': get_nav(all_posts),
             'root': root,
             'meta_description': unmark(post.content)[:160]
         }

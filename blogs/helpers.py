@@ -19,6 +19,22 @@ def get_base_root(extracted):
         return f"http://{extracted.domain}:8000"
 
 
+def get_nav(all_posts):
+    nav = []
+    for post in all_posts:
+        if post.is_page:
+            nav.append(post)
+    return nav
+
+
+def get_posts(all_posts):
+    posts = []
+    for post in all_posts:
+        if not post.is_page:
+            posts.append(post)
+    return posts
+
+
 def is_protected(subdomain):
     protected_subdomains = [
         'login',
