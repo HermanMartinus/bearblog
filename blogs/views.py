@@ -131,16 +131,18 @@ def feed(request):
     all_posts = blog.post_set.filter(publish=True, is_page=False).order_by('-published_date')
 
     fg = FeedGenerator()
-    fg.id(root)
+    fg.id(f'{root}/')
+    fg.author({'name': blog.subdomain, 'email': 'hidden'})
     fg.title(blog.title)
     fg.subtitle(unmark(blog.content)[:160])
-    fg.link(href=f"{root}/feed", rel='self')
+    fg.link(href=f"{root}/feed/", rel='self')
     fg.link(href=root, rel='alternate')
 
     for post in all_posts:
         fe = fg.add_entry()
         fe.id(f"{root}/{post.slug}")
         fe.title(post.title)
+        fe.author({'name': blog.subdomain, 'email': 'hidden'})
         fe.link(href=f"{root}/feed")
         fe.content(unmark(post.content))
 
