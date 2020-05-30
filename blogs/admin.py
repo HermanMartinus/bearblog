@@ -19,7 +19,7 @@ class BlogAdmin(admin.ModelAdmin):
             "<a href='http://{url}' target='_blank'>{url}</a>",
             url=obj.domain)
 
-    domain_url.short_description = "Domain"
+    domain_url.short_description = "Domain url"
 
     def subdomain_url(self, obj):
         return format_html(
@@ -31,13 +31,14 @@ class BlogAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'subdomain_url',
+        'domain',
         'domain_url',
         'user',
         'post_count',
         'created_date')
 
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
-    ordering = ('-created_date',)
+    ordering = ('-created_date', 'domain')
 
 
 @admin.register(Post)
