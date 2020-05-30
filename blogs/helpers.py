@@ -20,19 +20,15 @@ def get_base_root(extracted):
 
 
 def get_nav(all_posts):
-    nav = []
-    for post in all_posts:
-        if post.is_page:
-            nav.append(post)
-    return nav
+    return list(filter(lambda post: post.is_page, all_posts))
 
 
 def get_posts(all_posts):
-    posts = []
-    for post in all_posts:
-        if not post.is_page:
-            posts.append(post)
-    return posts
+    return list(filter(lambda post: not post.is_page, all_posts))
+
+
+def get_post(all_posts, slug):
+    return list(filter(lambda post: post.slug == slug, all_posts))[0]
 
 
 def is_protected(subdomain):

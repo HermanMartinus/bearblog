@@ -104,3 +104,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 .jsbeautifyrc
+taskfile.md

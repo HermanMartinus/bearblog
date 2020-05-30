@@ -4,7 +4,7 @@ import tldextract
 
 from .models import Blog, Post
 from .helpers import unmark, get_base_root, get_root, is_protected
-from blogs.helpers import get_nav, get_posts
+from blogs.helpers import get_nav, get_post, get_posts
 
 
 def home(request):
@@ -23,8 +23,7 @@ def home(request):
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
 
-    all_posts = Post.objects.filter(
-        blog=blog, publish=True).order_by('-published_date')
+    all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
     content = markdown(blog.content, extensions=['fenced_code'])
 
@@ -57,8 +56,7 @@ def posts(request):
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
 
-    all_posts = Post.objects.filter(
-        blog=blog, publish=True).order_by('-published_date')
+    all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
     return render(
         request,
@@ -90,13 +88,11 @@ def post(request, slug):
         root = http_host
 
     if request.GET.get('preview'):
-        all_posts = Post.objects.filter(
-            blog=blog).order_by('-published_date')
+        all_posts = blog.post_set.all().order_by('-published_date')
     else:
-        all_posts = Post.objects.filter(
-            blog=blog, publish=True).order_by('-published_date')
+        all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
-    post = get_object_or_404(all_posts, slug=slug)
+    post = get_post(all_posts, slug)
 
     content = markdown(post.content, extensions=['fenced_code'])
 
