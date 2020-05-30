@@ -16,5 +16,6 @@ urlpatterns = [
     path('ip_test/', dashboard_views.ip_test, name='ip_test'),
 
     path('blog/', views.posts, name='posts'),
+    path("feed/", views.feed, name="post_feed"),
     path('<slug>/', views.post, name='post'),
 ]

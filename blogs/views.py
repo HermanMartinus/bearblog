@@ -1,10 +1,12 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from markdown import markdown
 import tldextract
+from feedgen.feed import FeedGenerator
 
 from .models import Blog, Post
 from .helpers import unmark, get_base_root, get_root, is_protected
 from blogs.helpers import get_nav, get_post, get_posts
+from django.http import HttpResponse
 
 
 def home(request):
@@ -108,6 +110,42 @@ def post(request, slug):
             'meta_description': unmark(post.content)[:160]
         }
     )
+
+
+def feed(request):
+    http_host = request.META['HTTP_HOST']
+
+    if http_host == 'bearblog.dev' or http_host == 'localhost:8000':
+        return redirect('/')
+    elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
+        extracted = tldextract.extract(http_host)
+        if is_protected(extracted.subdomain):
+            return redirect(get_base_root(extracted))
+
+        blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
+        root = get_root(extracted, blog.subdomain)
+    else:
+        blog = get_object_or_404(Blog, domain=http_host)
+        root = http_host
+
+    all_posts = blog.post_set.filter(publish=True, is_page=False).order_by('-published_date')
+
+    fg = FeedGenerator()
+    fg.id(root)
+    fg.title(blog.title)
+    fg.subtitle(unmark(blog.content)[:160])
+    fg.link(href=f"{root}/feed", rel='self')
+    fg.link(href=root, rel='alternate')
+
+    for post in all_posts:
+        fe = fg.add_entry()
+        fe.id(f"{root}/{post.slug}")
+        fe.title(post.title)
+        fe.link(href=f"{root}/feed")
+        fe.content(unmark(post.content))
+
+    atomfeed = fg.atom_str(pretty=True)
+    return HttpResponse(atomfeed, content_type='application/atom+xml')
 
 
 def not_found(request, *args, **kwargs):
