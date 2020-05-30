@@ -3,7 +3,7 @@ import json
 from django.conf import settings
 from markdown import Markdown
 from io import StringIO
-
+from ipaddr import client_ip
 
 def get_root(extracted, subdomain):
     if extracted.suffix:
@@ -80,12 +80,7 @@ def delete_domain(domain):
 
 
 def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[-1]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
+    return client_ip(request)
 
 def unmark_element(element, stream=None):
     if stream is None:
