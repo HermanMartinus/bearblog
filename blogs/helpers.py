@@ -1,4 +1,5 @@
 import requests
+from django.http import Http404
 import json
 from django.conf import settings
 from markdown import Markdown
@@ -28,7 +29,10 @@ def get_posts(all_posts):
 
 
 def get_post(all_posts, slug):
-    return list(filter(lambda post: post.slug == slug, all_posts))[0]
+    try:
+        return list(filter(lambda post: post.slug == slug, all_posts))[0]
+    except IndexError:
+        raise Http404("No Post matches the given query.")
 
 
 def is_protected(subdomain):
