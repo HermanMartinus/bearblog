@@ -3,20 +3,20 @@ import json
 from django.conf import settings
 from markdown import Markdown
 from io import StringIO
-from ipaddr import client_ip
+
 
 def get_root(extracted, subdomain):
     if extracted.suffix:
-        return "https://{}.{}.{}".format(subdomain, extracted.domain, extracted.suffix)
+        return f"https://{subdomain}.{extracted.domain}.{extracted.suffix}"
     else:
-        return "http://{}.{}:{}".format(subdomain, extracted.domain, '8000')
+        return f"http://{subdomain}.{extracted.domain}:8000"
 
 
 def get_base_root(extracted):
     if extracted.suffix:
-        return "https://{}.{}".format(extracted.domain, extracted.suffix)
+        return f"https://{extracted.domain}.{extracted.suffix}"
     else:
-        return "http://{}:{}".format(extracted.domain, '8000')
+        return f"http://{extracted.domain}:8000"
 
 
 def is_protected(subdomain):
@@ -78,9 +78,6 @@ def delete_domain(domain):
 
     print(response.text)
 
-
-def get_client_ip(request):
-    return client_ip(request)
 
 def unmark_element(element, stream=None):
     if stream is None:

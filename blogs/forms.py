@@ -5,15 +5,20 @@ from .helpers import is_protected
 from .models import Blog, Post
 
 subdomain_validator = RegexValidator(
-    r"^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{,63}(?<!-)$", "Please enter a valid subdomain")
+    r"^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{,63}(?<!-)$",
+    "Please enter a valid subdomain")
 link_validator = RegexValidator(
-    r"[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?", "Please enter a valid link slug")
+    r"[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?",
+    "Please enter a valid link slug")
 domain_validator = RegexValidator(
-    r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$", "Please enter a valid domain")
+    r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$",
+    "Please enter a valid domain")
 script_validator = RegexValidator(
-    r"<[^>]*script", "No script tags allowed", inverse_match=True)
+    r"<[^>]*script",
+    "No script tags allowed", inverse_match=True)
 tags_validator = RegexValidator(
-    r"([^,]+)", "These tags are not valid (eg: tag1, tag2, tag3)")
+    r"([^,]+)",
+    "These tags are not valid (eg: tag1, tag2, tag3)")
 
 
 def protected_domains_validator(value):

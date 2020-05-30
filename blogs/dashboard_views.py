@@ -1,17 +1,15 @@
-from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.edit import DeleteView
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from markdown import markdown
 import tldextract
+from ipaddr import client_ip
 
-from .forms import *
+from .forms import BlogForm, PostForm, DomainForm
 from .models import Blog, Post
-from .helpers import *
+from .helpers import get_root
 
 
 @login_required
@@ -21,7 +19,7 @@ def dashboard(request):
     try:
         blog = Blog.objects.get(user=request.user)
         if extracted.subdomain and extracted.subdomain != blog.subdomain:
-            return redirect("{}/dashboard".format(get_root(extracted, blog.subdomain)))
+            return redirect(f"{get_root(extracted, blog.subdomain)}/dashboard")
 
         if request.method == "POST":
             form = BlogForm(request.POST, instance=blog)
@@ -63,11 +61,15 @@ def posts_edit(request):
     extracted = tldextract.extract(request.META['HTTP_HOST'])
     blog = get_object_or_404(Blog, user=request.user)
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return redirect("{}/dashboard/posts".format(get_root(extracted, blog.subdomain)))
+        return redirect(
+            f"{get_root(extracted, blog.subdomain)}/dashboard/posts")
 
     posts = Post.objects.filter(blog=blog).order_by('-published_date')
 
-    return render(request, 'dashboard/posts.html', {'posts': posts, 'blog': blog})
+    return render(request, 'dashboard/posts.html', {
+        'posts': posts,
+        'blog': blog
+    })
 
 
 @login_required
@@ -75,7 +77,8 @@ def post_new(request):
     extracted = tldextract.extract(request.META['HTTP_HOST'])
     blog = get_object_or_404(Blog, user=request.user)
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return redirect("{}/dashboard/posts/new".format(get_root(extracted, blog.subdomain)))
+        return redirect(
+            f"{get_root(extracted, blog.subdomain)}/dashboard/posts/new")
 
     if request.method == "POST":
         form = PostForm(request.user, request.POST)
@@ -87,7 +90,10 @@ def post_new(request):
             return redirect(f"/dashboard/posts/{post.id}/")
     else:
         form = PostForm(request.user)
-    return render(request, 'dashboard/post_edit.html', {'form': form, 'blog': blog})
+    return render(request, 'dashboard/post_edit.html', {
+        'form': form,
+        'blog': blog
+    })
 
 
 @login_required
@@ -95,7 +101,8 @@ def post_edit(request, pk):
     extracted = tldextract.extract(request.META['HTTP_HOST'])
     blog = get_object_or_404(Blog, user=request.user)
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return redirect("{}/dashboard/posts".format(get_root(extracted, blog.subdomain)))
+        return redirect(
+            f"{get_root(extracted, blog.subdomain)}/dashboard/posts")
 
     post = get_object_or_404(Post, blog=blog, pk=pk)
     if request.method == "POST":
@@ -122,7 +129,7 @@ def domain_edit(request):
     blog = Blog.objects.get(user=request.user)
 
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return redirect("{}/dashboard".format(get_root(extracted, blog.subdomain)))
+        return redirect(f"{get_root(extracted, blog.subdomain)}/dashboard")
 
     if request.method == "POST":
         form = DomainForm(request.POST, instance=blog)
@@ -153,5 +160,6 @@ class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
 
+
 def ip_test(request):
-    return HttpResponse(get_client_ip(request))
+    return HttpResponse(client_ip(request))

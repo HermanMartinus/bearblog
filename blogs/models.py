@@ -3,7 +3,8 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 
-from .helpers import *
+from .helpers import delete_domain, add_new_domain
+
 
 class Blog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)

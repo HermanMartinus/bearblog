@@ -1,16 +1,9 @@
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic.edit import DeleteView
-from django.utils import timezone
-from django.contrib.auth import get_user_model
 from markdown import markdown
 import tldextract
 
-from .forms import *
 from .models import Blog, Post
-from .helpers import *
+from .helpers import unmark, get_base_root, get_root, is_protected
 
 
 def home(request):
@@ -101,10 +94,10 @@ def post(request, slug):
     if request.GET.get('preview'):
         all_posts = Post.objects.filter(
             blog=blog).order_by('-published_date')
-    else: 
+    else:
         all_posts = Post.objects.filter(
             blog=blog, publish=True).order_by('-published_date')
-        
+
     nav = all_posts.filter(is_page=True)
     post = get_object_or_404(all_posts, slug=slug)
     content = markdown(post.content, extensions=['fenced_code'])
@@ -121,6 +114,7 @@ def post(request, slug):
             'meta_description': unmark(post.content)[:160]
         }
     )
+
 
 def not_found(request, *args, **kwargs):
     return render(request, '404.html', status=404)
