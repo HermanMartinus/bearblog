@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db.models import Count
-from .models import Blog, Post
+from .models import Blog, Post, Upvote
 from django.utils.html import format_html
 
 
@@ -43,6 +43,17 @@ class BlogAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'blog', 'published_date')
+    def get_queryset(self, request):
+        return Post.objects.annotate(upvote_count=Count('upvote'))
+
+    def upvote_count(self, obj):
+        return obj.upvote_count
+
+    upvote_count.short_description = ('Upvotes')
+
+    list_display = ('title', 'blog', 'upvote_count', 'published_date')
     search_fields = ('title', 'blog__title')
     ordering = ('-published_date',)
+
+
+admin.site.register(Upvote)

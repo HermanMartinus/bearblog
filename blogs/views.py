@@ -1,12 +1,14 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from markdown import markdown
 import tldextract
+from django.http import Http404
 from feedgen.feed import FeedGenerator
 
 from .models import Blog, Post
 from .helpers import unmark, get_base_root, get_root, is_protected
 from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
+from django.db.models import Count
 
 
 def home(request):
@@ -152,3 +154,24 @@ def feed(request):
 
 def not_found(request, *args, **kwargs):
     return render(request, '404.html', status=404)
+
+
+def board(request):
+    http_host = request.META['HTTP_HOST']
+
+    if not (http_host == 'bearblog.dev' or http_host == 'localhost:8000'):
+        raise Http404("No Post matches the given query.")
+
+    posts_per_page = 2
+    page = 0
+    if request.GET.get('page'):
+        page = int(request.GET.get('page'))
+    posts_from = page * posts_per_page
+    posts_to = (page * posts_per_page) + posts_per_page
+    posts = Post.objects.annotate(upvote_count=Count('upvote')).order_by(
+        '-upvote_count', '-published_date').select_related('blog')[posts_from:posts_to]
+
+    return render(request, 'board.html', {
+        'posts': posts,
+        'next_page': page+1,
+        'posts_from': posts_from})

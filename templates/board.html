@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block seo %}
+{% include 'snippets/seo_tags.html' with title='ʕ•ᴥ•ʔ Bear Blog' url='https://bearblog.dev' description='Free, no-nonsense, super-fast blogging.' tags="blog, blogging, write, writing" %}
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
+{% block content %}
+<h1>
+    Discovery board
+</h1>
+<content>
+    <ul>
+        {% for post in posts %}
+        <li>
+            #{{ forloop.counter|add:posts_from }}
+            <a href="/{{ post.slug }}">{{ post.title }}</a> -
+            <small>
+            {% comment %} {% if post.blog.domain %}
+            (<a href="http://{{ post.blog.domain }}">{{ post.blog.domain }}</a>)
+            {% else %} {% endcomment %}
+            (<a href="http://{{ post.blog.subdomain }}.bearblog.dev">{{ post.blog.subdomain }}.bearblog.dev</a>)
+            {% comment %} {% endif %} {% endcomment %}
+            </small>
+        </li>
+        {% empty %}
+        <li>
+            We've run out of posts ʕノ•ᴥ•ʔノ ︵ ┻━┻
+        </li>
+        {% endfor %}
+    </ul>
+</content>
+<p>
+    <a href="?page={{ next_page }}">More</a>
+</p>
+<p>
+    <small>
+    This page is ranked using the following algorithm:
+    // TODO
+    </small>
+</p>
+{% endblock %}
+
+{% block footer %}
+<p>
+    Start your own blog with <a href="/accounts/signup/">ʕ•ᴥ•ʔ Bear</a>
+</p>
+{% endblock %}
