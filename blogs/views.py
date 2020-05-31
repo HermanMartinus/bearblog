@@ -172,7 +172,7 @@ def discover(request):
             upvote = Upvote(post=post, ip_address=ip_address)
             upvote.save()
 
-    posts_per_page = 30
+    posts_per_page = 20
     page = 0
     if request.GET.get('page'):
         page = int(request.GET.get('page'))
