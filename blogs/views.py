@@ -8,7 +8,7 @@ from ipaddr import client_ip
 from .helpers import unmark, get_base_root, get_root, is_protected
 from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
-from django.db.models import Count, F, FloatField, ExpressionWrapper
+from django.db.models import Count, ExpressionWrapper, F, FloatField, Value
 from blogs.models import Upvote, Blog, Post
 from django.db.models.functions import Now
 
@@ -169,6 +169,7 @@ def discover(request):
         post = get_object_or_404(Post, pk=pk)
         ip_address = client_ip(request)
         posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
+
         if len(posts_upvote_dupe) == 0:
             upvote = Upvote(post=post, ip_address=ip_address)
             upvote.save()
@@ -189,7 +190,7 @@ def discover(request):
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
             score=ExpressionWrapper(
-                (Count('upvote')) / ((((Now()-F('published_date'))/3600000000)+2)**gravity),
+                (Count('upvote')) / ((((Now()-Value('published_date'))/3600000000)+2)**gravity),
                 output_field=FloatField()
             )
             ).filter(publish=True).order_by('-score').select_related('blog')[posts_from:posts_to]
