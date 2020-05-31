@@ -168,8 +168,10 @@ def discover(request):
         page = int(request.GET.get('page'))
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page
-    posts = Post.objects.annotate(upvote_count=Count('upvote')).order_by(
-        '-upvote_count', '-published_date').select_related('blog')[posts_from:posts_to]
+    posts = Post.objects.annotate(
+        upvote_count=Count('upvote')).filter(publish=True).order_by(
+        '-upvote_count', '-published_date').select_related(
+            'blog')[posts_from:posts_to]
 
     return render(request, 'discover.html', {
         'posts': posts,
