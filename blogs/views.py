@@ -8,8 +8,10 @@ from ipaddr import client_ip
 from .helpers import unmark, get_base_root, get_root, is_protected
 from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
-from django.db.models import Count, ExpressionWrapper, FloatField
+from django.db.models import Count, F
 from blogs.models import Upvote, Blog, Post
+from django.db.models.functions import Now
+from pg_utils import Seconds
 
 
 def home(request):
@@ -188,17 +190,12 @@ def discover(request):
     else:
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
-            # time_difference=ExpressionWrapper(
-            #     (Now() - F('published_date')),
-            #         output_field=DurationField()
-            # ),
             score=ExpressionWrapper(
-                (Count('upvote')) / ((2+2)**gravity),
+                ((Count('upvote')) / ((Seconds(Now() - F('published_date')))+2)**gravity)*100000,
                 output_field=FloatField()
             )
         ).filter(publish=True).order_by('-score').select_related('blog')[posts_from:posts_to]
 
-    print(posts[0])
     return render(request, 'discover.html', {
         'posts': posts,
         'next_page': page+1,

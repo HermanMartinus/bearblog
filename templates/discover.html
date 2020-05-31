@@ -31,7 +31,6 @@
             >{{ post.title|truncatechars:55 }}</a>
             <small>
                 <small>({{ post.published_date|timesince }} ago) - {{ post.upvote_count }} upvotes</small>
-                - {{ post.score}}
             </small>
         </li>
         {% empty %}
