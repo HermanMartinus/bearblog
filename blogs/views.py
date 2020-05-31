@@ -8,8 +8,9 @@ from ipaddr import client_ip
 from .helpers import unmark, get_base_root, get_root, is_protected
 from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
-from django.db.models import Count
+from django.db.models import Count, F, FloatField, ExpressionWrapper
 from blogs.models import Upvote, Blog, Post
+from django.db.models.functions import Now
 
 
 def home(request):
@@ -174,16 +175,27 @@ def discover(request):
 
     posts_per_page = 20
     page = 0
+    gravity = 1.1
     if request.GET.get('page'):
         page = int(request.GET.get('page'))
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page
-    posts = Post.objects.annotate(
-        upvote_count=Count('upvote')).filter(publish=True).order_by(
-        '-upvote_count', '-published_date').select_related(
-            'blog')[posts_from:posts_to]
+
+    if request.GET.get('newest'):
+        posts = Post.objects.annotate(
+            upvote_count=Count('upvote'),
+            ).filter(publish=True).order_by('-published_date').select_related('blog')[posts_from:posts_to]
+    else:
+        posts = Post.objects.annotate(
+            upvote_count=Count('upvote'),
+            score=ExpressionWrapper(
+                (Count('upvote')) / ((((Now()-F('published_date'))/3600000000)+2)**gravity),
+                output_field=FloatField()
+            )
+            ).filter(publish=True).order_by('-score').select_related('blog')[posts_from:posts_to]
 
     return render(request, 'discover.html', {
         'posts': posts,
         'next_page': page+1,
-        'posts_from': posts_from})
+        'posts_from': posts_from,
+        'gravity': gravity})

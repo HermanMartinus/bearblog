@@ -11,6 +11,10 @@
 <h1>
     Discovery board
 </h1>
+<nav>
+    <a href="/discover/">Trending</a>
+    <a href="/discover/?newest=true">Newest</a>
+</nav>
 <content>
     <ul style="list-style-type: none;padding: unset;">
         {% for post in posts %}
@@ -24,10 +28,9 @@
             <a
                 href="http://{{ post.blog.subdomain }}.bearblog.dev/{{ post.slug }}"
                 target="_blank"
-            >{{ post.title|truncatechars:65 }}</a>
-            <br>
-            <small style="padding-left: 60px;">
-                <small>({{ post.published_date|timesince }} ago) - {{ post.upvote_count }} points</small>
+            >{{ post.title|truncatechars:55 }}</a>
+            <small>
+                <small>({{ post.published_date|timesince }} ago) - {{ post.upvote_count }} upvotes</small>
             </small>
         </li>
         {% empty %}
@@ -43,7 +46,16 @@
 <p>
     <small>
         This page is ranked using the following algorithm:
-        // TODO
+        <pre>
+        <code>
+Score = (P-1) / (T+2)^G
+
+Where,
+P = Points of an item (and -1 is to negate submitters vote)
+T = Time since submission (in hours)
+G = Gravity (currently at {{ gravity }}) to keep page content fresh
+        </code>
+        </pre>
     </small>
 </p>
 {% endblock %}
