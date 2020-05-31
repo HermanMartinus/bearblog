@@ -8,7 +8,7 @@ from ipaddr import client_ip
 from .helpers import unmark, get_base_root, get_root, is_protected
 from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
-from django.db.models import Count, F
+from django.db.models import Count, ExpressionWrapper, F, FloatField
 from blogs.models import Upvote, Blog, Post
 from django.db.models.functions import Now
 from pg_utils import Seconds
@@ -171,9 +171,9 @@ def discover(request):
         ip_address = client_ip(request)
         posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
 
-        if len(posts_upvote_dupe) == 0:
-            upvote = Upvote(post=post, ip_address=ip_address)
-            upvote.save()
+        # if len(posts_upvote_dupe) == 0:
+        upvote = Upvote(post=post, ip_address=ip_address)
+        upvote.save()
 
     posts_per_page = 20
     page = 0
