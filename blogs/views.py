@@ -156,13 +156,13 @@ def not_found(request, *args, **kwargs):
     return render(request, '404.html', status=404)
 
 
-def board(request):
+def discover(request):
     http_host = request.META['HTTP_HOST']
 
     if not (http_host == 'bearblog.dev' or http_host == 'localhost:8000'):
         raise Http404("No Post matches the given query.")
 
-    posts_per_page = 2
+    posts_per_page = 30
     page = 0
     if request.GET.get('page'):
         page = int(request.GET.get('page'))
@@ -171,7 +171,7 @@ def board(request):
     posts = Post.objects.annotate(upvote_count=Count('upvote')).order_by(
         '-upvote_count', '-published_date').select_related('blog')[posts_from:posts_to]
 
-    return render(request, 'board.html', {
+    return render(request, 'discover.html', {
         'posts': posts,
         'next_page': page+1,
         'posts_from': posts_from})

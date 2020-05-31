@@ -16,7 +16,7 @@
         {% for post in posts %}
         <li>
             #{{ forloop.counter|add:posts_from }}
-            <a href="/{{ post.slug }}">{{ post.title }}</a> -
+            <a href="http://{{ post.blog.subdomain }}.bearblog.dev/{{ post.slug }}">{{ post.title }}</a> -
             <small>
             {% comment %} {% if post.blog.domain %}
             (<a href="http://{{ post.blog.domain }}">{{ post.blog.domain }}</a>)
