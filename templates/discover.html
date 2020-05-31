@@ -24,8 +24,9 @@
             <a
                 href="http://{{ post.blog.subdomain }}.bearblog.dev/{{ post.slug }}"
                 target="_blank"
-            >{{ post.title }}</a>
-            <small>
+            >{{ post.title|truncatechars:65 }}</a>
+            <br>
+            <small style="padding-left: 60px;">
                 <small>({{ post.published_date|timesince }} ago) - {{ post.upvote_count }} points</small>
             </small>
         </li>
