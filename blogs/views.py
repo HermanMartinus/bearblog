@@ -12,6 +12,7 @@ from django.db.models import Count, DurationField, ExpressionWrapper, F, FloatFi
 from blogs.models import Upvote, Blog, Post
 from django.db.models.functions import Now
 from django.utils import timezone
+import datetime
 
 
 def home(request):
@@ -191,11 +192,11 @@ def discover(request):
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
             time_difference=ExpressionWrapper(
-                ((timezone.now() - Value('published_date'))/3600000000),
+                ((datetime.datetime.utcnow() - Value('published_date'))/3600000000),
                                               output_field=DurationField()
                                               ),
             score=ExpressionWrapper(
-                (Count('upvote')) / ((((timezone.now() - Value('published_date'))/3600000000)+2)**gravity),
+                (Count('upvote')) / ((((datetime.datetime.utcnow() - Value('published_date'))/3600000000)+2)**gravity),
                 output_field=FloatField()
             )
         ).filter(publish=True).order_by('-score').select_related('blog')[posts_from:posts_to]
