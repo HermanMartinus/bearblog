@@ -8,9 +8,10 @@ from ipaddr import client_ip
 from .helpers import unmark, get_base_root, get_root, is_protected
 from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
-from django.db.models import Count, ExpressionWrapper, F, FloatField, Value
+from django.db.models import Count, DurationField, ExpressionWrapper, F, FloatField, Value
 from blogs.models import Upvote, Blog, Post
 from django.db.models.functions import Now
+from django.utils import timezone
 
 
 def home(request):
@@ -170,13 +171,13 @@ def discover(request):
         ip_address = client_ip(request)
         posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
 
-        if len(posts_upvote_dupe) == 0:
-            upvote = Upvote(post=post, ip_address=ip_address)
-            upvote.save()
+        # if len(posts_upvote_dupe) == 0:
+        upvote = Upvote(post=post, ip_address=ip_address)
+        upvote.save()
 
     posts_per_page = 20
     page = 0
-    gravity = 1.1
+    gravity = 1.8
     if request.GET.get('page'):
         page = int(request.GET.get('page'))
     posts_from = page * posts_per_page
@@ -185,16 +186,21 @@ def discover(request):
     if request.GET.get('newest'):
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
-            ).filter(publish=True).order_by('-published_date').select_related('blog')[posts_from:posts_to]
+        ).filter(publish=True).order_by('-published_date').select_related('blog')[posts_from:posts_to]
     else:
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
+            time_difference=ExpressionWrapper(
+                ((timezone.now() - Value('published_date'))/3600000000),
+                                              output_field=DurationField()
+                                              ),
             score=ExpressionWrapper(
-                (Count('upvote')) / ((((Now()-Value('published_date'))/3600000000)+2)**gravity),
+                (Count('upvote')) / ((((timezone.now() - Value('published_date'))/3600000000)+2)**gravity),
                 output_field=FloatField()
             )
-            ).filter(publish=True).order_by('-score').select_related('blog')[posts_from:posts_to]
+        ).filter(publish=True).order_by('-score').select_related('blog')[posts_from:posts_to]
 
+    print(posts[0].time_difference)
     return render(request, 'discover.html', {
         'posts': posts,
         'next_page': page+1,
