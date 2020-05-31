@@ -193,9 +193,9 @@ def discover(request):
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
             time_difference=ExpressionWrapper(
-                (TransactionNow() - Value('published_date'))/3600000000),
-                                              output_field=DurationField()
-                                              ),
+                (TransactionNow() - Value('published_date'))/3600000000,
+                    output_field=DurationField()
+            ),
             score=ExpressionWrapper(
                 (Count('upvote')) / ((((timezone.now().strftime("%Y-%m-%d %H:%M:%S") - Value('published_date'))/3600000000)+2)**gravity),
                 output_field=FloatField()
