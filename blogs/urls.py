@@ -13,10 +13,8 @@ urlpatterns = [
     path('dashboard/posts/<pk>/', dashboard_views.post_edit, name='post_edit'),
     path('dashboard/posts/<pk>/delete/', dashboard_views.PostDelete.as_view(),
          name='post_delete'),
-    path('ip_test/', dashboard_views.ip_test, name='ip_test'),
-
     path('discover/', views.discover, name='discover'),
-    
+
     path('blog/', views.posts, name='posts'),
     path("feed/", views.feed, name="post_feed"),
     path('<slug>/', views.post, name='post'),

@@ -16,13 +16,19 @@
         {% for post in posts %}
         <li>
             #{{ forloop.counter|add:posts_from }}
-            <a href="http://{{ post.blog.subdomain }}.bearblog.dev/{{ post.slug }}">{{ post.title }}</a> -
+            <form action="" method="post" style="display: inline">
+                <input hidden name="pk" value="{{ post.pk }}" />
+                {% csrf_token %}
+                <button>▵</button>
+            </form>
+            <a href="http://{{ post.blog.subdomain }}.bearblog.dev/{{ post.slug }}" target="_blank">
+                {{ post.title }}
+            </a> -
             <small>
-            {% comment %} {% if post.blog.domain %}
-            (<a href="http://{{ post.blog.domain }}">{{ post.blog.domain }}</a>)
-            {% else %} {% endcomment %}
-            (<a href="http://{{ post.blog.subdomain }}.bearblog.dev">{{ post.blog.subdomain }}.bearblog.dev</a>)
-            {% comment %} {% endif %} {% endcomment %}
+                (<a href="http://{{ post.blog.subdomain }}.bearblog.dev" target="_blank">
+                    {{ post.blog.subdomain }}.bearblog.dev
+                </a>)
+                <small>{{ post.upvote_count }} points</small>
             </small>
         </li>
         {% empty %}
@@ -37,8 +43,8 @@
 </p>
 <p>
     <small>
-    This page is ranked using the following algorithm:
-    // TODO
+        This page is ranked using the following algorithm:
+        // TODO
     </small>
 </p>
 {% endblock %}

@@ -3,12 +3,13 @@ from markdown import markdown
 import tldextract
 from django.http import Http404
 from feedgen.feed import FeedGenerator
+from ipaddr import client_ip
 
-from .models import Blog, Post
 from .helpers import unmark, get_base_root, get_root, is_protected
 from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
 from django.db.models import Count
+from blogs.models import Upvote, Blog, Post
 
 
 def home(request):
@@ -161,6 +162,15 @@ def discover(request):
 
     if not (http_host == 'bearblog.dev' or http_host == 'localhost:8000'):
         raise Http404("No Post matches the given query.")
+
+    if request.method == "POST":
+        pk = request.POST.get("pk", "")
+        post = get_object_or_404(Post, pk=pk)
+        ip_address = client_ip(request)
+        posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
+        if len(posts_upvote_dupe) == 0:
+            upvote = Upvote(post=post, ip_address=ip_address)
+            upvote.save()
 
     posts_per_page = 30
     page = 0

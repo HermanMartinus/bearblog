@@ -1,11 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.edit import DeleteView
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 import tldextract
-from ipaddr import client_ip
 
 from .forms import BlogForm, PostForm, DomainForm
 from .models import Blog, Post
@@ -158,7 +156,3 @@ def delete_user(request):
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
-
-
-def ip_test(request):
-    return HttpResponse(client_ip(request))
