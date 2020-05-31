@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from markdown import markdown
+from django.contrib.postgres.functions import TransactionNow
 import tldextract
 from django.http import Http404
 from feedgen.feed import FeedGenerator
@@ -10,7 +11,7 @@ from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
 from django.db.models import Count, DurationField, ExpressionWrapper, F, FloatField, Value
 from blogs.models import Upvote, Blog, Post
-from django.db.models.functions import Now
+
 from django.utils import timezone
 import datetime
 
@@ -192,7 +193,7 @@ def discover(request):
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
             time_difference=ExpressionWrapper(
-                ((timezone.now().strftime("%Y-%m-%d %H:%M:%S") - Value('published_date'))/3600000000),
+                (TransactionNow() - Value('published_date'))/3600000000),
                                               output_field=DurationField()
                                               ),
             score=ExpressionWrapper(
