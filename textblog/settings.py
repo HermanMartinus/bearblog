@@ -20,6 +20,8 @@ INTERNAL_IPS = ['127.0.0.1']
 
 ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
+USE_TZ = False
+
 # Application definition
 SITE_ID = 1
 INSTALLED_APPS = [
