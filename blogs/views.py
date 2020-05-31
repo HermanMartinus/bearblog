@@ -171,9 +171,9 @@ def discover(request):
         ip_address = client_ip(request)
         posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
 
-        # if len(posts_upvote_dupe) == 0:
-        upvote = Upvote(post=post, ip_address=ip_address)
-        upvote.save()
+        if len(posts_upvote_dupe) == 0:
+            upvote = Upvote(post=post, ip_address=ip_address)
+            upvote.save()
 
     posts_per_page = 20
     page = 0
