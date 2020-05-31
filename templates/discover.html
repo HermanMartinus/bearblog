@@ -28,9 +28,9 @@
             <a
                 href="http://{{ post.blog.subdomain }}.bearblog.dev/{{ post.slug }}"
                 target="_blank"
-            >{{ post.title|truncatechars:55 }}</a>
+            >{{ post.title|truncatechars:80 }}</a>
             <small>
-                <small>({{ post.published_date|timesince }} ago) - {{ post.upvote_count }} upvotes</small>
+                <small>({{ post.published_date }} ago) - {{ post.upvote_count }} upvotes</small>
             </small>
         </li>
         {% empty %}
