@@ -188,7 +188,9 @@ def discover(request):
     if newest:
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
-        ).filter(publish=True).order_by('-published_date').select_related('blog')[posts_from:posts_to]
+        ).filter(publish=True, published_date__lte=timezone.now()
+                 ).order_by('-published_date'
+                            ).select_related('blog')[posts_from:posts_to]
     else:
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
