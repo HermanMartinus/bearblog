@@ -183,7 +183,8 @@ def discover(request):
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page
 
-    if request.GET.get('newest'):
+    newest = request.GET.get('newest')
+    if newest:
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
         ).filter(publish=True).order_by('-published_date').select_related('blog')[posts_from:posts_to]
@@ -194,10 +195,12 @@ def discover(request):
                 ((Count('upvote')) / ((Seconds(Now() - F('published_date')))+2)**gravity)*100000,
                 output_field=FloatField()
             )
-        ).filter(publish=True).order_by('-score').select_related('blog')[posts_from:posts_to]
+        ).filter(publish=True).order_by('-score', '-published_date').select_related('blog')[posts_from:posts_to]
 
     return render(request, 'discover.html', {
         'posts': posts,
         'next_page': page+1,
         'posts_from': posts_from,
-        'gravity': gravity})
+        'gravity': gravity,
+        'newest': newest,
+        })
