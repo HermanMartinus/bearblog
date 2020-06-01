@@ -12,6 +12,7 @@ from django.db.models import Count, ExpressionWrapper, F, FloatField
 from blogs.models import Upvote, Blog, Post
 from django.db.models.functions import Now
 from pg_utils import Seconds
+from django.utils import timezone
 
 
 def home(request):
@@ -195,7 +196,9 @@ def discover(request):
                 ((Count('upvote')) / ((Seconds(Now() - F('published_date')))+2)**gravity)*100000,
                 output_field=FloatField()
             )
-        ).filter(publish=True).order_by('-score', '-published_date').select_related('blog')[posts_from:posts_to]
+        ).filter(publish=True, published_date__lte=timezone.now()
+                 ).order_by('-score', '-published_date'
+                            ).select_related('blog')[posts_from:posts_to]
 
     return render(request, 'discover.html', {
         'posts': posts,
@@ -203,4 +206,4 @@ def discover(request):
         'posts_from': posts_from,
         'gravity': gravity,
         'newest': newest,
-        })
+    })
