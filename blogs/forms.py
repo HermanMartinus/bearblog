@@ -110,12 +110,12 @@ class PostForm(forms.ModelForm):
 
     published_date = forms.DateTimeField(
         label="Date",
-        help_text="eg: 2020-05-31"
+        help_text="eg: '2020-05-31'"
     )
 
     content = forms.CharField(
         label="Content (markdown)",
-        # help_text="Add hastags to your post for categorization eg: #bears",
+        help_text="Add hastags preceeded by a backslash for categorization eg: '\#bear #blog #bearblog'",
         widget=forms.Textarea(),
         validators=[script_validator]
     )
