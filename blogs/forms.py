@@ -21,6 +21,26 @@ tags_validator = RegexValidator(
     "These tags are not valid (eg: tag1, tag2, tag3)")
 
 
+class DateInput(forms.DateInput):
+    input_type = "date"
+
+    def __init__(self, **kwargs):
+        kwargs["format"] = "%Y-%m-%d"
+        super().__init__(**kwargs)
+
+
+class TimeInput(forms.TimeInput):
+    input_type = "time"
+
+
+class DateTimeInput(forms.DateTimeInput):
+    input_type = "datetime-local"
+
+    def __init__(self, **kwargs):
+        kwargs["format"] = "%Y-%m-%dT%H:%M"
+        super().__init__(**kwargs)
+
+
 def protected_domains_validator(value):
     if is_protected(value):
         raise ValidationError(
@@ -78,25 +98,25 @@ class DomainForm(forms.ModelForm):
 
 class PostForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["published_date"].widget = DateInput()
         self.user = user
-        super(PostForm, self).__init__(*args, **kwargs)
 
     slug = forms.SlugField(
         label="Permalink",
         help_text="eg: 'why-i-like-bears'",
         validators=[link_validator]
     )
+
+    published_date = forms.DateTimeField(
+        label="Date",
+        help_text="eg: 2020-05-31"
+    )
     content = forms.CharField(
         label="Content (markdown)",
+        help_text="Add hastags to your post for categorization eg: #bears",
         widget=forms.Textarea(),
         validators=[script_validator]
-    )
-
-    tags = forms.CharField(
-        label="Categories (optional)",
-        help_text="A comma-separated list of tags",
-        required=False,
-        validators=[tags_validator]
     )
 
     def clean_slug(self):
@@ -114,4 +134,4 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'slug', 'tags', 'content', 'is_page', 'publish')
+        fields = ('title', 'slug', 'published_date', 'content', 'is_page', 'publish')
