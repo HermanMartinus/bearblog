@@ -112,6 +112,7 @@ class PostForm(forms.ModelForm):
         label="Date",
         help_text="eg: 2020-05-31"
     )
+
     content = forms.CharField(
         label="Content (markdown)",
         help_text="Add hastags to your post for categorization eg: #bears",
@@ -134,4 +135,4 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'slug', 'published_date', 'content', 'is_page', 'publish')
+        fields = ('title', 'slug', 'published_date', 'content', 'is_page', 'publish', 'show_in_feed')

@@ -9,7 +9,7 @@
 
 {% block content %}
 <h1>
-    Discovery board
+    Discovery feed
 </h1>
 <nav>
     <a href="/discover/">Trending</a>
@@ -28,7 +28,7 @@
             <a
                 href="http://{{ post.blog.subdomain }}.bearblog.dev/{{ post.slug }}"
                 target="_blank"
-            >{{ post.title|truncatechars:70 }}</a>
+            >{{ post.title }}</a>
             <small>
                 <small>- {{ post.upvote_count }} upvotes</small>
             </small>

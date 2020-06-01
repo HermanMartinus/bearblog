@@ -10,11 +10,14 @@
 {% block content %}
 <h1>Free, no-nonsense, super-fast blogging</h1>
 <h3>No javascript, no stylesheets, no trackers. Just your words.</h3>
-{% if  user.is_authenticated %}
-<a href="/dashboard">Dashboard</a>
-{% else %}
-<a href="accounts/signup">Sign up</a>
-{% endif %}
+<nav>
+    {% if  user.is_authenticated %}
+    <a href="/dashboard/">Dashboard</a>
+    {% else %}
+    <a href="/accounts/signup/">Sign up</a>
+    {% endif %}
+    <a href="/discover/">Discovery feed</a>
+</nav>
 <p>
     There is a website obesity crisis. Bloated websites full of scripts, ads, and trackers slowing your readers down every time they try to read your well crafted content.
 </p>
