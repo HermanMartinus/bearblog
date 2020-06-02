@@ -120,6 +120,10 @@ class PostForm(forms.ModelForm):
         validators=[script_validator]
     )
 
+    show_in_feed = forms.BooleanField(
+        help_text="Make post discoverable at <a href='https://bearblog.dev/discover' target='_blank'>bearblog.dev/discover</a>",
+        required=False)
+
     def clean_slug(self):
         slug = self.cleaned_data['slug']
 

@@ -95,10 +95,21 @@ def post(request, slug):
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
 
+    if request.method == "POST":
+        upvoted_pose = get_object_or_404(Post, blog=blog, slug=slug)
+        ip_address = client_ip(request)
+        posts_upvote_dupe = upvoted_pose.upvote_set.filter(ip_address=ip_address)
+
+        if len(posts_upvote_dupe) == 0:
+            upvote = Upvote(post=upvoted_pose, ip_address=ip_address)
+            upvote.save()
+
     if request.GET.get('preview'):
-        all_posts = blog.post_set.all().order_by('-published_date')
+        all_posts = blog.post_set.annotate(
+            upvote_count=Count('upvote')).all().order_by('-published_date')
     else:
-        all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+        all_posts = blog.post_set.annotate(
+            upvote_count=Count('upvote')).filter(publish=True).order_by('-published_date')
 
     post = get_post(all_posts, slug)
 
@@ -178,7 +189,7 @@ def discover(request):
 
     posts_per_page = 20
     page = 0
-    gravity = 1.8
+    gravity = 1.1
     if request.GET.get('page'):
         page = int(request.GET.get('page'))
     posts_from = page * posts_per_page

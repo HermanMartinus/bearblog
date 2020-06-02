@@ -41,6 +41,16 @@
     {{ content|safe }}
 </content>
 
+{% if post.show_in_feed %}
+<small>
+    <form action="" method="post" style="display: inline">
+        <input hidden name="pk" value="{{ post.pk }}" />
+        {% csrf_token %}
+        <button>▵ Toast this post</button>
+    </form>
+    - <small>{{ post.upvote_count }} toasts</small>
+</small>
+{% endif %}
 {% endblock %}
 
 {% block footer %}

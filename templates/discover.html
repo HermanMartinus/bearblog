@@ -18,20 +18,25 @@
 <content>
     <ul style="list-style-type: none;padding: unset;">
         {% for post in posts %}
-        <li>
+        <li style="display: flex;line-height: 1.2;">
+            <div style="margin-right: 10px;">
             #{{ forloop.counter|add:posts_from }}
-            <form action="" method="post" style="display: inline">
-                <input hidden name="pk" value="{{ post.pk }}" />
-                {% csrf_token %}
-                <button>▵</button>
-            </form>
+            </div>
+            <div style="padding-bottom: 7px">
             <a
                 href="http://{{ post.blog.subdomain }}.bearblog.dev/{{ post.slug }}"
                 target="_blank"
             >{{ post.title }}</a>
             <small>
-                <small>- {{ post.upvote_count }} upvotes</small>
+            <br>
+            <form action="" method="post" style="display: inline">
+                <input hidden name="pk" value="{{ post.pk }}" />
+                {% csrf_token %}
+                <button>▵ Toast this post</button>
+            </form>
+                <small>- {{ post.upvote_count }} toasts</small>
             </small>
+            </div>
         </li>
         {% empty %}
         <li>
@@ -45,10 +50,8 @@
 </p>
 <p>
     <small>
-        This page is ranked using the following algorithm:
-        <br>
-        <small>(Note: Only 1 vote per post per IP address is counted)</small>
         <pre>
+This page is ranked according to the following algorithm:
             <code>
 Score = (U-1) / (T+2)^G
 
