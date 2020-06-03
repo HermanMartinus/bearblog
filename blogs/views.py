@@ -96,7 +96,6 @@ def post(request, slug):
         root = http_host
 
     ip_address = client_ip(request)
-    get_ip_info(ip_address)
 
     if request.method == "POST":
         upvoted_pose = get_object_or_404(Post, blog=blog, slug=slug)
