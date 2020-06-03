@@ -28,13 +28,20 @@
                 target="_blank"
             >{{ post.title }}</a>
             <small>
-            <br>
-            <form action="" method="post" style="display: inline">
-                <input hidden name="pk" value="{{ post.pk }}" />
-                {% csrf_token %}
-                <button>▵ Toast this post</button>
-            </form>
+                <a
+                    href="http://{{ post.blog.subdomain }}.bearblog.dev/"
+                    target="_blank"
+                >
+                    ({{ post.blog.subdomain }}.bearblog.dev)
+                </a>
+                <br>
+                <form action="" method="post" style="display: inline">
+                    <input hidden name="pk" value="{{ post.pk }}" />
+                    {% csrf_token %}
+                    <button>▵ Toast this post</button>
+                </form>
                 <small>- {{ post.upvote_count }} toasts</small>
+                <small>({{ post.published_date|timesince }} ago)</small>
             </small>
             </div>
         </li>
