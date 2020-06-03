@@ -6,7 +6,7 @@ from feedgen.feed import FeedGenerator
 from ipaddr import client_ip
 
 from .helpers import unmark, get_base_root, get_root, is_protected
-from blogs.helpers import get_nav, get_post, get_posts
+from blogs.helpers import get_ip_info, get_nav, get_post, get_posts
 from django.http import HttpResponse
 from django.db.models import Count, ExpressionWrapper, F, FloatField
 from blogs.models import Upvote, Blog, Post
@@ -95,9 +95,11 @@ def post(request, slug):
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
 
+    ip_address = client_ip(request)
+    get_ip_info(ip_address)
+
     if request.method == "POST":
         upvoted_pose = get_object_or_404(Post, blog=blog, slug=slug)
-        ip_address = client_ip(request)
         posts_upvote_dupe = upvoted_pose.upvote_set.filter(ip_address=ip_address)
 
         if len(posts_upvote_dupe) == 0:
@@ -113,6 +115,11 @@ def post(request, slug):
 
     post = get_post(all_posts, slug)
 
+    upvoted = False
+    for upvote in post.upvote_set.all():
+        if upvote.ip_address == ip_address:
+            upvoted = True
+
     content = markdown(post.content, extensions=['fenced_code'])
 
     return render(
@@ -124,7 +131,8 @@ def post(request, slug):
             'post': post,
             'nav': get_nav(all_posts),
             'root': root,
-            'meta_description': unmark(post.content)[:160]
+            'meta_description': unmark(post.content)[:160],
+            'upvoted': upvoted
         }
     )
 
@@ -177,12 +185,12 @@ def discover(request):
     if not (http_host == 'bearblog.dev' or http_host == 'localhost:8000'):
         raise Http404("No Post matches the given query.")
 
+    ip_address = client_ip(request)
+
     if request.method == "POST":
         pk = request.POST.get("pk", "")
         post = get_object_or_404(Post, pk=pk)
-        ip_address = client_ip(request)
         posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
-
         if len(posts_upvote_dupe) == 0:
             upvote = Upvote(post=post, ip_address=ip_address)
             upvote.save()
@@ -192,6 +200,7 @@ def discover(request):
     gravity = 1.1
     if request.GET.get('page'):
         page = int(request.GET.get('page'))
+
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page
 
@@ -208,10 +217,16 @@ def discover(request):
             score=ExpressionWrapper(
                 ((Count('upvote')) / ((Seconds(Now() - F('published_date')))+2)**gravity)*100000,
                 output_field=FloatField()
-            )
+            ),
         ).filter(publish=True, show_in_feed=True, published_date__lte=timezone.now()
                  ).order_by('-score', '-published_date'
-                            ).select_related('blog')[posts_from:posts_to]
+                            ).select_related('blog').prefetch_related('upvote_set')[posts_from:posts_to]
+
+    upvoted_posts = []
+    for post in posts:
+        for upvote in post.upvote_set.all():
+            if upvote.ip_address == ip_address:
+                upvoted_posts.append(post.pk)
 
     return render(request, 'discover.html', {
         'posts': posts,
@@ -219,4 +234,5 @@ def discover(request):
         'posts_from': posts_from,
         'gravity': gravity,
         'newest': newest,
+        'upvoted_posts': upvoted_posts
     })
