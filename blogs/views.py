@@ -6,7 +6,7 @@ from feedgen.feed import FeedGenerator
 from ipaddr import client_ip
 
 from .helpers import unmark, get_base_root, get_root, is_protected
-from blogs.helpers import get_ip_info, get_nav, get_post, get_posts
+from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
 from django.db.models import Count, ExpressionWrapper, F, FloatField
 from blogs.models import Upvote, Blog, Post
