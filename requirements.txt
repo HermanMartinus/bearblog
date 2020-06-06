@@ -5,7 +5,7 @@ chardet==3.0.4
 defusedxml==0.6.0
 distlib==0.3.0
 dj-database-url==0.5.0
-Django==3.0.6
+Django==3.0.7
 django-allauth==0.41.0
 django-debug-toolbar==2.2
 django-ip==1.0.2
