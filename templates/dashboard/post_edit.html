@@ -24,9 +24,9 @@
 {% if post %}
 <p>
     {% if post.publish == True %}
-    <a href="{{ root }}/{{ post.slug }}" target="_blank">View post</a> |
+    <a href="http://{{ root }}/{{ post.slug }}" target="_blank">View post</a> |
     {% elif post %}
-    <a href="{{ root }}/{{ post.slug }}?preview=true" target="_blank">Preview post</a> |
+    <a href="http://{{ root }}/{{ post.slug }}?preview=true" target="_blank">Preview post</a> |
     {% endif %}
     <a href="/dashboard/posts/{{ post.pk }}/delete">Delete post</a>
 </p>

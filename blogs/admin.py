@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db.models import Count
 from .models import Blog, Post, Upvote
 from django.utils.html import format_html
+from blogs.helpers import root
 
 
 @admin.register(Blog)
@@ -23,8 +24,8 @@ class BlogAdmin(admin.ModelAdmin):
 
     def subdomain_url(self, obj):
         return format_html(
-            "<a href='http://{url}.bearblog.dev' target='_blank'>{url}.bearblog.dev</a>",
-            url=obj.subdomain)
+            "<a href='http://{url}' target='_blank'>{url}</a>",
+            url=root(obj.subdomain))
 
     subdomain_url.short_description = "Subomain"
 

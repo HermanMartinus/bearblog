@@ -5,7 +5,7 @@ from django.http import Http404
 from feedgen.feed import FeedGenerator
 from ipaddr import client_ip
 
-from .helpers import unmark, get_base_root, get_root, is_protected
+from .helpers import unmark, root as get_root, is_protected
 from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
 from django.db.models import Count, ExpressionWrapper, F, FloatField
@@ -23,10 +23,10 @@ def home(request):
     elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
         extracted = tldextract.extract(http_host)
         if is_protected(extracted.subdomain):
-            return redirect(get_base_root(extracted))
+            return redirect(get_root())
 
         blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
-        root = get_root(extracted, blog.subdomain)
+        root = get_root(blog.subdomain)
     else:
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
@@ -56,10 +56,10 @@ def posts(request):
     elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
         extracted = tldextract.extract(http_host)
         if is_protected(extracted.subdomain):
-            return redirect(get_base_root(extracted))
+            return redirect(get_root())
 
         blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
-        root = get_root(extracted, blog.subdomain)
+        root = get_root(blog.subdomain)
     else:
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
@@ -87,10 +87,10 @@ def post(request, slug):
     elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
         extracted = tldextract.extract(http_host)
         if is_protected(extracted.subdomain):
-            return redirect(get_base_root(extracted))
+            return redirect(get_root())
 
         blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
-        root = get_root(extracted, blog.subdomain)
+        root = get_root(blog.subdomain)
     else:
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host
@@ -144,10 +144,10 @@ def feed(request):
     elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
         extracted = tldextract.extract(http_host)
         if is_protected(extracted.subdomain):
-            return redirect(get_base_root(extracted))
+            return redirect(get_root())
 
         blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
-        root = get_root(extracted, blog.subdomain)
+        root = get_root(blog.subdomain)
     else:
         blog = get_object_or_404(Blog, domain=http_host)
         root = http_host

@@ -1,3 +1,4 @@
+from django.contrib.sites.models import Site
 import requests
 from django.http import Http404
 import json
@@ -6,18 +7,13 @@ from markdown import Markdown
 from io import StringIO
 
 
-def get_root(extracted, subdomain):
-    if extracted.suffix:
-        return f"https://{subdomain}.{extracted.domain}.{extracted.suffix}"
+def root(subdomain=''):
+    domain = Site.objects.get_current().domain
+    if subdomain == '':
+        return f"{domain}"
     else:
-        return f"http://{subdomain}.{extracted.domain}:8000"
-
-
-def get_base_root(extracted):
-    if extracted.suffix:
-        return f"https://{extracted.domain}.{extracted.suffix}"
-    else:
-        return f"http://{extracted.domain}:8000"
+        print(domain)
+        return f"{subdomain}.{domain}"
 
 
 def get_nav(all_posts):

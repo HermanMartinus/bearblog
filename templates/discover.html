@@ -24,15 +24,15 @@
             </div>
             <div style="padding-bottom: 7px">
             <a
-                href="http://{{ post.blog.subdomain }}.bearblog.dev/{{ post.slug }}"
+                href="http://{{ post.blog.subdomain }}.{{ request.META.HTTP_HOST }}/{{ post.slug }}"
                 target="_blank"
             >{{ post.title }}</a>
             <small>
                 <a
-                    href="http://{{ post.blog.subdomain }}.bearblog.dev/"
+                    href="http://{{ post.blog.subdomain }}.{{ request.META.HTTP_HOST }}/"
                     target="_blank"
                 >
-                    ({{ post.blog.subdomain }}.bearblog.dev)
+                    ({{ post.blog.subdomain }}.{{ request.META.HTTP_HOST }})
                 </a>
                 <br>
                 <form action="" method="post" style="display: inline">

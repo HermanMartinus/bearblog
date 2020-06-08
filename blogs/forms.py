@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator, ValidationError
 
-from .helpers import is_protected
+from .helpers import is_protected, root
 from .models import Blog, Post
 
 subdomain_validator = RegexValidator(
@@ -121,7 +121,7 @@ class PostForm(forms.ModelForm):
     )
 
     show_in_feed = forms.BooleanField(
-        help_text="Make post discoverable at <a href='https://bearblog.dev/discover' target='_blank'>bearblog.dev/discover</a>",
+        help_text=f"Make post discoverable at <a href='http://{root()}/discover/' target='_blank'>{root()}/discover</a>",
         required=False)
 
     def clean_slug(self):
