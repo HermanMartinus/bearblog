@@ -122,7 +122,8 @@ class PostForm(forms.ModelForm):
 
     show_in_feed = forms.BooleanField(
         help_text=f"Make post discoverable at <a href='http://{root()}/discover/' target='_blank'>{root()}/discover</a>",
-        required=False)
+        required=False,
+        initial=True)
 
     def clean_slug(self):
         slug = self.cleaned_data['slug']
