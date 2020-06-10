@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.db.models import Count
-from .models import Blog, Post, Upvote
 from django.utils.html import format_html
 from blogs.helpers import root
+from blogs.models import Blog, Post, Upvote, PageView
 
 
 @admin.register(Blog)
@@ -58,3 +58,4 @@ class PostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Upvote)
+admin.site.register(PageView)

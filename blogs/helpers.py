@@ -5,6 +5,7 @@ import json
 from django.conf import settings
 from markdown import Markdown
 from io import StringIO
+from ipaddr import client_ip
 
 
 def root(subdomain=''):
@@ -114,3 +115,19 @@ __md.stripTopLevelTags = False
 
 def unmark(text):
     return __md.convert(text)
+
+
+def log_view(request, blog, post=None):
+    ip_address = client_ip(request)
+
+    if post:
+        print(post.title)
+
+    http_referer = request.META.get('HTTP_REFERER')
+    referer = None
+    if http_referer:
+        if request.META.get('HTTP_HOST') not in http_referer:
+            referer = http_referer
+
+    return {'blog': blog, 'post': post, 'ip_address': ip_address, 'referer': referer}
+    

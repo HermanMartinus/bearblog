@@ -6,10 +6,10 @@ from feedgen.feed import FeedGenerator
 from ipaddr import client_ip
 
 from .helpers import unmark, root as get_root, is_protected
-from blogs.helpers import get_nav, get_post, get_posts
+from blogs.helpers import get_nav, get_post, get_posts, log_view
 from django.http import HttpResponse
 from django.db.models import Count, ExpressionWrapper, F, FloatField
-from blogs.models import Upvote, Blog, Post
+from blogs.models import Blog, PageView, Post, Upvote
 from django.db.models.functions import Now
 from pg_utils import Seconds
 from django.utils import timezone
@@ -34,6 +34,15 @@ def home(request):
     all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
     content = markdown(blog.content, extensions=['fenced_code'])
+
+    view_info = log_view(request, blog)
+    page_view = PageView(
+        blog=view_info['blog'],
+        post=view_info['post'],
+        ip_address=view_info['ip_address'],
+        referer=view_info['referer'],
+    )
+    page_view.save()
 
     return render(
         request,
@@ -120,6 +129,15 @@ def post(request, slug):
             upvoted = True
 
     content = markdown(post.content, extensions=['fenced_code'])
+
+    view_info = log_view(request, blog)
+    page_view = PageView(
+        blog=view_info['blog'],
+        post=view_info['post'],
+        ip_address=view_info['ip_address'],
+        referer=view_info['referer'],
+    )
+    page_view.save()
 
     return render(
         request,
