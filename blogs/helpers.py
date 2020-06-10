@@ -12,7 +12,6 @@ def root(subdomain=''):
     if subdomain == '':
         return f"{domain}"
     else:
-        print(domain)
         return f"{subdomain}.{domain}"
 
 
@@ -46,6 +45,10 @@ def is_protected(subdomain):
         'account',
         'router',
         'settings',
+        'bearblog.dev',
+        '*.bearblog.dev',
+        'router.bearblog.dev',
+        'www.bearblog.dev',
     ]
 
     return subdomain in protected_subdomains

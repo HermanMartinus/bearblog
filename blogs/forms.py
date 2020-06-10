@@ -44,7 +44,7 @@ class DateTimeInput(forms.DateTimeInput):
 def protected_domains_validator(value):
     if is_protected(value):
         raise ValidationError(
-            'Protected subdomain',
+            'Protected domain/subdomain',
             params={'value': value},
         )
 
@@ -72,7 +72,7 @@ class DomainForm(forms.ModelForm):
         max_length=128,
         label="Custom domain",
         help_text="eg: 'example.com'",
-        validators=[domain_validator],
+        validators=[domain_validator, protected_domains_validator],
         required=False
     )
 
