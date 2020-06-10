@@ -17,7 +17,7 @@ def dashboard(request):
     try:
         blog = Blog.objects.get(user=request.user)
         if extracted.subdomain and extracted.subdomain != blog.subdomain:
-            return redirect(f"{get_root(blog.subdomain)}/dashboard")
+            return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
         if request.method == "POST":
             form = BlogForm(request.POST, instance=blog)
@@ -60,7 +60,7 @@ def posts_edit(request):
     blog = get_object_or_404(Blog, user=request.user)
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
         return redirect(
-            f"{get_root(blog.subdomain)}/dashboard/posts")
+            f"http://{get_root(blog.subdomain)}/dashboard/posts")
 
     posts = Post.objects.filter(blog=blog).order_by('-published_date')
 
@@ -76,7 +76,7 @@ def post_new(request):
     blog = get_object_or_404(Blog, user=request.user)
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
         return redirect(
-            f"{get_root(blog.subdomain)}/dashboard/posts/new")
+            f"http://{get_root(blog.subdomain)}/dashboard/posts/new")
 
     if request.method == "POST":
         form = PostForm(request.user, request.POST)
@@ -100,7 +100,7 @@ def post_edit(request, pk):
     blog = get_object_or_404(Blog, user=request.user)
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
         return redirect(
-            f"{get_root(blog.subdomain)}/dashboard/posts")
+            f"http://{get_root(blog.subdomain)}/dashboard/posts")
 
     post = get_object_or_404(Post, blog=blog, pk=pk)
     if request.method == "POST":
@@ -126,7 +126,7 @@ def domain_edit(request):
     blog = Blog.objects.get(user=request.user)
 
     if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return redirect(f"{get_root(blog.subdomain)}/dashboard")
+        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
     if request.method == "POST":
         form = DomainForm(request.POST, instance=blog)
