@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from markdown import markdown
+import mistune
 import tldextract
 from django.http import Http404
 from feedgen.feed import FeedGenerator
@@ -30,8 +30,8 @@ def home(request):
 
     all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
-    content = markdown(blog.content, extensions=['fenced_code'])
-
+    content = mistune.html(blog.content)
+    
     return render(
         request,
         'home.html',
@@ -110,7 +110,7 @@ def post(request, slug):
         if upvote.ip_address == ip_address:
             upvoted = True
 
-    content = markdown(post.content, extensions=['fenced_code'])
+    content = mistune.html(post.content)
 
     return render(
         request,

@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block seo %}
-{% include 'snippets/seo_tags.html' with title=post.title url=root description=post.content %}
+{% include 'snippets/seo_tags.html' with title=post.title url=root description=meta_description %}
 {% endblock %}
 
 {% block nav %}
