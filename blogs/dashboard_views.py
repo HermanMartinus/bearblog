@@ -10,13 +10,18 @@ from .models import Blog, Post
 from .helpers import root as get_root
 
 
+def resolve_subdomain(http_host, blog):
+    extracted = tldextract.extract(http_host)
+    if extracted.subdomain and extracted.subdomain != blog.subdomain:
+        return False
+    return True
+
+
 @login_required
 def dashboard(request):
-    extracted = tldextract.extract(request.META['HTTP_HOST'])
-
     try:
         blog = Blog.objects.get(user=request.user)
-        if extracted.subdomain and extracted.subdomain != blog.subdomain:
+        if not resolve_subdomain(request.META['HTTP_HOST'], blog):
             return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
         if request.method == "POST":
@@ -30,7 +35,7 @@ def dashboard(request):
         return render(request, 'dashboard/dashboard.html', {
             'form': form,
             'blog': blog,
-            'root': get_root(blog.subdomain),
+            'root': get_root(blog.subdomain)
         })
 
     except Blog.DoesNotExist:
@@ -56,11 +61,9 @@ def dashboard(request):
 
 @login_required
 def posts_edit(request):
-    extracted = tldextract.extract(request.META['HTTP_HOST'])
     blog = get_object_or_404(Blog, user=request.user)
-    if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return redirect(
-            f"http://{get_root(blog.subdomain)}/dashboard/posts")
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
     posts = Post.objects.filter(blog=blog).order_by('-published_date')
 
@@ -72,11 +75,9 @@ def posts_edit(request):
 
 @login_required
 def post_new(request):
-    extracted = tldextract.extract(request.META['HTTP_HOST'])
     blog = get_object_or_404(Blog, user=request.user)
-    if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return redirect(
-            f"http://{get_root(blog.subdomain)}/dashboard/posts/new")
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
     if request.method == "POST":
         form = PostForm(request.user, request.POST)
@@ -96,11 +97,9 @@ def post_new(request):
 
 @login_required
 def post_edit(request, pk):
-    extracted = tldextract.extract(request.META['HTTP_HOST'])
     blog = get_object_or_404(Blog, user=request.user)
-    if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return redirect(
-            f"http://{get_root(blog.subdomain)}/dashboard/posts")
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
     post = get_object_or_404(Post, blog=blog, pk=pk)
     if request.method == "POST":
@@ -122,10 +121,8 @@ def post_edit(request, pk):
 
 @login_required
 def domain_edit(request):
-    extracted = tldextract.extract(request.META['HTTP_HOST'])
     blog = Blog.objects.get(user=request.user)
-
-    if extracted.subdomain and extracted.subdomain != blog.subdomain:
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
     if request.method == "POST":

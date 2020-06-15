@@ -1,37 +1,54 @@
 from django.shortcuts import get_object_or_404, redirect, render
-import mistune
-import tldextract
+from django.contrib.sites.models import Site
+from django.utils import timezone
 from django.http import Http404
-from feedgen.feed import FeedGenerator
-from ipaddr import client_ip
-
-from .helpers import unmark, root as get_root
-from blogs.helpers import get_nav, get_post, get_posts
 from django.http import HttpResponse
 from django.db.models import Count, ExpressionWrapper, F, FloatField
 from blogs.models import Upvote, Blog, Post
 from django.db.models.functions import Now
+
+
+from blogs.helpers import get_nav, get_post, get_posts, unmark, root as get_root
+
 from pg_utils import Seconds
-from django.utils import timezone
+from feedgen.feed import FeedGenerator
+from ipaddr import client_ip
+import mistune
+import tldextract
+
+
+def resolve_address(request):
+    http_host = request.META['HTTP_HOST']
+    sites = Site.objects.all()
+    if any(http_host == site.domain for site in sites):
+        # Homepage
+        return False
+    elif any(site.domain in http_host for site in sites):
+        # Subdomained blog
+        blog = get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain)
+        return {
+            'blog': blog,
+            'root': get_root(blog.subdomain)
+        }
+    else:
+        # Custom domain blog
+        return {
+            'blog': get_object_or_404(Blog, domain=http_host),
+            'root': http_host
+        }
 
 
 def home(request):
-    http_host = request.META['HTTP_HOST']
-
-    if http_host == 'bearblog.dev' or http_host == 'www.bearblog.dev' or http_host == 'localhost:8000':
+    address_info = resolve_address(request)
+    if not address_info:
         return render(request, 'landing.html')
-    elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
-        extracted = tldextract.extract(http_host)
-        blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
-        root = get_root(blog.subdomain)
-    else:
-        blog = get_object_or_404(Blog, domain=http_host)
-        root = http_host
+
+    blog = address_info['blog']
 
     all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
     content = mistune.html(blog.content)
-    
+
     return render(
         request,
         'home.html',
@@ -40,23 +57,17 @@ def home(request):
             'content': content,
             'posts': get_posts(all_posts),
             'nav': get_nav(all_posts),
-            'root': root,
+            'root': address_info['root'],
             'meta_description': unmark(blog.content)[:160]
         })
 
 
 def posts(request):
-    http_host = request.META['HTTP_HOST']
-
-    if http_host == 'bearblog.dev' or http_host == 'www.bearblog.dev' or http_host == 'localhost:8000':
+    address_info = resolve_address(request)
+    if not address_info:
         return redirect('/')
-    elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
-        extracted = tldextract.extract(http_host)
-        blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
-        root = get_root(blog.subdomain)
-    else:
-        blog = get_object_or_404(Blog, domain=http_host)
-        root = http_host
+
+    blog = address_info['blog']
 
     all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
@@ -67,24 +78,18 @@ def posts(request):
             'blog': blog,
             'posts': get_posts(all_posts),
             'nav': get_nav(all_posts),
-            'root': root,
+            'root': address_info['root'],
             'meta_description':  unmark(blog.content)[:160]
         }
     )
 
 
 def post(request, slug):
-    http_host = request.META['HTTP_HOST']
-
-    if http_host == 'bearblog.dev' or http_host == 'www.bearblog.dev' or http_host == 'localhost:8000':
+    address_info = resolve_address(request)
+    if not address_info:
         return redirect('/')
-    elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
-        extracted = tldextract.extract(http_host)
-        blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
-        root = get_root(blog.subdomain)
-    else:
-        blog = get_object_or_404(Blog, domain=http_host)
-        root = http_host
+
+    blog = address_info['blog']
 
     ip_address = client_ip(request)
 
@@ -120,7 +125,7 @@ def post(request, slug):
             'content': content,
             'post': post,
             'nav': get_nav(all_posts),
-            'root': root,
+            'root': address_info['root'],
             'meta_description': unmark(post.content)[:160],
             'upvoted': upvoted
         }
@@ -169,8 +174,7 @@ def not_found(request, *args, **kwargs):
 def discover(request):
     http_host = request.META['HTTP_HOST']
 
-    if not (http_host == 'bearblog.dev' or http_host == 'www.bearblog.dev' or http_host == 'localhost:8000'):
-        raise Http404("No Post matches the given query.")
+    get_object_or_404(Site, domain=http_host)
 
     ip_address = client_ip(request)
 
