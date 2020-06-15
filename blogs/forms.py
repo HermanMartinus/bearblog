@@ -115,7 +115,7 @@ class PostForm(forms.ModelForm):
 
     content = forms.CharField(
         label="Content (markdown)",
-        help_text="Add hastags for categorization eg: '#bear #blog #bearblog'",
+        help_text="Add hashtags for categorization e.g.: '#bear #blog #bearblog'",
         widget=forms.Textarea(),
         validators=[script_validator]
     )
