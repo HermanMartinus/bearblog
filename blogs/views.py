@@ -133,17 +133,12 @@ def post(request, slug):
 
 
 def feed(request):
-    http_host = request.META['HTTP_HOST']
-
-    if http_host == 'bearblog.dev' or http_host == 'www.bearblog.dev' or http_host == 'localhost:8000':
+    address_info = resolve_address(request)
+    if not address_info:
         return redirect('/')
-    elif 'bearblog.dev' in http_host or 'localhost:8000' in http_host:
-        extracted = tldextract.extract(http_host)
-        blog = get_object_or_404(Blog, subdomain=extracted.subdomain)
-        root = get_root(blog.subdomain)
-    else:
-        blog = get_object_or_404(Blog, domain=http_host)
-        root = http_host
+
+    blog = address_info['blog']
+    root = address_info['root']
 
     all_posts = blog.post_set.filter(publish=True, is_page=False).order_by('-published_date')
 
@@ -220,6 +215,7 @@ def discover(request):
                 upvoted_posts.append(post.pk)
 
     return render(request, 'discover.html', {
+        'site': Site.objects.get_current(),
         'posts': posts,
         'next_page': page+1,
         'posts_from': posts_from,
