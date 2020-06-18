@@ -15,9 +15,9 @@
 {% block nav %}
 <a href="/">Home</a>
 {% for item in nav %}
-<a href="/{{ item.slug }}">{{ item.title }}</a>
+<a href="/{{ item.slug }}/">{{ item.title }}</a>
 {% endfor %}
-<a href="/blog">Blog</a>
+<a href="/blog/">Blog</a>
 {% endblock %}
 
 {% block content %}
@@ -35,7 +35,7 @@
                 - {{ post.published_date|date:'d M, Y' }} -
             </time>
         </i>
-        <a href="/{{ post.slug }}">{{ post.title }}</a>
+        <a href="/{{ post.slug }}/">{{ post.title }}</a>
     </li>
     {% endfor %}
 </ul>
