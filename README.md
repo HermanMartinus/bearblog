@@ -4,16 +4,15 @@
 ## Free, no-nonsense, super-fast blogging
 ### No javascript, no stylesheets, no trackers. Just your words.
 
-There is a website obesity crisis. Bloated websites full of scripts, ads, and trackers slowing your readers down every time they try to read your well crafted content.
-
-Bear is all you need to build a fantasic and optimized site or blog.
-It works perfectly on <b>any</b> viewing device. All you need to focus on is writing good content.
-
-[View example blog](https://herman.bearblog.dev)
-
-Bear makes it simple to publish content online, grow an audience, all while keeping pages tiny, fast, and optimized for search engines.
-
+## Markdown
 All the post content is written in [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
 
-### [Start blogging now](https://bearblog.dev)
+## Custom domains
+It is free to add custom domains. Learn more in the [wiki](https://github.com/HermanMartinus/bearblog/wiki/Custom-domains)
 
+## Can Bear Blog be self-hosted? 
+Bear Blog has been built as a platform and not as an indiviual blog system.
+It is more like Medium than Jekyll. Due to this it currently isn't possible to self-host Bear Blog as an individual blog. This may change in the future, but for now it's a open-source blogging *platform*.
+
+## Roadmap
+Check out the roadmap in the [wiki](https://github.com/HermanMartinus/bearblog/wiki/Roadmap)
