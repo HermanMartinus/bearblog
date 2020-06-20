@@ -5,6 +5,7 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.db.models import Count, ExpressionWrapper, F, FloatField
 from blogs.models import Upvote, Blog, Post
+from django.db.models import Q
 from django.db.models.functions import Now
 
 
@@ -13,8 +14,8 @@ from blogs.helpers import get_nav, get_post, get_posts, unmark, root as get_root
 from pg_utils import Seconds
 from feedgen.feed import FeedGenerator
 from ipaddr import client_ip
-import mistune
 import tldextract
+import json
 
 
 def resolve_address(request):
@@ -67,7 +68,17 @@ def posts(request):
 
     blog = address_info['blog']
 
-    all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+    query = request.GET.get('q', '')
+    if query:
+        print(f"Found {query}")
+        all_posts = blog.post_set.filter(Q(publish=True) & Q(content__icontains=query)).order_by('-published_date')
+    else:
+        all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+
+    if blog.hashtags:
+        hashtags = json.loads(blog.hashtags)
+    else:
+        hashtags = []
 
     return render(
         request,
@@ -77,7 +88,8 @@ def posts(request):
             'posts': get_posts(all_posts),
             'nav': get_nav(all_posts),
             'root': address_info['root'],
-            'meta_description':  unmark(blog.content)[:160]
+            'meta_description':  unmark(blog.content)[:160],
+            'hashtags': hashtags,
         }
     )
 

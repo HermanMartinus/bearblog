@@ -40,6 +40,13 @@ Blog |
         </li>
         {% endfor %}
     </ul>
+    <small>
+        <div>
+            {% for tag in hashtags %}
+                <a href="/blog/?q=%23{{ tag }}">#{{ tag }}</a>
+            {% endfor %}
+        </div>
+    </small>
 </content>
 
 {% endblock %}
