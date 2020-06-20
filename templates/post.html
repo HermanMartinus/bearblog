@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load markdownify %}
 
 {% block title %}
 {{ post.title }} |
@@ -38,7 +39,7 @@
 {% endif %}
 
 <content>
-    {{ content|safe }}
+    {{ content | markdown | safe }}
 </content>
 
 {% if post.show_in_feed %}

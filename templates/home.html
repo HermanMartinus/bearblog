@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load markdownify %}
 
 {% block title %}
 {{ blog.title }}
@@ -23,7 +24,7 @@
 {% block content %}
 {% if blog.content %}
 <content>
-    {{ content|safe }}
+    {{ content | markdown | safe }}
 </content>
 {% else %}
 <ul>

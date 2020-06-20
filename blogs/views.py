@@ -47,14 +47,12 @@ def home(request):
 
     all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
-    content = mistune.html(blog.content)
-
     return render(
         request,
         'home.html',
         {
             'blog': blog,
-            'content': content,
+            'content': blog.content,
             'posts': get_posts(all_posts),
             'nav': get_nav(all_posts),
             'root': address_info['root'],
@@ -115,14 +113,12 @@ def post(request, slug):
         if upvote.ip_address == ip_address:
             upvoted = True
 
-    content = mistune.html(post.content)
-
     return render(
         request,
         'post.html',
         {
             'blog': blog,
-            'content': content,
+            'content': post.content,
             'post': post,
             'nav': get_nav(all_posts),
             'root': address_info['root'],

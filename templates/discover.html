@@ -23,15 +23,11 @@
             #{{ forloop.counter|add:posts_from }}
             </div>
             <div style="padding-bottom: 7px">
-            <a
-                href="http://{{ post.blog.subdomain }}.{{ site }}/{{ post.slug }}"
-                target="_blank"
-            >{{ post.title }}</a>
+            <a href="http://{{ post.blog.subdomain }}.{{ site }}/{{ post.slug }}/">
+                {{ post.title }}
+            </a>
             <small>
-                <a
-                    href="http://{{ post.blog.subdomain }}.{{ site }}/"
-                    target="_blank"
-                >
+                <a href="http://{{ post.blog.subdomain }}.{{ site }}/">
                     ({{ post.blog.subdomain }}.{{ site }})
                 </a>
                 <br>

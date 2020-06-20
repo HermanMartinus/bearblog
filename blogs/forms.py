@@ -13,9 +13,6 @@ link_validator = RegexValidator(
 domain_validator = RegexValidator(
     r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$",
     "Please enter a valid domain")
-script_validator = RegexValidator(
-    r"<[^>]*script",
-    "No script tags allowed", inverse_match=True)
 tags_validator = RegexValidator(
     r"([^,]+)",
     "These tags are not valid (eg: tag1, tag2, tag3)")
@@ -54,7 +51,6 @@ class BlogForm(forms.ModelForm):
         label="Homepage content (markdown)",
         widget=forms.Textarea(),
         required=False,
-        validators=[script_validator]
     )
     subdomain = forms.SlugField(
         label="Subdomain",
@@ -117,7 +113,6 @@ class PostForm(forms.ModelForm):
         label="Content (markdown)",
         help_text="Add hashtags for categorization e.g.: '#bear #blog #bearblog'",
         widget=forms.Textarea(),
-        validators=[script_validator]
     )
 
     show_in_feed = forms.BooleanField(
