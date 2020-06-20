@@ -23,6 +23,12 @@ Blog |
 
 {% block content %}
 <content>
+    {% if query %}
+    <h3>Filtering for "{{ query }}"</h3>
+    <small>
+    <a href="/blog/">Remove filter</a>
+    </small>
+    {% endif %}
     <ul style="list-style-type: none;padding: unset;">
         {% for post in posts %}
         <li>

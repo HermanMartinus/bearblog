@@ -90,6 +90,7 @@ def posts(request):
             'root': address_info['root'],
             'meta_description':  unmark(blog.content)[:160],
             'hashtags': hashtags,
+            'query': query,
         }
     )
 
