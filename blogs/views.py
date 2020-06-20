@@ -70,7 +70,6 @@ def posts(request):
 
     query = request.GET.get('q', '')
     if query:
-        print(f"Found {query}")
         all_posts = blog.post_set.filter(Q(publish=True) & Q(content__icontains=query)).order_by('-published_date')
     else:
         all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
