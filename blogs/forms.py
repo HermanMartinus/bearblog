@@ -49,7 +49,7 @@ def protected_domains_validator(value):
 class BlogForm(forms.ModelForm):
     content = forms.CharField(
         label="Homepage content (markdown)",
-        widget=forms.Textarea(),
+        widget=forms.Textarea(attrs={'rows': 40, 'cols': 40}),
         required=False,
     )
     subdomain = forms.SlugField(
@@ -112,7 +112,7 @@ class PostForm(forms.ModelForm):
     content = forms.CharField(
         label="Content (markdown)",
         help_text="Add hashtags for categorization e.g.: '#bear #blog #bearblog'",
-        widget=forms.Textarea(),
+        widget=forms.Textarea(attrs={'rows': 40, 'cols': 40}),
     )
 
     show_in_feed = forms.BooleanField(
