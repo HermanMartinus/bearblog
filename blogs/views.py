@@ -155,15 +155,15 @@ def feed(request):
     fg.author({'name': blog.subdomain, 'email': blog.user.email})
     fg.title(blog.title)
     fg.subtitle(unmark(blog.content)[:160])
-    fg.link(href=f"http://{root}/", rel='self')
+    fg.link(href=f"http://{root}/feed/", rel='self')
     fg.link(href=root, rel='alternate')
 
     for post in all_posts:
         fe = fg.add_entry()
-        fe.id(f"http://{root}/{post.slug}")
+        fe.id(f"http://{root}/{post.slug}/")
         fe.title(post.title)
         fe.author({'name': blog.subdomain, 'email': blog.user.email})
-        fe.link(href=f"http://{root}/feed")
+        fe.link(href=f"http://{root}/feed/")
         fe.content(unmark(post.content))
         fe.updated(post.published_date)
 
