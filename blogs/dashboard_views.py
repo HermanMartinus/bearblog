@@ -3,10 +3,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.edit import DeleteView
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+
 import tldextract
+from ipaddr import client_ip
 
 from .forms import BlogForm, PostForm, DomainForm
-from .models import Blog, Post
+from .models import Blog, Post, Upvote
 from .helpers import root as get_root
 
 
@@ -86,6 +88,9 @@ def post_new(request):
             post.blog = blog
             post.published_date = timezone.now()
             post.save()
+
+            upvote = Upvote(post=post, ip_address=client_ip(request))
+            upvote.save()
             return redirect(f"/dashboard/posts/{post.id}/")
     else:
         form = PostForm(request.user)
