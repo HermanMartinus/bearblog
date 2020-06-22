@@ -155,8 +155,8 @@ def feed(request):
     fg.author({'name': blog.subdomain, 'email': blog.user.email})
     fg.title(blog.title)
     fg.subtitle(unmark(blog.content)[:160])
-    fg.link(href=f"http://{root}/feed/", rel='self')
-    fg.link(href=root, rel='alternate')
+    fg.link(href=f"http://{root}/", rel='self')
+    fg.link(href=f"http://{root}/", rel='alternate')
 
     for post in all_posts:
         fe = fg.add_entry()
@@ -168,6 +168,7 @@ def feed(request):
         fe.updated(post.published_date)
 
     atomfeed = fg.atom_str(pretty=True)
+    rssfeed = fg.rss_str(pretty=True)
     return HttpResponse(atomfeed, content_type='application/atom+xml')
 
 
