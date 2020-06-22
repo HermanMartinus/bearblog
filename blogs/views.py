@@ -197,7 +197,7 @@ def discover(request):
 
     posts_per_page = 20
     page = 0
-    gravity = 1.1
+    gravity = 1.2
     if request.GET.get('page'):
         page = int(request.GET.get('page'))
 

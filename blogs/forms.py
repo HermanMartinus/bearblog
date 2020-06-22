@@ -106,12 +106,13 @@ class PostForm(forms.ModelForm):
 
     published_date = forms.DateTimeField(
         label="Date",
-        help_text="eg: '2020-05-31'"
+        help_text="eg: '2020-05-31' (leave empty to post now)",
+        required=False
     )
 
     content = forms.CharField(
         label="Content (markdown)",
-        help_text="Add hashtags for categorization e.g.: '#bear #blog #bearblog'",
+        help_text="Add hashtags for categorization, eg: '#bear #blog #bearblog'",
         widget=forms.Textarea(attrs={'rows': 40, 'cols': 40}),
     )
 
