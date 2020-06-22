@@ -167,6 +167,7 @@ def feed(request):
         fe.updated(post.published_date)
 
     if request.GET.get('type') == 'rss':
+        fg.link(href=f"http://{root}/feed/?type=rss", rel='self')
         rssfeed = fg.rss_str(pretty=True)
         return HttpResponse(rssfeed, content_type='application/rss+xml')
     else:
