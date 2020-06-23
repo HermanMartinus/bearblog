@@ -116,6 +116,12 @@ class PostForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'rows': 40, 'cols': 40}),
     )
 
+    canonical_url = forms.CharField(
+        label="Canonical url (optional)",
+        help_text="<a href='https://ahrefs.com/blog/canonical-tags/#what-is-a-canonical-tag' target='_blank'>Learn more</a>",
+        required=False
+    )
+
     show_in_feed = forms.BooleanField(
         help_text=f"Make post discoverable at <a href='http://{root()}/discover/' target='_blank'>{root()}/discover</a>",
         required=False,
@@ -136,4 +142,4 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'slug', 'published_date', 'content', 'is_page', 'publish', 'show_in_feed')
+        fields = ('title', 'slug', 'canonical_url', 'published_date', 'content', 'is_page', 'publish', 'show_in_feed')

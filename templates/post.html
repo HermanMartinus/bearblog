@@ -6,6 +6,12 @@
 {{ blog.title }}
 {% endblock %}
 
+{% block canonical %}
+{% if post.canonical_url %}
+<link rel="canonical" href="{{ post.canonical_url }}" />
+{% endif %}
+{% endblock %}
+
 {% block heading %}
 {{ blog.title }}
 {% endblock %}
@@ -47,7 +53,7 @@
     <form action="" method="post" style="display: inline">
         <input hidden name="pk" value="{{ post.pk }}" />
         {% csrf_token %}
-         {% if upvoted %}
+        {% if upvoted %}
         <button disabled=true>▵ Toasted</button>
         {% else %}
         <button>▵ Toast this post</button>

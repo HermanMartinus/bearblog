@@ -52,6 +52,7 @@ class Post(models.Model):
     show_in_feed = models.BooleanField(default=True)
     is_page = models.BooleanField(default=False)
     content = models.TextField()
+    canonical_url = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.title
