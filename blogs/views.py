@@ -162,7 +162,7 @@ def feed(request):
         fe.id(f"http://{root}/{post.slug}/")
         fe.title(post.title)
         fe.author({'name': blog.subdomain, 'email': blog.user.email})
-        fe.link(href=f"http://{root}/feed/")
+        fe.link(href=f"http://{root}/{post.slug}/")
         fe.content(unmark(post.content))
         fe.updated(post.published_date)
 
