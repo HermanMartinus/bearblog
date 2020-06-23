@@ -48,6 +48,14 @@
     {{ content | markdown | safe }}
 </content>
 
+{% if post.canonical_url %}
+<p>
+    <small>
+        <a href="{{ post.canonical_url }}">Show original</a>
+    </small>
+</p>
+{% endif %}
+
 {% if post.show_in_feed %}
 <small>
     <form action="" method="post" style="display: inline">
