@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block nav %}
@@ -10,26 +9,28 @@
 {% endblock %}
 
 {% block content %}
-<h1>
+<content>
+    <h1>
+        {% if post %}
+        Edit post
+        {% else %}
+        New post
+        {% endif %}
+    </h1>
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
     {% if post %}
-    Edit post
-    {% else %}
-    New post
-    {% endif %}
-</h1>
-<form method="POST" class="post-form">{% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="save btn btn-default">Save</button>
-</form>
-{% if post %}
-<p>
-    {% if post.publish == True %}
-    <a href="http://{{ root }}/{{ post.slug }}" target="_blank">View post</a> |
-    {% elif post %}
-    <a href="http://{{ root }}/{{ post.slug }}?preview=true" target="_blank">Preview post</a> |
-    {% endif %}
-    <a href="/dashboard/posts/{{ post.pk }}/delete">Delete post</a>
-</p>
+    <p>
+        {% if post.publish == True %}
+        <a href="http://{{ root }}/{{ post.slug }}" target="_blank">View post</a> |
+        {% elif post %}
+        <a href="http://{{ root }}/{{ post.slug }}?preview=true" target="_blank">Preview post</a> |
+        {% endif %}
+        <a href="/dashboard/posts/{{ post.pk }}/delete">Delete post</a>
+    </p>
+</content>
 {% endif %}
 
 {% endblock %}

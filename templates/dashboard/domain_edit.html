@@ -11,35 +11,37 @@
 {% endblock %}
 
 {% block content %}
-<h1>Custom domain</h1>
-<h3>Set the following DNS record</h1>
-<table>
-<tr>
-    <th>Type</th>
-    <th>Name</th>
-    <th>Content</th>
-    <th>TTL</th>
-</tr>
-<tr>
-    <td>CNAME</td>
-    <td><small>{your domain}</small></td>
-    <td><small>shaped-krill-fusn49u0rpoovwvgh0i6za5w.herokudns.com</small></td>
-    <td>3600</td>
-</tr>
-</table>
-<p>Then add your domain below</p>
-<form method="POST" class="post-form">{% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="save btn btn-default">Save</button>
-</form>
-<p>
-    <small>
-        Bear does not provide SSL certificates for custom domains. Use a CDN like Cloudflare and set the SSL connection type to Flexible to achieve this.
-    </small>
-</p>
-<p>
-    <small>
-        If your domain records are not set in 48h, we will remove your custom domain from the system as there is limited room.
-    </small>
-</p>
+<content>
+    <h1>Custom domain</h1>
+    <h3>Set the following DNS record</h1>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Content</th>
+                <th>TTL</th>
+            </tr>
+            <tr>
+                <td>CNAME</td>
+                <td><small>{your domain}</small></td>
+                <td><small>shaped-krill-fusn49u0rpoovwvgh0i6za5w.herokudns.com</small></td>
+                <td>3600</td>
+            </tr>
+        </table>
+        <p>Then add your domain below</p>
+        <form method="POST" class="post-form">{% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="save btn btn-default">Save</button>
+        </form>
+        <p>
+            <small>
+                Bear does not provide SSL certificates for custom domains. Use a CDN like Cloudflare and set the SSL connection type to Flexible to achieve this.
+            </small>
+        </p>
+        <p>
+            <small>
+                If your domain records are not set in 48h, we will remove your custom domain from the system as there is limited room.
+            </small>
+        </p>
+</content>
 {% endblock %}

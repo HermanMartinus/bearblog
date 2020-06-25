@@ -9,27 +9,43 @@
 {% endblock %}
 
 {% block content %}
-<h1>Posts</h1>
-<a href="/dashboard/posts/new">New post</a>
-<ul>
-    {% for post in posts %}
-    <li>
-        #{{ forloop.revcounter }}
-        <i>
-            <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
-                - {{ post.published_date|date:'d M, Y' }} -
-            </time>
-        </i>
-        <a href="/dashboard/posts/{{ post.pk }}">{{ post.title }}</a>
-        {% if not post.publish %}
-        (not published)
-        {% endif %}
-    </li>
-    {% empty %}
-    <li>
-        No posts yet
-    </li>
-    {% endfor %}
-</ul>
+<style>
+    ul {
+        list-style-type: none;
+        padding: unset;
+    }
 
+    li {
+        display: flex;
+    }
+
+    li span {
+        flex: 0 0 130px;
+    }
+</style>
+<content>
+    <h1>Posts</h1>
+    <a href="/dashboard/posts/new">New post</a>
+    <ul>
+        {% for post in posts %}
+        <li>
+            <span>
+                <i>
+                    <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
+                        {{ post.published_date|date:'d M, Y' }}
+                    </time>
+                </i>
+            </span>
+            <a href="/dashboard/posts/{{ post.pk }}">{{ post.title }}</a>
+            {% if not post.publish %}
+            (not published)
+            {% endif %}
+        </li>
+        {% empty %}
+        <li>
+            No posts yet
+        </li>
+        {% endfor %}
+    </ul>
+</content>
 {% endblock %}
