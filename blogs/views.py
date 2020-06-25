@@ -215,7 +215,7 @@ def discover(request):
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
             score=ExpressionWrapper(
-                ((Count('upvote')) / ((Seconds(Now() - F('published_date')))+2)**gravity)*100000,
+                ((Count('upvote')) / ((Seconds(Now() - F('published_date')))+4)**gravity)*100000,
                 output_field=FloatField()
             ),
         ).filter(publish=True, show_in_feed=True, published_date__lte=timezone.now()

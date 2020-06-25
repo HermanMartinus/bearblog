@@ -8,41 +8,66 @@
 {% endblock %}
 
 {% block content %}
-<h1>
-    Discovery feed
-</h1>
-<nav>
-    <a href="/discover/">Trending</a>
-    <a href="/discover/?newest=true">Newest</a>
-</nav>
+<style>
+    ul {
+        list-style-type: none;
+        padding: unset;
+    }
+
+    li {
+        display: flex;
+        line-height: 1.2;
+    }
+
+    li span {
+        flex: 0 0 40px;
+    }
+
+    li a:visited {
+      color: #6532dc;
+    }
+
+    li div {
+        padding-bottom: 8px;
+    }
+</style>
+
 <content>
-    <ul style="list-style-type: none;padding: unset;">
+    <h1>
+        Discovery feed
+    </h1>
+    <nav>
+        <a href="/discover/">Trending</a>
+        <a href="/discover/?newest=true">Newest</a>
+    </nav>
+
+    <ul>
         {% for post in posts %}
-        <li style="display: flex;line-height: 1.2;">
-            <div style="margin-right: 10px;">
-            #{{ forloop.counter|add:posts_from }}
-            </div>
-            <div style="padding-bottom: 7px">
-            <a href="http://{{ post.blog.subdomain }}.{{ site }}/{{ post.slug }}/">
-                {{ post.title }}
-            </a>
-            <small>
-                <a href="http://{{ post.blog.subdomain }}.{{ site }}/">
-                    ({{ post.blog.subdomain }}.{{ site }})
+        <li>
+            <span>
+                #{{ forloop.counter|add:posts_from }}
+            </span>
+            <div>
+                <a href="http://{{ post.blog.subdomain }}.{{ site }}/{{ post.slug }}/">
+                    {{ post.title }}
                 </a>
-                <br>
-                <form action="" method="post" style="display: inline">
-                    <input hidden name="pk" value="{{ post.pk }}" />
-                    {% csrf_token %}
-                    {% if post.pk in upvoted_posts%}
-                    <button disabled=true>▵ Toasted</button>
-                    {% else %}
-                    <button>▵ Toast this post</button>
-                    {% endif %}
-                </form>
-                <small>- {{ post.upvote_count }} toasts</small>
-                <small>({{ post.published_date|timesince }} ago)</small>
-            </small>
+                <small>
+                    <a href="http://{{ post.blog.subdomain }}.{{ site }}/">
+                        ({{ post.blog.subdomain }}.{{ site }})
+                    </a>
+                    <br>
+                    <form action="" method="post" style="display: inline">
+                        <input hidden name="pk" value="{{ post.pk }}" />
+                        {% csrf_token %}
+                        {% if post.pk in upvoted_posts%}
+                        <button disabled=true>▵ Toasted</button>
+                        {% else %}
+                        <button>▵ Toast this post</button>
+                        {% endif %}
+                    </form>
+                    <small>- {{ post.upvote_count }} toasts</small>
+                    <small>({{ post.published_date|timesince }} ago)</small>
+                </small>
             </div>
         </li>
         {% empty %}
@@ -60,7 +85,7 @@
         <pre>
 This page is ranked according to the following algorithm:
             <code>
-Score = U / (T+2)^G
+Score = U / (T+4)^G
 
 Where,
 U = Upvotes (toasts) of a post
