@@ -8,14 +8,16 @@ register = template.Library()
 
 @register.filter
 def markdown(value):
-    markup = mistune.html(value)
-    cleaned_markup = clean_html(markup)
+    markdown = value
 
     # linkify hashtags
-    for tag in re.findall(r"(#[\d\w\.]+)", cleaned_markup):
+    for tag in re.findall(r"(#[\d\w\.]+)", markdown):
         text_tag = tag.replace('#', '')
-        cleaned_markup = cleaned_markup.replace(
+        markdown = markdown.replace(
             tag,
-            f"<a href='/blog/?q=%23{text_tag}'>{tag}</a>")
+            f"[{tag}](/blog/?q=%23{text_tag})")
+
+    markup = mistune.html(markdown)
+    cleaned_markup = clean_html(markup)
 
     return cleaned_markup
