@@ -1,5 +1,6 @@
 appdirs==1.4.3
 asgiref==3.2.7
+beautifulsoup4==4.9.1
 certifi==2020.4.5.1
 chardet==3.0.4
 defusedxml==0.6.0
