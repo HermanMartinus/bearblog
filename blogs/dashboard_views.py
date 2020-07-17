@@ -46,7 +46,8 @@ def dashboard(request):
             if form.is_valid():
                 blog = form.save(commit=False)
                 blog.user = request.user
-                blog.created_date = timezone.now()
+                if not blog.created_date:
+                    blog.created_date = timezone.now()
                 blog.save()
 
                 return render(request, 'dashboard/dashboard.html', {
