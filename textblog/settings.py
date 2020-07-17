@@ -120,10 +120,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Cookies
-
-SESSION_COOKIE_SECURE = True
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
