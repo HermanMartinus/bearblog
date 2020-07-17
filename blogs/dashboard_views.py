@@ -46,8 +46,7 @@ def dashboard(request):
             if form.is_valid():
                 blog = form.save(commit=False)
                 blog.user = request.user
-                if not blog.created_date:
-                    blog.created_date = timezone.now()
+                blog.created_date = timezone.now()
                 blog.save()
 
                 return render(request, 'dashboard/dashboard.html', {
@@ -87,7 +86,8 @@ def post_new(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.blog = blog
-            post.published_date = timezone.now()
+            if not post.published_date:
+                post.published_date = timezone.now()
             post.save()
 
             upvote = Upvote(post=post, ip_address=client_ip(request))
