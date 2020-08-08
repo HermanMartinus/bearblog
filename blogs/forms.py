@@ -49,6 +49,7 @@ def protected_domains_validator(value):
 class BlogForm(forms.ModelForm):
     content = forms.CharField(
         label="Homepage content (markdown)",
+        help_text="<a href='https://simplemde.com/markdown-guide' target='_blank'>Markdown cheatsheet</a>",
         widget=forms.Textarea(attrs={'rows': 40, 'cols': 40}),
         required=False,
     )
@@ -112,7 +113,7 @@ class PostForm(forms.ModelForm):
 
     content = forms.CharField(
         label="Content (markdown)",
-        help_text="Add hashtags for categorization, eg: '#bear #blog #bearblog'",
+        help_text="<a href='https://simplemde.com/markdown-guide' target='_blank'>Markdown cheatsheet</a> | Add hashtags for categorization, eg: '#bears #blogs #bearblog'",
         widget=forms.Textarea(attrs={'rows': 40, 'cols': 40}),
     )
 
