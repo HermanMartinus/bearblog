@@ -113,6 +113,8 @@ def post_edit(request, pk):
         if form.is_valid():
             post = form.save(commit=False)
             post.blog = blog
+            if not post.published_date:
+                post.published_date = timezone.now()
             post.save()
     else:
         form = PostForm(request.user, instance=post)
