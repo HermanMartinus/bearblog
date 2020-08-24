@@ -48,7 +48,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=100)
     published_date = models.DateTimeField(blank=True)
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
     publish = models.BooleanField(default=True)
     show_in_feed = models.BooleanField(default=True)
     is_page = models.BooleanField(default=False)
