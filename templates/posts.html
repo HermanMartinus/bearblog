@@ -66,13 +66,15 @@ Blog |
         </li>
         {% endfor %}
     </ul>
+    {% if not query %}
     <small>
         <div>
-            {% for tag in hashtags %}
-                <a href="/blog/?q=%23{{ tag }}">#{{ tag }}</a>
+            {% for tag in tags %}
+                <a href="/blog/?q={{ tag }}">#{{ tag }}</a>
             {% endfor %}
         </div>
     </small>
+    {% endif %}
 </content>
 
 {% endblock %}

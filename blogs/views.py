@@ -5,7 +5,6 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.db.models import Count, ExpressionWrapper, F, FloatField
 from blogs.models import Upvote, Blog, Post
-from django.db.models import Q
 from django.db.models.functions import Now
 
 
@@ -14,6 +13,8 @@ from blogs.helpers import get_nav, get_post, get_posts, unmark, root as get_root
 from pg_utils import Seconds
 from feedgen.feed import FeedGenerator
 from ipaddr import client_ip
+from taggit.models import Tag
+
 import tldextract
 import json
 
@@ -70,14 +71,17 @@ def posts(request):
 
     query = request.GET.get('q', '')
     if query:
-        all_posts = blog.post_set.filter(Q(publish=True) & Q(content__icontains=query)).order_by('-published_date')
+        try:
+            tag = Tag.objects.get(name=query)
+            all_posts = blog.post_set.filter(tags=tag, publish=True).order_by('-published_date')
+        except Tag.DoesNotExist:
+            all_posts = []
     else:
         all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
-    if blog.hashtags:
-        hashtags = json.loads(blog.hashtags)
-    else:
-        hashtags = []
+    tags = []
+    for post in all_posts:
+        tags += post.tags.most_common()[:10]
 
     return render(
         request,
@@ -88,7 +92,7 @@ def posts(request):
             'nav': get_nav(all_posts),
             'root': address_info['root'],
             'meta_description':  unmark(blog.content)[:160],
-            'hashtags': hashtags,
+            'tags': tags,
             'query': query,
         }
     )

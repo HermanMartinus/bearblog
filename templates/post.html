@@ -47,7 +47,6 @@
 <content>
     {{ content | markdown | safe }}
 </content>
-
 {% if post.canonical_url %}
 <p>
     <small>
@@ -55,6 +54,11 @@
     </small>
 </p>
 {% endif %}
+<p>
+{% for tag in post.tags.all %}
+    <a href="/blog/?q={{tag}}">#{{ tag }}</a>
+{% endfor %}
+</p>
 
 {% if post.show_in_feed %}
 <small>

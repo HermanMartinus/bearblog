@@ -89,6 +89,7 @@ def post_new(request):
             if not post.published_date:
                 post.published_date = timezone.now()
             post.save()
+            form.save_m2m()
 
             upvote = Upvote(post=post, ip_address=client_ip(request))
             upvote.save()
@@ -116,6 +117,7 @@ def post_edit(request, pk):
             if not post.published_date:
                 post.published_date = timezone.now()
             post.save()
+            form.save_m2m()
     else:
         form = PostForm(request.user, instance=post)
 

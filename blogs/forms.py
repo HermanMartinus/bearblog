@@ -50,7 +50,7 @@ class BlogForm(forms.ModelForm):
     content = forms.CharField(
         label="Homepage content (markdown)",
         help_text="<a href='https://simplemde.com/markdown-guide' target='_blank'>Markdown cheatsheet</a>",
-        widget=forms.Textarea(attrs={'rows': 40, 'cols': 40}),
+        widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
         required=False,
     )
     subdomain = forms.SlugField(
@@ -113,8 +113,8 @@ class PostForm(forms.ModelForm):
 
     content = forms.CharField(
         label="Content (markdown)",
-        help_text="<a href='https://simplemde.com/markdown-guide' target='_blank'>Markdown cheatsheet</a> | Add hashtags for categorization, eg: '#bears #blogs #bearblog'",
-        widget=forms.Textarea(attrs={'rows': 40, 'cols': 40}),
+        help_text="<a href='https://simplemde.com/markdown-guide' target='_blank'>Markdown cheatsheet</a>",
+        widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
     )
 
     canonical_url = forms.CharField(
@@ -143,4 +143,4 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'slug', 'canonical_url', 'published_date', 'content', 'is_page', 'publish', 'show_in_feed')
+        fields = ('title', 'slug', 'canonical_url', 'published_date', 'content', 'tags', 'is_page', 'publish', 'show_in_feed')

@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 
 from .helpers import delete_domain, add_new_domain
+from taggit.managers import TaggableManager
 import re
 import json
 
@@ -15,7 +16,6 @@ class Blog(models.Model):
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
     content = models.TextField(blank=True)
-    hashtags = models.TextField(blank=True)
 
     def __str__(self):
         return self.title
@@ -48,6 +48,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=100)
     published_date = models.DateTimeField(blank=True)
+    tags = TaggableManager()
     publish = models.BooleanField(default=True)
     show_in_feed = models.BooleanField(default=True)
     is_page = models.BooleanField(default=False)
@@ -60,15 +61,6 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         self.slug = self.slug.lower()
         super(Post, self).save(*args, **kwargs)
-
-        # TODO: Make this asynchronous
-        all_text = ''
-        for entry in Post.objects.filter(blog=self.blog):
-            all_text += f'{entry.content} '
-
-        new_hashtags = list(dict.fromkeys(re.findall(r"#(\w+)", all_text)))
-        self.blog.hashtags = json.dumps(new_hashtags)
-        self.blog.save()
 
 
 class Upvote(models.Model):
