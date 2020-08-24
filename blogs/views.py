@@ -154,7 +154,10 @@ def feed(request):
     fg.id(f'http://{root}/')
     fg.author({'name': blog.subdomain, 'email': blog.user.email})
     fg.title(blog.title)
-    fg.subtitle(unmark(blog.content)[:160])
+    if blog.content:
+        fg.subtitle(unmark(blog.content)[:160])
+    else:
+        fg.subtitle(blog.title)
     fg.link(href=f"http://{root}/", rel='alternate')
 
     for post in all_posts:
