@@ -82,7 +82,8 @@ def posts(request):
     tags = []
     for post in all_posts:
         tags += post.tags.most_common()[:10]
-
+    tags = list(dict.fromkeys(tags))
+    
     return render(
         request,
         'posts.html',
