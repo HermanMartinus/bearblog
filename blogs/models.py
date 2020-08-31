@@ -16,7 +16,7 @@ class Blog(models.Model):
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
     content = models.TextField(blank=True)
-    reviewed = models.BooleanField(default=True)
+    reviewed = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
