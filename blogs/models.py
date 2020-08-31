@@ -37,9 +37,12 @@ class Blog(models.Model):
 
 @receiver(pre_delete, sender=Blog, dispatch_uid='blog_delete_signal')
 def delete_blog_receiver(sender, instance, using, **kwargs):
-    print("Delete domain from Heroku")
+    print("Setting user to inactive")
+    instance.user.is_active = False
+    instance.user.save()
 
     if instance.domain:
+        print("Deleting domain from Heroku")
         delete_domain(instance.domain)
 
 
