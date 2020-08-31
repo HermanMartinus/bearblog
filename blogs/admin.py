@@ -4,8 +4,9 @@ from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
 
 from .models import Blog, Post, Upvote
-from django.utils.html import format_html
+from django.utils.html import escape, format_html
 from blogs.helpers import root
+from django.urls import reverse
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -49,13 +50,21 @@ class BlogAdmin(admin.ModelAdmin):
 
     subdomain_url.short_description = "Subomain"
 
+    def user_link(self, obj):
+        return format_html('<a href="{url}">{username}</a>',
+                           url=reverse("admin:auth_user_change", args=(obj.user.id,)),
+                           username=escape(obj.user))
+
+    user_link.allow_tags = True
+    user_link.short_description = "User"
+
     list_display = (
         'title',
         'reviewed',
         'subdomain_url',
         'domain_url',
-        'user',
         'post_count',
+        'user_link',
         'created_date')
 
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
