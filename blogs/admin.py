@@ -51,8 +51,8 @@ class BlogAdmin(admin.ModelAdmin):
 
     list_display = (
         'title',
+        'reviewed',
         'subdomain_url',
-        'domain',
         'domain_url',
         'user',
         'post_count',
@@ -61,7 +61,11 @@ class BlogAdmin(admin.ModelAdmin):
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
     ordering = ('-created_date', 'domain')
 
-    actions = ['remove_account', ]
+    actions = ['approve_blog', ]
+
+    def approve_blog(self, request, queryset):
+        queryset.update(reviewed=True)
+    approve_blog.short_description = "Approve selected blogs"
 
 
 @admin.register(Post)

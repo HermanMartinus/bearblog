@@ -216,7 +216,7 @@ def discover(request):
     if newest:
         posts = Post.objects.annotate(
             upvote_count=Count('upvote'),
-        ).filter(publish=True, show_in_feed=True, published_date__lte=timezone.now()
+        ).filter(publish=True, blog__reviewed=True, show_in_feed=True, published_date__lte=timezone.now()
                  ).order_by('-published_date'
                             ).select_related('blog')[posts_from:posts_to]
     else:
@@ -226,7 +226,7 @@ def discover(request):
                 ((Count('upvote')-1) / ((Seconds(Now() - F('published_date')))+4)**gravity)*100000,
                 output_field=FloatField()
             ),
-        ).filter(publish=True, show_in_feed=True, published_date__lte=timezone.now()
+        ).filter(publish=True, blog__reviewed=True, show_in_feed=True, published_date__lte=timezone.now()
                  ).order_by('-score', '-published_date'
                             ).select_related('blog').prefetch_related('upvote_set')[posts_from:posts_to]
 

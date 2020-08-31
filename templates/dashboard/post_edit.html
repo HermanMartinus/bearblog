@@ -30,6 +30,17 @@
         {% endif %}
         <a href="/dashboard/posts/{{ post.pk }}/delete">Delete post</a>
     </p>
+    {% if not blog.reviewed %}
+    <p>
+        <i>
+            <b>Your blog is currently in review.</b>
+            <br>
+            Your posts can only appear in the discover feed once your blog has been approved. 
+            <br>
+            Sorry about this, we're just trying keep Bear spam free. 
+        </i>
+    </p>
+    {% endif %}
 </content>
 {% endif %}
 
