@@ -5,8 +5,8 @@
   <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0"/>
-  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-  <title>{% block title %}ʕ•ᴥ•ʔ Bear Blog{% endblock %}</title>
+  <link rel="icon" href="https://cdn.shopify.com/s/files/1/1061/1924/files/Panda_Face_Emoji_60x60.png?5173740432015257961">
+  <title>{% block title %}Bear Blog{% endblock %}</title>
   {% block canonical %}
   {% endblock %}
   {% block seo %}
@@ -21,16 +21,26 @@
       background-color: white;
       word-wrap: break-word; 
       overflow-wrap: break-word;
+      line-height: 1.5;
+      color: #444;
+    }
+
+    h1, h2, h3, h4, h5, h6, strong, b {
+      color: #222;
     }
 
     a {
+      {% comment %} color: #ff5e6c; {% endcomment %}
       color: #3273dc;
     }
 
-    h2 a {
-      font-weight: 400;
-      color: #000;
+    .title {
       text-decoration: none;
+      border: 0;
+    }
+
+    .title span {
+      font-weight: 400;
     }
 
     nav a {
@@ -65,6 +75,7 @@
 
     pre code{
       border-left: 1px solid #999;
+      color: #555;
       display: block;
       padding: 10px;
       white-space: pre-wrap;
@@ -72,6 +83,7 @@
 
     blockquote{
       border-left: 1px solid #999;
+      color: #555;
       padding-left: 10px;
       font-style: italic;
     }
@@ -95,11 +107,13 @@
 
 <body>
   <header>
-    <h2>
-      {% block heading %}
-      <a href="/">ʕ•ᴥ•ʔ</a> Bear
-      {% endblock %}
-    </h2>
+    <a class="title" href="/">
+      <h2>
+        {% block heading %}
+        <span>ʕ•ᴥ•ʔ</span> Bear
+        {% endblock %}
+      </h2>
+    </a>
     <nav>
       {% block nav %}
       {% endblock %}
