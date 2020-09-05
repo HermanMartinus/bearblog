@@ -12,7 +12,9 @@ It is free to add custom domains. Learn more in the [wiki](https://github.com/He
 
 ## Can Bear Blog be self-hosted? 
 Bear Blog has been built as a platform and not as an indiviual blog system.
-It is more like Medium than Jekyll. Due to this it currently isn't possible to self-host Bear Blog as an individual blog. This may change in the future, but for now it's a open-source blogging *platform*.
+It is more like Medium than Jekyll. Due to this it currently isn't possible to self-host Bear Blog as an individual blog.
+
+There is currently a [Bear Blog Hugo theme](https://github.com/janraasch/hugo-bearblog) available built by [Jan Raasch](https://www.janraasch.com/). 
 
 ## Roadmap
 Check out the roadmap in the [wiki](https://github.com/HermanMartinus/bearblog/wiki/Roadmap)
