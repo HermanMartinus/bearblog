@@ -20,4 +20,4 @@ if settings.DEBUG:
         path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
 
-handler404 = 'blogs.views.not_found'
+handler404 = 'blogs.views.blog.not_found'

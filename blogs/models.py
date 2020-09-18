@@ -5,8 +5,6 @@ from django.contrib.auth.models import User
 
 from .helpers import delete_domain, add_new_domain
 from taggit.managers import TaggableManager
-import re
-import json
 
 
 class Blog(models.Model):
