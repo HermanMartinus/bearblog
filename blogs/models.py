@@ -17,6 +17,7 @@ class Blog(models.Model):
     domain = models.CharField(max_length=128, blank=True, null=True)
     content = models.TextField(blank=True)
     reviewed = models.BooleanField(default=False)
+    upgraded = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -68,6 +69,15 @@ class Post(models.Model):
 
 
 class Upvote(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+    ip_address = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.ip_address} | {self.created_date.strftime('%d %b %Y, %X')}"
+
+
+class Hit(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     ip_address = models.CharField(max_length=200)

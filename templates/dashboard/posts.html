@@ -17,10 +17,19 @@
 
     li {
         display: flex;
+        padding: 10px 0;
+        border-bottom: 1px dashed;
     }
 
     li span {
         flex: 0 0 130px;
+    }
+    li a {
+        flex: max-content;
+    }
+    li small {
+        text-align: right;
+        flex: 0 0 115px;
     }
 </style>
 <content>
@@ -36,9 +45,12 @@
                     </time>
                 </i>
             </span>
-            <a href="/dashboard/posts/{{ post.pk }}">{{ post.title }}</a>
             {% if not post.publish %}
             (not published)
+            {% endif %}
+            <a href="/dashboard/posts/{{ post.pk }}">{{ post.title }}</a>
+            {% if blog.upgraded %}
+            <small>({{ post.hit_count }} reads)</small>
             {% endif %}
         </li>
         {% empty %}

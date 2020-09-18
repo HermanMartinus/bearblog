@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.http import Http404
 from django.http import HttpResponse
 from django.db.models import Count, ExpressionWrapper, F, FloatField
-from blogs.models import Upvote, Blog, Post
+from blogs.models import Blog, Hit, Post, Upvote
 from django.db.models.functions import Now
 
 
@@ -109,11 +109,11 @@ def post(request, slug):
     ip_address = client_ip(request)
 
     if request.method == "POST":
-        upvoted_pose = get_object_or_404(Post, blog=blog, slug=slug)
-        posts_upvote_dupe = upvoted_pose.upvote_set.filter(ip_address=ip_address)
+        upvoted_post = get_object_or_404(Post, blog=blog, slug=slug)
+        posts_upvote_dupe = upvoted_post.upvote_set.filter(ip_address=ip_address)
 
         if len(posts_upvote_dupe) == 0:
-            upvote = Upvote(post=upvoted_pose, ip_address=ip_address)
+            upvote = Upvote(post=upvoted_post, ip_address=ip_address)
             upvote.save()
 
     if request.GET.get('preview'):
@@ -143,6 +143,18 @@ def post(request, slug):
             'upvoted': upvoted
         }
     )
+
+
+def post_hit(request, pk):
+    ip_address = client_ip(request)
+    post = get_object_or_404(Post, pk=pk)
+    post_view_dupe = post.hit_set.filter(ip_address=ip_address)
+
+    if len(post_view_dupe) == 0:
+        hit = Hit(post=post, ip_address=ip_address)
+        hit.save()
+
+    return HttpResponse("Image", 'Content-Type: image/png')
 
 
 def feed(request):

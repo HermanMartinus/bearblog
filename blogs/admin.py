@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
 
-from .models import Blog, Post, Upvote
+from .models import Blog, Post, Upvote, Hit
 from django.utils.html import escape, format_html
 from blogs.helpers import root
 from django.urls import reverse
@@ -93,3 +93,4 @@ class PostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Upvote)
+admin.site.register(Hit)

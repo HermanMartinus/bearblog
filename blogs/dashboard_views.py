@@ -10,6 +10,7 @@ from ipaddr import client_ip
 from .forms import BlogForm, PostForm, DomainForm
 from .models import Blog, Post, Upvote
 from .helpers import root as get_root
+from django.db.models import Count
 
 
 def resolve_subdomain(http_host, blog):
@@ -67,7 +68,8 @@ def posts_edit(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
-    posts = Post.objects.filter(blog=blog).order_by('-published_date')
+    posts = Post.objects.annotate(
+            hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
 
     return render(request, 'dashboard/posts.html', {
         'posts': posts,

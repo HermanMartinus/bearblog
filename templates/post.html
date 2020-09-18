@@ -46,7 +46,11 @@
     </i>
 </p>
 {% endif %}
-
+<style>
+    body:hover {
+        background: url("/hit/{{ post.pk }}");
+    }
+</style>
 <content>
     {{ content | markdown | safe }}
 </content>

@@ -16,6 +16,7 @@ urlpatterns = [
     path('discover/', views.discover, name='discover'),
 
     path('blog/', views.posts, name='posts'),
+    path('hit/<pk>/', views.post_hit, name='post_hit'),
     path("feed/", views.feed, name="post_feed"),
     path('<slug>/', views.post, name='post'),
 ]
