@@ -8,7 +8,7 @@ from blogs.models import Blog, Hit, Post, Upvote
 from django.db.models.functions import Now
 
 
-from blogs.helpers import get_nav, get_post, get_posts, unmark, root as get_root
+from blogs.helpers import get_nav, get_post, get_posts, unmark, clean_text, root as get_root
 
 from pg_utils import Seconds
 from feedgen.feed import FeedGenerator
@@ -172,7 +172,7 @@ def feed(request):
     fg.author({'name': blog.subdomain, 'email': blog.user.email})
     fg.title(blog.title)
     if blog.content:
-        fg.subtitle(unmark(blog.content)[:160])
+        fg.subtitle(clean_text(unmark(blog.content)[:160]))
     else:
         fg.subtitle(blog.title)
     fg.link(href=f"http://{root}/", rel='alternate')
@@ -183,7 +183,7 @@ def feed(request):
         fe.title(post.title)
         fe.author({'name': blog.subdomain, 'email': blog.user.email})
         fe.link(href=f"http://{root}/{post.slug}/")
-        fe.content(unmark(post.content))
+        fe.content(clean_text(unmark(post.content)))
         fe.updated(post.published_date)
 
     if request.GET.get('type') == 'rss':
