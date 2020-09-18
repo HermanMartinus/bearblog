@@ -72,7 +72,7 @@ class Upvote(models.Model):
     ip_address = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"{self.ip_address} | {self.created_date.strftime('%d %b %Y, %X')}"
+        return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.ip_address} - {self.post}"
 
 
 class Hit(models.Model):
@@ -81,4 +81,4 @@ class Hit(models.Model):
     ip_address = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"{self.ip_address} | {self.created_date.strftime('%d %b %Y, %X')}"
+        return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.ip_address} - {self.post}"
