@@ -18,7 +18,12 @@
                     </time>
                 </i>
             </span>
-            <a href="/dashboard/posts/{{ post.pk }}">{{ post.title }}</a>
+            <a href="/dashboard/posts/{{ post.pk }}">
+                {% if post.is_page %}
+                    [Page]
+                {% endif %}
+                {{ post.title }}
+            </a>
             {% if not post.publish %}
                 <small>(not published)</small>
             {% endif %}

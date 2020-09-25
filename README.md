@@ -18,3 +18,7 @@ There is currently a [Bear Blog Hugo theme](https://github.com/janraasch/hugo-be
 
 ## Roadmap
 Check out the roadmap in the [wiki](https://github.com/HermanMartinus/bearblog/wiki/Roadmap)
+
+## Some Bear faces
+
+https://cutekaomoji.com/animals/bears/
