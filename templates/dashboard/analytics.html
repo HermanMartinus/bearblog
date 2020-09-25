@@ -8,6 +8,7 @@
 <content>
     <h1>Analytics</h1>
     {% if blog.upgraded %}
+    <h3>Unique reads: {{ unique_reads.hit_count__sum }}</h3>
     <h2>Top posts</h2>
     <ul class="post-list">
     {% for post in posts %}

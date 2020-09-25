@@ -17,7 +17,7 @@ urlpatterns = [
     path('discover/', discover.discover, name='discover'),
 
     path('blog/', blog.posts, name='posts'),
-    path('hit/<pk>/', blog.post_hit, name='post_hit'),
+    path('hit/<pk>/', analytics.post_hit, name='post_hit'),
     path("feed/", feed.feed, name="post_feed"),
     path('<slug>/', blog.post, name='post'),
 ]

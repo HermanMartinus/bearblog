@@ -137,17 +137,5 @@ def post(request, slug):
     )
 
 
-def post_hit(request, pk):
-    ip_address = client_ip(request)
-    post = get_object_or_404(Post, pk=pk)
-    post_view_dupe = post.hit_set.filter(ip_address=ip_address)
-
-    if len(post_view_dupe) == 0:
-        hit = Hit(post=post, ip_address=ip_address)
-        hit.save()
-
-    return HttpResponse("Image", 'Content-Type: image/png')
-
-
 def not_found(request, *args, **kwargs):
     return render(request, '404.html', status=404)
