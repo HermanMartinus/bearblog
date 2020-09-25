@@ -4,30 +4,10 @@ from django.http import HttpResponse
 from blogs.models import Blog
 
 from blogs.helpers import unmark, clean_text, root as get_root
+from blogs.views.blog import resolve_address
 
 from feedgen.feed import FeedGenerator
 import tldextract
-
-
-def resolve_address(request):
-    http_host = request.META['HTTP_HOST']
-    sites = Site.objects.all()
-    if any(http_host == site.domain for site in sites):
-        # Homepage
-        return False
-    elif any(site.domain in http_host for site in sites):
-        # Subdomained blog
-        blog = get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain)
-        return {
-            'blog': blog,
-            'root': get_root(blog.subdomain)
-        }
-    else:
-        # Custom domain blog
-        return {
-            'blog': get_object_or_404(Blog, domain=http_host),
-            'root': http_host
-        }
 
 
 def feed(request):

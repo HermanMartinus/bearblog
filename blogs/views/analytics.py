@@ -14,7 +14,7 @@ def analytics(request):
     blog = get_object_or_404(Blog, user=request.user)
 
     posts = Post.objects.annotate(
-            hit_count=Count('hit')).filter(blog=blog).order_by('-hit_count', '-published_date')
+            hit_count=Count('hit')).filter(blog=blog, publish=True).order_by('-hit_count', '-published_date')
 
     unique_reads = posts.aggregate(Sum('hit_count'))
 
