@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from blogs.models import Blog, Post
 from blogs.helpers import root
 from django.db.models import Count
+from django.http import HttpResponse
 
 
 @login_required
@@ -17,3 +18,10 @@ def analytics(request):
         'posts': posts,
         'blog': blog
     })
+
+
+@login_required
+def post_analytics(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    return HttpResponse("Work in progress  ᕦʕ •ᴥ•ʔᕤ")
