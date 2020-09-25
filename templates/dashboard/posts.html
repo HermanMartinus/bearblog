@@ -1,41 +1,14 @@
 {% extends 'base.html' %}
 
 {% block nav %}
-<a href="/dashboard">Dashboard</a>
-<a href="/dashboard/posts">Posts</a>
-<a href="/dashboard/domain">Custom domain</a>
-<a href="https://github.com/HermanMartinus/bearblog/wiki" target="_blank">Docs</a>
-<a href="/accounts/logout">Sign out</a>
+{% include '../snippets/dashboard_nav.html' %}
 {% endblock %}
 
 {% block content %}
-<style>
-    ul {
-        list-style-type: none;
-        padding: unset;
-    }
-
-    li {
-        display: flex;
-        padding: 10px 0;
-        border-bottom: 1px dashed;
-    }
-
-    li span {
-        flex: 0 0 130px;
-    }
-    li a {
-        flex: max-content;
-    }
-    li small {
-        text-align: right;
-        flex: 0 0 115px;
-    }
-</style>
 <content>
     <h1>Posts</h1>
     <a href="/dashboard/posts/new">New post</a>
-    <ul>
+    <ul class="post-list">
         {% for post in posts %}
         <li>
             <span>
@@ -45,12 +18,9 @@
                     </time>
                 </i>
             </span>
-            {% if not post.publish %}
-            (not published)
-            {% endif %}
             <a href="/dashboard/posts/{{ post.pk }}">{{ post.title }}</a>
-            {% if blog.upgraded %}
-            <small>({{ post.hit_count }} reads)</small>
+            {% if not post.publish %}
+                <small>(not published)</small>
             {% endif %}
         </li>
         {% empty %}

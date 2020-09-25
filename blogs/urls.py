@@ -1,12 +1,13 @@
 from django.urls import path
 
-from .views import blog, dashboard, feed, discover
+from .views import blog, dashboard, feed, discover, analytics
 
 urlpatterns = [
     path('', blog.home, name='home'),
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('dashboard/', dashboard.dashboard, name='dashboard'),
     path('dashboard/domain/', dashboard.domain_edit, name='domain'),
+    path('dashboard/analytics/', analytics.analytics, name='analytics'),
     path('dashboard/posts/', dashboard.posts_edit, name='post'),
     path('dashboard/posts/new/', dashboard.post_new, name='post_new'),
     path('dashboard/posts/<pk>/', dashboard.post_edit, name='post_edit'),

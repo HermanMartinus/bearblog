@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>Analytics</h1>
+    {% if blog.upgraded %}
+    <h2>Top posts</h2>
+    <ul class="post-list">
+    {% for post in posts %}
+        <li>
+            <span class="number">#{{ forloop.counter }}</span> <a href="/dashboard/analytics/{{ post.pk }}">{{ post.title }}</a>
+            <small>({{ post.hit_count }} reads)</small>
+        </li>
+        {% empty %}
+        <li>
+            No posts yet
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <h2>Still in beta</h2>
+    <p>
+        Email me for early access. Consider <a href="https://www.buymeacoffee.com/hermanmartinus" target="_blank">sponsoring me.</a>
+    </p>
+    {% endif %}
+</content>
+{% endblock %}
