@@ -19,9 +19,10 @@ def analytics(request):
     if request.GET.get('days', ''):
         days = int(request.GET.get('days', ''))
     else:
-        days = 99999
+        days = 1
 
     time_threshold = timezone.now() - timedelta(days=days)
+    delta = timezone.now() - blog.created_date
 
     posts = Post.objects.annotate(
             hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))).filter(
@@ -34,7 +35,9 @@ def analytics(request):
     return render(request, 'dashboard/analytics.html', {
         'unique_reads': unique_reads,
         'posts': posts,
-        'blog': blog
+        'blog': blog,
+        'time_threshold': time_threshold,
+        'since_started': delta.days
     })
 
 
