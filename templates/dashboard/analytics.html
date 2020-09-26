@@ -8,6 +8,19 @@
 <content>
     <h1>Analytics</h1>
     {% if blog.upgraded %}
+
+    <p>
+        <small>
+        <a href="?days=1">Past 24 hours</a> |
+        <a href="?days=7">Past 7 days</a> |
+        <a href="?days=30">Past 30 days</a> |
+        <a href="?days=90">Past 3 months</a> |
+        <a href="?days=180">Past 6 months</a> |
+        <a href="?days=365">Past year</a> |
+        <a href="?days=99999">All time</a>
+        </small>
+    </p>
+
     <h3>Unique reads: {{ unique_reads.hit_count__sum }}</h3>
     <h2>Top posts</h2>
     <ul class="post-list">
@@ -22,6 +35,7 @@
         </li>
         {% endfor %}
     </ul>
+
     {% else %}
     <h2>Still in beta</h2>
     <p>
