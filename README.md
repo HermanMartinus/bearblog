@@ -1,8 +1,10 @@
 # ʕ•ᴥ•ʔ Bear
-## [Bear blog](https://bearblog.dev)
+## https://bearblog.dev
 
 ## Free, no-nonsense, super-fast blogging
 ### No javascript, no stylesheets, no trackers. Just your words.
+
+**Please log all bugs and feature requests as [issues](https://github.com/HermanMartinus/bearblog/issues).**
 
 ## Markdown
 All the post content is written in [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
