@@ -27,7 +27,6 @@ def analytics(request):
             hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))).filter(
                 blog=blog,
                 publish=True,
-                published_date__gt=time_threshold,
                 ).order_by('-hit_count', '-published_date')
 
     unique_reads = posts.aggregate(Sum('hit_count'))
