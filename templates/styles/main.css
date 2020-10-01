@@ -96,6 +96,14 @@ footer {
     font-size: small;
 }
 
+#date-range {
+    display: none;
+}
+
+#date-range:target {
+    display: block;
+}
+
 /* dashboard post list and analytics */
 ul.post-list {
     list-style-type: none;

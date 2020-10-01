@@ -13,16 +13,34 @@
         <a href="?days=1">Past 24 hours</a> |
         <a href="?days=7">Past 7 days</a> |
         <a href="?days=30">Past 30 days</a> |
-        <a href="?days=90">Past 3 months</a> |
         <a href="?days=180">Past 6 months</a> |
         <a href="?days=365">Past year</a> |
-        <a href="?days={{ since_started }}">All time</a>
+        <a href="?days={{ since_started }}">All time</a> |
+        <a href="#date-range">Custom range</a>
         </small>
     </p>
+    <p >
+        <form type="get" id="date-range">
+            <label for="date_from">From:</label>
+            <input type="date" name="date_from" value='{{ date_from|date:"Y-m-d" }}' required/>
+            <label for="date_to">To:</label>
+            <input type="date" name="date_to" value='{{ date_to|date:"Y-m-d" }}' required/>
+            <br>
+            <input type="submit" value="Go" />
+            <a href="#">Close</a>
+        </form>
+    </p>
+    
+    <hr>
 
-    <i>Viewing results for the past {{ time_threshold|timesince }}</i>
+    {% if time_threshold %}
+        <h2>Viewing results for the past {{ time_threshold|timesince }}</h2>
+    {% else %}
+        <h2>Viewing from <i>{{ date_from|date:"d M Y" }}</i> to <i>{{ date_to|date:"d M Y" }}</i></h2>
+    {% endif %}
+
     <h3>Unique reads: {{ unique_reads.hit_count__sum }}</h3>
-    <h2>Top posts</h2>
+    <h3>Top posts</h3>
     <ul class="post-list">
     {% for post in posts %}
         <li>
