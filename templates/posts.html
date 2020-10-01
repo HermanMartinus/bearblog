@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base.html'%}
 
 {% block title %}
 Blog |
@@ -26,24 +26,6 @@ Blog |
 {% endblock %}
 
 {% block content %}
-<style>
-    ul {
-        list-style-type: none;
-        padding: unset;
-    }
-
-    li {
-        display: flex;
-    }
-
-    li span {
-        flex: 0 0 130px;
-    }
-
-    li a:visited {
-      color: #6532dc;
-    }
-</style>
 <content>
     {% if query %}
     <h3 style="margin-bottom:0">Filtering for "{{ query }}"</h3>
@@ -51,7 +33,7 @@ Blog |
     <a href="/blog/">Remove filter</a>
     </small>
     {% endif %}
-    <ul>
+    <ul class="blog-posts">
         {% for post in posts %}
         <li>
             <span>

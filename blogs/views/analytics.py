@@ -57,4 +57,4 @@ def post_hit(request, pk):
         hit = Hit(post=post, ip_address=ip_address)
         hit.save()
 
-    return HttpResponse("Image", 'Content-Type: image/png')
+    return HttpResponse("Logged")

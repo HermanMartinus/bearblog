@@ -8,38 +8,6 @@
 {% endblock %}
 
 {% block content %}
-<style>
-    ul {
-        list-style-type: none;
-        padding: unset;
-    }
-
-    li {
-        display: flex;
-        line-height: 1.2;
-    }
-
-    li span {
-        flex: 0 0 40px;
-    }
-
-    li a:visited {
-      color: #6532dc;
-    }
-
-    li div {
-        padding-bottom: 8px;
-    }
-
-    li small {
-        color: #777 !important;
-    }
-
-    li small a {
-        color: #777 !important;
-    }
-</style>
-
 <content>
     <h1>
         Discovery feed
@@ -49,7 +17,7 @@
         <a href="/discover/?newest=true">Newest</a>
     </nav>
 
-    <ul>
+    <ul class="discover-posts">
         {% for post in posts %}
         <li>
             <span>

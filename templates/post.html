@@ -23,6 +23,10 @@
 {% include 'snippets/seo_tags.html' with title=post.title url=root description=meta_description %}
 {% endblock %}
 
+{% block hitcount %}
+url("/hit/{{ post.pk }}")
+{% endblock %}
+
 {% block nav %}
 <a href="/">Home</a>
 {% for item in nav %}
@@ -46,11 +50,6 @@
     </i>
 </p>
 {% endif %}
-<style>
-    body:hover {
-        background: url("/hit/{{ post.pk }}");
-    }
-</style>
 <content>
     {{ content | markdown | safe }}
 </content>
