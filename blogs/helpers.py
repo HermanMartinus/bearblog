@@ -5,6 +5,7 @@ import json
 from django.conf import settings
 from markdown import Markdown
 from io import StringIO
+from _datetime import timedelta
 
 
 def root(subdomain=''):
@@ -129,3 +130,8 @@ def valid_xml_char_ordinal(c):
         0xE000 <= codepoint <= 0xFFFD or
         0x10000 <= codepoint <= 0x10FFFF
         )
+
+
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days)):
+        yield start_date + timedelta(n)

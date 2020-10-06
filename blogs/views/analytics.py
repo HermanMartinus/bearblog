@@ -6,11 +6,14 @@ from datetime import timedelta
 
 from blogs.models import Blog, Hit, Post
 from django.core.exceptions import ObjectDoesNotExist
-from blogs.helpers import root
+from blogs.helpers import daterange, root
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
 
 from ipaddr import client_ip
+import pygal
+import json
+from django.utils.datetime_safe import date
 
 
 @login_required
@@ -53,15 +56,70 @@ def analytics(request):
         'time_threshold': time_threshold,
         'since_started': delta.days,
         'date_from': date_from,
-        'date_to': date_to
+        'date_to': date_to,
     })
 
 
 @login_required
 def post_analytics(request, pk):
-    post = get_object_or_404(Post, pk=pk)
+    blog = get_object_or_404(Blog, user=request.user)
+    time_threshold = False
+    date_from = False
+    date_to = False
+    chart_data = []
+    if request.GET.get('date_from', '') and request.GET.get('date_to', ''):
+        date_from = parse_date(request.GET.get('date_from', ''))
+        date_to = parse_date(request.GET.get('date_to', ''))
 
-    return HttpResponse("Work in progress  ᕦʕ •ᴥ•ʔᕤ")
+        post = get_object_or_404(Post.objects.annotate(
+                hit_count=Count('hit', filter=Q(hit__created_date__range=[date_from, date_to]))), pk=pk)
+
+        for single_date in daterange(date_from, date_to):
+            chart_data.append({
+                "date": single_date.strftime("%Y-%m-%d"),
+                "hits": Hit.objects.filter(
+                    post=post,
+                    created_date__gte=single_date - timedelta(days=1),
+                    created_date__lte=single_date).count()
+            })
+    else:
+        if request.GET.get('days', ''):
+            days = int(request.GET.get('days', ''))
+        else:
+            days = 1
+
+        time_threshold = timezone.now() - timedelta(days=days)
+
+        post = get_object_or_404(Post.objects.annotate(
+                hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))), pk=pk)
+
+        for single_date in daterange(timezone.now() - timedelta(days=days), timezone.now()):
+            chart_data.append({
+                "date": single_date.strftime("%Y-%m-%d"),
+                "hits": Hit.objects.filter(
+                    post=post,
+                    created_date__gte=single_date - timedelta(days=1),
+                    created_date__lte=single_date).count()
+            })
+
+    delta = timezone.now() - blog.created_date
+
+    chart = pygal.Line(range=(0, post.hit_count + 5))
+    mark_list = [x['hits'] for x in chart_data]
+    [x['date'] for x in chart_data]
+    chart.add('Reads', mark_list)
+    chart.x_labels = [x['date'] for x in chart_data]
+    chart.show_dots = False
+
+    return render(request, 'dashboard/post_analytics.html', {
+        'post': post,
+        'blog': blog,
+        'time_threshold': time_threshold,
+        'since_started': delta.days,
+        'date_from': date_from,
+        'date_to': date_to,
+        'chart': chart.render().decode('utf-8')
+    })
 
 
 def post_hit(request, pk):
