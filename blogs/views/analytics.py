@@ -36,7 +36,7 @@ def analytics(request):
         if request.GET.get('days', ''):
             days = int(request.GET.get('days', ''))
         else:
-            days = 1
+            days = 7
 
         time_threshold = timezone.now() - timedelta(days=days)
 
@@ -92,8 +92,8 @@ def post_analytics(request, pk):
                 hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))), pk=pk)
 
         hits = Hit.objects.filter(post=post, created_date__gt=time_threshold)
-        print(hits)
-        for single_date in daterange(timezone.now() - timedelta(days=days-1), timezone.now() + timedelta(days=1)):
+
+        for single_date in daterange(timezone.now() - timedelta(days=days+1), timezone.now() + timedelta(days=1)):
             chart_data.append({
                 "date": single_date.strftime("%Y-%m-%d"),
                 "hits": len(list(filter(lambda hit: hit.created_date.date() == single_date.date(), list(hits))))
@@ -106,6 +106,7 @@ def post_analytics(request, pk):
     [x['date'] for x in chart_data]
     chart.add('Reads', mark_list)
     chart.x_labels = [x['date'] for x in chart_data]
+    chart_render = chart.render().decode('utf-8')
 
     return render(request, 'dashboard/post_analytics.html', {
         'post': post,
@@ -114,7 +115,7 @@ def post_analytics(request, pk):
         'since_started': delta.days,
         'date_from': date_from,
         'date_to': date_to,
-        'chart': chart.render().decode('utf-8')
+        'chart': chart_render
     })
 
 
