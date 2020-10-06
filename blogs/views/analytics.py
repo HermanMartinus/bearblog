@@ -74,32 +74,29 @@ def post_analytics(request, pk):
         post = get_object_or_404(Post.objects.annotate(
                 hit_count=Count('hit', filter=Q(hit__created_date__range=[date_from, date_to]))), pk=pk)
 
+        hits = Hit.objects.filter(post=post, created_date__range=[date_from, date_to])
         for single_date in daterange(date_from, date_to):
             chart_data.append({
                 "date": single_date.strftime("%Y-%m-%d"),
-                "hits": Hit.objects.filter(
-                    post=post,
-                    created_date__gte=single_date - timedelta(days=1),
-                    created_date__lte=single_date).count()
+                "hits": len(list(filter(lambda hit: hit.created_date.date() == single_date, list(hits))))
             })
     else:
         if request.GET.get('days', ''):
             days = int(request.GET.get('days', ''))
         else:
-            days = 1
+            days = 7
 
         time_threshold = timezone.now() - timedelta(days=days)
 
         post = get_object_or_404(Post.objects.annotate(
                 hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))), pk=pk)
 
-        for single_date in daterange(timezone.now() - timedelta(days=days), timezone.now() + timedelta(days=1)):
+        hits = Hit.objects.filter(post=post, created_date__gt=time_threshold)
+        print(hits)
+        for single_date in daterange(timezone.now() - timedelta(days=days-1), timezone.now() + timedelta(days=1)):
             chart_data.append({
                 "date": single_date.strftime("%Y-%m-%d"),
-                "hits": Hit.objects.filter(
-                    post=post,
-                    created_date__gte=single_date - timedelta(days=1),
-                    created_date__lte=single_date).count()
+                "hits": len(list(filter(lambda hit: hit.created_date.date() == single_date.date(), list(hits))))
             })
 
     delta = timezone.now() - blog.created_date
@@ -109,7 +106,6 @@ def post_analytics(request, pk):
     [x['date'] for x in chart_data]
     chart.add('Reads', mark_list)
     chart.x_labels = [x['date'] for x in chart_data]
-    chart.show_dots = False
 
     return render(request, 'dashboard/post_analytics.html', {
         'post': post,
