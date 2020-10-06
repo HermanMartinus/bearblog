@@ -22,6 +22,7 @@ def analytics(request):
     time_threshold = False
     date_from = False
     date_to = False
+    chart_data = []
     
     if request.GET.get('date_from', '') and request.GET.get('date_to', ''):
         date_from = parse_date(request.GET.get('date_from', ''))
@@ -32,6 +33,14 @@ def analytics(request):
                     blog=blog,
                     publish=True,
                     ).order_by('-hit_count', '-published_date')
+
+        hits = Hit.objects.filter(post__blog=blog, created_date__range=[date_from, date_to])
+
+        for single_date in daterange(date_from, date_to):
+            chart_data.append({
+                "date": single_date.strftime("%Y-%m-%d"),
+                "hits": len(list(filter(lambda hit: hit.created_date.date() == single_date, list(hits))))
+            })
     else:
         if request.GET.get('days', ''):
             days = int(request.GET.get('days', ''))
@@ -46,8 +55,23 @@ def analytics(request):
                     publish=True,
                     ).order_by('-hit_count', '-published_date')
 
+        hits = Hit.objects.filter(post__blog=blog, created_date__gt=time_threshold)
+
+        for single_date in daterange(timezone.now() - timedelta(days=days), timezone.now() + timedelta(days=1)):
+            chart_data.append({
+                "date": single_date.strftime("%Y-%m-%d"),
+                "hits": len(list(filter(lambda hit: hit.created_date.date() == single_date.date(), list(hits))))
+            })
+
     unique_reads = posts.aggregate(Sum('hit_count'))
     delta = timezone.now() - blog.created_date
+
+    chart = pygal.Line(range=(0, len(unique_reads) + 5))
+    mark_list = [x['hits'] for x in chart_data]
+    [x['date'] for x in chart_data]
+    chart.add('Reads', mark_list)
+    chart.x_labels = [x['date'] for x in chart_data]
+    chart_render = chart.render().decode('utf-8')
 
     return render(request, 'dashboard/analytics.html', {
         'unique_reads': unique_reads,
@@ -57,6 +81,7 @@ def analytics(request):
         'since_started': delta.days,
         'date_from': date_from,
         'date_to': date_to,
+        'chart': chart_render
     })
 
 
@@ -67,6 +92,7 @@ def post_analytics(request, pk):
     date_from = False
     date_to = False
     chart_data = []
+
     if request.GET.get('date_from', '') and request.GET.get('date_to', ''):
         date_from = parse_date(request.GET.get('date_from', ''))
         date_to = parse_date(request.GET.get('date_to', ''))
@@ -93,7 +119,7 @@ def post_analytics(request, pk):
 
         hits = Hit.objects.filter(post=post, created_date__gt=time_threshold)
 
-        for single_date in daterange(timezone.now() - timedelta(days=days+1), timezone.now() + timedelta(days=1)):
+        for single_date in daterange(timezone.now() - timedelta(days=days), timezone.now() + timedelta(days=1)):
             chart_data.append({
                 "date": single_date.strftime("%Y-%m-%d"),
                 "hits": len(list(filter(lambda hit: hit.created_date.date() == single_date.date(), list(hits))))
