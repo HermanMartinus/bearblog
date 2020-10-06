@@ -66,7 +66,7 @@ def analytics(request):
     unique_reads = posts.aggregate(Sum('hit_count'))
     delta = timezone.now() - blog.created_date
 
-    chart = pygal.Line()
+    chart = pygal.Line(height=300)
     mark_list = [x['hits'] for x in chart_data]
     [x['date'] for x in chart_data]
     chart.add('Reads', mark_list)
@@ -127,7 +127,7 @@ def post_analytics(request, pk):
 
     delta = timezone.now() - blog.created_date
 
-    chart = pygal.Line(range=(0, post.hit_count + 5))
+    chart = pygal.Line(height=300, range=(0, post.hit_count + 5))
     mark_list = [x['hits'] for x in chart_data]
     [x['date'] for x in chart_data]
     chart.add('Reads', mark_list)
