@@ -93,7 +93,7 @@ def post_analytics(request, pk):
         post = get_object_or_404(Post.objects.annotate(
                 hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))), pk=pk)
 
-        for single_date in daterange(timezone.now() - timedelta(days=days), timezone.now()):
+        for single_date in daterange(timezone.now() - timedelta(days=days), timezone.now() + timedelta(days=1)):
             chart_data.append({
                 "date": single_date.strftime("%Y-%m-%d"),
                 "hits": Hit.objects.filter(
