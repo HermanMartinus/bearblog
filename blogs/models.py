@@ -46,6 +46,23 @@ def delete_blog_receiver(sender, instance, using, **kwargs):
         delete_domain(instance.domain)
 
 
+class Style(models.Model):
+    blog = models.OneToOneField(
+        Blog,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
+    background_color = models.CharField(max_length=7, blank=True)
+    font_color = models.CharField(max_length=7, blank=True)
+    heading_color = models.CharField(max_length=7, blank=True)
+    link_color = models.CharField(max_length=7, blank=True)
+    font_family = models.CharField(max_length=200, blank=True)
+    custom_css = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.blog.title
+
+
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)

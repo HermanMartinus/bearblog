@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator, ValidationError
 
 from .helpers import is_protected, root
-from .models import Blog, Post
+from blogs.models import Blog, Post, Style
 
 subdomain_validator = RegexValidator(
     r"^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{,63}(?<!-)$",
@@ -62,6 +62,19 @@ class BlogForm(forms.ModelForm):
     class Meta:
         model = Blog
         fields = ('title', 'subdomain', 'content',)
+
+
+class StyleForm(forms.ModelForm):
+    class Meta:
+        model = Style
+        fields = (
+            'background_color',
+            'font_color',
+            'heading_color',
+            'link_color',
+            'font_family',
+            'custom_css'
+        )
 
 
 class DomainForm(forms.ModelForm):

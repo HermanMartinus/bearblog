@@ -17,6 +17,10 @@ Blog |
 <link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}
 
+{% block style_preferences %}
+{% include 'snippets/custom_styles.css' with blog=blog%}
+{% endblock %}
+
 {% block nav %}
 <a href="/">Home</a>
 {% for item in nav %}

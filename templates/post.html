@@ -23,6 +23,10 @@
 {% include 'snippets/seo_tags.html' with title=post.title url=root description=meta_description %}
 {% endblock %}
 
+{% block style_preferences %}
+{% include 'snippets/custom_styles.css' with blog=blog%}
+{% endblock %}
+
 {% block hitcount %}
 url("/hit/{{ post.pk }}")
 {% endblock %}

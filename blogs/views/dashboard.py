@@ -8,8 +8,8 @@ from django.contrib.auth import get_user_model
 import tldextract
 from ipaddr import client_ip
 
-from blogs.forms import BlogForm, PostForm, DomainForm
-from blogs.models import Blog, Post, Upvote
+from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
+from blogs.models import Blog, Post, Style, Upvote
 from blogs.helpers import root as get_root
 
 
@@ -60,6 +60,31 @@ def dashboard(request):
         else:
             form = BlogForm()
             return render(request, 'dashboard/dashboard.html', {'form': form})
+
+
+@login_required
+def style_preferences(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+
+    if request.method == "POST":
+        form = StyleForm(request.POST)
+        if form.is_valid():
+            styles = form.save(commit=False)
+            styles.blog = blog
+            styles.save()
+    else:
+        try:
+            style_preferences = Style.objects.get(blog=blog)
+            form = StyleForm(instance=style_preferences)
+        except Style.DoesNotExist:
+            form = StyleForm()
+
+    return render(request, 'dashboard/style_preferences.html', {
+        'form': form,
+        'blog': blog
+    })
 
 
 @login_required

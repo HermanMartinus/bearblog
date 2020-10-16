@@ -1,0 +1,22 @@
+body{
+    background-color: {{blog.style.background_color}} !important;
+    color: {{blog.style.font_color}} !important;
+    font-family: {{blog.style.font_family}} !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong,
+b {
+    color: {{blog.style.heading_color}} !important;
+}
+
+a {
+    color: {{blog.style.link_color}} !important;
+}
+
+{{ blog.style.custom_css }}
