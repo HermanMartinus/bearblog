@@ -96,11 +96,13 @@ footer {
     font-size: small;
 }
 
-#date-range {
+#date-range,
+#initial-values {
     display: none;
 }
 
-#date-range:target {
+#date-range:target,
+#initial-values:target {
     display: block;
 }
 
@@ -181,3 +183,4 @@ ul.discover-posts li small {
 ul.discover-posts li small a {
     color: #777 !important;
 }
+

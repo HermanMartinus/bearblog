@@ -64,6 +64,23 @@ class BlogForm(forms.ModelForm):
         fields = ('title', 'subdomain', 'content',)
 
 
+class StyleForm(forms.ModelForm):
+    external_stylesheet = forms.CharField(
+        help_text="<br>Check out these <a href='https://css-tricks.com/no-class-css-frameworks/' target='_blank'>no-class css frameworks</a>. (Only paste the CDN link!)",
+        required=False,
+    )
+
+    custom_styles = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
+        help_text="<a href='#initial-values'>Show initial values</a>",
+        required=False,
+    )
+
+    class Meta:
+        model = Blog
+        fields = ('external_stylesheet', 'custom_styles', 'remove_branding',)
+
+
 class DomainForm(forms.ModelForm):
     domain = forms.CharField(
         max_length=128,

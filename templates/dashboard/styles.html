@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>Custom styling</h1>
+    {% if blog.upgraded %}
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
+    <div id="initial-values">
+        <pre>
+            <code>
+            body {
+                font-family: Verdana, sans-serif;
+                background-color: #fff;
+                color: #444;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            strong,
+            b {
+                color: #222;
+            }
+
+            a {
+                color: #3273dc;
+            }
+            </code>
+        </pre>
+        <a href="#">Close</a>
+    </div>
+    {% else %}
+    {% include "snippets/signup.html" %}
+    {% endif %}
+</content>
+{% endblock %}

@@ -17,6 +17,16 @@ Blog |
 <link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}
 
+{% block custom_styles %}
+    {% if blog.external_stylesheet %}
+        @import '{{ blog.external_stylesheet }}';
+    {% else %}
+        {% include 'styles/main.css' %}
+        {% include 'styles/dark_mode.css' %}
+    {% endif %}
+    {{ blog.custom_styles }}
+{% endblock %}
+
 {% block nav %}
 <a href="/">Home</a>
 {% for item in nav %}
@@ -65,5 +75,7 @@ Blog |
 {% endblock %}
 
 {% block footer %}
+{% if not blog.remove_branding %}
 Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+{% endif %}
 {% endblock %}

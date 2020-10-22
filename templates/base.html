@@ -11,16 +11,15 @@
   {% endblock %}
   {% block seo %}
   {% endblock %}
-  <style>
-    {% include 'styles/main.css' %}
-    {% include 'styles/dark_mode.css' %}
-    
-    {% block custom_styles %}
-    {% endblock %}
 
-    body:hover {
-      background-image: {% block hitcount %}{% endblock %};
-    }
+  <style>
+      {% block custom_styles %}
+        {% include 'styles/main.css' %}
+        {% include 'styles/dark_mode.css' %}
+      {% endblock %}
+      body:hover {
+        background-image: {% block hitcount %}{% endblock %};
+      }
   </style>
 </head>
 

@@ -6,6 +6,7 @@ urlpatterns = [
     path('', blog.home, name='home'),
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('dashboard/', dashboard.dashboard, name='dashboard'),
+    path('dashboard/styles/', dashboard.styles, name='styles'),
     path('dashboard/domain/', dashboard.domain_edit, name='domain'),
     path('dashboard/analytics/', analytics.analytics, name='analytics'),
     path('dashboard/analytics/<pk>/', analytics.post_analytics, name='post_analytics'),
