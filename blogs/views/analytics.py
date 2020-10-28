@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.utils.dateparse import parse_date
@@ -19,6 +19,10 @@ from django.utils.datetime_safe import date
 @login_required
 def analytics(request):
     blog = get_object_or_404(Blog, user=request.user)
+
+    if not blog.upgraded:
+        return redirect('account')
+
     time_threshold = False
     date_from = False
     date_to = False
@@ -88,6 +92,10 @@ def analytics(request):
 @login_required
 def post_analytics(request, pk):
     blog = get_object_or_404(Blog, user=request.user)
+
+    if not blog.upgraded:
+        return redirect('account')
+
     time_threshold = False
     date_from = False
     date_to = False

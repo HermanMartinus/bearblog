@@ -10,6 +10,7 @@ Django==3.0.7
 django-allauth==0.41.0
 django-debug-toolbar==2.2
 django-ip==1.0.2
+django-paypal==1.0.0
 django-pg-utils==0.1.5
 django-sendgrid-v5==0.8.1
 django-six==1.0.4
@@ -23,6 +24,7 @@ lxml==4.5.1
 Markdown==2.6.11
 mistune==2.0.0a4
 oauthlib==3.1.0
+Paperboy==1.0.1
 psycopg2==2.8.5
 pygal==2.4.0
 python-dateutil==2.8.1

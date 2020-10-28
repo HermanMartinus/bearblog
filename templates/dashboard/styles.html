@@ -7,7 +7,7 @@
 {% block content %}
 <content>
     <h1>Custom styling</h1>
-    {% if blog.upgraded %}
+
     <form method="POST" class="post-form">{% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="save btn btn-default">Save</button>
@@ -39,8 +39,5 @@
         </pre>
         <a href="#">Close</a>
     </div>
-    {% else %}
-    {% include "snippets/signup.html" %}
-    {% endif %}
 </content>
 {% endblock %}

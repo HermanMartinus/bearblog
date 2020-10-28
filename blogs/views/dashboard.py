@@ -7,10 +7,13 @@ from django.contrib.auth import get_user_model
 
 import tldextract
 from ipaddr import client_ip
+from paypal.standard.forms import PayPalPaymentsForm
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import root as get_root
+from django.urls import reverse
+import random
 
 
 def resolve_subdomain(http_host, blog):
@@ -67,6 +70,9 @@ def styles(request):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+
+    if not blog.upgraded:
+        return redirect('account')
 
     if request.method == "POST":
         form = StyleForm(request.POST, instance=blog)
@@ -174,6 +180,35 @@ def domain_edit(request):
         'blog': blog,
         'root': get_root(blog.subdomain),
     })
+
+
+@login_required
+def account(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    # if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+    #     return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+
+    paypal_dict = {
+        "cmd": "_xclick-subscriptions",
+        "business": "anotherone@somewordsfor.me",
+        "a3": 50,                         # yearly price
+        # duration of each unit (depends on unit)
+        "p3": 1,
+        "t3": "Y",                         # duration unit ("M for Month")
+        "src": "1",                        # make payments recur
+        "sra": "1",                        # reattempt payment on payment error
+        "no_note": "1",                    # remove extra notes (optional)
+        "item_name": "yearly",
+        "invoice": random.randint(1, 9999),
+        "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+        "return": request.build_absolute_uri(reverse('account')),
+        "cancel_return": request.build_absolute_uri(reverse('account')),
+        "custom": str(blog.pk),
+    }
+
+    form = PayPalPaymentsForm(initial=paypal_dict)
+    context = {"blog": blog, "form": form}
+    return render(request, "dashboard/account.html", context)
 
 
 @login_required

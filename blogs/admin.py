@@ -61,6 +61,7 @@ class BlogAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'reviewed',
+        'upgraded',
         'subdomain_url',
         'domain_url',
         'post_count',

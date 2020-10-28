@@ -6,11 +6,9 @@
 
 {% block content %}
 <content>
-    <h1>Home page</h1>
-    <form method="POST" class="post-form">{% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Save</button>
-    </form>
+    <h1>This is in beta</h1>
+    <p>Do not try to make a payment</p>
+    {{ form.render }}
 
     {% if blog %}
     <p>

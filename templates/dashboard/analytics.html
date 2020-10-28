@@ -7,7 +7,7 @@
 {% block content %}
 <content>
     <h1>Analytics</h1>
-    {% if blog.upgraded %}
+
     <p>
         <small>
         <a href="?days=1">Past 24 hours</a> |
@@ -56,9 +56,5 @@
         </li>
         {% endfor %}
     </ul>
-
-    {% else %}
-    {% include "snippets/signup.html" %}
-    {% endif %}
 </content>
 {% endblock %}
