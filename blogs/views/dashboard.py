@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.edit import DeleteView
 from django.utils import timezone
@@ -190,8 +191,8 @@ def account(request):
 
     paypal_dict = {
         "cmd": "_xclick-subscriptions",
-        "business": "anotherone@somewordsfor.me",
-        "a3": 50,                         # yearly price
+        "business": "hfbmartinus@gmail.com",
+        "a3": 60,                         # yearly price
         # duration of each unit (depends on unit)
         "p3": 1,
         "t3": "Y",                         # duration unit ("M for Month")
@@ -201,14 +202,25 @@ def account(request):
         "item_name": "yearly",
         "invoice": random.randint(1, 9999),
         "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
-        "return": request.build_absolute_uri(reverse('account')),
+        "return": request.build_absolute_uri(reverse('completed_payment')),
         "cancel_return": request.build_absolute_uri(reverse('account')),
         "custom": str(blog.pk),
     }
 
-    form = PayPalPaymentsForm(initial=paypal_dict)
+    form = PayPalPaymentsForm(initial=paypal_dict, button_type="subscribe")
     context = {"blog": blog, "form": form}
     return render(request, "dashboard/account.html", context)
+
+
+@login_required
+@csrf_exempt
+def completed_payment(request):
+    blog = get_object_or_404(Blog, user=request.user)
+
+    return render(request, "dashboard/account.html", {
+        "blog": blog,
+        "success": True
+        })
 
 
 @login_required

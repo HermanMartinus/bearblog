@@ -55,7 +55,7 @@ class BlogForm(forms.ModelForm):
     )
     subdomain = forms.SlugField(
         label="Subdomain",
-        help_text=".bearblog.dev | <a href='domain' target='_blank'>Add your own domain</a>",
+        help_text=".bearblog.dev | <a href='domain'>Add a custom domain</a>",
         validators=[subdomain_validator, protected_domains_validator]
     )
 

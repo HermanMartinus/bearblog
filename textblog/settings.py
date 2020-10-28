@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blogs',
+    'blogs.apps.BlogsConfig',
     'allauth.account',
     'allauth.socialaccount',
     'debug_toolbar',
@@ -151,4 +151,5 @@ SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 DEFAULT_FROM_EMAIL = "bear@somewordsfor.me"
 
 # Paypal
-PAYPAL_TEST = True
+PAYPAL_TEST = False
+PAYPAL_SUBSCRIPTION_BUTTON_IMAGE = "https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-medium.png"

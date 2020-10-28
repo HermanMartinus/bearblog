@@ -6,9 +6,29 @@
 
 {% block content %}
 <content>
-    <h1>This is in beta</h1>
-    <p>Do not try to make a payment</p>
+    {% if blog.upgraded %}
+        <h1>Account</h1>
+        <p>
+            Your account is in order. If you have any requests, please email
+            <a href="mailto:hi@bearblog.dev">hi@bearblog.dev</a>
+        <p>
+    {% elif success %}
+        <h1>ʕ´•ᴥ•`ʔσ”</h1>
+        <h2>Bear with us while we validate your payment.</h2>
+        <p>Paypal takes about a minute to verify payments.</p>
+        <p>Your new features will be unlocked shortly.</p>
+    {% else %}
+    <h1>Upgrade for full access</h1>
+    <p>Get access to more features for only <b>$5/mo</b> <small>($60/yr)</small></p>
+    <p><b>What you're getting:</b></p>
+    <ul>
+        <li>Analytics</li>
+        <li>Custom styling</li>
+        <li>Remove Bear branding</li>
+    </ul>
     {{ form.render }}
+    
+    {% endif %}
 
     {% if blog %}
     <p>
