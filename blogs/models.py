@@ -20,6 +20,7 @@ class Blog(models.Model):
     external_stylesheet = models.CharField(max_length=255, blank=True)
     custom_styles = models.TextField(blank=True)
     remove_branding = models.BooleanField(default=False)
+    favicon = models.CharField(max_length=2, default="🐼")
 
     def __str__(self):
         return self.title

@@ -48,6 +48,13 @@ textarea {
 input {
     font-size: 16px;
 }
+textarea,
+input {
+    background-color: inherit;
+    color: inherit;
+    border: 1px dashed;
+    padding: 3px;
+}
 
 content {
     line-height: 1.6;
@@ -94,6 +101,11 @@ footer {
 .errorlist {
     color: #eba613;
     font-size: small;
+}
+
+#id_favicon {
+    width: 20px;
+    text-align: center;
 }
 
 #date-range,

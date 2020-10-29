@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load markdownify %}
 
+{% block favicon %}
+{{ blog.favicon }}
+{% endblock %}
+
 {% block title %}
 {{ post.title }} |
 {{ blog.title }}

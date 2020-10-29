@@ -55,7 +55,7 @@ class BlogForm(forms.ModelForm):
     )
     subdomain = forms.SlugField(
         label="Subdomain",
-        help_text=".bearblog.dev | <a href='domain'>Add a custom domain</a>",
+        help_text=".bearblog.dev | <a href='domain/'>Add a custom domain</a>",
         validators=[subdomain_validator, protected_domains_validator]
     )
 
@@ -65,8 +65,14 @@ class BlogForm(forms.ModelForm):
 
 
 class StyleForm(forms.ModelForm):
+    favicon = forms.CharField(
+        max_length=2,
+        help_text="List of emojis <a href='https://getemoji.com/' target='_blank'>here</a>",
+        required=True
+    )
+
     external_stylesheet = forms.CharField(
-        help_text="<br>Check out these <a href='https://css-tricks.com/no-class-css-frameworks/' target='_blank'>no-class css frameworks</a>. (Only paste the CDN link!)",
+        help_text="<br>Check out these <a href='https://www.cssbed.com/' target='_blank'>no-class css themes</a>. (Only paste the CDN link!)",
         required=False,
     )
 
@@ -78,7 +84,7 @@ class StyleForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('external_stylesheet', 'custom_styles', 'remove_branding',)
+        fields = ('favicon', 'external_stylesheet', 'custom_styles', 'remove_branding',)
 
 
 class DomainForm(forms.ModelForm):
