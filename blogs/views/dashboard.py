@@ -39,31 +39,22 @@ def dashboard(request):
         else:
             form = BlogForm(instance=blog)
 
-        return render(request, 'dashboard/dashboard.html', {
-            'form': form,
-            'blog': blog,
-            'root': get_root(blog.subdomain)
-        })
-
     except Blog.DoesNotExist:
-        if request.method == "POST":
-            form = BlogForm(request.POST)
-            if form.is_valid():
-                blog = form.save(commit=False)
-                blog.user = request.user
-                blog.created_date = timezone.now()
-                blog.save()
+        blog = Blog(
+            user=request.user,
+            title=f"{request.user.username}'s blog",
+            subdomain=f"{request.user.username}-new",
+            content="Hello World!",
+            created_date=timezone.now()
+        )
+        blog.save()
+        form = BlogForm(instance=blog)
 
-                return render(request, 'dashboard/dashboard.html', {
-                    'form': form,
-                    'blog': blog,
-                    'root': get_root(blog.subdomain),
-                })
-            return render(request, 'dashboard/dashboard.html', {'form': form})
-
-        else:
-            form = BlogForm()
-            return render(request, 'dashboard/dashboard.html', {'form': form})
+    return render(request, 'dashboard/dashboard.html', {
+        'form': form,
+        'blog': blog,
+        'root': get_root(blog.subdomain)
+    })
 
 
 @login_required

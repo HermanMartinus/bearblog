@@ -5,7 +5,7 @@ from django.db.models import Count
 
 from .models import Blog, Post, Upvote, Hit
 from django.utils.html import escape, format_html
-from blogs.helpers import root
+from blogs.helpers import delete_domain, root
 from django.urls import reverse
 
 
@@ -71,11 +71,25 @@ class BlogAdmin(admin.ModelAdmin):
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
     ordering = ('-created_date', 'domain')
 
-    actions = ['approve_blog', ]
+    actions = ['approve_blog', 'block_blog']
 
     def approve_blog(self, request, queryset):
         queryset.update(reviewed=True)
+
     approve_blog.short_description = "Approve selected blogs"
+
+    def block_blog(self, request, queryset):
+        for blog in queryset:
+            blog.user.is_active = False
+            blog.user.save()
+            blog.delete()
+            if blog.domain:
+                print("Deleting domain from Heroku")
+                delete_domain(blog.domain)
+            print(f"Deleted {blog} and banned {blog.user}")
+
+    block_blog.short_description = "Block selected blogs"
+
 
 
 @admin.register(Post)
