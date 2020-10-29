@@ -36,6 +36,15 @@ a {
     font-weight: 400;
 }
 
+.bear::before {
+    content: "ᕦʕ •ᴥ•ʔᕤ";
+    font-weight: 400;
+}
+.bear:hover::before {
+    content: "ᕙʕ ಠᴥಠʔᕗ";
+    font-weight: 400;
+}
+
 nav a {
     margin-right: 10px;
 }
