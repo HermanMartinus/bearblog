@@ -192,7 +192,7 @@ def account(request):
     paypal_dict = {
         "cmd": "_xclick-subscriptions",
         "business": "hfbmartinus@gmail.com",
-        "a3": 60,                         # yearly price
+        "a3": 25,                         # yearly price
         # duration of each unit (depends on unit)
         "p3": 1,
         "t3": "Y",                         # duration unit ("M for Month")
