@@ -45,11 +45,11 @@ textarea {
     font-size: 16px;
 }
 
-input {
+input:not([type="submit"]) {
     font-size: 16px;
 }
 textarea,
-input {
+input:not([type="submit"]) {
     background-color: inherit;
     color: inherit;
     border: 1px dashed;
