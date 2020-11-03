@@ -62,6 +62,7 @@ class BlogAdmin(admin.ModelAdmin):
         'title',
         'reviewed',
         'upgraded',
+        'blocked',
         'subdomain_url',
         'domain_url',
         'post_count',
@@ -82,11 +83,9 @@ class BlogAdmin(admin.ModelAdmin):
         for blog in queryset:
             blog.user.is_active = False
             blog.user.save()
-            blog.delete()
-            if blog.domain:
-                print("Deleting domain from Heroku")
-                delete_domain(blog.domain)
-            print(f"Deleted {blog} and banned {blog.user}")
+            blog.blocked = True
+            blog.save()
+            print(f"Blocked {blog} and banned {blog.user}")
 
     block_blog.short_description = "Block selected blogs"
 

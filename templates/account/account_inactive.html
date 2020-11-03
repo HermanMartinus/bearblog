@@ -2,10 +2,16 @@
 
 {% load i18n %}
 
-{% block head_title %}{% trans "Account Inactive" %}{% endblock %}
+{% block head_title %}{% trans "Account blocked" %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Account Inactive" %}</h1>
+<h1>Account blocked</h1>
 
-<p>{% trans "This account is inactive." %}</p>
+<p>
+    This account has been auto marked as spam and deactivated.
+</p>
+<p>
+    If this has been a mistake please send a mail to 
+    <a href="mailto:hi@bearblog.dev">hi@bearblog.dev</a>
+<p>
 {% endblock %}

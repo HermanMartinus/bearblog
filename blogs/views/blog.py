@@ -19,7 +19,7 @@ def resolve_address(request):
         return False
     elif any(site.domain in http_host for site in sites):
         # Subdomained blog
-        blog = get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain)
+        blog = get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain, blocked=False)
         return {
             'blog': blog,
             'root': get_root(blog.subdomain)
@@ -27,7 +27,7 @@ def resolve_address(request):
     else:
         # Custom domain blog
         return {
-            'blog': get_object_or_404(Blog, domain=http_host),
+            'blog': get_object_or_404(Blog, domain=http_host, blocked=False),
             'root': http_host
         }
 

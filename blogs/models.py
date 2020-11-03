@@ -16,6 +16,7 @@ class Blog(models.Model):
     content = models.TextField(blank=True)
     reviewed = models.BooleanField(default=False)
     upgraded = models.BooleanField(default=False)
+    blocked = models.BooleanField(default=False)
 
     external_stylesheet = models.CharField(max_length=255, blank=True)
     custom_styles = models.TextField(blank=True)
