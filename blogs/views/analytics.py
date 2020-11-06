@@ -14,6 +14,7 @@ from ipaddr import client_ip
 import pygal
 import json
 from django.utils.datetime_safe import date
+import hashlib
 
 
 @login_required
@@ -154,12 +155,12 @@ def post_analytics(request, pk):
 
 
 def post_hit(request, pk):
-    ip_address = client_ip(request)
+    ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
     post = get_object_or_404(Post, pk=pk)
-    post_view_dupe = post.hit_set.filter(ip_address=ip_address)
+    post_view_dupe = post.hit_set.filter(ip_address=ip_hash)
 
     if len(post_view_dupe) == 0:
-        hit = Hit(post=post, ip_address=ip_address)
+        hit = Hit(post=post, ip_address=ip_hash)
         hit.save()
 
     return HttpResponse("Logged")

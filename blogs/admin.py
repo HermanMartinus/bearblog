@@ -90,7 +90,6 @@ class BlogAdmin(admin.ModelAdmin):
     block_blog.short_description = "Block selected blogs"
 
 
-
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
@@ -107,4 +106,15 @@ class PostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Upvote)
-admin.site.register(Hit)
+
+
+@admin.register(Hit)
+class HitAdmin(admin.ModelAdmin):
+    def post_link(self, obj):
+        return format_html('<a href="/mothership/blogs/post/{id}/change/">{post}</a>',
+                           id=obj.post.pk,
+                           post=escape(obj.post))
+
+    list_display = ('created_date', 'post_link', 'ip_address')
+    search_fields = ('created_date', 'post__title')
+    ordering = ('-created_date',)
