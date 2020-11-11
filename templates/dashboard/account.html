@@ -6,35 +6,11 @@
 
 {% block content %}
 <content>
-    {% if blog.upgraded %}
-        <h1>Account</h1>
-        <p>
-            Your account is in order. If you have any requests, please email
-            <a href="mailto:hi@bearblog.dev">hi@bearblog.dev</a>
-        <p>
-    {% elif success %}
-        <h1>ʕ´•ᴥ•`ʔσ”</h1>
-        <h2>Bear with us while we validate your payment.</h2>
-        <p>Paypal takes about a minute to verify payments.</p>
-        <p>Your new features will be unlocked shortly.</p>
-    {% else %}
-    <h1>Upgrade for full access</h1>
-    <p>Get access to more features for <b>$25/year</b></p>
-    <p><b>What you're getting:</b></p>
-    <ul>
-        <li>Analytics</li>
-        <li>Custom emoji favicon</li>
-        <li>Custom styling</li>
-        <li>External stylesheets</li>
-        <li>Remove Bear branding</li>
-        <li>
-            <a href="https://github.com/HermanMartinus/bearblog/wiki/Roadmap" target="_blank">
-            More
-            </a>
-            on the way
-        </li>
-    </ul>
-    {{ form.render }}
+    <h1>Account</h1>
+    <p>
+        Your account is in order. If you have any requests, please email
+        <a href="mailto:hi@bearblog.dev">hi@bearblog.dev</a>
+    <p>
     
     {% endif %}
     <p>

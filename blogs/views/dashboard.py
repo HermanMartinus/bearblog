@@ -64,9 +64,6 @@ def styles(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
-    if not blog.upgraded:
-        return redirect('account')
-
     if request.method == "POST":
         form = StyleForm(request.POST, instance=blog)
         if form.is_valid():

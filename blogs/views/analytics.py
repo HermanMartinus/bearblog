@@ -21,9 +21,6 @@ import hashlib
 def analytics(request):
     blog = get_object_or_404(Blog, user=request.user)
 
-    if not blog.upgraded:
-        return redirect('account')
-
     time_threshold = False
     date_from = False
     date_to = False
@@ -93,9 +90,6 @@ def analytics(request):
 @login_required
 def post_analytics(request, pk):
     blog = get_object_or_404(Blog, user=request.user)
-
-    if not blog.upgraded:
-        return redirect('account')
 
     time_threshold = False
     date_from = False

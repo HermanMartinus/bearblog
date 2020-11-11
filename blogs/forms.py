@@ -84,7 +84,7 @@ class StyleForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('favicon', 'external_stylesheet', 'custom_styles', 'remove_branding',)
+        fields = ('favicon', 'external_stylesheet', 'custom_styles',)
 
 
 class DomainForm(forms.ModelForm):
