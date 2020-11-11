@@ -21,26 +21,11 @@
         </b>
     </p>
     <p>
-        <div id="paypal-button-container" style="width: 200px; margin: 0 auto;"></div>
-        <script src="https://www.paypal.com/sdk/js?client-id=AbRjN4qNt-N00y6d7UmpqqeLL2Cy8S5XXOQaWsgT6kbgf38oDuQmrkFScnusGXwi9s6-Z6Xq31b3laXR&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
-        <script>
-            paypal.Buttons({
-                style: {
-                    shape: 'rect',
-                    color: 'silver',
-                    layout: 'vertical',
-                    label: 'paypal'
-                },
-                createSubscription: function(data, actions) {
-                    return actions.subscription.create({
-                        'plan_id': 'P-5MR1645184984743LL6WDVSQ'
-                    });
-                },
-                onApprove: function(data, actions) {
-                    alert(data.subscriptionID);
-                }
-            }).render('#paypal-button-container');
-        </script>
+        <form action="https://www.paypal.com/donate" method="post" target="_top" style="text-align: center">
+            <input type="hidden" name="hosted_button_id" value="US5ULU3GULSML" />
+            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+            <img alt="" border="0" src="https://www.paypal.com/en_ZA/i/scr/pixel.gif" width="1" height="1" />
+        </form>
     </p>
 </content>
 {% endblock %}
