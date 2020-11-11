@@ -5,6 +5,7 @@ from django.views.generic.edit import DeleteView
 from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
+from django.utils.text import slugify
 
 import tldextract
 from ipaddr import client_ip
@@ -43,7 +44,7 @@ def dashboard(request):
         blog = Blog(
             user=request.user,
             title=f"{request.user.username}'s blog",
-            subdomain=f"{request.user.username}-new",
+            subdomain=slugify(f"{request.user.username}-new"),
             content="Hello World!",
             created_date=timezone.now()
         )
