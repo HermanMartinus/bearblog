@@ -148,7 +148,7 @@ LOGIN_REDIRECT_URL = '/dashboard'
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY', False)
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-DEFAULT_FROM_EMAIL = "Bear Blog <hi@bearblog.dev>"
+DEFAULT_FROM_EMAIL = "ʕ•ᴥ•ʔ Bear Blog <hi@bearblog.dev>"
 
 # Paypal
 PAYPAL_TEST = False
