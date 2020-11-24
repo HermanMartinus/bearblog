@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>
+        Send email to all users
+    </h1>
+    <form method="POST" class="post-form">{% csrf_token %}
+        <p>
+            <label for="subject">Subject</label>
+            <input type="text" name="subject"/>
+        </p>
+        <p>
+            <label for="email_body">Email body</label>
+            <textarea name="email_body" rows=20></textarea>
+        </p>
+        <p>
+            <label for="is_test">Is test</label>
+            <input type="checkbox" checked name="is_test" value="test"/>
+        </p>
+        <button type="submit">Send</button>
+    </form>
+</content>
+{% endblock %}

@@ -7,12 +7,10 @@ from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
-from django.http import HttpResponse
 
 import tldextract
 from ipaddr import client_ip
 from paypal.standard.forms import PayPalPaymentsForm
-import djqscsv
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote
@@ -20,6 +18,7 @@ from blogs.helpers import root as get_root
 from django.urls import reverse
 import random
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 
 
 def resolve_subdomain(http_host, blog):
@@ -90,7 +89,7 @@ def posts_edit(request):
         return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
     posts = Post.objects.annotate(
-            hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
+        hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
 
     return render(request, 'dashboard/posts.html', {
         'posts': posts,
@@ -214,7 +213,7 @@ def completed_payment(request):
     return render(request, "dashboard/account.html", {
         "blog": blog,
         "success": True
-        })
+    })
 
 
 @login_required
@@ -233,7 +232,25 @@ class PostDelete(DeleteView):
 
 
 @staff_member_required
-def export_emails(request):
-    users = User.objects.filter(is_active=True).values("email",)
+def send_email(request):
+    if request.method == "POST":
+        if not request.POST.get('is_test', False):
+            blogs = Blog.objects.filter(reviewed=True, blocked=False)
+            for blog in blogs:
+                print("Sent to", blog.user.email)
+                send_mail(request.POST['subject'],
+                          request.POST['email_body'],
+                          'Herman at Bear Blog <hi@bearblog.dev>',
+                          [blog.user.email],
+                          fail_silently=False,
+                          )
+        else:
+            print("Test: Sent to", request.user.email)
+            send_mail(request.POST['subject'],
+                      request.POST['email_body'],
+                      'Herman at Bear Blog <hi@bearblog.dev>',
+                      [request.user.email],
+                      fail_silently=False,
+                      )
 
-    return djqscsv.render_to_csv_response(users)
+    return render(request, 'admin/send_email.html')
