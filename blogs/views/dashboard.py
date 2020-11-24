@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.edit import DeleteView
@@ -6,16 +7,19 @@ from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
+from django.http import HttpResponse
 
 import tldextract
 from ipaddr import client_ip
 from paypal.standard.forms import PayPalPaymentsForm
+import djqscsv
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import root as get_root
 from django.urls import reverse
 import random
+from django.contrib.auth.models import User
 
 
 def resolve_subdomain(http_host, blog):
@@ -226,3 +230,10 @@ def delete_user(request):
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
+
+
+@staff_member_required
+def export_emails(request):
+    users = User.objects.filter(is_active=True).values("email",)
+
+    return djqscsv.render_to_csv_response(users)
