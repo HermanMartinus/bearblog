@@ -10,7 +10,6 @@ urlpatterns = [
     path('dashboard/account/', dashboard.account, name='account'),
     path('dashboard/completed_payment/', dashboard.completed_payment, name='completed_payment'),
     path('dashboard/domain/', dashboard.domain_edit, name='domain'),
-    path('dashboard/send_email/', dashboard.send_email, name='send_email'),
     path('dashboard/analytics/', analytics.analytics, name='analytics'),
     path('dashboard/analytics/<pk>/', analytics.post_analytics, name='post_analytics'),
     path('dashboard/posts/', dashboard.posts_edit, name='post'),
