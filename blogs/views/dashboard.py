@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
+from django.core import mail
 
 import tldextract
 from ipaddr import client_ip
@@ -235,25 +236,37 @@ class PostDelete(DeleteView):
 @staff_member_required
 def send_email(request):
     if request.method == "POST":
+        connection = mail.get_connection()
+        connection.open()
+
+        subject = request.POST.get('subject')
+        body = request.POST.get('email_body')
+        from_address = 'Herman at Bear Blog <hi@bearblog.dev>'
+
+        emails = []
+
         if not request.POST.get('is_test', False):
             blogs = Blog.objects.filter(reviewed=True, blocked=False)
             for blog in blogs:
-                print("Sent to", blog.user.email)
-                send_mail(request.POST['subject'],
-                          request.POST['email_body'],
-                          'Herman at Bear Blog <hi@bearblog.dev>',
-                          [blog.user.email],
-                          fail_silently=False,
-                          html_message=mistune.html(request.POST['email_body']),
-                          )
+                email = mail.EmailMessage(
+                        subject,
+                        mistune.html(body),
+                        from_address,
+                        [blog.user.email],
+                    )
+                email.content_subtype = "html"
+                emails.append(email)
         else:
-            print("Test: Sent to", request.user.email)
-            send_mail(request.POST['subject'],
-                      request.POST['email_body'],
-                      'Herman at Bear Blog <hi@bearblog.dev>',
-                      [request.user.email],
-                      fail_silently=False,
-                      html_message=mistune.html(request.POST['email_body']),
-                      )
+            email = mail.EmailMessage(
+                        subject,
+                        mistune.html(body),
+                        from_address,
+                        [request.user.email],
+                    )
+            email.content_subtype = "html"
+            emails.append(email)
+
+        connection.send_messages(emails)
+        connection.close()
 
     return render(request, 'admin/send_email.html')
