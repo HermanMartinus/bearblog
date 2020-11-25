@@ -11,6 +11,7 @@ from django.utils.text import slugify
 import tldextract
 from ipaddr import client_ip
 from paypal.standard.forms import PayPalPaymentsForm
+import mistune
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote
@@ -243,6 +244,7 @@ def send_email(request):
                           'Herman at Bear Blog <hi@bearblog.dev>',
                           [blog.user.email],
                           fail_silently=False,
+                          html_message=mistune.html(request.POST['email_body']),
                           )
         else:
             print("Test: Sent to", request.user.email)
@@ -251,6 +253,7 @@ def send_email(request):
                       'Herman at Bear Blog <hi@bearblog.dev>',
                       [request.user.email],
                       fail_silently=False,
+                      html_message=mistune.html(request.POST['email_body']),
                       )
 
     return render(request, 'admin/send_email.html')

@@ -141,14 +141,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+LOGIN_REDIRECT_URL = '/dashboard/'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-LOGIN_REDIRECT_URL = '/dashboard'
-
-EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY', False)
-SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 DEFAULT_FROM_EMAIL = "ʕ•ᴥ•ʔ Bear Blog <hi@bearblog.dev>"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.eu.mailgun.org'
+EMAIL_HOST_USER = 'postmaster@mg.bearblog.dev'
+EMAIL_HOST_PASSWORD = os.getenv('MAILGUN_PASSWORD', False)
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # Paypal
 PAYPAL_TEST = False
