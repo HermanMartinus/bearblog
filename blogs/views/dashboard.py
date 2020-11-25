@@ -7,12 +7,12 @@ from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
-from django.core import mail
+from django.http import HttpResponse
 
 import tldextract
 from ipaddr import client_ip
 from paypal.standard.forms import PayPalPaymentsForm
-import mistune
+import djqscsv
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote
@@ -20,7 +20,6 @@ from blogs.helpers import root as get_root
 from django.urls import reverse
 import random
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 
 
 def resolve_subdomain(http_host, blog):
@@ -91,7 +90,7 @@ def posts_edit(request):
         return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
 
     posts = Post.objects.annotate(
-        hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
+            hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
 
     return render(request, 'dashboard/posts.html', {
         'posts': posts,
@@ -215,7 +214,7 @@ def completed_payment(request):
     return render(request, "dashboard/account.html", {
         "blog": blog,
         "success": True
-    })
+        })
 
 
 @login_required
@@ -231,3 +230,10 @@ def delete_user(request):
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
+
+
+@staff_member_required
+def export_emails(request):
+    users = Blog.objects.filter(reviewed=True, blocked=False).values('user__email')
+
+    return djqscsv.render_to_csv_response(users)
