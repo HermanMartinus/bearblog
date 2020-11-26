@@ -35,6 +35,7 @@ class BlogAdmin(admin.ModelAdmin):
         return obj.posts_count
 
     post_count.short_description = ('Post count')
+    post_count.admin_order_field = "posts_count"
 
     def domain_url(self, obj):
         return format_html(
@@ -42,6 +43,7 @@ class BlogAdmin(admin.ModelAdmin):
             url=obj.domain)
 
     domain_url.short_description = "Domain url"
+    domain_url.admin_order_field = 'domain'
 
     def subdomain_url(self, obj):
         return format_html(
@@ -70,7 +72,7 @@ class BlogAdmin(admin.ModelAdmin):
         'created_date')
 
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
-    ordering = ('-created_date', 'domain')
+    ordering = ('-created_date',)
 
     actions = ['approve_blog', 'block_blog']
 
