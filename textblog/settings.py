@@ -151,6 +151,8 @@ EMAIL_HOST_PASSWORD = os.getenv('MAILGUN_PASSWORD', False)
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+EMAILOCTOPUS_API = os.getenv('EMAILOCTOPUS_API', False)
+
 # Paypal
 PAYPAL_TEST = False
 PAYPAL_SUBSCRIPTION_BUTTON_IMAGE = "https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-medium.png"

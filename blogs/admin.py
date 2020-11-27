@@ -5,7 +5,7 @@ from django.db.models import Count
 
 from .models import Blog, Post, Upvote, Hit
 from django.utils.html import escape, format_html
-from blogs.helpers import delete_domain, root
+from blogs.helpers import add_email_address, delete_domain, root
 from django.urls import reverse
 
 
@@ -77,7 +77,9 @@ class BlogAdmin(admin.ModelAdmin):
     actions = ['approve_blog', 'block_blog']
 
     def approve_blog(self, request, queryset):
-        queryset.update(reviewed=True)
+        for blog in queryset:
+            blog.reviewed=True
+            add_email_address(blog.user.email)
 
     approve_blog.short_description = "Approve selected blogs"
 

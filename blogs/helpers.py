@@ -96,6 +96,22 @@ def delete_domain(domain):
     print(response.text)
 
 
+def add_email_address(email_address):
+    if settings.DEBUG:
+        return
+
+    url = "https://emailoctopus.com/api/1.5/lists/34f03ee5-2f2f-11eb-a3d0-06b4694bee2a/contacts"
+
+    querystring = {"api_key": settings.EMAILOCTOPUS_API}
+
+    payload = json.dumps({"email_address": email_address})
+    headers = {'Content-Type': "application/json"}
+
+    response = requests.request("POST", url, data=payload, headers=headers, params=querystring)
+
+    print(response.text)
+
+
 def unmark_element(element, stream=None):
     if stream is None:
         stream = StringIO()
