@@ -77,8 +77,8 @@ class BlogAdmin(admin.ModelAdmin):
     actions = ['approve_blog', 'block_blog']
 
     def approve_blog(self, request, queryset):
+        queryset.update(reviewed=True)
         for blog in queryset:
-            blog.reviewed=True
             add_email_address(blog.user.email)
 
     approve_blog.short_description = "Approve selected blogs"
