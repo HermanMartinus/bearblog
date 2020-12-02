@@ -37,7 +37,7 @@ def feed(request):
         fe.author({'name': blog.subdomain, 'email': blog.user.email})
         fe.link(href=f"http://{root}/{post.slug}/")
         fe.content(clean_text(unmark(post.content)))
-        fe.updated(post.published_date)
+        fe.published(post.published_date)
 
     if request.GET.get('type') == 'rss':
         fg.link(href=f"http://{root}/feed/?type=rss", rel='self')
