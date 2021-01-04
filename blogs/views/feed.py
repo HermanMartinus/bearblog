@@ -22,7 +22,7 @@ def feed(request):
 
     fg = FeedGenerator()
     fg.id(f'http://{root}/')
-    fg.author({'name': blog.subdomain, 'email': blog.user.email})
+    fg.author({'name': blog.subdomain, 'email': 'hidden'})
     fg.title(blog.title)
     if blog.content:
         fg.subtitle(clean_text(unmark(blog.content)[:160]))
@@ -34,7 +34,7 @@ def feed(request):
         fe = fg.add_entry()
         fe.id(f"http://{root}/{post.slug}/")
         fe.title(post.title)
-        fe.author({'name': blog.subdomain, 'email': blog.user.email})
+        fe.author({'name': blog.subdomain, 'email': 'hidden'})
         fe.link(href=f"http://{root}/{post.slug}/")
         fe.content(clean_text(unmark(post.content)))
         fe.published(post.published_date)
