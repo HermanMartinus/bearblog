@@ -9,6 +9,8 @@
 
 <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
 
+<p><i>Please note that Bear is free to use for blogs. If your account is backlink spam it will be flagged as such and removed.</i></p>
+
 <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
   {% csrf_token %}
   {{ form.as_p }}
