@@ -83,7 +83,7 @@ url("/hit/{{ post.pk }}")
 {% if post.show_in_feed %}
 <small>
     <form action="" method="post" style="display: inline">
-        <input hidden name="pk" value="{{ post.pk }}" />
+        <input hidden name="pk" value="{{ post.pk }}" style="display:none"/>
         {% csrf_token %}
         {% if upvoted %}
         <button disabled=true>▵ Toasted</button>
