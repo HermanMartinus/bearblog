@@ -7,7 +7,7 @@
 {% block content %}
 <content>
     <h1>Custom domain</h1>
-    <h3>Set the following DNS record</h1>
+    <h4>Set the following DNS record</h4>
         <table>
             <tr>
                 <th>Type</th>
@@ -22,7 +22,7 @@
                 <td>3600</td>
             </tr>
         </table>
-        <p>Then add your domain below</p>
+        <h4>Then add your domain below</h4>
         <form method="POST" class="post-form">{% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="save btn btn-default">Save</button>
@@ -31,6 +31,10 @@
             <small>
                 Bear does not provide SSL certificates for custom domains. Use a CDN like Cloudflare and set the SSL connection type to Flexible to achieve this.
             </small>
+        </p>
+        <p>
+            Having issues? More info
+            <a href="https://github.com/HermanMartinus/bearblog/wiki/Custom-domains" target="_blank">here</a>.
         </p>
 </content>
 {% endblock %}
