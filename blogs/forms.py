@@ -66,7 +66,7 @@ class BlogForm(forms.ModelForm):
 
 class StyleForm(forms.ModelForm):
     favicon = forms.CharField(
-        max_length=2,
+        max_length=4,
         help_text="List of emojis <a href='https://getemoji.com/' target='_blank'>here</a>",
         required=True
     )
