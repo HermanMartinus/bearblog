@@ -39,6 +39,8 @@ def feed(request):
         fe.link(href=f"http://{root}/{post.slug}/")
         fe.content(clean_text(mistune.html(post.content)))
         fe.published(post.published_date)
+        fe.updated(post.published_date)
+
 
     if request.GET.get('type') == 'rss':
         fg.link(href=f"http://{root}/feed/?type=rss", rel='self')
