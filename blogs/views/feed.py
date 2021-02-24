@@ -3,7 +3,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from blogs.models import Blog
 
-from blogs.helpers import clean_text, root as get_root
+from blogs.helpers import unmark, clean_text, root as get_root
 from blogs.views.blog import resolve_address
 
 from feedgen.feed import FeedGenerator
@@ -26,7 +26,7 @@ def feed(request):
     fg.author({'name': blog.subdomain, 'email': 'hidden'})
     fg.title(blog.title)
     if blog.content:
-        fg.subtitle(clean_text(mistune.html(blog.content)[:160]))
+        fg.subtitle(clean_text(unmark(blog.content)[:160]))
     else:
         fg.subtitle(blog.title)
     fg.link(href=f"http://{root}/", rel='alternate')
@@ -37,7 +37,7 @@ def feed(request):
         fe.title(post.title)
         fe.author({'name': blog.subdomain, 'email': 'hidden'})
         fe.link(href=f"http://{root}/{post.slug}/")
-        fe.content(clean_text(mistune.html(post.content)))
+        fe.content(clean_text(mistune.html(post.content)), type="CDATA")
         fe.published(post.published_date)
         fe.updated(post.published_date)
 
