@@ -72,7 +72,7 @@ def posts(request):
         all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
     tags = []
-    for post in all_posts:
+    for post in get_posts(all_posts):
         tags += post.tags.most_common()[:10]
     tags = list(dict.fromkeys(tags))
 
