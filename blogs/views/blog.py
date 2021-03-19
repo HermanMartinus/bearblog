@@ -68,11 +68,13 @@ def posts(request):
             all_posts = blog.post_set.filter(tags=tag, publish=True).order_by('-published_date')
         except Tag.DoesNotExist:
             all_posts = []
+        blog_posts = all_posts
     else:
         all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+        blog_posts = get_posts(all_posts)
 
     tags = []
-    for post in get_posts(all_posts):
+    for post in all_posts:
         tags += post.tags.most_common()[:10]
     tags = list(dict.fromkeys(tags))
 
@@ -81,7 +83,7 @@ def posts(request):
         'posts.html',
         {
             'blog': blog,
-            'posts': get_posts(all_posts),
+            'posts': blog_posts,
             'nav': get_nav(all_posts),
             'root': address_info['root'],
             'meta_description':  unmark(blog.content)[:160],
