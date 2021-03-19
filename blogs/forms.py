@@ -72,13 +72,12 @@ class StyleForm(forms.ModelForm):
     )
 
     external_stylesheet = forms.CharField(
-        help_text="<br>Check out these <a href='https://www.cssbed.com/' target='_blank'>no-class css themes</a>. (Only paste the CDN link!)",
+        help_text="<br>List of <a href='https://www.cssbed.com/' target='_blank'>no-class css themes</a> (only paste the CDN link)",
         required=False,
     )
 
     custom_styles = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
-        help_text="<a href='#initial-values'>Show initial values</a>",
         required=False,
     )
 
