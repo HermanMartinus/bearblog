@@ -47,16 +47,17 @@ def protected_domains_validator(value):
 
 
 class BlogForm(forms.ModelForm):
+    subdomain = forms.SlugField(
+        label="Subdomain",
+        help_text=".bearblog.dev | <a href='domain/'>Add a custom domain</a>",
+        validators=[subdomain_validator, protected_domains_validator]
+    )
+
     content = forms.CharField(
         label="Homepage content (markdown)",
         help_text="<a href='https://simplemde.com/markdown-guide' target='_blank'>Markdown cheatsheet</a>",
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
         required=False,
-    )
-    subdomain = forms.SlugField(
-        label="Subdomain",
-        help_text=".bearblog.dev | <a href='domain/'>Add a custom domain</a>",
-        validators=[subdomain_validator, protected_domains_validator]
     )
 
     class Meta:
@@ -67,7 +68,7 @@ class BlogForm(forms.ModelForm):
 class StyleForm(forms.ModelForm):
     favicon = forms.CharField(
         max_length=4,
-        help_text="List of emojis <a href='https://getemoji.com/' target='_blank'>here</a>",
+        help_text="<a href='https://getemoji.com/' target='_blank'>Emoji cheatsheet</a>",
         required=True
     )
 
