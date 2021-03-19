@@ -6,55 +6,30 @@
 
 {% block content %}
 <content>
-    <h1>Analytics</h1>
-
-    <p>
-        <small>
-        <a href="?days=1">Past 24 hours</a> |
-        <a href="?days=7">Past 7 days</a> |
-        <a href="?days=30">Past 30 days</a> |
-        <a href="?days=180">Past 6 months</a> |
-        <a href="?days=365">Past year</a> |
-        <a href="?days={{ since_started }}">All time</a> |
-        <a href="#date-range">Custom range</a>
-        </small>
-    </p>
-    <p >
-        <form type="get" id="date-range">
-            <label for="date_from">From:</label>
-            <input type="date" name="date_from" value='{{ date_from|date:"Y-m-d" }}' required/>
-            <label for="date_to">To:</label>
-            <input type="date" name="date_to" value='{{ date_to|date:"Y-m-d" }}' required/>
-            <br>
-            <input type="submit" value="Go" />
-            <a href="#">Close</a>
-        </form>
-    </p>
-    
-    <hr>
-
-    {% if time_threshold %}
-        <h2>Viewing results for the past {{ time_threshold|timesince }}</h2>
-    {% else %}
-        <h2>Viewing from <i>{{ date_from|date:"d M Y" }}</i> to <i>{{ date_to|date:"d M Y" }}</i></h2>
-    {% endif %}
-
-    <h3>Unique reads: {{ unique_reads.hit_count__sum }}</h3>
-    
-    {{ chart|safe  }}
-    
-    <h3>Top posts</h3>
-    <ul class="post-list">
-    {% for post in posts %}
-        <li>
-            <span class="number">#{{ forloop.counter }}</span> <a href="/dashboard/analytics/{{ post.pk }}">{{ post.title }}</a>
-            <small>({{ post.hit_count }} reads)</small>
-        </li>
-        {% empty %}
-        <li>
-            No posts yet
-        </li>
-        {% endfor %}
+    <h1>Analytics (7 days)</h1>
+    <ul>
+        <li><b>Unique reads:</b> {{ unique_reads.hit_count__sum }}</li>
+        <li><b>Unique visitors:</b> {{ unique_visitors }}</li>
     </ul>
+    {{ chart|safe  }}
+    <hr>
+    <h3>Need more in-depth analytics?</h3>
+    <p>
+        For more in-depth analytics sign up for
+        <a href="https://usefathom.com/ref/GMAGWL" title="Fathom Analytics" target="_blank">
+            Fathom Analytics
+        </a>
+        who are comitted to simple, fast and privacy-focused analytics.
+    </p>
+    <p>
+        Use <a href="https://usefathom.com/ref/GMAGWL" title="Fathom Analytics" target="_blank">
+            this link
+        </a>
+        to get <b>$10 off</b>
+    </p>
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
 </content>
 {% endblock %}

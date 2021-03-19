@@ -23,6 +23,8 @@ class Blog(models.Model):
     remove_branding = models.BooleanField(default=False)
     favicon = models.CharField(max_length=4, default="🐼")
 
+    fathom_site_id = models.CharField(max_length=8, blank=True)
+
     def __str__(self):
         return self.title
 

@@ -13,9 +13,6 @@ link_validator = RegexValidator(
 domain_validator = RegexValidator(
     r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$",
     "Please enter a valid domain")
-tags_validator = RegexValidator(
-    r"([^,]+)",
-    "These tags are not valid (eg: tag1, tag2, tag3)")
 
 
 class DateInput(forms.DateInput):
@@ -167,3 +164,9 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('title', 'slug', 'canonical_url', 'published_date', 'content', 'tags', 'is_page', 'publish', 'show_in_feed')
+
+
+class AnalyticsForm(forms.ModelForm):
+    class Meta:
+        model = Blog
+        fields = ('fathom_site_id',)
