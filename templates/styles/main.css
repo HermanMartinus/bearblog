@@ -32,6 +32,10 @@ a {
     border: 0;
 }
 
+.title h1 {
+    font-size: 1.5em;
+}
+
 .title span {
     font-weight: 400;
 }
