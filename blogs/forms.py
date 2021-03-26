@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator, ValidationError
 
-from .helpers import is_protected, root
+from .helpers import is_protected, root, check_records
 from .models import Blog, Post
 
 subdomain_validator = RegexValidator(
@@ -98,6 +98,9 @@ class DomainForm(forms.ModelForm):
 
         if domain == '':
             return domain
+
+        if not check_records(domain):
+            raise ValidationError(f"TXT record for '{domain}' has not been set.")
 
         matching_blogs = Blog.objects.filter(domain=domain)
 
