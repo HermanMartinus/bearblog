@@ -5,7 +5,7 @@ from django.db.models import Count
 
 from .models import Blog, Post, Upvote, Hit
 from django.utils.html import escape, format_html
-from blogs.helpers import add_email_address, delete_domain, root
+from blogs.helpers import add_email_address, delete_domain, root, check_records
 from django.urls import reverse
 
 
@@ -76,7 +76,7 @@ class BlogAdmin(admin.ModelAdmin):
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
     ordering = ('-created_date',)
 
-    actions = ['approve_blog', 'block_blog', 'remove_domain']
+    actions = ['approve_blog', 'block_blog', 'validate_domains']
 
     def approve_blog(self, request, queryset):
         queryset.update(reviewed=True)
@@ -95,13 +95,14 @@ class BlogAdmin(admin.ModelAdmin):
 
     block_blog.short_description = "Block selected blogs"
 
-    def remove_domain(self, request, queryset):
+    def validate_domains(self, request, queryset):
         for blog in queryset:
+            check_records(blog.domain)
             blog.domain = None
             blog.save()
             print(f"Removed domain of {blog}")
 
-    remove_domain.short_description = "Remove domain of selected blogs"
+    validate_domains.short_description = "Validate domain records"
 
 
 @admin.register(Post)

@@ -2,6 +2,7 @@ from django.contrib.sites.models import Site
 import requests
 from django.http import Http404
 import json
+import subprocess
 from django.conf import settings
 from markdown import Markdown
 from io import StringIO
@@ -75,6 +76,13 @@ def add_new_domain(domain):
     print(response.text)
 
     return id
+
+
+def check_records(domain):
+    if not domain:
+        return
+    verification_string = subprocess.Popen(["dig", "-t", "txt", domain, '+short'], stdout=subprocess.PIPE).communicate()[0]
+    return ('look-for-the-bear-necessities' in str(verification_string))
 
 
 def delete_domain(domain):
