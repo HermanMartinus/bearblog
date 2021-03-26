@@ -76,7 +76,7 @@ class BlogAdmin(admin.ModelAdmin):
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
     ordering = ('-created_date',)
 
-    actions = ['approve_blog', 'block_blog']
+    actions = ['approve_blog', 'block_blog', 'remove_domain']
 
     def approve_blog(self, request, queryset):
         queryset.update(reviewed=True)
@@ -94,6 +94,14 @@ class BlogAdmin(admin.ModelAdmin):
             print(f"Blocked {blog} and banned {blog.user}")
 
     block_blog.short_description = "Block selected blogs"
+
+    def remove_domain(self, request, queryset):
+        for blog in queryset:
+            blog.domain = None
+            blog.save()
+            print(f"Removed domain of {blog}")
+
+    remove_domain.short_description = "Remove domain of selected blogs"
 
 
 @admin.register(Post)
