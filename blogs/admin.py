@@ -38,6 +38,8 @@ class BlogAdmin(admin.ModelAdmin):
     post_count.admin_order_field = "posts_count"
 
     def domain_url(self, obj):
+        if not obj.domain:
+            return ''
         return format_html(
             "<a href='http://{url}' target='_blank'>{url}</a>",
             url=obj.domain)
