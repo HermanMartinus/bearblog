@@ -32,7 +32,10 @@ def home(request):
     if not blog:
         return render(request, 'landing.html')
 
-    all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+    try:
+        all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+    except Post.DoesNotExist:
+        all_posts = []
 
     return render(
         request,
