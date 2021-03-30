@@ -19,7 +19,7 @@ filelock==3.0.12
 future==0.18.2
 gunicorn==20.0.4
 idna==2.9
-lxml==4.5.1
+lxml==4.6.3
 Markdown==2.6.11
 mistune==2.0.0a4
 oauthlib==3.1.0
