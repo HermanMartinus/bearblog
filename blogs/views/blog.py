@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.sites.models import Site
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.db.models import Count
 from django.utils import timezone
 
@@ -32,10 +32,7 @@ def home(request):
     if not blog:
         return render(request, 'landing.html')
 
-    try:
-        all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
-    except Post.DoesNotExist:
-        all_posts = []
+    all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
     return render(
         request,
@@ -52,6 +49,8 @@ def home(request):
 
 def posts(request):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
 
     query = request.GET.get('q', '')
     if query:
@@ -87,6 +86,8 @@ def posts(request):
 
 def post(request, slug):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
 
     ip_address = client_ip(request)
 
@@ -131,6 +132,8 @@ def post(request, slug):
 
 def subscribe(request):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
 
     subscribe_message = ""
     if request.method == "POST":
@@ -159,6 +162,8 @@ def subscribe(request):
 
 def confirm_subscription(request):
     blog = resolve_address(request)
+    if not blog:
+        return Http404()
 
     email = request.GET.get("email", "")
     token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()
