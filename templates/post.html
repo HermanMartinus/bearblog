@@ -70,6 +70,7 @@ url("/hit/{{ post.pk }}")
     </i>
 </p>
 {% endif %}
+
 <content>
     {{ content | markdown | safe }}
 </content>
@@ -80,6 +81,7 @@ url("/hit/{{ post.pk }}")
     </small>
 </p>
 {% endif %}
+
 <p>
 {% for tag in post.tags.all %}
     <a href="/blog/?q={{tag}}">#{{ tag }}</a>
@@ -103,7 +105,5 @@ url("/hit/{{ post.pk }}")
 {% endblock %}
 
 {% block footer %}
-{% if not blog.remove_branding %}
 Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
-{% endif %}
 {% endblock %}

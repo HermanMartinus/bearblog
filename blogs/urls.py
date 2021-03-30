@@ -20,6 +20,7 @@ urlpatterns = [
     path('discover/', discover.discover, name='discover'),
 
     path('blog/', blog.posts, name='posts'),
+    path('subscribe/', blog.subscribe, name='subscribe'),
     path('confirm-subscription/', blog.confirm_subscription, name='confirm_subscription'),
     path('hit/<pk>/', analytics.post_hit, name='post_hit'),
     path("feed/", feed.feed, name="post_feed"),

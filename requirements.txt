@@ -10,7 +10,6 @@ Django==3.0.7
 django-allauth==0.41.0
 django-debug-toolbar==2.2
 django-ip==1.0.2
-django-paypal==1.0.0
 django-pg-utils==0.1.5
 django-queryset-csv==1.1.0
 django-six==1.0.4

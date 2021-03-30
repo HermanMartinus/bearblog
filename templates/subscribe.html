@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block title %}
+{{ post.title }} |
 {{ blog.title }}
 {% endblock %}
 
@@ -15,14 +16,9 @@
 {% endif %}
 {% endblock %}
 
-{% block seo %}
-{% if not blog.reviewed %}
-<meta name="robots" content="noindex">
-{% endif %}
-{% include 'snippets/seo_tags.html' with title=blog.title url=root description=meta_description tags="blog, blogging, write, writing" %}
-<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
+{% block heading %}
+{{ blog.title }}
 {% endblock %}
-
 
 {% block custom_styles %}
     {% if blog.external_stylesheet %}
@@ -34,10 +30,6 @@
     {{ blog.custom_styles }}
 {% endblock %}
 
-{% block heading %}
-{{ blog.title }}
-{% endblock %}
-
 {% block nav %}
 <a href="/">Home</a>
 {% for item in nav %}
@@ -47,30 +39,21 @@
 {% endblock %}
 
 {% block content %}
-{% if blog.content %}
-<content>
-    {{ content | markdown | safe }}
-</content>
-{% else %}
-<ul>
-    {% for post in posts %}
-    <li>
-        #{{ forloop.counter }}
-        <i>
-            <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
-                - {{ post.published_date|date:'d M, Y' }} -
-            </time>
-        </i>
-        <a href="/{{ post.slug }}/">{{ post.title }}</a>
-    </li>
-    {% endfor %}
-</ul>
+
+{% if blog.upgraded and not subscribe_message %}
+<form action="" method="post" style="display: inline">
+    <p>
+        <b>Subscribe to this blog</b>
+    </p>
+    <input type="text" name="name" style="display:none"/>
+    <input type="email" placeholder="Email address..." name="email"/>
+    {% csrf_token %}
+    <input type="submit" value="Subscribe" />
+</form>
 {% endif %}
 
-{% if posts.empty %}
-<p>
-    No posts yet
-</p>
+{% if subscribe_message %}
+<p><i>{{ subscribe_message }}</i></p>
 {% endif %}
 
 {% endblock %}

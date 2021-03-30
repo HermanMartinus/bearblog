@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'debug_toolbar',
     'taggit',
-    'paypal.standard.ipn',
 ]
 
 AUTHENTICATION_BACKENDS = (
@@ -150,7 +149,3 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 EMAILOCTOPUS_API = os.getenv('EMAILOCTOPUS_API', False)
-
-# Paypal
-PAYPAL_TEST = False
-PAYPAL_SUBSCRIPTION_BUTTON_IMAGE = "https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-medium.png"

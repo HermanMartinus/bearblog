@@ -13,8 +13,6 @@ import mistune
 
 def feed(request):
     blog = resolve_address(request)
-    if not blog:
-        return redirect('/')
 
     all_posts = blog.post_set.filter(publish=True, is_page=False).order_by('-published_date')
 

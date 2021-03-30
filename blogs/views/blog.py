@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.db.models import Count
 from django.utils import timezone
 
-from blogs.models import Blog, Hit, Post, Upvote
+from blogs.models import Blog, Hit, Post, Upvote, Subscriber
 from blogs.helpers import get_nav, get_post, get_posts, unmark, validate_subscriber_email
 
 from ipaddr import client_ip
@@ -18,11 +18,10 @@ def resolve_address(request):
     sites = Site.objects.all()
     if any(http_host == site.domain for site in sites):
         # Homepage
-        return False
+        return None
     elif any(site.domain in http_host for site in sites):
         # Subdomained blog
-        blog = get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain, blocked=False)
-        return blog
+        return get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain, blocked=False)
     else:
         # Custom domain blog
         return get_object_or_404(Blog, domain=http_host, blocked=False)
@@ -50,8 +49,6 @@ def home(request):
 
 def posts(request):
     blog = resolve_address(request)
-    if not blog:
-        return redirect('/')
 
     query = request.GET.get('q', '')
     if query:
@@ -87,17 +84,12 @@ def posts(request):
 
 def post(request, slug):
     blog = resolve_address(request)
-    if not blog:
-        return redirect('/')
 
     ip_address = client_ip(request)
 
     if request.method == "POST":
-        if request.POST.get("email", "") and not request.POST.get("name", ""):
-            email = request.POST.get("email", "")
-            print(email)
-            validate_subscriber_email(email, blog)
-        elif request.POST.get("pk", ""):
+        if request.POST.get("pk", ""):
+            # Upvoting
             pk = request.POST.get("pk", "")
             post = get_object_or_404(Post, pk=pk)
             posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
@@ -134,16 +126,46 @@ def post(request, slug):
     )
 
 
+def subscribe(request):
+    blog = resolve_address(request)
+
+    subscribe_message = ""
+    if request.method == "POST":
+        if request.POST.get("email", "") and not request.POST.get("name", ""):
+            email = request.POST.get("email", "")
+            subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email)
+            if not subscriber_dupe:
+                validate_subscriber_email(email, blog)
+                subscribe_message = "Check your email to confirm your subscription."
+            else:
+                subscribe_message = "You are already subscribed."
+
+    all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+
+    return render(
+        request,
+        'subscribe.html',
+        {
+            'blog': blog,
+            'nav': get_nav(all_posts),
+            'root': blog.useful_domain(),
+            'subscribe_message': subscribe_message
+        }
+    )
+
+
 def confirm_subscription(request):
     blog = resolve_address(request)
-    if not blog:
-        return redirect('/')
 
     email = request.GET.get("email", "")
     token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()
     if token == request.GET.get("token", ""):
-        print(email)
-        return HttpResponse(f"You've been subscribed to {blog.title}. ＼ʕ •ᴥ•ʔ／")
+        subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email)
+        if not subscriber_dupe:
+            subscriber = Subscriber(blog=blog, email_address=email)
+            subscriber.save()
+
+        return HttpResponse(f"<p>You've been subscribed to <a href='{blog.useful_domain()}'>{blog.title}</a>. ＼ʕ •ᴥ•ʔ／</p>")
 
     return HttpResponse("Something went wrong. Try subscribing again. ʕノ•ᴥ•ʔノ ︵ ┻━┻")
 

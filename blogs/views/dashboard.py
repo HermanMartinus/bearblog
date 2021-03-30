@@ -11,7 +11,6 @@ from django.http import HttpResponse
 
 import tldextract
 from ipaddr import client_ip
-from paypal.standard.forms import PayPalPaymentsForm
 import djqscsv
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
@@ -179,29 +178,10 @@ def domain_edit(request):
 @login_required
 def account(request):
     blog = get_object_or_404(Blog, user=request.user)
-    # if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-    #     return redirect(f"{blog.useful_domain()}/dashboard")
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"{blog.useful_domain()}/dashboard")
 
-    paypal_dict = {
-        "cmd": "_xclick-subscriptions",
-        "business": "hfbmartinus@gmail.com",
-        "a3": 25,                         # yearly price
-        # duration of each unit (depends on unit)
-        "p3": 1,
-        "t3": "Y",                         # duration unit ("M for Month")
-        "src": "1",                        # make payments recur
-        "sra": "1",                        # reattempt payment on payment error
-        "no_note": "1",                    # remove extra notes (optional)
-        "item_name": "yearly",
-        "invoice": random.randint(1, 9999),
-        "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
-        "return": request.build_absolute_uri(reverse('completed_payment')),
-        "cancel_return": request.build_absolute_uri(reverse('account')),
-        "custom": str(blog.pk),
-    }
-
-    form = PayPalPaymentsForm(initial=paypal_dict, button_type="subscribe")
-    context = {"blog": blog, "form": form}
+    context = {"blog": blog}
     return render(request, "dashboard/account.html", context)
 
 

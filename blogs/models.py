@@ -21,10 +21,12 @@ class Blog(models.Model):
 
     external_stylesheet = models.CharField(max_length=255, blank=True)
     custom_styles = models.TextField(blank=True)
-    remove_branding = models.BooleanField(default=False)
     favicon = models.CharField(max_length=4, default="🐼")
 
     fathom_site_id = models.CharField(max_length=8, blank=True)
+
+    def bear_domain(self):
+        return f'http://{self.subdomain}.{Site.objects.get_current().domain}'
 
     def useful_domain(self):
         if self.domain:

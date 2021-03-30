@@ -2,3 +2,5 @@ User-Agent: *
 Disallow: /accounts/
 Disallow: /dashboard/
 Disallow: /mothership/
+Disallow: /subscribe/
+Disallow: /confirm-subscription/

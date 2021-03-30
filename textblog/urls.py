@@ -9,7 +9,6 @@ from django.views.generic.base import RedirectView
 urlpatterns = [
     path('mothership/', admin.site.urls),
     url(r'^accounts/', include('allauth.urls')),
-    url(r'^paypal/', include('paypal.standard.ipn.urls')),
     path('', include('blogs.urls')),
     path(
         "robots.txt",
