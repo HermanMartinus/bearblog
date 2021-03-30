@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 
 from .helpers import delete_domain, add_new_domain
 from taggit.managers import TaggableManager
@@ -25,8 +26,14 @@ class Blog(models.Model):
 
     fathom_site_id = models.CharField(max_length=8, blank=True)
 
+    def useful_domain(self):
+        if self.domain:
+            return f'http://{self.domain}'
+        else:
+            return f'http://{self.subdomain}.{Site.objects.get_current().domain}'
+
     def __str__(self):
-        return self.title
+        return f'{self.title} ({self.useful_domain()})'
 
     def save(self, *args, **kwargs):
         if self.pk:
@@ -86,3 +93,9 @@ class Hit(models.Model):
 
     def __str__(self):
         return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.ip_address} - {self.post}"
+
+
+class Subscriber(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    email_address = models.EmailField()
+    subscribed_date = models.DateTimeField(auto_now_add=True)

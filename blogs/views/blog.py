@@ -2,13 +2,15 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.db.models import Count
+from django.utils import timezone
 
 from blogs.models import Blog, Hit, Post, Upvote
-from blogs.helpers import get_nav, get_post, get_posts, unmark, root as get_root
+from blogs.helpers import get_nav, get_post, get_posts, unmark, validate_subscriber_email
 
 from ipaddr import client_ip
 from taggit.models import Tag
 import tldextract
+import hashlib
 
 
 def resolve_address(request):
@@ -20,24 +22,16 @@ def resolve_address(request):
     elif any(site.domain in http_host for site in sites):
         # Subdomained blog
         blog = get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain, blocked=False)
-        return {
-            'blog': blog,
-            'root': get_root(blog.subdomain)
-        }
+        return blog
     else:
         # Custom domain blog
-        return {
-            'blog': get_object_or_404(Blog, domain=http_host, blocked=False),
-            'root': http_host
-        }
+        return get_object_or_404(Blog, domain=http_host, blocked=False)
 
 
 def home(request):
-    address_info = resolve_address(request)
-    if not address_info:
+    blog = resolve_address(request)
+    if not blog:
         return render(request, 'landing.html')
-
-    blog = address_info['blog']
 
     all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
@@ -49,17 +43,15 @@ def home(request):
             'content': blog.content,
             'posts': get_posts(all_posts),
             'nav': get_nav(all_posts),
-            'root': address_info['root'],
+            'root': blog.useful_domain(),
             'meta_description': unmark(blog.content)[:160]
         })
 
 
 def posts(request):
-    address_info = resolve_address(request)
-    if not address_info:
+    blog = resolve_address(request)
+    if not blog:
         return redirect('/')
-
-    blog = address_info['blog']
 
     query = request.GET.get('q', '')
     if query:
@@ -85,7 +77,7 @@ def posts(request):
             'blog': blog,
             'posts': blog_posts,
             'nav': get_nav(all_posts),
-            'root': address_info['root'],
+            'root': blog.useful_domain(),
             'meta_description':  unmark(blog.content)[:160],
             'tags': tags,
             'query': query,
@@ -94,21 +86,24 @@ def posts(request):
 
 
 def post(request, slug):
-    address_info = resolve_address(request)
-    if not address_info:
+    blog = resolve_address(request)
+    if not blog:
         return redirect('/')
-
-    blog = address_info['blog']
 
     ip_address = client_ip(request)
 
     if request.method == "POST":
-        upvoted_post = get_object_or_404(Post, blog=blog, slug=slug)
-        posts_upvote_dupe = upvoted_post.upvote_set.filter(ip_address=ip_address)
-
-        if len(posts_upvote_dupe) == 0:
-            upvote = Upvote(post=upvoted_post, ip_address=ip_address)
-            upvote.save()
+        if request.POST.get("email", "") and not request.POST.get("name", ""):
+            email = request.POST.get("email", "")
+            print(email)
+            validate_subscriber_email(email, blog)
+        elif request.POST.get("pk", ""):
+            pk = request.POST.get("pk", "")
+            post = get_object_or_404(Post, pk=pk)
+            posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
+            if len(posts_upvote_dupe) == 0:
+                upvote = Upvote(post=post, ip_address=ip_address)
+                upvote.save()
 
     if request.GET.get('preview'):
         all_posts = blog.post_set.annotate(
@@ -132,11 +127,25 @@ def post(request, slug):
             'content': post.content,
             'post': post,
             'nav': get_nav(all_posts),
-            'root': address_info['root'],
+            'root': blog.useful_domain(),
             'meta_description': unmark(post.content)[:160],
             'upvoted': upvoted
         }
     )
+
+
+def confirm_subscription(request):
+    blog = resolve_address(request)
+    if not blog:
+        return redirect('/')
+
+    email = request.GET.get("email", "")
+    token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()
+    if token == request.GET.get("token", ""):
+        print(email)
+        return HttpResponse(f"You've been subscribed to {blog.title}. ＼ʕ •ᴥ•ʔ／")
+
+    return HttpResponse("Something went wrong. Try subscribing again. ʕノ•ᴥ•ʔノ ︵ ┻━┻")
 
 
 def not_found(request, *args, **kwargs):

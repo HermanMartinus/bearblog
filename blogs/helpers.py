@@ -1,5 +1,8 @@
 from django.contrib.sites.models import Site
+from django.core.mail import send_mail
+from django.utils import timezone
 import requests
+import hashlib
 from django.http import Http404
 import json
 import subprocess
@@ -160,3 +163,33 @@ def valid_xml_char_ordinal(c):
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
+
+
+def validate_subscriber_email(email, blog):
+    token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()
+    confirmation_link = f'{blog.useful_domain()}/confirm-subscription/?token={token}&email={email}'
+
+    html_message = f'''
+        You've decided to subscribe to {blog.title} ({blog.useful_domain()}). That's awesome!
+        <br>
+        <br>
+        Follow this <a href="{confirmation_link}">link</a> to confirm your subscription.
+        <br>
+        <br>
+        Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+    '''
+    text_message = f'''
+        You've decided to subscribe to {blog.title} ({blog.useful_domain()}). That's awesome!
+
+        Follow this link to confirm your subscription: {confirmation_link}
+
+        Made with Bear ʕ•ᴥ•ʔ
+    '''
+    send_mail(
+        'Confirm your email address',
+        text_message,
+        f'{blog.title} subscription <subscriptions@bearblog.dev>',
+        [email],
+        fail_silently=False,
+        html_message=html_message,
+    )

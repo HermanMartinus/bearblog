@@ -7,7 +7,7 @@ from datetime import timedelta
 from blogs.models import Blog, Hit, Post
 from blogs.forms import AnalyticsForm
 from django.core.exceptions import ObjectDoesNotExist
-from blogs.helpers import daterange, root
+from blogs.helpers import daterange
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
 

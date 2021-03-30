@@ -16,7 +16,6 @@ import djqscsv
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import root as get_root
 from django.urls import reverse
 import random
 from django.contrib.auth.models import User
@@ -34,7 +33,7 @@ def dashboard(request):
     try:
         blog = Blog.objects.get(user=request.user)
         if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-            return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+            return redirect(f"{blog.useful_domain()}/dashboard")
 
         if request.method == "POST":
             form = BlogForm(request.POST, instance=blog)
@@ -58,7 +57,7 @@ def dashboard(request):
     return render(request, 'dashboard/dashboard.html', {
         'form': form,
         'blog': blog,
-        'root': get_root(blog.subdomain)
+        'root': blog.useful_domain()
     })
 
 
@@ -66,7 +65,7 @@ def dashboard(request):
 def styles(request):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+        return redirect(f"{blog.useful_domain()}/dashboard")
 
     if request.method == "POST":
         form = StyleForm(request.POST, instance=blog)
@@ -79,7 +78,7 @@ def styles(request):
     return render(request, 'dashboard/styles.html', {
         'blog': blog,
         'form': form,
-        'root': get_root(blog.subdomain),
+        'root': blog.useful_domain(),
     })
 
 
@@ -87,7 +86,7 @@ def styles(request):
 def posts_edit(request):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+        return redirect(f"{blog.useful_domain()}/dashboard")
 
     posts = Post.objects.annotate(
             hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
@@ -102,7 +101,7 @@ def posts_edit(request):
 def post_new(request):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+        return redirect(f"{blog.useful_domain()}/dashboard")
 
     if request.method == "POST":
         form = PostForm(request.user, request.POST)
@@ -129,7 +128,7 @@ def post_new(request):
 def post_edit(request, pk):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+        return redirect(f"{blog.useful_domain()}/dashboard")
 
     post = get_object_or_404(Post, blog=blog, pk=pk)
     published_date_old = post.published_date
@@ -152,7 +151,7 @@ def post_edit(request, pk):
         'form': form,
         'blog': blog,
         'post': post,
-        'root': get_root(blog.subdomain),
+        'root': blog.useful_domain(),
     })
 
 
@@ -160,7 +159,7 @@ def post_edit(request, pk):
 def domain_edit(request):
     blog = Blog.objects.get(user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+        return redirect(f"{blog.useful_domain()}/dashboard")
 
     if request.method == "POST":
         form = DomainForm(request.POST, instance=blog)
@@ -173,7 +172,7 @@ def domain_edit(request):
     return render(request, 'dashboard/domain_edit.html', {
         'form': form,
         'blog': blog,
-        'root': get_root(blog.subdomain),
+        'root': blog.useful_domain(),
     })
 
 
@@ -181,7 +180,7 @@ def domain_edit(request):
 def account(request):
     blog = get_object_or_404(Blog, user=request.user)
     # if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-    #     return redirect(f"http://{get_root(blog.subdomain)}/dashboard")
+    #     return redirect(f"{blog.useful_domain()}/dashboard")
 
     paypal_dict = {
         "cmd": "_xclick-subscriptions",

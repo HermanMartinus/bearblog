@@ -3,9 +3,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
 
-from .models import Blog, Post, Upvote, Hit
+from .models import Blog, Post, Upvote, Hit, Subscriber
 from django.utils.html import escape, format_html
-from blogs.helpers import add_email_address, delete_domain, root, check_records
+from blogs.helpers import add_email_address, delete_domain, check_records, root
 from django.urls import reverse
 
 
@@ -13,8 +13,8 @@ class UserAdmin(admin.ModelAdmin):
     def subdomain_url(self, obj):
         blog = Blog.objects.get(user=obj)
         return format_html(
-            "<a href='http://{url}' target='_blank'>{url}</a>",
-            url=root(blog.subdomain))
+            "<a href='{url}' target='_blank'>{url}</a>",
+            url={blog.useful_domain()})
 
     subdomain_url.short_description = "Subomain"
 
@@ -133,3 +133,8 @@ class HitAdmin(admin.ModelAdmin):
     list_display = ('created_date', 'post_link', 'ip_address')
     search_fields = ('created_date', 'post__title')
     ordering = ('-created_date',)
+
+
+@admin.register(Subscriber)
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ('subscribed_date', 'blog', 'email_address')
