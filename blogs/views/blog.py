@@ -163,7 +163,7 @@ def subscribe(request):
 def confirm_subscription(request):
     blog = resolve_address(request)
     if not blog:
-        return Http404()
+        return not_found(request)
 
     email = request.GET.get("email", "")
     token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()

@@ -14,7 +14,7 @@ from ipaddr import client_ip
 import djqscsv
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
-from blogs.models import Blog, Post, Upvote
+from blogs.models import Blog, Post, Upvote, Subscriber
 from django.urls import reverse
 import random
 from django.contrib.auth.models import User
@@ -186,17 +186,6 @@ def account(request):
 
 
 @login_required
-@csrf_exempt
-def completed_payment(request):
-    blog = get_object_or_404(Blog, user=request.user)
-
-    return render(request, "dashboard/account.html", {
-        "blog": blog,
-        "success": True
-        })
-
-
-@login_required
 def delete_user(request):
     if request.method == "POST":
         user = get_object_or_404(get_user_model(), pk=request.user.pk)
@@ -209,6 +198,24 @@ def delete_user(request):
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
+
+
+@login_required
+def subscribers(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"{blog.useful_domain()}/dashboard")
+
+    subscribers = Subscriber.objects.filter(blog=blog)
+
+    if request.GET.get("export", ""):
+        subscribers = subscribers.values('email_address', 'subscribed_date')
+        return djqscsv.render_to_csv_response(subscribers)
+
+    return render(request, "dashboard/subscribers.html", {
+        "blog": blog,
+        "subscribers": subscribers,
+    })
 
 
 @staff_member_required

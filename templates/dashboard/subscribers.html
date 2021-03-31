@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>Email subscribers ({{ subscribers|length }})</h1>
+    <p>
+        <a href="?export=True" download>Export list</a>
+    </p>
+    <ul>
+    {% for subscriber in subscribers %}
+        <li>{{ subscriber.email_address }}</li>
+    {% endfor %}
+    </ul>
+</content>
+{% endblock %}
