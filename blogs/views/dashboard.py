@@ -212,7 +212,7 @@ def subscribers(request):
         return redirect(f"/dashboard/")
 
     if request.GET.get("delete", ""):
-        Subscriber.objects.filter(pk=request.GET.get("delete", "")).delete()
+        Subscriber.objects.filter(blog=blog, pk=request.GET.get("delete", "")).delete()
 
     subscribers = Subscriber.objects.filter(blog=blog)
 
