@@ -137,7 +137,9 @@ def post_edit(request, pk):
             post_new = form.save(commit=False)
             post_new.blog = blog
             # This prevents the resetting of time to 00:00 if same day edit
-            if published_date_old.date() == post_new.published_date.date():
+            if (published_date_old and
+                post_new.published_date and
+                    published_date_old.date() == post_new.published_date.date()):
                 post_new.published_date = published_date_old
             if not post_new.published_date:
                 post_new.published_date = timezone.now()
