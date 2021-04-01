@@ -122,12 +122,14 @@ footer {
 }
 
 #date-range,
-#initial-values {
+#initial-values,
+#import-contacts {
     display: none;
 }
 
 #date-range:target,
-#initial-values:target {
+#initial-values:target,
+#import-contacts:target {
     display: block;
 }
 

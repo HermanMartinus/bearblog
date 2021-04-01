@@ -168,10 +168,7 @@ def confirm_subscription(request):
     email = request.GET.get("email", "")
     token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()
     if token == request.GET.get("token", ""):
-        subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email)
-        if not subscriber_dupe:
-            subscriber = Subscriber(blog=blog, email_address=email)
-            subscriber.save()
+        Subscriber.objects.get_or_create(blog=blog, email_address=email)
 
         return HttpResponse(f"<p>You've been subscribed to <a href='{blog.useful_domain()}'>{blog.title}</a>. ＼ʕ •ᴥ•ʔ／</p>")
 

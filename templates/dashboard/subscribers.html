@@ -8,12 +8,30 @@
 <content>
     <h1>Email subscribers ({{ subscribers|length }})</h1>
     <p>
+        <a href="#import-contacts" download>Import contacts</a> |
         <a href="?export=True" download>Export list</a>
     </p>
     <ul>
     {% for subscriber in subscribers %}
-        <li>{{ subscriber.email_address }}</li>
+        <li>
+            {{ subscriber.email_address }} -
+            <small>
+                <a href="?delete={{subscriber.pk}}">
+                    [delete]
+                </a>
+            </small>
+        </li>
+    {% empty %}
+        <li>No subscribers yet</li>
     {% endfor %}
     </ul>
+    <form method="POST" id="import-contacts">
+        {% csrf_token %}
+        <label for="email_addresses">
+            <b>Import contacts</b> - One email address per line
+        </label>
+        <textarea name="email_addresses" rows="10"></textarea>
+        <input type="submit" value="Add contacts" />
+    </form>
 </content>
 {% endblock %}
