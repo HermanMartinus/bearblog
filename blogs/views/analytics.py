@@ -75,6 +75,9 @@ def analytics(request):
 
 def post_hit(request, pk):
     ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
-    Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash)
+    try:
+        Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash)
+    except Hit.MultipleObjectsReturned:
+        print('Duplicate hit')
 
     return HttpResponse("Logged")
