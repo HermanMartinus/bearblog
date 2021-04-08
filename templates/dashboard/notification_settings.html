@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+<a href="/dashboard/subscribers/">Back</a>
+{% endblock %}
+
+{% block content %}
+{% if not blog.upgraded %}
+    {% include '../snippets/upgrade.html' %}
+{% else %}
+<content>
+    <h1>Notification settings</h1>
+    <p>
+        <form method="POST" class="post-form">{% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="save btn btn-default">Save</button>
+        </form>
+    </p>
+</content>
+{% endif %}
+{% endblock %}

@@ -97,6 +97,21 @@ class Hit(models.Model):
         return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.ip_address} - {self.post}"
 
 
+class Emailer(models.Model):
+    blog = models.OneToOneField(
+        Blog,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    notify = models.BooleanField(default=False)
+    notification_text = models.TextField(
+        blank=True,
+        default="Hey, I've just published a new post! Check out the link below.")
+
+    def __str__(self):
+        return f"Emailer settings for {self.blog}"
+
+
 class Subscriber(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     email_address = models.EmailField()

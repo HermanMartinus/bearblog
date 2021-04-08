@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator, ValidationError
 
 from .helpers import is_protected, root, check_records
-from .models import Blog, Post
+from .models import Blog, Post, Emailer
 
 subdomain_validator = RegexValidator(
     r"^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{,63}(?<!-)$",
@@ -173,3 +173,19 @@ class AnalyticsForm(forms.ModelForm):
     class Meta:
         model = Blog
         fields = ('fathom_site_id',)
+
+
+class NotifyForm(forms.ModelForm):
+    notify = forms.BooleanField(
+        label="Notify subscribers about new posts?",
+        help_text="<br>This will send an email to subscribers letting them know you've just published a new post",
+        required=False)
+    notification_text = forms.CharField(
+        help_text="The link to your new post will be appended to this notification",
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 5, 'cols': 40}),
+    )
+
+    class Meta:
+        model = Emailer
+        fields = ('notify', 'notification_text')

@@ -1,24 +1,18 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.edit import DeleteView
 from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
-from django.http import HttpResponse
 
 import tldextract
 from ipaddr import client_ip
 import djqscsv
-import re
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
-from blogs.models import Blog, Post, Upvote, Subscriber
-from django.urls import reverse
-import random
-from django.contrib.auth.models import User
+from blogs.models import Blog, Post, Upvote
 
 
 def resolve_subdomain(http_host, blog):
@@ -200,36 +194,6 @@ def delete_user(request):
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
-
-
-@login_required
-def subscribers(request):
-    blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
-
-    if not blog.upgraded:
-        return redirect(f"/dashboard/")
-
-    if request.GET.get("delete", ""):
-        Subscriber.objects.filter(blog=blog, pk=request.GET.get("delete", "")).delete()
-
-    subscribers = Subscriber.objects.filter(blog=blog)
-
-    if request.GET.get("export", ""):
-        subscribers = subscribers.values('email_address', 'subscribed_date')
-        return djqscsv.render_to_csv_response(subscribers)
-
-    if request.POST.get("email_addresses", ""):
-        email_addresses = re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", request.POST.get("email_addresses", ""))
-
-        for email in email_addresses:
-            Subscriber.objects.get_or_create(blog=blog, email_address=email)
-
-    return render(request, "dashboard/subscribers.html", {
-        "blog": blog,
-        "subscribers": subscribers,
-    })
 
 
 @staff_member_required

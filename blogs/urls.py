@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import blog, dashboard, feed, discover, analytics
+from .views import blog, dashboard, feed, discover, analytics, emailer
 
 urlpatterns = [
     path('', blog.home, name='home'),
@@ -9,7 +9,8 @@ urlpatterns = [
     path('dashboard/styles/', dashboard.styles, name='styles'),
     path('dashboard/account/', dashboard.account, name='account'),
     path('dashboard/domain/', dashboard.domain_edit, name='domain'),
-    path('dashboard/subscribers/', dashboard.subscribers, name='subscribers'),
+    path('dashboard/subscribers/', emailer.subscribers, name='subscribers'),
+    path('dashboard/subscribers/settings/', emailer.notification_settings, name='notification_settings'),
     path('dashboard/export_emails/', dashboard.export_emails, name='export_emails'),
     path('dashboard/analytics/', analytics.analytics, name='analytics'),
     path('dashboard/posts/', dashboard.posts_edit, name='post'),
@@ -20,8 +21,8 @@ urlpatterns = [
     path('discover/', discover.discover, name='discover'),
 
     path('blog/', blog.posts, name='posts'),
-    path('subscribe/', blog.subscribe, name='subscribe'),
-    path('confirm-subscription/', blog.confirm_subscription, name='confirm_subscription'),
+    path('subscribe/', emailer.subscribe, name='subscribe'),
+    path('confirm-subscription/', emailer.confirm_subscription, name='confirm_subscription'),
     path('hit/<pk>/', analytics.post_hit, name='post_hit'),
     path("feed/", feed.feed, name="post_feed"),
     path('<slug>/', blog.post, name='post'),
