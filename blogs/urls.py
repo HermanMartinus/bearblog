@@ -1,11 +1,9 @@
 from django.urls import path
-from django.views.generic import TemplateView
 
 from .views import blog, dashboard, feed, discover, analytics, emailer
 
 urlpatterns = [
     path('', blog.home, name='home'),
-    path('contribute/', TemplateView.as_view(template_name='contribute.html')),
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('dashboard/', dashboard.dashboard, name='dashboard'),
     path('dashboard/styles/', dashboard.styles, name='styles'),
