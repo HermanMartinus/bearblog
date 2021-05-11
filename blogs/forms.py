@@ -57,9 +57,15 @@ class BlogForm(forms.ModelForm):
         required=False,
     )
 
+    meta_description = forms.CharField(
+        label="Meta description",
+        help_text="Max 200 characters",
+        widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}),
+    )
+
     class Meta:
         model = Blog
-        fields = ('title', 'subdomain', 'content',)
+        fields = ('title', 'subdomain', 'content', 'meta_description')
 
 
 class StyleForm(forms.ModelForm):
@@ -140,6 +146,12 @@ class PostForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
     )
 
+    meta_description = forms.CharField(
+        label="Meta description",
+        help_text="Max 200 characters",
+        widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}),
+    )
+
     canonical_url = forms.CharField(
         label="Canonical url (optional)",
         help_text="<a href='https://ahrefs.com/blog/canonical-tags/#what-is-a-canonical-tag' target='_blank'>Learn more</a>",
@@ -166,7 +178,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'slug', 'canonical_url', 'published_date', 'content', 'tags', 'is_page', 'publish', 'show_in_feed')
+        fields = ('title', 'slug', 'canonical_url', 'published_date', 'content', 'meta_description', 'tags', 'is_page', 'publish', 'show_in_feed')
 
 
 class AnalyticsForm(forms.ModelForm):

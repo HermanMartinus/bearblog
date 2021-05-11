@@ -15,6 +15,8 @@ class Blog(models.Model):
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
     content = models.TextField(blank=True)
+    meta_description = models.CharField(max_length=200, blank=True)
+
     reviewed = models.BooleanField(default=False)
     upgraded = models.BooleanField(default=False)
     blocked = models.BooleanField(default=False)
@@ -70,6 +72,7 @@ class Post(models.Model):
     is_page = models.BooleanField(default=False)
     content = models.TextField()
     canonical_url = models.CharField(max_length=200, blank=True)
+    meta_description = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.title

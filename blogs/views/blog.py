@@ -31,6 +31,8 @@ def home(request):
 
     all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
+    meta_description = blog.meta_description or unmark(blog.content)[:160]
+
     return render(
         request,
         'home.html',
@@ -40,7 +42,7 @@ def home(request):
             'posts': get_posts(all_posts),
             'nav': get_nav(all_posts),
             'root': blog.useful_domain(),
-            'meta_description': unmark(blog.content)[:160]
+            'meta_description': meta_description
         })
 
 
@@ -66,6 +68,8 @@ def posts(request):
         tags += post.tags.most_common()[:10]
     tags = list(dict.fromkeys(tags))
 
+    meta_description = blog.meta_description or unmark(blog.content)[:160]
+
     return render(
         request,
         'posts.html',
@@ -74,7 +78,7 @@ def posts(request):
             'posts': blog_posts,
             'nav': get_nav(all_posts),
             'root': blog.useful_domain(),
-            'meta_description':  unmark(blog.content)[:160],
+            'meta_description':  meta_description,
             'tags': tags,
             'query': query,
         }
@@ -112,6 +116,8 @@ def post(request, slug):
         if upvote.ip_address == ip_address:
             upvoted = True
 
+    meta_description = post.meta_description or unmark(post.content)[:160]
+
     return render(
         request,
         'post.html',
@@ -121,7 +127,7 @@ def post(request, slug):
             'post': post,
             'nav': get_nav(all_posts),
             'root': blog.useful_domain(),
-            'meta_description': unmark(post.content)[:160],
+            'meta_description': meta_description,
             'upvoted': upvoted
         }
     )
