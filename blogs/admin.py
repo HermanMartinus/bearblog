@@ -62,6 +62,11 @@ class BlogAdmin(admin.ModelAdmin):
     user_link.allow_tags = True
     user_link.short_description = "User"
 
+    def user_email(self, obj):
+        return obj.user.email
+
+    user_email.short_description = "Email"
+
     list_display = (
         'title',
         'reviewed',
@@ -71,6 +76,7 @@ class BlogAdmin(admin.ModelAdmin):
         'domain_url',
         'post_count',
         'user_link',
+        'user_email',
         'created_date')
 
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
