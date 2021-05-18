@@ -141,7 +141,7 @@ def not_found(request, *args, **kwargs):
 
 @staff_member_required
 def review_flow(request):
-    unreviewed_blogs = Blog.objects.filter(reviewed=False, blocked=False)
+    unreviewed_blogs = Blog.objects.filter(reviewed=False, blocked=False).order_by('-created_date')
 
     if unreviewed_blogs:
         blog = unreviewed_blogs[0]
