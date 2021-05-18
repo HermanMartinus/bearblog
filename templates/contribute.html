@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Contribute to Bear
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
+{% block content %}
+<h2>Help Bear keep the Internet awesome! ＼ʕ •ᴥ•ʔ／</h2>
+<h4>Bear is 100% free, open-source, community-centric, and awesome.</h4>
+{% comment %} <p>
+    I am the creator and maintainer of <a href="/">ʕ•ᴥ•ʔ Bear</a>.
+    This project started out as a personal blog, and turned into a minimal blogging platform
+    for the masses (we currently have more than 3,000 blogs running on Bear with more signing up every day).
+</p>
+<p>
+    It has gotten to the point where I need to open up the conversation around how this project
+    monetises due to the cost of hosting and maintenance.
+</p> {% endcomment %}
+<p>
+    Most “free” websites subsist by selling ads or selling user data.
+    Others do it by putting all the good stuff behind paywalls. Bear doesn't do any of that. 
+</p>
+
+<h4>Firstly, a few things that won't change:</h4>
+<ul>
+    <li>Bear will never have ads.</li>
+    <li>Bear will never sell your data.</li>
+    <li>All the existing features of Bear will remain free of charge, forever.</li>
+</ul>
+<p>
+    If you're keen to support the project you can contribute here.
+    Monthly recurring contributors will receive beta access to new features such as
+    newsletter subscriptions and API access (still in development). 
+</p>
+<h4>
+    Bear receives $60 per month from 14
+    <a href="https://github.com/HermanMartinus/bearblog/wiki/Contributors" target="_blank">patrons</a>.
+    <br>
+    Goal: $1000 per month.
+</h4>
+<p>
+	<div id="paypal-button-container-P-04C10350V4946812SMCN56MA" style="width: 300px; margin-top: 20px;"></div>
+	<script src="https://www.paypal.com/sdk/js?client-id=AR1r8JHELZ6X04dTtwQrwp6dca8JeopBGHQ8JqLnZ3FqWyh57IcHZlXKQBj2PgT8qCFFdnJnHf_qiYCY&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script> 
+	<script>
+	paypal.Buttons({
+		style: {
+			shape: 'rect',
+			color: 'silver',
+			layout: 'vertical',
+			label: 'paypal'
+		},
+		createSubscription: function(data, actions) {
+			return actions.subscription.create({
+			/* Creates the subscription */
+			plan_id: 'P-04C10350V4946812SMCN56MA'
+			});
+		},
+		onApprove: function(data, actions) {
+			alert("Thanks for your support! Give me a day or two to grant you access to the beta features."); // You can add optional success message for the subscriber here
+		}
+	}).render('#paypal-button-container-P-04C10350V4946812SMCN56MA'); // Renders the PayPal button
+	</script>
+</p>
+
+<p>
+    If you would like to contribute more than $5 per month, you can do that
+    <a target="_blank" href="https://www.paypal.com/donate?hosted_button_id=FAZ5LMBRHDDKY">here</a>
+</p>
+
+<p>
+All the best,
+<br>
+Herman
+</p>
+
+{% endblock %}
