@@ -38,6 +38,7 @@
 
 {% block content %}
 <a href="{{ root }}" target="_blank">{{ root }}</a>
+<p><b>Created {{ blog.created_date | timesince }} ago</b></p>
 <content>
     {{ content | markdown | safe }}
 </content>
@@ -48,7 +49,7 @@
         #{{ forloop.counter }}
         <i>
             <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
-                - {{ post.published_date|date:'d M, Y' }} -
+                - {{ post.published_date|date:'d M, Y' }}
             </time>
         </i>
         <h3><a href="{{ root }}/{{ post.slug }}/" target="_blank">{{ post.title }}</a></h3>
