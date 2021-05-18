@@ -26,7 +26,7 @@
 {% endblock %}
 
 {% block heading %}
-<a href="{{ root }}" target="_blank">{{ blog.title }}</a>
+{{ blog.title }}
 {% endblock %}
 
 {% block nav %}
@@ -37,7 +37,7 @@
 {% endblock %}
 
 {% block content %}
-
+<a href="{{ root }}" target="_blank">{{ root }}</a>
 <content>
     {{ content | markdown | safe }}
 </content>
