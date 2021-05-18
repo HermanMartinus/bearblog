@@ -38,6 +38,8 @@
 
 {% block content %}
 <a href="{{ root }}" target="_blank">{{ root }}</a>
+<br>
+<a href="mailto:{{ blog.user.email }}">{{ blog.user.email }}</a>
 <p><b>Created {{ blog.created_date | timesince }} ago</b></p>
 <content>
     {{ content | markdown | safe }}
