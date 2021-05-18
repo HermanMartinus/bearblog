@@ -58,9 +58,10 @@ class BlogForm(forms.ModelForm):
     )
 
     meta_description = forms.CharField(
-        label="Meta description",
+        label="Meta description (optional)",
         help_text="Max 200 characters",
         widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}),
+        required=False
     )
 
     class Meta:
@@ -147,9 +148,10 @@ class PostForm(forms.ModelForm):
     )
 
     meta_description = forms.CharField(
-        label="Meta description",
+        label="Meta description (optional)",
         help_text="Max 200 characters",
         widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}),
+        required=False,
     )
 
     canonical_url = forms.CharField(

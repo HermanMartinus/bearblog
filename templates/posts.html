@@ -38,11 +38,7 @@ Blog |
 {% endblock %}
 
 {% block nav %}
-<a href="/">Home</a>
-{% for item in nav %}
-<a href="/{{ item.slug }}/">{{ item.title }}</a>
-{% endfor %}
-<a href="/blog/">Blog</a>
+{% include './snippets/nav.html' with nav=nav%}
 {% endblock %}
 
 {% block content %}

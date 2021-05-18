@@ -9,18 +9,9 @@
 {{ blog.title }}
 {% endblock %}
 
-{% block analytics %}
-{% if blog.fathom_site_id %}
-<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>
-{% endif %}
-{% endblock %}
 
 {% block seo %}
-{% if not blog.reviewed %}
 <meta name="robots" content="noindex">
-{% endif %}
-{% include 'snippets/seo_tags.html' with title=blog.title url=root description=meta_description tags="blog, blogging, write, writing" %}
-<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}
 
 
@@ -35,19 +26,22 @@
 {% endblock %}
 
 {% block heading %}
-{{ blog.title }}
+<a href="{{ root }}" target="_blank">{{ blog.title }}</a>
 {% endblock %}
 
 {% block nav %}
-{% include './snippets/nav.html' with nav=nav %}
+<p style="position:fixed; top: -20px; background-color: wheat; padding: 10px">
+<a href="approve/{{ blog.pk }}">Approve</a>|
+<a href="block/{{ blog.pk }}">Block</a>
+</p>
 {% endblock %}
 
 {% block content %}
-{% if blog.content %}
+
 <content>
     {{ content | markdown | safe }}
 </content>
-{% else %}
+
 <ul>
     {% for post in posts %}
     <li>
@@ -57,11 +51,14 @@
                 - {{ post.published_date|date:'d M, Y' }} -
             </time>
         </i>
-        <a href="/{{ post.slug }}/">{{ post.title }}</a>
+        <h3><a href="{{ root }}/{{ post.slug }}/" target="_blank">{{ post.title }}</a></h3>
+        <p>
+            {{ post.content | markdown | safe }}
+        </p>
     </li>
     {% endfor %}
 </ul>
-{% endif %}
+
 
 {% if posts.empty %}
 <p>

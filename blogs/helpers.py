@@ -109,6 +109,7 @@ def delete_domain(domain):
 
 def add_email_address(email_address):
     if settings.DEBUG:
+        print("Sent email address to Email Octopus")
         return
 
     url = "https://emailoctopus.com/api/1.5/lists/34f03ee5-2f2f-11eb-a3d0-06b4694bee2a/contacts"

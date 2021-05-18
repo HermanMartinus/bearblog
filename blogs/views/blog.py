@@ -1,9 +1,11 @@
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.sites.models import Site
 from django.db.models import Count
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_nav, get_post, get_posts, unmark
+from blogs.helpers import add_email_address, get_nav, get_post, get_posts, unmark
 
 from ipaddr import client_ip
 from taggit.models import Tag
@@ -135,3 +137,45 @@ def post(request, slug):
 
 def not_found(request, *args, **kwargs):
     return render(request, '404.html', status=404)
+
+
+@staff_member_required
+def review_flow(request):
+    unreviewed_blogs = Blog.objects.filter(reviewed=False, blocked=False)
+
+    if unreviewed_blogs:
+        blog = unreviewed_blogs[0]
+        all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+
+        meta_description = blog.meta_description or unmark(blog.content)[:160]
+
+        return render(
+            request,
+            'review_flow.html',
+            {
+                'blog': blog,
+                'content': blog.content or "~nothing here~",
+                'posts': all_posts,
+                'nav': get_nav(all_posts),
+                'root': blog.useful_domain(),
+                'meta_description': meta_description
+            })
+    else:
+        return HttpResponse("No blogs left to review! \ʕ•ᴥ•ʔ/")
+
+
+@staff_member_required
+def approve(request, pk):
+    blog = get_object_or_404(Blog, pk=pk)
+    blog.reviewed = True
+    blog.save()
+    add_email_address(blog.user.email)
+    return redirect('review_flow')
+
+
+@staff_member_required
+def block(request, pk):
+    blog = get_object_or_404(Blog, pk=pk)
+    blog.blocked = True
+    blog.save()
+    return redirect('review_flow')

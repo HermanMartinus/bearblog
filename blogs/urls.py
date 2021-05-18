@@ -6,6 +6,9 @@ from .views import blog, dashboard, feed, discover, analytics, emailer
 urlpatterns = [
     path('', blog.home, name='home'),
     path('contribute/', TemplateView.as_view(template_name='contribute.html')),
+    path('review/', blog.review_flow, name='review_flow'),
+    path('review/approve/<pk>', blog.approve, name='review_approve'),
+    path('review/block/<pk>', blog.block, name='review_block'),
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('dashboard/', dashboard.dashboard, name='dashboard'),
     path('dashboard/styles/', dashboard.styles, name='styles'),
