@@ -1,3 +1,4 @@
+from django.http.response import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
@@ -7,12 +8,14 @@ from blogs.helpers import unmark, clean_text
 from blogs.views.blog import resolve_address
 
 from feedgen.feed import FeedGenerator
-import tldextract
 import mistune
 
 
 def feed(request):
     blog = resolve_address(request)
+
+    if not blog:
+        raise Http404("Blog does not exist")
 
     all_posts = blog.post_set.filter(publish=True, is_page=False).order_by('-published_date')
 

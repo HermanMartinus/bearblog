@@ -32,7 +32,7 @@
 {% block nav %}
 <p style="position:fixed; top: -20px; background-color: wheat; padding: 10px">
 <a href="approve/{{ blog.pk }}">Approve</a>|
-<a href="block/{{ blog.pk }}">Block</a>
+<a href="block/{{ blog.pk }}">Block</a> - {{ still_to_go }} blog(s) still to go
 </p>
 {% endblock %}
 

@@ -156,9 +156,8 @@ def review_flow(request):
                 'blog': blog,
                 'content': blog.content or "~nothing here~",
                 'posts': all_posts,
-                'nav': get_nav(all_posts),
                 'root': blog.useful_domain(),
-                'meta_description': meta_description
+                'still_to_go': len(unreviewed_blogs)
             })
     else:
         return HttpResponse("No blogs left to review! \ʕ•ᴥ•ʔ/")
