@@ -53,24 +53,22 @@ nav a {
     margin-right: 10px;
 }
 
-textarea {
-    width: 100%;
-    font-size: 16px;
-}
-
-input:not([type="submit"]) {
-    font-size: 16px;
-}
 textarea,
 input:not([type="submit"]) {
     background-color: inherit;
     color: inherit;
     border: 1px dashed;
-    padding: 3px;
+    padding: 5px;
+    font-size: 16px;
+}
+
+.full-width textarea,
+.full-width input:not([type="submit"]) {
+    width: 100%;
 }
 
 textarea:required,
-input:required{
+input:required:not([type="submit"]){
     border: 1px solid;
 }
 

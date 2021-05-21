@@ -13,7 +13,7 @@
         <input type="text" value="optional" style="width: 70px; font-size: 10px;" readonly/>
     </p>
 
-    <form method="POST" class="post-form">{% csrf_token %}
+    <form method="POST" class="post-form full-width">{% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="save btn btn-default">Save</button>
     </form>

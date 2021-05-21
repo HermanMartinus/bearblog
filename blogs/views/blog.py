@@ -147,8 +147,6 @@ def review_flow(request):
         blog = unreviewed_blogs[0]
         all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
-        meta_description = blog.meta_description or unmark(blog.content)[:160]
-
         return render(
             request,
             'review_flow.html',

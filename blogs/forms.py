@@ -77,6 +77,12 @@ class StyleForm(forms.ModelForm):
         required=True
     )
 
+    meta_image = forms.CharField(
+        label="Meta image URL",
+        help_text="<a href='https://github.com/HermanMartinus/bearblog/wiki/Meta-information' target='_blank'>Learn more</a>",
+        required=False
+    )
+
     external_stylesheet = forms.CharField(
         help_text="<br>List of <a href='https://www.cssbed.com/' target='_blank'>no-class css themes</a> (only paste the CDN link)",
         required=False,
@@ -89,7 +95,7 @@ class StyleForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('favicon', 'external_stylesheet', 'custom_styles',)
+        fields = ('favicon', 'meta_image', 'external_stylesheet', 'custom_styles',)
 
 
 class DomainForm(forms.ModelForm):
@@ -156,6 +162,12 @@ class PostForm(forms.ModelForm):
         required=False,
     )
 
+    meta_image = forms.CharField(
+        label="Meta image URL",
+        help_text="<a href='https://github.com/HermanMartinus/bearblog/wiki/Meta-information' target='_blank'>Learn more</a>",
+        required=False
+    )
+
     canonical_url = forms.CharField(
         label="Canonical url",
         help_text="<a href='https://ahrefs.com/blog/canonical-tags/#what-is-a-canonical-tag' target='_blank'>Learn more</a>",
@@ -185,7 +197,18 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'slug', 'canonical_url', 'published_date', 'content', 'meta_description', 'tags', 'is_page', 'publish', 'show_in_feed')
+        fields = (
+            'title',
+            'slug',
+            'canonical_url',
+            'published_date',
+            'content',
+            'meta_description',
+            'meta_image',
+            'tags',
+            'is_page',
+            'publish',
+            'show_in_feed')
 
 
 class AnalyticsForm(forms.ModelForm):
