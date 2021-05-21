@@ -59,7 +59,7 @@ class BlogForm(forms.ModelForm):
     )
 
     meta_description = forms.CharField(
-        label="Meta description (optional)",
+        label="Meta description",
         help_text="Max 200 characters",
         widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}),
         required=False
@@ -131,14 +131,14 @@ class PostForm(forms.ModelForm):
         self.user = user
 
     slug = forms.SlugField(
-        label="Permalink (optional)",
+        label="Permalink",
         help_text="eg: 'why-i-like-bears'",
         validators=[link_validator],
         required=False
     )
 
     published_date = forms.DateTimeField(
-        label="Date (optional)",
+        label="Date",
         help_text="eg: '2020-05-31' (leave empty to post now)",
         required=False
     )
@@ -150,14 +150,14 @@ class PostForm(forms.ModelForm):
     )
 
     meta_description = forms.CharField(
-        label="Meta description (optional)",
+        label="Meta description",
         help_text="Max 200 characters",
         widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}),
         required=False,
     )
 
     canonical_url = forms.CharField(
-        label="Canonical url (optional)",
+        label="Canonical url",
         help_text="<a href='https://ahrefs.com/blog/canonical-tags/#what-is-a-canonical-tag' target='_blank'>Learn more</a>",
         required=False
     )

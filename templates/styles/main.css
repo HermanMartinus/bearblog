@@ -69,6 +69,12 @@ input:not([type="submit"]) {
     padding: 3px;
 }
 
+textarea:required,
+input:required{
+    border: 1px solid;
+}
+
+
 content {
     line-height: 1.6;
 }
