@@ -14,6 +14,7 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
+    path('404/', TemplateView.as_view(template_name="404.html", content_type="text/html"))
 ]
 
 if settings.DEBUG:

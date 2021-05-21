@@ -5,19 +5,27 @@
 {% endblock %}
 
 {% block custom_styles %}
-    {% include 'snippets/styles.html' with blog=blog %}
+    {% include 'snippets/styles.html' %}
 {% endblock %}
 
+{% block heading %}
+{% endblock %}
 
 {% block nav %}
-<a href="/">Home</a>
-{% for item in nav %}
-<a href="/{{ item.slug }}/">{{ item.title }}</a>
-{% endfor %}
-<a href="/blog/">Blog</a>
 {% endblock %}
 
 {% block content %}
-<h1>404</h1>
-<h2>ʕノ•ᴥ•ʔノ ︵ ┻━┻</h2>
+<div style="text-align: center; display: flex; flex-flow: column; justify-content: center; height: calc(100vh - 70px);">
+    <h1>404</h1>
+    <h2>ʕノ•ᴥ•ʔノ ︵ ┻━┻</h2>
+    <p>
+        It looks like this page doesn't exist.
+        <br>
+        Let's get you
+        <a href="/">back home</a>.
+    </p>
+</div>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}
