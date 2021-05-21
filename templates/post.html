@@ -38,13 +38,7 @@ url("/hit/{{ post.pk }}")
 {% endblock %}
 
 {% block custom_styles %}
-    {% if blog.external_stylesheet %}
-        @import '{{ blog.external_stylesheet }}';
-    {% else %}
-        {% include 'styles/main.css' %}
-        {% include 'styles/dark_mode.css' %}
-    {% endif %}
-    {{ blog.custom_styles }}
+    {% include 'snippets/styles.html' with blog=blog %}
 {% endblock %}
 
 {% block nav %}
