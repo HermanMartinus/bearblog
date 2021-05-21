@@ -1,5 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator, ValidationError
+from django.template.defaultfilters import slugify
 
 from .helpers import is_protected, root, check_records
 from .models import Blog, Post, Emailer
@@ -130,13 +131,14 @@ class PostForm(forms.ModelForm):
         self.user = user
 
     slug = forms.SlugField(
-        label="Permalink",
+        label="Permalink (optional)",
         help_text="eg: 'why-i-like-bears'",
-        validators=[link_validator]
+        validators=[link_validator],
+        required=False
     )
 
     published_date = forms.DateTimeField(
-        label="Date",
+        label="Date (optional)",
         help_text="eg: '2020-05-31' (leave empty to post now)",
         required=False
     )
@@ -166,7 +168,10 @@ class PostForm(forms.ModelForm):
         initial=True)
 
     def clean_slug(self):
-        slug = self.cleaned_data['slug']
+        if self.cleaned_data['slug']:
+            slug = self.cleaned_data['slug']
+        else:
+            slug = slugify(self.cleaned_data['title'])
 
         blog = Blog.objects.get(user=self.user)
         matching_posts = Post.objects.filter(blog=blog, slug=slug)
