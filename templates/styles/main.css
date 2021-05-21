@@ -63,7 +63,7 @@ input:not([type="submit"]) {
 }
 
 .full-width textarea,
-.full-width input:not([type="submit"]) {
+.full-width input:not([type="submit"], [type="checkbox"]) {
     width: 100%;
 }
 
