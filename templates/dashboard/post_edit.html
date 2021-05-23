@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    {% if post %}
+        Editing {{ post.title }}
+    {% else %}
+        New post
+    {% endif %}
+{% endblock %}
+
 {% block nav %}
 {% include '../snippets/dashboard_nav.html' %}
 {% endblock %}
