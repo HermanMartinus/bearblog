@@ -14,6 +14,7 @@ class Blog(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
+    challenge = models.CharField(max_length=128, blank=True)
     content = models.TextField(blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)

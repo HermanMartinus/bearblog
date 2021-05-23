@@ -1,5 +1,6 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
+from django.http.response import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.sites.models import Site
 from django.db.models import Count
@@ -133,6 +134,19 @@ def post(request, slug):
             'upvoted': upvoted
         }
     )
+
+
+def challenge(request, challenge):
+    blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+
+    print(challenge)
+    print(blog.challenge)
+    if challenge == blog.challenge.split('.')[0]:
+        return HttpResponse(blog.challenge)
+    else:
+        raise Http404()
 
 
 def not_found(request, *args, **kwargs):

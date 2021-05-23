@@ -21,10 +21,11 @@ urlpatterns = [
     path('dashboard/posts/', dashboard.posts_edit, name='post'),
     path('dashboard/posts/new/', dashboard.post_new, name='post_new'),
     path('dashboard/posts/<pk>/', dashboard.post_edit, name='post_edit'),
-    path('dashboard/posts/<pk>/delete/', dashboard.PostDelete.as_view(),
-         name='post_delete'),
+    path('dashboard/posts/<pk>/delete/', dashboard.PostDelete.as_view(), name='post_delete'),
+
     path('discover/', discover.discover, name='discover'),
 
+    path('.well-known/acme-challenge/<challenge>', blog.challenge, name='challenge'),
     path('blog/', blog.posts, name='posts'),
     path('subscribe/', emailer.subscribe, name='subscribe'),
     path('confirm-subscription/', emailer.confirm_subscription, name='confirm_subscription'),
