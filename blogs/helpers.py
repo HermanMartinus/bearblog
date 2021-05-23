@@ -189,7 +189,7 @@ def validate_subscriber_email(email, blog):
     send_mail(
         'Confirm your email address',
         text_message,
-        f'{blog.title} subscription <subscriptions@bearblog.dev>',
+        'subscriptions@bearblog.dev',
         [email],
         fail_silently=False,
         html_message=html_message,
