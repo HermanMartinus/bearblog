@@ -76,7 +76,7 @@ def subscribe(request):
             subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email)
             if not subscriber_dupe:
                 validate_subscriber_email(email, blog)
-                subscribe_message = "Check your email to confirm your subscription."
+                subscribe_message = "You've been subscribed! ＼ʕ •ᴥ•ʔ／"
             else:
                 subscribe_message = "You are already subscribed."
 
@@ -104,6 +104,12 @@ def confirm_subscription(request):
     if token == request.GET.get("token", ""):
         Subscriber.objects.get_or_create(blog=blog, email_address=email)
 
-        return HttpResponse(f"<p>You've been subscribed to <a href='{blog.useful_domain()}'>{blog.title}</a>. ＼ʕ •ᴥ•ʔ／</p>")
+        return HttpResponse(f'''
+            <p style='text-align: center; padding-top: 30%'>
+                Your subscription to
+                <a href="{blog.useful_domain()}">{blog.title}</a>
+                has been confirmed. ＼ʕ •ᴥ•ʔ／
+            </p>
+            ''')
 
     return HttpResponse("Something went wrong. Try subscribing again. ʕノ•ᴥ•ʔノ ︵ ┻━┻")
