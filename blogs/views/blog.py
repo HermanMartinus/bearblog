@@ -180,7 +180,8 @@ def approve(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.reviewed = True
     blog.save()
-    add_email_address(blog.user.email)
+    if not request.GET.get("no-email", ""):
+        add_email_address(blog.user.email)
     return redirect('review_flow')
 
 

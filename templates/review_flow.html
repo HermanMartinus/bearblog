@@ -20,13 +20,17 @@
 {% endblock %}
 
 {% block heading %}
+<br>
 {{ blog.title }}
 {% endblock %}
 
 {% block nav %}
-<p style="position:fixed; top: -20px; background-color: wheat; padding: 10px">
+<p style="position:fixed; top: -20px; background-color: wheat; padding: 20px 10px 10px">
 <a href="approve/{{ blog.pk }}">Approve</a>|
-<a href="block/{{ blog.pk }}">Block</a> - {{ still_to_go }} blog(s) still to go
+<a href="approve/{{ blog.pk }}?no-email=True">Approve (no email)</a>|
+<a href="block/{{ blog.pk }}">Block</a>
+<br>
+{{ still_to_go }} blog(s) still to go
 </p>
 {% endblock %}
 
