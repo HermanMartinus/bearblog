@@ -7,7 +7,7 @@
 **Please log all bugs and feature requests as [issues](https://github.com/HermanMartinus/bearblog/issues).**
 
 ## Markdown
-All the post content is written in [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
+All the post content is written in [markdown](https://herman.bearblog.dev/markdown-cheatsheet/).
 
 ## Custom domains
 It is free to add custom domains. Learn more in the [wiki](https://github.com/HermanMartinus/bearblog/wiki/Custom-domains)
