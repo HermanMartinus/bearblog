@@ -24,6 +24,8 @@ def markdown(value):
         for match in soup.findAll(tag):
             if match.parent.name == 'pre':
                 match.parent.wrap(soup.new_tag("p"))
+                if match.has_attr('class'):
+                    match.parent.attrs['class'] = match['class'][0].replace('language-', '')
                 match.replaceWithChildren()
 
     cleaned_markup = clean_html(str(soup))
