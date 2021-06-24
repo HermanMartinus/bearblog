@@ -26,7 +26,7 @@
 
 {% block imports %}
 {% if blog.contains_code %}
-<link rel="stylesheet" href="{% pygmentify_css 'monokai' %}">
+<link rel="stylesheet" href="{% pygmentify_css 'monokai' minify='false' %}">
 {% endif %}
 {% endblock %}
 
