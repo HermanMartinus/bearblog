@@ -29,6 +29,10 @@ class Blog(models.Model):
 
     fathom_site_id = models.CharField(max_length=8, blank=True)
 
+    @property
+    def contains_code(self):
+        return "```" in self.content
+
     def bear_domain(self):
         return f'http://{self.subdomain}.{Site.objects.get_current().domain}'
 
@@ -76,6 +80,10 @@ class Post(models.Model):
     canonical_url = models.CharField(max_length=200, blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
+
+    @property
+    def contains_code(self):
+        return "```" in self.content
 
     def __str__(self):
         return self.title

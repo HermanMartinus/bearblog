@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load pygmentify_tags %}
 {% load markdownify %}
 
 {% block favicon %}
@@ -23,6 +24,11 @@
 <link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}
 
+{% block imports %}
+{% if blog.contains_code %}
+<link rel="stylesheet" href="{% pygmentify_css 'monokai' %}">
+{% endif %}
+{% endblock %}
 
 {% block custom_styles %}
     {% include 'snippets/styles.html' with blog=blog %}
@@ -39,7 +45,9 @@
 {% block content %}
 {% if blog.content %}
 <content>
+{% pygmentify 'monokai' %}
     {{ content | markdown | safe }}
+{% endpygmentify %}
 </content>
 {% else %}
 <ul>

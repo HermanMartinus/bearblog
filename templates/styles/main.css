@@ -85,17 +85,20 @@ img {
     max-width: 100%;
 }
 
-code {
-    padding: 2px 5px;
-    background-color: #f2f2f2;
+code{
+    font-family: monospace;
+    padding: 2px 5px 4px;
+    background-color: #282922;
+    color: #f8f8f2;
+    border-radius: 3px;
 }
 
-pre code {
-    color: #222;
-    display: block;
-    padding: 20px;
-    white-space: pre-wrap;
-    font-size: 14px;
+.highlight,
+.code {
+    padding: 1px 15px;
+    background-color: #282922;
+    color: #f8f8f2;
+    border-radius: 3px;
 }
 
 blockquote {
