@@ -15,7 +15,6 @@ def markdown(value):
     heading_tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
 
     for each_tag in heading_tags:
-        each_tag.attrs['id'] = f"section-{heading_tags.index(each_tag)}"
         each_tag.attrs['id'] = slugify(each_tag.text)
 
     invalid_tags = ['code']
