@@ -36,7 +36,7 @@
 
 {% block imports %}
 {% if post.contains_code %}
-<link rel="stylesheet" href="{% pygmentify_css 'monokai' minify='false' %}">
+<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">
 {% endif %}
 {% endblock %}
 
@@ -69,7 +69,7 @@ url("/hit/{{ post.pk }}")
 {% endif %}
 
 <content>
-{% pygmentify 'monokai' %}
+{% pygmentify %}
     {{ content | markdown | safe }}
 {% endpygmentify %}
 </content>
