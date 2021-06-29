@@ -67,7 +67,7 @@ class BlogForm(forms.ModelForm):
 
     lang = forms.CharField(
         label="lang",
-        help_text="Language attribute",
+        help_text="<a href='https://gist.github.com/JamieMason/3748498/' target='_blank'>Language code cheatsheet</a>",
         widget=forms.TextInput(attrs={'class': "inline"}),
         required=False
     )
@@ -178,6 +178,11 @@ class PostForm(forms.ModelForm):
     canonical_url = forms.CharField(
         label="Canonical url",
         help_text="<a href='https://ahrefs.com/blog/canonical-tags/#what-is-a-canonical-tag' target='_blank'>Learn more</a>",
+        required=False
+    )
+
+    publish = forms.BooleanField(
+        widget=forms.HiddenInput(),
         required=False
     )
 

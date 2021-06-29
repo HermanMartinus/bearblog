@@ -29,7 +29,14 @@
 
     <form method="POST" class="post-form full-width">{% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Save</button>
+        <button type="submit" onclick="document.getElementById('id_publish').value = true;">Publish</button>
+        <button type="submit" onclick="document.getElementById('id_publish').value = false;">
+            {% if post.publish %}
+            Unpublish
+            {% else %}
+            Save as draft
+            {% endif %}
+        </button>
     </form>
     {% if post %}
     <p>
