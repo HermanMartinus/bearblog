@@ -67,6 +67,10 @@ input:not([type="submit"]) {
     width: 100%;
 }
 
+.inline {
+    width: auto !important;
+}
+
 textarea:required,
 input:required:not([type="submit"]){
     border: 1px solid;

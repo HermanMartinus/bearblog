@@ -65,9 +65,16 @@ class BlogForm(forms.ModelForm):
         required=False
     )
 
+    lang = forms.CharField(
+        label="lang",
+        help_text="Language attribute",
+        widget=forms.TextInput(attrs={'class': "inline"}),
+        required=False
+    )
+
     class Meta:
         model = Blog
-        fields = ('title', 'subdomain', 'content', 'meta_description')
+        fields = ('title', 'subdomain', 'content', 'meta_description', 'lang')
 
 
 class StyleForm(forms.ModelForm):

@@ -2,6 +2,8 @@
 {% load pygmentify_tags %}
 {% load markdownify %}
 
+{% block lang %}{{ blog.lang }}{% endblock %}
+
 {% block favicon %}
 {{ blog.favicon }}
 {% endblock %}

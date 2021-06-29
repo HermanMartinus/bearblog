@@ -18,6 +18,7 @@ class Blog(models.Model):
     content = models.TextField(blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
+    lang = models.CharField(max_length=10, default='en', blank=True)
 
     reviewed = models.BooleanField(default=False)
     upgraded = models.BooleanField(default=False)
