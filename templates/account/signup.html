@@ -2,14 +2,16 @@
 
 {% load i18n %}
 
-{% block head_title %}{% trans "Signup" %}{% endblock %}
+{% block head_title %}{% trans "Create Account" %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Sign Up" %}</h1>
+<h1>{% trans "Create Account" %}</h1>
 
-<p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
-
-<p><i>Please note that Bear is free to use for blogs. If your account is backlink spam it will be flagged as such and removed.</i></p>
+<p>
+  <small>
+    {% blocktrans %}Have an account? <a href="{{ login_url }}">Log in</a>{% endblocktrans %}
+  </small>
+</p>
 
 <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
   {% csrf_token %}
@@ -17,7 +19,22 @@
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <button type="submit">{% trans "Sign Up" %} &raquo;</button>
+  <button type="submit">{% trans "Create Account" %} &raquo;</button>
+  <p>
+    <small>
+      Bear is free to use for blogs.
+      <br>
+      If your account is backlink spam it will be flagged and removed.
+      <br>
+      By creating an account you agree to our
+      <a href="https://github.com/HermanMartinus/bearblog/wiki/Terms-of-Service">terms of service</a>
+      and <a href="https://github.com/HermanMartinus/bearblog/wiki/Privacy-Policy">privacy policy</a>.
+    </small>
+  </p>
 </form>
+
+<script>
+document.querySelector('form input[type=email]').select();
+</script>
 
 {% endblock %}
