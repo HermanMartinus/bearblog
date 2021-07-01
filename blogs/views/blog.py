@@ -131,6 +131,7 @@ def post(request, slug):
             'nav': get_nav(all_posts),
             'root': blog.useful_domain(),
             'meta_description': meta_description,
+            'meta_image': post.meta_image or blog.meta_image,
             'upvoted': upvoted
         }
     )
