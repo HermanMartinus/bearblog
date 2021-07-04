@@ -100,7 +100,7 @@ url("/hit/{{ post.pk }}")
         <button>▵ Toast this post</button>
         {% endif %}
     </form>
-    - <small>{{ post.upvote_count }} toasts</small>
+    - <small>{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</small>
 </small>
 {% endif %}
 {% endblock %}
