@@ -14,8 +14,13 @@
         Discovery feed
     </h1>
     <nav>
+        {% if not newest %}
+        <b><a href="/discover/">Trending</a></b>
+        <a href="/discover/?newest=true">Most recent</a>
+        {% else %}
         <a href="/discover/">Trending</a>
-        <a href="/discover/?newest=true">Newest</a>
+        <b><a href="/discover/?newest=true">Most recent</a></b>
+        {% endif %}
     </nav>
 
     <ul class="discover-posts">
