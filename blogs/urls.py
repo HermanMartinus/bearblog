@@ -24,6 +24,7 @@ urlpatterns = [
     path('dashboard/posts/<pk>/delete/', dashboard.PostDelete.as_view(), name='post_delete'),
 
     path('discover/', discover.discover, name='discover'),
+    path('discover/feed/', discover.feed, name='discover_feed'),
 
     path('.well-known/acme-challenge/<challenge>', blog.challenge, name='challenge'),
     path('blog/', blog.posts, name='posts'),

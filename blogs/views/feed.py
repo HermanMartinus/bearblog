@@ -1,8 +1,5 @@
 from django.http.response import Http404
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.sites.models import Site
 from django.http import HttpResponse
-from blogs.models import Blog
 
 from blogs.helpers import unmark, clean_text
 from blogs.views.blog import resolve_address
@@ -23,10 +20,7 @@ def feed(request):
     fg.id(blog.useful_domain())
     fg.author({'name': blog.subdomain, 'email': 'hidden'})
     fg.title(blog.title)
-    if blog.content:
-        fg.subtitle(clean_text(unmark(blog.content)[:160]))
-    else:
-        fg.subtitle(blog.title)
+    fg.subtitle(blog.meta_description or clean_text(unmark(blog.content)[:160]) or blog.title)
     fg.link(href=f"{blog.useful_domain()}/", rel='alternate')
 
     for post in all_posts:

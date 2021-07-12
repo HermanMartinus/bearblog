@@ -54,23 +54,35 @@
     </ul>
 </content>
 <p>
-    <a href="?page={{ next_page }}{% if newest %}&newest=true{% endif %}">More</a>
+    {% if previous_page >= 0 %}
+    <a href="?page={{ previous_page }}{% if newest %}&newest=true{% endif %}">&laquo; Previous</a> |
+    {% endif %}
+    {% if posts %}
+    <a href="?page={{ next_page }}{% if newest %}&newest=true{% endif %}">Next &raquo;</a>
+    {% endif %}
 </p>
 <p>
+    <i>
+        Subscribe to the
+        <a href="feed/{% if newest %}?newest=True{% endif %}">RSS feed</a>.
+    </i>
+</p>
+{% if not newest %}
+<p>
     <small>
-        <pre>
+        <pre class="code">
+
 This page is ranked according to the following algorithm:
-            <code>
 Score = U / (T+4)^G
 
 Where,
 U = Upvotes (toasts) of a post
 T = Time since submission (in hours)
 G = Gravity (currently at {{ gravity }}) to keep page content fresh
-            </code>
         </pre>
     </small>
 </p>
+{% endif %}
 {% endblock %}
 
 {% block footer %}
