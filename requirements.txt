@@ -8,7 +8,7 @@ distlib==0.3.0
 dj-database-url==0.5.0
 Django==3.0.7
 django-allauth==0.41.0
-django-debug-toolbar==2.2
+django-debug-toolbar==2.2.1
 django-ip==1.0.2
 django-pg-utils==0.1.5
 django-pygmentify==0.3.7
