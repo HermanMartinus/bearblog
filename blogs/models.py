@@ -68,6 +68,15 @@ def delete_blog_receiver(sender, instance, using, **kwargs):
         delete_domain(instance.domain)
 
 
+class NavItem(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    label = models.CharField(max_length=200)
+    link = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"[{self.blog.title}] {self.label} - {self.link}"
+
+
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)

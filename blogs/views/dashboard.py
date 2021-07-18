@@ -12,7 +12,7 @@ from ipaddr import client_ip
 import djqscsv
 
 from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
-from blogs.models import Blog, Post, Upvote
+from blogs.models import Blog, NavItem, Post, Upvote
 
 
 def resolve_subdomain(http_host, blog):
@@ -38,6 +38,7 @@ def dashboard(request):
             form = BlogForm(instance=blog)
 
     except Blog.DoesNotExist:
+        # Create new blog
         blog = Blog(
             user=request.user,
             title=f"{request.user.username}'s blog",
@@ -46,6 +47,19 @@ def dashboard(request):
             created_date=timezone.now()
         )
         blog.save()
+        # Populate nav
+        home_link = NavItem(
+            blog=blog,
+            label='Home',
+            link="/"
+        )
+        home_link.save()
+        blog_link = NavItem(
+            blog=blog,
+            label='Blog',
+            link="/blog/"
+        )
+        blog_link.save()
         form = BlogForm(instance=blog)
 
     return render(request, 'dashboard/dashboard.html', {

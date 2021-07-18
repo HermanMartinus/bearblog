@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
 
-from .models import Blog, Post, Upvote, Hit, Subscriber, Emailer
+from .models import Blog, NavItem, Post, Upvote, Hit, Subscriber, Emailer
 from django.utils.html import escape, format_html
 from blogs.helpers import add_email_address, delete_domain, check_records, root
 from django.urls import reverse
@@ -82,8 +82,6 @@ class BlogAdmin(admin.ModelAdmin):
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
     ordering = ('-created_date',)
 
-    actions = ['approve_blog', 'block_blog', 'validate_domains']
-
     def approve_blog(self, request, queryset):
         queryset.update(reviewed=True)
         for blog in queryset:
@@ -109,6 +107,38 @@ class BlogAdmin(admin.ModelAdmin):
             print(f"Removed domain of {blog}")
 
     validate_domains.short_description = "Validate domain records"
+
+    def migrate_pages(self, reqest, queryset):
+        for blog in queryset:
+            home_link = NavItem(
+                blog=blog,
+                label='Home',
+                link="/"
+            )
+            home_link.save()
+
+            for post in blog.post_set.filter(publish=True):
+                if post.is_page:
+                    link = NavItem(
+                        blog=blog,
+                        label=post.title,
+                        link=f'/{post.slug}/'
+                    )
+                    link.save()
+
+            blog_link = NavItem(
+                blog=blog,
+                label='Blog',
+                link="/blog/"
+            )
+            blog_link.save()
+
+    migrate_pages.short_description = "Migrate nav pages"
+
+    actions = ['approve_blog', 'block_blog', 'validate_domains', 'migrate_pages']
+
+
+admin.site.register(NavItem)
 
 
 @admin.register(Post)

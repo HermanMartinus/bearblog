@@ -1,5 +1,3 @@
-<a href="/">Home</a>
-{% for item in nav %}
-    <a href="/{{ item.slug }}/">{{ item.title }}</a>
+{% for navitem in blog.navitem_set.all %}
+    <a href="{{ navitem.link }}">{{ navitem.label }}</a>
 {% endfor %}
-<a href="/blog/">Blog</a>
