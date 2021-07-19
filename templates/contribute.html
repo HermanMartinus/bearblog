@@ -23,19 +23,15 @@ Contribute to Bear
 </ul>
 <p>
     If you're keen to support the project you can contribute here.
-    Monthly recurring contributors will receive beta access to new features such as
+    Supporters will receive access to beta features such as
     newsletter subscriptions and API access (still in development).
-	I'll also issue you an SSL certificate for a custom domain if you need one. 
+	I'll also issue an SSL certificate for a custom domain if you need one. 
 </p>
-<h4>
-    Bear receives $95 per month from 18
-    <a href="https://github.com/HermanMartinus/bearblog/wiki/Contributors" target="_blank">patrons</a>.
-    <br>
-    Goal: $1000 per month (<b>9.5%</b>).
-</h4>
-<p>
-	<div id="paypal-button-container-P-04C10350V4946812SMCN56MA" style="width: 300px; margin-top: 20px;"></div>
-	<script src="https://www.paypal.com/sdk/js?client-id=AR1r8JHELZ6X04dTtwQrwp6dca8JeopBGHQ8JqLnZ3FqWyh57IcHZlXKQBj2PgT8qCFFdnJnHf_qiYCY&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script> 
+
+<script src="https://www.paypal.com/sdk/js?client-id=AR1r8JHELZ6X04dTtwQrwp6dca8JeopBGHQ8JqLnZ3FqWyh57IcHZlXKQBj2PgT8qCFFdnJnHf_qiYCY&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script> 
+<fieldset style="width: 300px; float: left">
+	<legend><b>$5 per month</b></legend>
+	<div id="paypal-button-container-P-04C10350V4946812SMCN56MA" style="margin-top: 20px;"></div>
 	<script>
 	paypal.Buttons({
 		style: {
@@ -55,14 +51,40 @@ Contribute to Bear
 		}
 	}).render('#paypal-button-container-P-04C10350V4946812SMCN56MA'); // Renders the PayPal button
 	</script>
-</p>
+</fieldset>
 
-<p>
-    If you would like to contribute more than $5 per month, you can do that
-    <a target="_blank" href="https://www.paypal.com/donate?hosted_button_id=FAZ5LMBRHDDKY">here</a>
-</p>
+<fieldset style="width: 300px;">
+	<legend><b>$50 per year</b></legend>
+	<div id="paypal-button-container-P-7EY9103592940484EMD24WRY" style="margin-top: 20px;"></div>
+	<script>
+	paypal.Buttons({
+		style: {
+			shape: 'rect',
+			color: 'silver',
+			layout: 'vertical',
+			label: 'paypal'
+		},
+		createSubscription: function(data, actions) {
+			return actions.subscription.create({
+			/* Creates the subscription */
+			plan_id: 'P-7EY9103592940484EMD24WRY'
+			});
+		},
+		onApprove: function(data, actions) {
+			alert("Thanks for your support! Give me a day or two to grant you access to the beta features.");
+		}
+	}).render('#paypal-button-container-P-7EY9103592940484EMD24WRY'); // Renders the PayPal button
+	</script>
+</fieldset>
 
-<p>
+<h4>
+    Bear receives $95 per month from 19
+    <a href="https://github.com/HermanMartinus/bearblog/wiki/Contributors" target="_blank">supporters</a>.
+    <br>
+    Goal: $1000 per month (<b>9.5%</b>).
+</h4>
+
+<p style="float: none">
 All the best,
 <br>
 Herman
