@@ -110,9 +110,9 @@ class BlogAdmin(admin.ModelAdmin):
 
     def migrate_nav(self, request, queryset):
         for blog in Blog.objects.all():
-            nav_string = '[Home](/) '
+            nav_string = '[Home](/)\n'
             for page in blog.post_set.filter(is_page=True):
-                nav_string += f'[{page.title}](/{page.slug}/) '
+                nav_string += f'[{page.title}](/{page.slug}/)\n'
             nav_string += '[Blog](/blog/)'
             blog.nav = nav_string
             blog.save()

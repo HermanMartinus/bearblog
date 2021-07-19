@@ -80,7 +80,8 @@ class BlogForm(forms.ModelForm):
 class NavForm(forms.ModelForm):
     nav = forms.CharField(
         label="Nav",
-        help_text="Nav bar content in <a href='https://herman.bearblog.dev/markdown-cheatsheet/#links' target='_blank'>Markdown</a>",
+        widget=forms.Textarea(attrs={'rows': 10, 'cols': 40}),
+        help_text="Add nav links in <a href='https://herman.bearblog.dev/markdown-cheatsheet/#links' target='_blank'>Markdown</a>",
         required=False,
     )
 
