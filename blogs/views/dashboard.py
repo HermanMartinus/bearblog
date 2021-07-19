@@ -70,6 +70,43 @@ def dashboard(request):
 
 
 @login_required
+def nav(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"{blog.useful_domain()}/dashboard")
+
+    if request.method == "POST":
+        for navitem in blog.navitem_set.all():
+            navitem.delete()
+
+        new_links = []
+        for i in '0123456789':
+            if request.POST.get(f'label-{i}') and request.POST.get(f'link-{i}'):
+                new_links.append({
+                    'label': request.POST.get(f'label-{i}'),
+                    'link': request.POST.get(f'link-{i}')
+                })
+        if request.POST.get('label-new') and request.POST.get('link-new'):
+            new_links.append({
+                    'label': request.POST.get('label-new'),
+                    'link': request.POST.get('link-new')
+                })
+        for link in new_links:
+            navitem = NavItem(
+                blog=blog,
+                label=link['label'],
+                link=link['link']
+            )
+            navitem.save()
+
+    return render(request, 'dashboard/nav.html', {
+        'blog': blog,
+        'navitems': blog.navitem_set.all(),
+        'root': blog.useful_domain(),
+    })
+
+
+@login_required
 def styles(request):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Nav | Bear Blog
+{% endblock %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>Navigation</h1>
+    <p>
+        Arrange your navigation lables and links in the order which you would like them to appear in the nav bar.
+    <p>
+    <form method="POST" class="post-form">
+        {% csrf_token %}
+        {% for navitem in navitems %}
+            <p>
+                <label for="label-{{ forloop.counter0 }}">Label</label>
+                <input type="text" name="label-{{ forloop.counter0 }}" value="{{ navitem.label }}"/>
+                <label for="link-{{ forloop.counter0 }}">Link</label>
+                <input type="text" name="link-{{ forloop.counter0 }}" value="{{ navitem.link }}"/>
+            </p>
+        {% endfor %}
+        <p>
+            <label for="label-new">Label</label>
+            <input type="text" name="label-new" placeholder="New label"/>
+            <label for="link-new">Link</label>
+            <input type="text" name="link-new" placeholder="New link"/>
+        </p>
+        <p>
+            <small> When directing to an internal page make sure to add the preceding "/".</small>
+        </p>
+        <button type="submit">Update nav</button>
+    </form>
+    <p>
+        View site: <a href="{{ root }}" target="_blank">{{ root }}</a>
+    </p>
+</content>
+{% endblock %}

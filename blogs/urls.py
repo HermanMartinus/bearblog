@@ -12,6 +12,7 @@ urlpatterns = [
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('dashboard/', dashboard.dashboard, name='dashboard'),
     path('dashboard/styles/', dashboard.styles, name='styles'),
+    path('dashboard/nav/', dashboard.nav, name='nav'),
     path('dashboard/account/', dashboard.account, name='account'),
     path('dashboard/domain/', dashboard.domain_edit, name='domain'),
     path('dashboard/subscribers/', emailer.subscribers, name='subscribers'),
