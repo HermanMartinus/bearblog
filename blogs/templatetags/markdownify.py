@@ -17,6 +17,11 @@ def markdown(value):
     for each_tag in heading_tags:
         each_tag.attrs['id'] = slugify(each_tag.text)
 
+    for each_anchor in soup.find_all('a', href=True):
+        if 'tab:' in each_anchor.attrs['href']:
+            each_anchor.attrs['href'] = each_anchor.attrs['href'].replace('tab:', '')
+            each_anchor.attrs['target'] = '_blank'
+
     invalid_tags = ['code']
 
     for tag in invalid_tags:
