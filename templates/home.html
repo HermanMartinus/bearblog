@@ -41,7 +41,7 @@
 {% endblock %}
 
 {% block nav %}
-{% include './snippets/nav.html' with nav=nav %}
+{{ blog.nav | markdown | safe }}
 {% endblock %}
 
 {% block content %}

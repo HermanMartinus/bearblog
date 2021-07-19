@@ -82,8 +82,6 @@ class BlogAdmin(admin.ModelAdmin):
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
     ordering = ('-created_date',)
 
-    actions = ['approve_blog', 'block_blog', 'validate_domains']
-
     def approve_blog(self, request, queryset):
         queryset.update(reviewed=True)
         for blog in queryset:
@@ -109,6 +107,17 @@ class BlogAdmin(admin.ModelAdmin):
             print(f"Removed domain of {blog}")
 
     validate_domains.short_description = "Validate domain records"
+
+    def migrate_nav(self, request, queryset):
+        for blog in Blog.objects.all():
+            nav_string = '[Home](/) '
+            for page in blog.post_set.filter(is_page=True):
+                nav_string += f'[{page.title}](/{page.slug}/) '
+            nav_string += '[Blog](/blog/)'
+            blog.nav = nav_string
+            blog.save()
+
+    actions = ['approve_blog', 'block_blog', 'validate_domains', 'migrate_nav']
 
 
 @admin.register(Post)
