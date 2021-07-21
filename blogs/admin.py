@@ -109,7 +109,7 @@ class BlogAdmin(admin.ModelAdmin):
     validate_domains.short_description = "Validate domain records"
 
     def migrate_nav(self, request, queryset):
-        for blog in Blog.objects.all():
+        for blog in queryset:
             nav_string = '[Home](/)\n'
             for page in blog.post_set.filter(is_page=True):
                 nav_string += f'[{page.title}](/{page.slug}/)\n'
