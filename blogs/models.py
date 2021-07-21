@@ -15,7 +15,7 @@ class Blog(models.Model):
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
     challenge = models.CharField(max_length=128, blank=True)
-    nav = models.CharField(max_length=500, default="[Home](/) [Blog](/blog/)", blank=True)
+    nav = models.CharField(max_length=500, default="[Home](/)\n[Blog](/blog/)", blank=True)
     content = models.TextField(default="Hello World!", blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)

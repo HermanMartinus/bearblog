@@ -81,7 +81,7 @@ class NavForm(forms.ModelForm):
     nav = forms.CharField(
         label="Nav",
         widget=forms.Textarea(attrs={'rows': 10, 'cols': 40}),
-        help_text="Add nav links in <a href='https://herman.bearblog.dev/markdown-cheatsheet/#links' target='_blank'>Markdown</a>",
+        help_text="Add nav links in <a href='https://herman.bearblog.dev/markdown-cheatsheet/#links' target='_blank'>Markdown</a>. Each link should be on a new line.",
         required=False,
     )
 
