@@ -20,10 +20,6 @@ def root(subdomain=''):
         return f"{subdomain}.{domain}"
 
 
-def get_nav(all_posts):
-    return list(filter(lambda post: post.is_page, all_posts))
-
-
 def get_posts(all_posts):
     return list(filter(lambda post: not post.is_page, all_posts))
 

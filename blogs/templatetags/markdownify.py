@@ -9,6 +9,8 @@ register = template.Library()
 
 @register.filter
 def markdown(value):
+    if not value:
+        return ''
     markup = mistune.html(value)
 
     soup = html_parser(markup, 'html.parser')

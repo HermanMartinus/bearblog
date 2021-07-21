@@ -11,7 +11,7 @@ import tldextract
 from ipaddr import client_ip
 import djqscsv
 
-from blogs.forms import BlogForm, DomainForm, PostForm, StyleForm
+from blogs.forms import BlogForm, DomainForm, NavForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote
 
 
@@ -42,13 +42,35 @@ def dashboard(request):
             user=request.user,
             title=f"{request.user.username}'s blog",
             subdomain=slugify(f"{request.user.username}-new"),
-            content="Hello World!",
             created_date=timezone.now()
         )
         blog.save()
         form = BlogForm(instance=blog)
 
     return render(request, 'dashboard/dashboard.html', {
+        'form': form,
+        'blog': blog,
+        'root': blog.useful_domain()
+    })
+
+
+@login_required
+def nav(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"{blog.useful_domain()}/dashboard")
+
+    if request.method == "POST":
+        form = NavForm(request.POST, instance=blog)
+        if form.is_valid():
+            blog_info = form.save(commit=False)
+            blog_info.save()
+        else:
+            form = NavForm(instance=blog)
+    else:
+        form = NavForm(instance=blog)
+
+    return render(request, 'dashboard/nav.html', {
         'form': form,
         'blog': blog,
         'root': blog.useful_domain()

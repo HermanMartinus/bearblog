@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Nav | Bear Blog
+{% endblock %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>Navigation</h1>
+    
+    <form method="POST" class="post-form full-width">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Update nav</button>
+    </form>
+    <p>
+        View site: <a href="{{ root }}" target="_blank">{{ root }}</a>
+    </p>
+</content>
+{% endblock %}

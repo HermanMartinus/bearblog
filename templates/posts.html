@@ -1,4 +1,5 @@
 {% extends 'base.html'%}
+{% load markdownify %}
 
 {% block lang %}{{ blog.lang }}{% endblock %}
 
@@ -7,8 +8,7 @@
 {% endblock %}
 
 {% block title %}
-Blog |
-{{ blog.title }}
+Blog | {{ blog.title }}
 {% endblock %}
 
 {% block analytics %}
@@ -34,7 +34,7 @@ Blog |
 {% endblock %}
 
 {% block nav %}
-{% include './snippets/nav.html' with nav=nav%}
+{{ blog.nav | markdown | safe }}
 {% endblock %}
 
 {% block content %}

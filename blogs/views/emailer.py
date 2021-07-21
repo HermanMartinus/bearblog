@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from blogs.helpers import validate_subscriber_email, get_nav
+from blogs.helpers import validate_subscriber_email
 from blogs.models import Blog, Subscriber, Emailer
 from blogs.forms import NotifyForm
 from blogs.views.blog import resolve_address, not_found
@@ -87,7 +87,6 @@ def subscribe(request):
         'subscribe.html',
         {
             'blog': blog,
-            'nav': get_nav(all_posts),
             'root': blog.useful_domain(),
             'subscribe_message': subscribe_message
         }

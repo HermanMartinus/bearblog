@@ -40,6 +40,7 @@
 <a href="mailto:{{ blog.user.email }}">{{ blog.user.email }}</a>
 <p><b>Created {{ blog.created_date | timesince }} ago</b></p>
 <content>
+    {{ blog.nav | markdown | safe }}
     {{ content | markdown | safe }}
 </content>
 
