@@ -6,7 +6,7 @@ from django.contrib.sites.models import Site
 from django.db.models import Count
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import add_email_address, get_nav, get_post, get_posts, unmark
+from blogs.helpers import add_email_address, get_post, get_posts, unmark
 
 from ipaddr import client_ip
 from taggit.models import Tag
@@ -43,7 +43,6 @@ def home(request):
             'blog': blog,
             'content': blog.content,
             'posts': get_posts(all_posts),
-            'nav': get_nav(all_posts),
             'root': blog.useful_domain(),
             'meta_description': meta_description
         })
@@ -79,7 +78,6 @@ def posts(request):
         {
             'blog': blog,
             'posts': blog_posts,
-            'nav': get_nav(all_posts),
             'root': blog.useful_domain(),
             'meta_description':  meta_description,
             'tags': tags,
@@ -128,7 +126,6 @@ def post(request, slug):
             'blog': blog,
             'content': post.content,
             'post': post,
-            'nav': get_nav(all_posts),
             'root': blog.useful_domain(),
             'meta_description': meta_description,
             'meta_image': post.meta_image or blog.meta_image,

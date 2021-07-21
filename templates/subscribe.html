@@ -25,11 +25,7 @@
 {% endblock %}
 
 {% block nav %}
-<a href="/">Home</a>
-{% for item in nav %}
-<a href="/{{ item.slug }}/">{{ item.title }}</a>
-{% endfor %}
-<a href="/blog/">Blog</a>
+{{ blog.nav | markdown | safe }}
 {% endblock %}
 
 {% block content %}
