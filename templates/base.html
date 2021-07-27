@@ -21,8 +21,9 @@
         {% include 'styles/main.css' %}
         {% include 'styles/dark_mode.css' %}
       {% endblock %}
-      html:hover {
-        background-image: {% block hitcount %}{% endblock %};
+      body:hover {
+        border-image: {% block hitcount %}{% endblock %};
+        border-width: 0;
       }
   </style>
 </head>
