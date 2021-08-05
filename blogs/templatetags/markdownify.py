@@ -1,5 +1,6 @@
 from django import template
 import mistune
+import html
 from bs4 import BeautifulSoup as html_parser
 from lxml.html.clean import clean_html
 from slugify import slugify
@@ -24,14 +25,15 @@ def markdown(value):
             each_anchor.attrs['href'] = each_anchor.attrs['href'].replace('tab:', '')
             each_anchor.attrs['target'] = '_blank'
 
-    invalid_tags = ['code']
-
-    for tag in invalid_tags:
-        for match in soup.findAll(tag):
-            if match.parent.name == 'pre':
-                if match.has_attr('class'):
-                    match.parent.attrs['class'] = match['class'][0].replace('language-', '')
-                match.replaceWithChildren()
+    for match in soup.findAll('code'):
+        if match.parent.name == 'pre':
+            if match.has_attr('class'):
+                match.parent.attrs['class'] = match['class'][0].replace('language-', '')
+            match.replaceWithChildren()
+        else:
+            new_tag = soup.new_tag("code")
+            new_tag.append(html.escape(str(match.contents[0])))
+            match.replace_with(new_tag)
 
     cleaned_markup = clean_html(str(soup))
 
