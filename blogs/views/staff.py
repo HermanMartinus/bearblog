@@ -92,8 +92,8 @@ def bulk_mail_users(request):
         )
 
 
-def bulk_mail_unsubscribe(request, pk):
-    user = get_object_or_404(User, pk=pk)
-    user.subscribed = False
-    user.save()
+def bulk_mail_unsubscribe(request, email):
+    blog = get_object_or_404(Blog, user__email=email)
+    blog.subscribed = False
+    blog.save()
     return HttpResponse('You have been successfully unsubscribed.')
