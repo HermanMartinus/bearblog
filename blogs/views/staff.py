@@ -1,4 +1,5 @@
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.models import User
@@ -35,7 +36,23 @@ def approve(request, pk):
     blog.reviewed = True
     blog.save()
     if not request.GET.get("no-email", ""):
-        add_email_address(blog.user.email)
+        send_mail(
+            'Hello',
+            f'''
+Hey, awesome to have you on board!
+
+I hope you enjoy your "bear" blogging experience. Bear is 100% free, open-source, and community centric. 
+
+If you're keen to support the project you can contribute here.
+Supporters will receive beta access to new features such as newsletter subscriptions. 
+
+Have an awesome week!
+
+Herman
+            ''',
+            'hi@bearblog.dev',
+            [blog.user.email]
+        )
     return redirect('review_flow')
 
 
