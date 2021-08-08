@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.models import User
+from blogs.templatetags.markdownify import markdown
 
 from blogs.models import Blog
 from blogs.helpers import bulk_email
@@ -76,7 +77,7 @@ def bulk_mail_users(request):
             bulk_email(
                 queryset,
                 request.POST.get("subject", ""),
-                request.POST.get("body", "")
+                markdown(request.POST.get("body", ""))
             )
             return HttpResponse(f"Your mail has been sent to {len(queryset)} users!")
         return render(
