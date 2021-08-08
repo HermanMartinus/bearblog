@@ -41,10 +41,10 @@ def approve(request, pk):
             f'''
 Hey, awesome to have you on board!
 
-I hope you enjoy your "bear" blogging experience. Bear is 100% free, open-source, and community centric. 
+I hope you enjoy your "bear" blogging experience. Bear is 100% free, open-source, and community centric.
 
-If you're keen to support the project you can contribute here.
-Supporters will receive beta access to new features such as newsletter subscriptions. 
+If you're keen to support the project you can do that here: https://bearblog.dev/contribute/
+Supporters will receive beta access to new features such as newsletter subscriptions.
 
 Have an awesome week!
 
