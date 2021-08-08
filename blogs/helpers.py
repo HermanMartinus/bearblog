@@ -1,5 +1,5 @@
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail
+from django.core.mail import send_mail, send_mass_mail
 from django.utils import timezone
 import requests
 import hashlib
@@ -160,6 +160,12 @@ def valid_xml_char_ordinal(c):
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
+
+
+def bulk_email(queryset, subject, body):
+    recipient_list = queryset.filter(subscribed=True).values_list('user__email', flat=True)
+    messages = [(subject, body, 'hi@bearblog.dev', [recipient]) for recipient in recipient_list]
+    send_mass_mail(messages)
 
 
 def validate_subscriber_email(email, blog):

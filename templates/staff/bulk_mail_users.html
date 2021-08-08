@@ -6,17 +6,20 @@
 
 {% block content %}
 <content>
-    <h1>
+    <h2>
         Send email to all users
-    </h1>
-    <form method="POST" class="post-form">{% csrf_token %}
+    </h2>
+     <p class="errorlist">
+        {{ error }}
+    </p>
+    <form method="POST" class="post-form full-width">{% csrf_token %}
         <p>
             <label for="subject">Subject</label>
             <input type="text" name="subject"/>
         </p>
         <p>
-            <label for="email_body">Email body</label>
-            <textarea name="email_body" rows=20></textarea>
+            <label for="body">Email body</label>
+            <textarea name="body" rows=20></textarea>
         </p>
         <p>
             <label for="is_test">Is test</label>

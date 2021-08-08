@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
+from django.core.mail import send_mail, send_mass_mail
 from django.db.models import Count
 
 from .models import Blog, Post, Upvote, Hit, Subscriber, Emailer
@@ -108,16 +109,7 @@ class BlogAdmin(admin.ModelAdmin):
 
     validate_domains.short_description = "Validate domain records"
 
-    def migrate_nav(self, request, queryset):
-        for blog in queryset:
-            nav_string = '[Home](/)\n'
-            for page in blog.post_set.filter(is_page=True):
-                nav_string += f'[{page.title}](/{page.slug}/)\n'
-            nav_string += '[Blog](/blog/)'
-            blog.nav = nav_string
-            blog.save()
-
-    actions = ['approve_blog', 'block_blog', 'validate_domains', 'migrate_nav']
+    actions = ['approve_blog', 'block_blog', 'validate_domains']
 
 
 @admin.register(Post)

@@ -24,6 +24,7 @@ class Blog(models.Model):
     reviewed = models.BooleanField(default=False)
     upgraded = models.BooleanField(default=False)
     blocked = models.BooleanField(default=False)
+    subscribed = models.BooleanField(default=True)
 
     external_stylesheet = models.CharField(max_length=255, blank=True)
     custom_styles = models.TextField(blank=True)
