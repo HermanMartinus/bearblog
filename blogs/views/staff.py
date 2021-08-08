@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.models import User
 
 from blogs.models import Blog
-from blogs.helpers import add_email_address, bulk_email
+from blogs.helpers import bulk_email
 
 
 @staff_member_required

@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
-from django.core.mail import send_mail, send_mass_mail
 from django.db.models import Count
 
 from .models import Blog, Post, Upvote, Hit, Subscriber, Emailer
 from django.utils.html import escape, format_html
-from blogs.helpers import add_email_address, delete_domain, check_records, root
+from blogs.helpers import check_records, root
 from django.urls import reverse
 
 
@@ -82,13 +81,6 @@ class BlogAdmin(admin.ModelAdmin):
 
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
     ordering = ('-created_date',)
-
-    def approve_blog(self, request, queryset):
-        queryset.update(reviewed=True)
-        for blog in queryset:
-            add_email_address(blog.user.email)
-
-    approve_blog.short_description = "Approve selected blogs"
 
     def block_blog(self, request, queryset):
         for blog in queryset:

@@ -1,12 +1,11 @@
-from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 from django.http.response import Http404
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.contrib.sites.models import Site
 from django.db.models import Count
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import add_email_address, get_post, get_posts, unmark
+from blogs.helpers import get_post, get_posts, unmark
 
 from ipaddr import client_ip
 from taggit.models import Tag
