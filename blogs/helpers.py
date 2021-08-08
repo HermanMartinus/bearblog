@@ -1,5 +1,5 @@
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail, send_mass_mail
+from django.core.mail import send_mail, send_mass_mail, get_connection, EmailMultiAlternatives
 from django.utils import timezone
 import requests
 import hashlib
@@ -145,10 +145,37 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 
+def send_mass_html_mail(datatuple, fail_silently=False, user=None, password=None, connection=None):
+    connection = connection or get_connection(username=user, password=password, fail_silently=fail_silently)
+    messages = []
+    for subject, text, html, from_email, recipient in datatuple:
+        message = EmailMultiAlternatives(subject, text, from_email, recipient)
+        message.attach_alternative(html, 'text/html')
+        messages.append(message)
+    return connection.send_messages(messages)
+
+
 def bulk_email(queryset, subject, body):
     recipient_list = queryset.filter(subscribed=True).values_list('user__email', flat=True)
-    messages = [(subject, body, 'hi@bearblog.dev', [recipient]) for recipient in recipient_list]
-    send_mass_mail(messages)
+    messages = [(
+        subject,
+        f'{body}\n\n\nUnsubscribe: https://bearblog.dev/bulk_mail_unsubscribe/{recipient}',
+        f'''{body}
+        <br>
+        <p style="text-align: center">
+            <small>
+                <a href="https://bearblog.dev/">
+                    ʕ•ᴥ•ʔ Bear
+                </a> |
+                <a href="https://bearblog.dev/bulk_mail_unsubscribe/{recipient}">
+                    Unsubscribe
+                </a>
+            </small>
+        </p>''',
+        'hi@bearblog.dev',
+        [recipient]
+    ) for recipient in recipient_list]
+    send_mass_html_mail(messages)
 
 
 def validate_subscriber_email(email, blog):
