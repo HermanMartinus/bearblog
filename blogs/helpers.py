@@ -5,7 +5,6 @@ import requests
 import hashlib
 from django.http import Http404
 import json
-import subprocess
 from django.conf import settings
 from markdown import Markdown
 from io import StringIO
@@ -80,8 +79,15 @@ def add_new_domain(domain):
 def check_records(domain):
     if not domain:
         return
-    verification_string = subprocess.Popen(["dig", "-t", "txt", domain, '+short'], stdout=subprocess.PIPE).communicate()[0]
-    return ('look-for-the-bear-necessities' in str(verification_string))
+    resp = requests.get(
+        f'https://cloudflare-dns.com/dns-query?ct=application/dns-json&type=TXT&name={domain}'
+    )
+    data = resp.json()
+    answers = data.get('Answer', [])
+    for answer in answers:
+        if answer.get('data') == '"look-for-the-bear-necessities"':
+            return True
+    return False
 
 
 def delete_domain(domain):
