@@ -52,16 +52,21 @@
 {% endpygmentify %}
 </content>
 {% else %}
-<ul>
+<ul class="blog-posts">
     {% for post in posts %}
     <li>
-        #{{ forloop.counter }}
-        <i>
-            <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
-                - {{ post.published_date|date:'d M, Y' }} -
-            </time>
-        </i>
+        <span>
+            <i>
+                <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
+                    {{ post.published_date|date:'d M, Y' }}
+                </time>
+            </i>
+        </span>
         <a href="/{{ post.slug }}/">{{ post.title }}</a>
+    </li>
+    {% empty %}
+    <li>
+        No posts yet
     </li>
     {% endfor %}
 </ul>
