@@ -38,14 +38,16 @@ def approve(request, pk):
     blog.save()
     if not request.GET.get("no-email", ""):
         send_mail(
-            'The future of Bear 🐻',
+            'Some blogging extras 🐻',
             f'''
-Hey, awesome to have you on board!
+Hey, welcome to your "bear" blogging experience!
 
-I hope you enjoy your "bear" blogging experience. Bear is 100% free, open-source, and community centric.
+I'm Herman, the creator and maintainer of Bear.
 
+I've built Bear to be 100% free, open-source, and community centric.
 If you're keen to support the project you can do that here: https://bearblog.dev/contribute/
-Supporters will receive beta access to new features such as newsletter subscriptions.
+
+Supporters will receive beta access to beta features. 
 
 Have an awesome week!
 
