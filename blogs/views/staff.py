@@ -38,7 +38,7 @@ def approve(request, pk):
     blog.save()
     if not request.GET.get("no-email", ""):
         send_mail(
-            'Hello',
+            'The future of Bear 🐻',
             f'''
 Hey, awesome to have you on board!
 
@@ -51,7 +51,7 @@ Have an awesome week!
 
 Herman
             ''',
-            'hi@bearblog.dev',
+            'Herman at Bear Blog <hi@bearblog.dev>',
             [blog.user.email]
         )
     return redirect('review_flow')
