@@ -2,17 +2,18 @@ from django import template
 import mistune
 import html
 from bs4 import BeautifulSoup as html_parser
-from lxml.html.clean import clean_html
+from lxml.html.clean import clean_html, Cleaner
 from slugify import slugify
 
 register = template.Library()
 
 
 @register.filter
-def markdown(value):
-    if not value:
+def markdown(content):
+    if not content:
         return ''
-    markup = mistune.html(value)
+
+    markup = mistune.html(content)
 
     soup = html_parser(markup, 'html.parser')
     heading_tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
@@ -36,6 +37,10 @@ def markdown(value):
                 new_tag.append(html.escape(str(match.contents[0])))
                 match.replace_with(new_tag)
 
-    cleaned_markup = clean_html(str(soup))
+    host_whitelist = ['www.youtube.com', 'www.slideshare.net', 'player.vimeo.com']
+    cleaner = Cleaner(host_whitelist=host_whitelist)
+    cleaned_markup = cleaner.clean_html(str(soup))
+
+    # TODO: add 'sandbox' attribute to all iframes
 
     return cleaned_markup
