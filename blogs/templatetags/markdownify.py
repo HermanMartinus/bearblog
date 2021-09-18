@@ -2,7 +2,7 @@ from django import template
 import mistune
 import html
 from bs4 import BeautifulSoup as html_parser
-from lxml.html.clean import clean_html, Cleaner
+from lxml.html.clean import Cleaner
 from slugify import slugify
 
 register = template.Library()
