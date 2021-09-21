@@ -188,7 +188,7 @@ def images(request):
             "Authorization": "Bearer suJv_Lk52Ho_ozVjtKXn5hq5GvTs3wq1iNckCEPk"
         }
         payload = {
-            'file': (f'{blog.subdomain}-{datetime.strftime(timezone.now(), "%Y-%m-%d")}', request.FILES.get('image').read())
+            'file': (f'bear-{blog.subdomain}-{datetime.strftime(timezone.now(), "%Y-%m-%d")}', request.FILES.get('image').read())
         }
         response = requests.post(url, files=payload, headers=headers)
         json_result = json.loads(response.text)["result"]
