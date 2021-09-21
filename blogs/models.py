@@ -99,8 +99,9 @@ class Post(models.Model):
 class Image(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, blank=True)
-    image_url = models.CharField(max_length=200, unique=True)
-    icon_url = models.CharField(max_length=200, unique=True)
+    optimised_url = models.CharField(max_length=200, blank=True)
+    large_url = models.CharField(max_length=200, blank=True)
+    icon_url = models.CharField(max_length=200, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

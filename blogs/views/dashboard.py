@@ -192,13 +192,20 @@ def images(request):
         }
         response = requests.post(url, files=payload, headers=headers)
         json_result = json.loads(response.text)["result"]
-        if "public" in json_result["variants"][0]:
-            image_url = json_result["variants"][0]
-            icon_url = json_result["variants"][1]
-        else:
-            image_url = json_result["variants"][1]
-            icon_url = json_result["variants"][0]
-        image = Image(blog=blog, title=request.POST.get('title', ''), image_url=image_url, icon_url=icon_url)
+        for variant in json_result["variants"]:
+            if "optimised" in variant:
+                optimised_url = variant
+            elif "icon" in variant:
+                icon_url = variant
+            elif "public" in variant:
+                large_url = variant
+        image = Image(
+            blog=blog,
+            title=request.POST.get('title', ''),
+            optimised_url=optimised_url,
+            icon_url=icon_url,
+            large_url=large_url
+        )
         image.save()
 
     return render(request, 'dashboard/media.html', {

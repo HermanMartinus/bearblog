@@ -36,28 +36,67 @@
     </form>
     <hr>
     <h3>Uploaded images</h3>
-    {% for image in images reversed %}
+{% for image in images reversed %}
         <p>
             <h4>{{ image.title }}</h4>
-            <a href="{{ image.image_url }}" target="_blank">
-                <img src="{{ image.icon_url }}" alt="{{ image.title }}"/>
-            </a>
-            <br>
-            <small>
-                Markdown (copy and paste into text content):
-                <br>
-                <input
-                    type="text"
-                    onClick="this.select();"
-                    value="![{{ image.title }}]({{ image.image_url }})"
-                    required style="width: calc(100% - 10px); font-size: 10px;"
-                    readonly
-                />
-            </small>
-            <br>
-            <a href="{{ image.pk }}/delete/">
-                <button>Delete</button>
-            </a>
+            <div style="display:flex; justify-content: space-between">
+                <div>
+                    <a href="{{ image.image_url }}" target="_blank">
+                        <img src="{{ image.icon_url }}" alt="{{ image.title }}"/>
+                    </a>
+                    <br>
+                    <a href="{{ image.pk }}/delete/">
+                        <button>Delete</button>
+                    </a>
+                </div>
+
+                <small style="width: calc(100% - 40px); padding: 0 20px;">
+                    <label for="optimised_markdown">
+                        Optimised Markdown:
+                    </lable>
+                    <input
+                        type="text"
+                        name="optimised_markdown"
+                        onClick="this.select();"
+                        value="![{{ image.title }}]({{ image.optimised_url }})"
+                        required style="width: calc(100% - 10px); font-size: 10px;"
+                        readonly
+                    />
+                     <label for="optimised_url">
+                        Optimised link:
+                    </lable>
+                    <input
+                        type="text"
+                        name="optimised_url"
+                        onClick="this.select();"
+                        value="{{ image.optimised_url }}"
+                        required style="width: calc(100% - 10px); font-size: 10px;"
+                        readonly
+                    />
+                     <label for="icon_url">
+                        Icon link:
+                    </lable>
+                    <input
+                        type="text"
+                        name="icon_url"
+                        onClick="this.select();"
+                        value="{{ image.icon_url }}"
+                        required style="width: calc(100% - 10px); font-size: 10px;"
+                        readonly
+                    />
+                    <label for="large_url">
+                        Large link (not recommended):
+                    </lable>
+                    <input
+                        type="text"
+                        name="large_url"
+                        onClick="this.select();"
+                        value="{{ image.large_url }}"
+                        required style="width: calc(100% - 10px); font-size: 10px;"
+                        readonly
+                    />
+                </small>
+            </div>
         </p>
         <hr>
     {% empty %}
