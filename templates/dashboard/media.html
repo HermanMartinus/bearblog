@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Media
+{% endblock %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>
+        Add image
+    </h1>
+    <form
+      action=""
+      method="post"
+      enctype="multipart/form-data"
+      class="full-width"
+    >
+        {% csrf_token %}
+        <p>
+            <label for="title">
+                Image title:
+            </label>
+            <input type="text" id="title" name="title" required/>
+        </p>
+        <p>
+            <label for="image">
+                Image file:
+            </label>
+            <input type="file" id="image" name="image" required accept=".jpg,.jpeg,.gif,.png,.heic,.webp"/>
+        </p>
+        <input type="submit" value="Upload image"/>
+    </form>
+    <hr>
+    <h3>Uploaded images</h3>
+    {% for image in images reversed %}
+        <p>
+            <h4>{{ image.title }}</h4>
+            <a href="{{ image.image_url }}" target="_blank">
+                <img src="{{ image.icon_url }}" alt="{{ image.title }}"/>
+            </a>
+            <br>
+            <small>
+                Markdown (copy and paste into text content):
+                <br>
+                <input
+                    type="text"
+                    onClick="this.select();"
+                    value="![{{ image.title }}]({{ image.image_url }})"
+                    required style="width: calc(100% - 10px); font-size: 10px;"
+                    readonly
+                />
+            </small>
+            <br>
+            <a href="{{ image.pk }}/delete/">
+                <button>Delete</button>
+            </a>
+        </p>
+        <hr>
+    {% empty %}
+        <p>No images yet...
+    {% endfor %}
+  </body>
+   
+</content>
+{% endblock %}

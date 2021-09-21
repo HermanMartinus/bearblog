@@ -96,6 +96,17 @@ class Post(models.Model):
         super(Post, self).save(*args, **kwargs)
 
 
+class Image(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200, blank=True)
+    image_url = models.CharField(max_length=200, unique=True)
+    icon_url = models.CharField(max_length=200, unique=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
 class Upvote(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)

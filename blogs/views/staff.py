@@ -2,11 +2,11 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.models import User
-from blogs.templatetags.markdownify import markdown
 
+from blogs.templatetags.markdownify import markdown
 from blogs.models import Blog
 from blogs.helpers import bulk_email
+import djqscsv
 
 
 @staff_member_required
@@ -65,6 +65,13 @@ def block(request, pk):
     blog.blocked = True
     blog.save()
     return redirect('review_flow')
+
+
+@staff_member_required
+def export_emails(request):
+    users = Blog.objects.filter(reviewed=True, blocked=False).values('user__email')
+
+    return djqscsv.render_to_csv_response(users)
 
 
 @staff_member_required

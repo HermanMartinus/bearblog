@@ -1,18 +1,19 @@
+from datetime import datetime
+import json
 from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.edit import DeleteView
 from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
+import requests
 
 import tldextract
 from ipaddr import client_ip
-import djqscsv
 
 from blogs.forms import BlogForm, DomainForm, NavForm, PostForm, StyleForm
-from blogs.models import Blog, Post, Upvote
+from blogs.models import Blog, Post, Upvote, Image
 
 
 def resolve_subdomain(http_host, blog):
@@ -174,6 +175,45 @@ def post_edit(request, pk):
 
 
 @login_required
+def images(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"{blog.useful_domain()}/dashboard")
+
+    image_url = None
+
+    if request.method == "POST":
+        url = "https://api.cloudflare.com/client/v4/accounts/d8b6eb36804dc8209919ad7451605f7e/images/v1"
+        headers = {
+            "Authorization": "Bearer suJv_Lk52Ho_ozVjtKXn5hq5GvTs3wq1iNckCEPk"
+        }
+        payload = {
+            'file': (f'{blog.subdomain}-{datetime.strftime(timezone.now(), "%Y-%m-%d")}', request.FILES.get('image').read())
+        }
+        response = requests.post(url, files=payload, headers=headers)
+        json_result = json.loads(response.text)["result"]
+        if "public" in json_result["variants"][0]:
+            image_url = json_result["variants"][0]
+            icon_url = json_result["variants"][1]
+        else:
+            image_url = json_result["variants"][1]
+            icon_url = json_result["variants"][0]
+        image = Image(blog=blog, title=request.POST.get('title', ''), image_url=image_url, icon_url=icon_url)
+        image.save()
+
+    return render(request, 'dashboard/media.html', {
+        'blog': blog,
+        'root': blog.useful_domain(),
+        'images': blog.image_set.all()
+    })
+
+
+class ImageDelete(DeleteView):
+    model = Image
+    success_url = '/dashboard/images'
+
+
+@login_required
 def domain_edit(request):
     blog = Blog.objects.get(user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
@@ -216,10 +256,3 @@ def delete_user(request):
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
-
-
-@staff_member_required
-def export_emails(request):
-    users = Blog.objects.filter(reviewed=True, blocked=False).values('user__email')
-
-    return djqscsv.render_to_csv_response(users)

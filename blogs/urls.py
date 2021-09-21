@@ -11,6 +11,8 @@ urlpatterns = [
     path('review/block/<pk>', staff.block, name='review_block'),
     path('staff/bulk_mail_users/', staff.bulk_mail_users, name='bulk_mail_users'),
     path('bulk_mail_unsubscribe/<email>/', staff.bulk_mail_unsubscribe, name='bulk_mail_unsubscribe'),
+    path('staff/export_emails/', staff.export_emails, name='export_emails'),
+
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('dashboard/', dashboard.dashboard, name='dashboard'),
     path('dashboard/nav/', dashboard.nav, name='nav'),
@@ -19,8 +21,11 @@ urlpatterns = [
     path('dashboard/domain/', dashboard.domain_edit, name='domain'),
     path('dashboard/subscribers/', emailer.subscribers, name='subscribers'),
     path('dashboard/subscribers/settings/', emailer.notification_settings, name='notification_settings'),
-    path('dashboard/export_emails/', dashboard.export_emails, name='export_emails'),
     path('dashboard/analytics/', analytics.analytics, name='analytics'),
+    
+    path('dashboard/images/', dashboard.images, name='images'),
+    path('dashboard/images/<pk>/delete/', dashboard.ImageDelete.as_view(), name='image_delete'),
+
     path('dashboard/posts/', dashboard.posts_edit, name='post'),
     path('dashboard/posts/new/', dashboard.post_new, name='post_new'),
     path('dashboard/posts/<pk>/', dashboard.post_edit, name='post_edit'),
