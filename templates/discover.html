@@ -30,12 +30,12 @@
                 #{{ forloop.counter|add:posts_from }}
             </span>
             <div>
-                <a href="http://{{ post.blog.subdomain }}.{{ site }}/{{ post.slug }}/">
+                <a href="{{ post.blog.useful_domain }}/{{ post.slug }}/">
                     {{ post.title }}
                 </a>
                 <small>
-                    <a href="http://{{ post.blog.subdomain }}.{{ site }}/">
-                        ({{ post.blog.subdomain }}.{{ site }})
+                    <a href="{{ post.blog.useful_domain }}">
+                        ({{ post.blog.useful_domain }})
                     </a>
                     <br>
                     <form action="" method="post" style="display: inline">
