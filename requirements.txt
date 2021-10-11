@@ -1,5 +1,5 @@
 appdirs==1.4.3
-asgiref==3.2.7
+asgiref==3.2.10
 beautifulsoup4==4.9.1
 bleach==4.1.0
 certifi==2020.6.20
