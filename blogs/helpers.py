@@ -1,6 +1,6 @@
 import bleach
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail, send_mass_mail, get_connection, EmailMultiAlternatives
+from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 from django.utils import timezone
 import requests
 import hashlib
@@ -39,7 +39,7 @@ def sanitise_int(input, length):
         else:
             raise ValueError
     except ValueError:
-        raise Exception("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
+        raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
 
 def is_protected(subdomain):
