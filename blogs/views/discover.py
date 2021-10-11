@@ -1,4 +1,4 @@
-from django.http.response import Http404, HttpResponse
+from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Count, ExpressionWrapper, F, FloatField
 from django.utils import timezone
@@ -6,13 +6,12 @@ from django.db.models.functions import Now
 from django.contrib.sites.models import Site
 
 from blogs.models import Post, Upvote
-from blogs.helpers import clean_text
+from blogs.helpers import clean_text, sanitise_int
 
 from feedgen.feed import FeedGenerator
 from pg_utils import Seconds
 from ipaddr import client_ip
 import mistune
-import bleach
 
 gravity = 1.2
 posts_per_page = 20
@@ -22,23 +21,17 @@ def discover(request):
     ip_address = client_ip(request)
 
     if request.method == "POST":
-        try:
-            pk = int(bleach.clean(request.POST.get("pk", "")))
-            post = get_object_or_404(Post, pk=pk)
-            posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
-            if len(posts_upvote_dupe) == 0:
-                upvote = Upvote(post=post, ip_address=ip_address)
-                upvote.save()
-        except ValueError:
-            print("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
+        pk = sanitise_int(request.POST.get("pk", ""), 7)
+        post = get_object_or_404(Post, pk=pk)
+        posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
+        if len(posts_upvote_dupe) == 0:
+            upvote = Upvote(post=post, ip_address=ip_address)
+            upvote.save()
 
     page = 0
 
     if request.GET.get("page", 0):
-        try:
-            page = int(bleach.clean(request.GET.get("page")))
-        except ValueError:
-            raise Http404
+        page = sanitise_int(request.GET.get("page"), 7)
 
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page

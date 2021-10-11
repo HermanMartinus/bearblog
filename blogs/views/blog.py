@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.db.models import Count
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_post, get_posts, unmark
+from blogs.helpers import get_post, get_posts, sanitise_int, unmark
 
 from ipaddr import client_ip
 from taggit.models import Tag
@@ -95,7 +95,7 @@ def post(request, slug):
     if request.method == "POST":
         if request.POST.get("pk", ""):
             # Upvoting
-            pk = request.POST.get("pk", "")
+            pk = sanitise_int(request.POST.get("pk", ""), 7)
             post = get_object_or_404(Post, pk=pk)
             posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
             if len(posts_upvote_dupe) == 0:

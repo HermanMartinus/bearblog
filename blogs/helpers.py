@@ -1,3 +1,4 @@
+import bleach
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail, send_mass_mail, get_connection, EmailMultiAlternatives
 from django.utils import timezone
@@ -28,6 +29,17 @@ def get_post(all_posts, slug):
         return list(filter(lambda post: post.slug == slug, all_posts))[0]
     except IndexError:
         raise Http404("No Post matches the given query.")
+
+
+def sanitise_int(input, length):
+    try:
+        print(len(input))
+        if len(input) < length:
+            return int(bleach.clean(input))
+        else:
+            raise ValueError
+    except ValueError:
+        raise Exception("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
 
 def is_protected(subdomain):
