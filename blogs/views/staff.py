@@ -47,7 +47,7 @@ I'm Herman, the creator and maintainer of Bear.
 I've built Bear to be 100% free, open-source, and community centric.
 If you're keen to support the project you can do that here: https://bearblog.dev/contribute/
 
-Supporters will receive beta access to beta features. 
+Supporters will receive beta access to new features like email subscriptions.
 
 Have an awesome week!
 
