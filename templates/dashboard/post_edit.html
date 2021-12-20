@@ -26,7 +26,6 @@
         <input type="text" value="required" required style="width: 70px; font-size: 10px;" readonly/>
         <input type="text" value="optional" style="width: 70px; font-size: 10px;" readonly/>
     </p>
-
     <form method="POST" class="post-form full-width">{% csrf_token %}
         {{ form.as_p }}
         <button type="submit" onclick="document.getElementById('id_publish').value = true;">Publish</button>
@@ -60,5 +59,11 @@
         {% endif %}
     {% endif %}
 </content>
-
+<script>
+    document.querySelector('#toggle-full-screen').onclick = event => {
+        event.preventDefault()
+        document.querySelector('textarea').classList.toggle('full-screen')
+        event.target.classList.toggle('floating')
+    }
+</script>
 {% endblock %}

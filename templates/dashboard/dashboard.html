@@ -30,4 +30,11 @@
     </p>
     {% endif %}
 </content>
+<script>
+    document.querySelector('#toggle-full-screen').onclick = event => {
+        event.preventDefault()
+        document.querySelector('textarea').classList.toggle('full-screen')
+        event.target.classList.toggle('floating')
+    }
+</script>
 {% endblock %}
