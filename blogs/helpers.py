@@ -72,7 +72,8 @@ def add_new_domain(domain):
     url = "https://api.heroku.com/apps/bear-blog/domains"
 
     payload = {
-        "hostname": domain
+        "hostname": domain,
+        "sni_endpoint": "saurolophus-08033"
     }
 
     headers = {
