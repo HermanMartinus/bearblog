@@ -53,7 +53,9 @@ class BlogForm(forms.ModelForm):
 
     content = forms.CharField(
         label="Homepage content (markdown)",
-        help_text="<a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown cheatsheet</a> <button id='toggle-full-screen'>&#10529;</button>",
+        help_text='''
+        <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown cheatsheet</a>
+        <button id='toggle-full-screen'>&#10529;</button>''',
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
         required=False,
     )
@@ -175,7 +177,9 @@ class PostForm(forms.ModelForm):
 
     content = forms.CharField(
         label="Content (markdown)",
-        help_text="<a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown cheatsheet</a> <button id='toggle-full-screen'>&#10529;</button>",
+        help_text='''
+        <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown cheatsheet</a>
+        <button id='toggle-full-screen'>&#10529;</button>''',
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
     )
 
