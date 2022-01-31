@@ -11,7 +11,7 @@ import djqscsv
 
 @staff_member_required
 def review_flow(request):
-    unreviewed_blogs = Blog.objects.filter(reviewed=False, blocked=False).order_by('created_date')
+    unreviewed_blogs = Blog.objects.filter(reviewed=False, blocked=False).exclude(content='Hello World!').order_by('created_date')
 
     if unreviewed_blogs:
         blog = unreviewed_blogs[0]
