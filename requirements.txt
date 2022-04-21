@@ -2,6 +2,7 @@ appdirs==1.4.3
 asgiref==3.4.1
 beautifulsoup4==4.9.1
 bleach==4.1.0
+boto3==1.21.44
 certifi==2020.6.20
 chardet==3.0.4
 defusedxml==0.6.0
