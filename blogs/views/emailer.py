@@ -80,8 +80,6 @@ def subscribe(request):
             else:
                 subscribe_message = "You are already subscribed."
 
-    all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
-
     return render(
         request,
         'subscribe.html',

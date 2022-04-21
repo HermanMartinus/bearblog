@@ -55,6 +55,7 @@ class BlogForm(forms.ModelForm):
         label="Homepage content (markdown)",
         help_text='''
         <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown cheatsheet</a>
+        <a id='upload-image'>| Insert image</a>
         <button id='toggle-full-screen'>&#10529;</button>''',
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
         required=False,
@@ -179,6 +180,7 @@ class PostForm(forms.ModelForm):
         label="Content (markdown)",
         help_text='''
         <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown cheatsheet</a>
+        <a id='upload-image'>| Insert image</a>
         <button id='toggle-full-screen'>&#10529;</button>''',
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
     )

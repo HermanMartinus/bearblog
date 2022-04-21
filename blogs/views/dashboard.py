@@ -1,16 +1,22 @@
-from datetime import datetime
-import json
+
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.edit import DeleteView
 from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
-import requests
 
+import json
+import requests
+import os
+import boto3
 import tldextract
 from ipaddr import client_ip
+from datetime import datetime
+import time
 
 from blogs.forms import BlogForm, DomainForm, NavForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote, Image
@@ -172,6 +178,33 @@ def post_edit(request, pk):
         'post': post,
         'root': blog.useful_domain(),
     })
+
+
+@csrf_exempt
+def upload_image(request):
+    blog = get_object_or_404(Blog, user=request.user)
+
+    if request.method == "POST":
+        extention = request.FILES.getlist('file')[0].name.split('.')[-1]
+        if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif')):
+            filepath = blog.subdomain + '-' + str(time.time()).split('.')[0] + '.' + extention
+
+            session = boto3.session.Session()
+            client = session.client(
+                's3',
+                endpoint_url='https://sfo2.digitaloceanspaces.com',
+                region_name='sfo2',
+                aws_access_key_id='KKKRU7JXRF6ZOLEGJPPX',
+                aws_secret_access_key=os.getenv('SPACES_SECRET'))
+
+            response = client.put_object(
+                Bucket='bear-images',
+                Key=filepath,
+                Body=request.FILES.getlist('file')[0],
+                ACL='public-read',
+                )
+
+            return HttpResponse('https://bear-images.sfo2.cdn.digitaloceanspaces.com/'+filepath, 200)
 
 
 @login_required
