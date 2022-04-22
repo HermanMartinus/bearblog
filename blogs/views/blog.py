@@ -3,6 +3,7 @@ from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
 from django.contrib.sites.models import Site
 from django.db.models import Count
+from django.utils import timezone
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_post, get_posts, sanitise_int, unmark
@@ -56,12 +57,12 @@ def posts(request):
     if query:
         try:
             tag = Tag.objects.get(name=query)
-            all_posts = blog.post_set.filter(tags=tag, publish=True).order_by('-published_date')
+            all_posts = blog.post_set.filter(tags=tag, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         except Tag.DoesNotExist:
             all_posts = []
         blog_posts = all_posts
     else:
-        all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+        all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         blog_posts = get_posts(all_posts)
 
     tags = []

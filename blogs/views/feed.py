@@ -1,5 +1,6 @@
 from django.http.response import Http404
 from django.http import HttpResponse
+from django.utils import timezone
 
 from blogs.helpers import unmark, clean_text
 from blogs.views.blog import resolve_address
@@ -14,7 +15,7 @@ def feed(request):
     if not blog:
         raise Http404("Blog does not exist")
 
-    all_posts = blog.post_set.filter(publish=True, is_page=False).order_by('-published_date')
+    all_posts = blog.post_set.filter(publish=True, is_page=False, published_date__lte=timezone.now()).order_by('-published_date')
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain())
