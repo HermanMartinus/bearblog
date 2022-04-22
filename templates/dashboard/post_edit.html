@@ -59,7 +59,7 @@
     {% endif %}
 </content>
 
-<input type="file" id="file" hidden accept="image/*">
+<input type="file" id="file" hidden multiple accept="image/*">
 <script>
     document.querySelector('#toggle-full-screen').onclick = event => {
         event.preventDefault()
@@ -83,7 +83,12 @@
 
         var formData = new FormData();
         var target = '/dashboard/upload-image/'
-        formData.append("file", document.getElementById("file").files[0])
+
+        var fileInput = document.getElementById("file")
+        for (var i = 0; i<fileInput.files.length; i++) {
+            formData.append("file", fileInput.files[i])
+        }
+
         var xhr = new XMLHttpRequest()
         var eventSource = xhr.upload || xhr
         eventSource.addEventListener("progress", function(e){
@@ -97,10 +102,11 @@
         xhr.onload = function() {
             if (this.status === 200) {
                 textarea = document.querySelector('textarea')
-                textarea.value += '\n\n![Image title]('+this.responseText+')'
-                alert('The image has been added to the bottom of your content')
+                JSON.parse(this.responseText).forEach(image => {
+                    textarea.value += '\n\n![Image title]('+image+')'
+                })
+                alert('The image(s) have been added to the bottom of your content')
             }
-                
         };
     }
     {% else %}

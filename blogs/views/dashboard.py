@@ -185,26 +185,31 @@ def upload_image(request):
     blog = get_object_or_404(Blog, user=request.user)
 
     if request.method == "POST":
-        extention = request.FILES.getlist('file')[0].name.split('.')[-1]
-        if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif')):
-            filepath = blog.subdomain + '-' + str(time.time()).split('.')[0] + '.' + extention
+        fileLinks = []
 
-            session = boto3.session.Session()
-            client = session.client(
-                's3',
-                endpoint_url='https://sfo2.digitaloceanspaces.com',
-                region_name='sfo2',
-                aws_access_key_id='KKKRU7JXRF6ZOLEGJPPX',
-                aws_secret_access_key=os.getenv('SPACES_SECRET'))
+        for file in request.FILES.getlist('file'):
+            extention = file.name.split('.')[-1]
+            if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif')):
+                filepath = blog.subdomain + '-' + str(time.time()).split('.')[0] + '.' + extention
+                url = f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{filepath}'
 
-            response = client.put_object(
-                Bucket='bear-images',
-                Key=filepath,
-                Body=request.FILES.getlist('file')[0],
-                ACL='public-read',
-                )
+                session = boto3.session.Session()
+                client = session.client(
+                    's3',
+                    endpoint_url='https://sfo2.digitaloceanspaces.com',
+                    region_name='sfo2',
+                    aws_access_key_id='KKKRU7JXRF6ZOLEGJPPX',
+                    aws_secret_access_key=os.getenv('SPACES_SECRET'))
 
-            return HttpResponse('https://bear-images.sfo2.cdn.digitaloceanspaces.com/'+filepath, 200)
+                response = client.put_object(
+                    Bucket='bear-images',
+                    Key=filepath,
+                    Body=file,
+                    ACL='public-read',
+                    )
+
+                fileLinks.append(url)
+        return HttpResponse(json.dumps(fileLinks), 200)
 
 
 @login_required
