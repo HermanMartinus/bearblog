@@ -36,6 +36,8 @@ urlpatterns = [
     path('discover/feed/', discover.feed, name='discover_feed'),
 
     path('.well-known/acme-challenge/<challenge>', blog.challenge, name='challenge'),
+    path('lemon-webhook/', blog.lemon_webhook, name='lemon_webhook'),
+
     path('blog/', blog.posts, name='posts'),
     path('subscribe/', emailer.subscribe, name='subscribe'),
     path('confirm-subscription/', emailer.confirm_subscription, name='confirm_subscription'),

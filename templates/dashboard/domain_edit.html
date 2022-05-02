@@ -11,7 +11,9 @@
 {% block content %}
 <content>
     <h1>Custom domain</h1>
-    <p>Get a custom domain <a href="https://domain.mno8.net/a1nXmN" target="_blank">here</a></p>
+    {% if not blog.upgraded and not blog.domain %}
+    {% include '../snippets/upgrade.html' %}
+    {% else %}
     <h4>Set the following DNS record</h4>
         <table>
             <tr>
@@ -51,5 +53,6 @@
             Having issues? More info
             <a href="https://github.com/HermanMartinus/bearblog/wiki/Custom-domains" target="_blank">here</a>.
         </p>
+    {% endif %}
 </content>
 {% endblock %}

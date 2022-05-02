@@ -8,86 +8,25 @@ Contribute to Bear
 {% endblock %}
 
 {% block content %}
-<h2>Help Bear keep the Internet awesome! ＼ʕ •ᴥ•ʔ／</h2>
-<h4>Bear is 100% free, open-source, community-centric, and awesome.</h4>
+<h2>Hey, Herman here  ʕ •ᴥ•ʔゝ</h2>
 <p>
-    Most “free” websites subsist by selling ads or selling user data.
-    Others do it by putting all the good stuff behind paywalls. Bear doesn't do any of that. 
+	Most “free” websites subsist by displaying ads or selling user data.
+	That, however, would be against the spirit of the Bear project.
+	<br>
+	In order to keep the servers running and the coffee hot I've decided to charge
+	for the most resource-intensive parts of the project:
+	<ul>
+		<li>Custom domains (due to the amount of my time they require)</li>
+		<li>Image uploading (due to the cost of hosting images)</li>
+		<li>Beta features (since, well, they aren't ready yet)</li>
+	</ul>
 </p>
-
-<h4>Firstly, a few things that won't change:</h4>
-<ul>
-    <li>Bear will never have ads.</li>
-    <li>Bear will never sell your data.</li>
-    <li>Bear will remain free of charge, forever.</li>
-</ul>
 <p>
-    If you're keen to support the project you can contribute here.
-    Supporters will receive access to beta features such as
-    newsletter subscriptions and API access (still in development).
-	I'll also issue an SSL certificate for a custom domain if you need one. 
+	<b>You can <a href="#">upgrade for $29 per year</a>.</b>
 </p>
-
-<script src="https://www.paypal.com/sdk/js?client-id=AR1r8JHELZ6X04dTtwQrwp6dca8JeopBGHQ8JqLnZ3FqWyh57IcHZlXKQBj2PgT8qCFFdnJnHf_qiYCY&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script> 
-<fieldset style="width: 300px; float: left">
-	<legend><b>$5 per month</b></legend>
-	<div id="paypal-button-container-P-04C10350V4946812SMCN56MA" style="margin-top: 20px;"></div>
-	<script>
-	paypal.Buttons({
-		style: {
-			shape: 'rect',
-			color: 'silver',
-			layout: 'vertical',
-			label: 'paypal'
-		},
-		createSubscription: function(data, actions) {
-			return actions.subscription.create({
-			/* Creates the subscription */
-			plan_id: 'P-04C10350V4946812SMCN56MA'
-			});
-		},
-		onApprove: function(data, actions) {
-			alert("Thanks for your support! Pop me an email at hi@bearblog.dev and I'll unlock the beta features for you :)");
-		}
-	}).render('#paypal-button-container-P-04C10350V4946812SMCN56MA'); // Renders the PayPal button
-	</script>
-</fieldset>
-
-<fieldset style="width: 300px;">
-	<legend><b>$50 per year</b></legend>
-	<div id="paypal-button-container-P-7EY9103592940484EMD24WRY" style="margin-top: 20px;"></div>
-	<script>
-	paypal.Buttons({
-		style: {
-			shape: 'rect',
-			color: 'silver',
-			layout: 'vertical',
-			label: 'paypal'
-		},
-		createSubscription: function(data, actions) {
-			return actions.subscription.create({
-			/* Creates the subscription */
-			plan_id: 'P-7EY9103592940484EMD24WRY'
-			});
-		},
-		onApprove: function(data, actions) {
-			alert("Thanks for your support!  Pop me an email at hi@bearblog.dev and I'll unlock the beta features for you :)");
-		}
-	}).render('#paypal-button-container-P-7EY9103592940484EMD24WRY'); // Renders the PayPal button
-	</script>
-</fieldset>
-
-<h4>
-    Bear receives $135 per month from 19
-    <a href="https://github.com/HermanMartinus/bearblog/wiki/Contributors" target="_blank">supporters</a>.
-    <br>
-    Goal: $1000 per month (<b>13.5%</b>).
-</h4>
-
-<p style="float: none">
-All the best,
-<br>
-Herman
+<p>
+	You can see where how much money Bear makes, and where those funds are spent <a href="#">here</a>.
 </p>
+<h3>Help Bear keep the internet awesome!  \ʕ•ᴥ•ʔ/</h2>
 
 {% endblock %}

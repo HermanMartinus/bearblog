@@ -1,6 +1,8 @@
+import json
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
 from django.db.models import Count
 from django.utils import timezone
@@ -145,6 +147,17 @@ def challenge(request, challenge):
         return HttpResponse(blog.challenge)
     else:
         raise Http404()
+
+
+@csrf_exempt
+def lemon_webhook(request):
+    data = json.loads(request.body, strict=False)
+    print(data)
+    subdomain = str(data['meta']['custom_data']['blog'])
+    blog = get_object_or_404(Blog, subdomain=subdomain)
+    blog.upgraded = True
+    blog.save()
+    return HttpResponse(f'Upgraded {blog}')
 
 
 def not_found(request, *args, **kwargs):

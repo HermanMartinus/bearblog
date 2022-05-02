@@ -301,3 +301,4 @@ def delete_user(request):
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
+
