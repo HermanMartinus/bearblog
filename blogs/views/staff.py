@@ -44,10 +44,10 @@ Hey, welcome to your "bear" blogging experience!
 
 I'm Herman, the creator and maintainer of Bear.
 
-I've built Bear to be 100% free, open-source, and community centric.
+I've built Bear to be open-source, community centric, and awesome.
 If you're keen to support the project you can do that here: https://bearblog.dev/contribute/
 
-Supporters will receive beta access to new features like email subscriptions.
+Supporters will receive access to features like email capture, custom domains, and image uploading.
 
 Have an awesome week!
 
