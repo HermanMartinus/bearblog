@@ -15,7 +15,7 @@ from blogs.views.dashboard import resolve_subdomain
 
 
 @login_required
-def subscribers(request):
+def email_list(request):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"{blog.useful_domain()}/dashboard")
@@ -25,9 +25,18 @@ def subscribers(request):
 
     subscribers = Subscriber.objects.filter(blog=blog)
 
-    if request.GET.get("export", ""):
+    if request.GET.get("export-csv", ""):
         subscribers = subscribers.values('email_address', 'subscribed_date')
         return djqscsv.render_to_csv_response(subscribers)
+
+    if request.GET.get("export-txt", ""):
+        subscribers = subscribers.values('email_address')
+        file_data = ""
+        for subscriber in subscribers:
+            file_data += subscriber['email_address'] + "\n"
+        response = HttpResponse(file_data, content_type='application/text charset=utf-8')
+        response['Content-Disposition'] = 'attachment; filename="emails.txt"'
+        return response
 
     if request.POST.get("email_addresses", ""):
         email_addresses = re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", request.POST.get("email_addresses", ""))

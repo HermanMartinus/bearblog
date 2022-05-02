@@ -19,8 +19,8 @@ urlpatterns = [
     path('dashboard/styles/', dashboard.styles, name='styles'),
     path('dashboard/account/', dashboard.account, name='account'),
     path('dashboard/domain/', dashboard.domain_edit, name='domain'),
-    path('dashboard/subscribers/', emailer.subscribers, name='subscribers'),
-    path('dashboard/subscribers/settings/', emailer.notification_settings, name='notification_settings'),
+    path('dashboard/email-list/', emailer.email_list, name='email_list'),
+    path('dashboard/email-list/settings/', emailer.notification_settings, name='notification_settings'),
     path('dashboard/analytics/', analytics.analytics, name='analytics'),
 
     path('dashboard/upload-image/', dashboard.upload_image, name='upload_image'),

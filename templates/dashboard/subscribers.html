@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Subscribers | Bear Blog
+    Email list | Bear Blog
 {% endblock %}
 
 {% block nav %}
@@ -13,7 +13,7 @@
     {% include '../snippets/upgrade.html' %}
 {% else %}
 <content>
-    <h1>Email subscribers ({{ subscribers|length }})</h1>
+    <h1>Email list ({{ subscribers|length }})</h1>
     <p>
         <small>
             Include the following snippet in your blog posts or on your home page:
@@ -23,13 +23,14 @@
     </p>
     <p>
         <small>
-            Bear does not currently send emails to subscribers.
+            <b>Bear does not send emails to subscribers. This is an email list.</b>
+            <br>
             Check out <a href="https://github.com/HermanMartinus/bearblog/wiki/Sending-emails" target="_blank">this guide</a> to sending emails.
         </small>
     </p>
     <p>
         <a href="#import-contacts">Import contacts</a> |
-        <a href="?export=True" download>Export list</a>
+        Export as <a href="?export-csv=True" download>csv</a> | <a href="?export-txt=True" download>txt</a>
     </p>
     <ul>
     {% for subscriber in subscribers %}
@@ -42,7 +43,7 @@
             </small>
         </li>
     {% empty %}
-        <li>No subscribers yet</li>
+        <li>No emails yet</li>
     {% endfor %}
     </ul>
     <form method="POST" id="import-contacts" class="full-width">
