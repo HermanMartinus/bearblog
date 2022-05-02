@@ -21,11 +21,6 @@ There is currently a [Bear Blog Hugo theme](https://github.com/janraasch/hugo-be
 ## Roadmap
 Check out the roadmap in the [wiki](https://github.com/HermanMartinus/bearblog/wiki/Roadmap)
 
-
-## Consider contributing!
-
-Bear will never have ads, sell your data, or charge you for existing features, ever. But please consider [contributing](https://bearblog.dev/contribute/) to help Bear keep the Internet awesome ＼ʕ •ᴥ•ʔ／
-
 ## Some Bear faces
 
 https://cutekaomoji.com/animals/bears/
