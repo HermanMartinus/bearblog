@@ -24,8 +24,6 @@ urlpatterns = [
     path('dashboard/analytics/', analytics.analytics, name='analytics'),
 
     path('dashboard/upload-image/', dashboard.upload_image, name='upload_image'),
-    path('dashboard/images/', dashboard.images, name='images'),
-    path('dashboard/images/<pk>/delete/', dashboard.ImageDelete.as_view(), name='image_delete'),
 
     path('dashboard/posts/', dashboard.posts_edit, name='post'),
     path('dashboard/posts/new/', dashboard.post_new, name='post_new'),

@@ -213,52 +213,6 @@ def upload_image(request):
 
 
 @login_required
-def images(request):
-    blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
-
-    image_url = None
-
-    if request.method == "POST":
-        url = "https://api.cloudflare.com/client/v4/accounts/d8b6eb36804dc8209919ad7451605f7e/images/v1"
-        headers = {
-            "Authorization": "Bearer suJv_Lk52Ho_ozVjtKXn5hq5GvTs3wq1iNckCEPk"
-        }
-        payload = {
-            'file': (f'bear-{blog.subdomain}-{datetime.strftime(timezone.now(), "%Y-%m-%d")}', request.FILES.get('image').read())
-        }
-        response = requests.post(url, files=payload, headers=headers)
-        json_result = json.loads(response.text)["result"]
-        for variant in json_result["variants"]:
-            if "optimised" in variant:
-                optimised_url = variant
-            elif "icon" in variant:
-                icon_url = variant
-            elif "public" in variant:
-                large_url = variant
-        image = Image(
-            blog=blog,
-            title=request.POST.get('title', ''),
-            optimised_url=optimised_url,
-            icon_url=icon_url,
-            large_url=large_url
-        )
-        image.save()
-
-    return render(request, 'dashboard/media.html', {
-        'blog': blog,
-        'root': blog.useful_domain(),
-        'images': blog.image_set.all()
-    })
-
-
-class ImageDelete(DeleteView):
-    model = Image
-    success_url = '/dashboard/images'
-
-
-@login_required
 def domain_edit(request):
     blog = Blog.objects.get(user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
