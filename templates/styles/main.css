@@ -25,6 +25,7 @@ b {
 a {
     color: #3273dc;
     cursor: pointer;
+    text-decoration: underline;
     /*color: #ff5e6c;*/
 }
 
