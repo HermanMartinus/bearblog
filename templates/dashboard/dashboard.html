@@ -10,6 +10,15 @@
 
 {% block content %}
 <content>
+
+    {% if not blog.upgraded %}
+    <p style="border: 1px dashed; text-align:center; padding: 5px">
+        <i>
+            <a href="/dashboard/upgrade/">Upgrade</a> to get neat stuff and support the Tiny Internet!
+        </i>
+    </p>
+    {% endif %}
+
     <h1>Home page</h1>
 
     <p>
