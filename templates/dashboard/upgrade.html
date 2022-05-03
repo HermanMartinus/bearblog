@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Account | Bear Blog
+{% endblock %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    {% if not blog.upgraded and not blog.domain %}
+    {% include '../snippets/upgrade.html' %}
+    {% else %}
+    <h3>You've already upgraded your Bear account! \ʕ•ᴥ•ʔ/</h3>
+    {% endif %}
+</content>
+{% endblock %}

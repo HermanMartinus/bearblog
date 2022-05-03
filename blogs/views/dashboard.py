@@ -234,6 +234,15 @@ def domain_edit(request):
 
 
 @login_required
+def upgrade(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"{blog.useful_domain()}/dashboard")
+
+    return render(request, "dashboard/upgrade.html", {"blog": blog})
+
+
+@login_required
 def account(request):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
@@ -255,4 +264,3 @@ def delete_user(request):
 class PostDelete(DeleteView):
     model = Post
     success_url = '/dashboard/posts'
-

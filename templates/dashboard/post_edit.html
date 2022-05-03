@@ -59,58 +59,5 @@
     {% endif %}
 </content>
 
-<input type="file" id="file" hidden multiple accept="image/*">
-<script>
-    document.querySelector('#toggle-full-screen').onclick = event => {
-        event.preventDefault()
-        document.querySelector('textarea').classList.toggle('full-screen')
-        event.target.classList.toggle('floating')
-    }
-
-    {% if blog.upgraded %}
-    document.querySelector('#upload-image').onclick = event => {
-        event.preventDefault()
-        document.getElementById("file").click()
-    }
-
-    document.getElementById("file").addEventListener("change", upload)
-
-    function upload() {
-        if(document.getElementById("file").files[0].size > 2000000){
-            alert(`File over the 2mb limit. Use https://tinypng.com to minimise it.`)
-            return
-        }
-
-        var formData = new FormData();
-        var target = '/dashboard/upload-image/'
-
-        var fileInput = document.getElementById("file")
-        for (var i = 0; i<fileInput.files.length; i++) {
-            formData.append("file", fileInput.files[i])
-        }
-
-        var xhr = new XMLHttpRequest()
-        var eventSource = xhr.upload || xhr
-        eventSource.addEventListener("progress", function(e){
-            var current = e.loaded || e.position
-            var total = e.total || e.totalSize
-            var percent = parseInt((current/total)*100, 10)
-            alert('Uploading...')
-        });
-        xhr.open("POST", target, true)
-        xhr.send(formData)
-        xhr.onload = function() {
-            if (this.status === 200) {
-                textarea = document.querySelector('textarea')
-                JSON.parse(this.responseText).forEach(image => {
-                    textarea.value += '\n\n![Image title]('+image+')'
-                })
-                alert('The image(s) have been added to the bottom of your content')
-            }
-        };
-    }
-    {% else %}
-    document.querySelector('#upload-image').style.display = 'none'
-    {% endif %}
-</script>
+{% include '../snippets/editor_functions.html' with blog=blog%}
 {% endblock %}

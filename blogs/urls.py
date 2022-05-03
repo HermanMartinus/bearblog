@@ -22,6 +22,7 @@ urlpatterns = [
     path('dashboard/email-list/', emailer.email_list, name='email_list'),
     path('dashboard/email-list/settings/', emailer.notification_settings, name='notification_settings'),
     path('dashboard/analytics/', analytics.analytics, name='analytics'),
+    path('dashboard/upgrade/', dashboard.upgrade, name='upgrade'),
 
     path('dashboard/upload-image/', dashboard.upload_image, name='upload_image'),
 
