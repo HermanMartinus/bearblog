@@ -9,9 +9,6 @@
 ## Markdown
 All the post content is written in [markdown](https://herman.bearblog.dev/markdown-cheatsheet/).
 
-## Custom domains
-It is free to add custom domains. Learn more in the [wiki](https://github.com/HermanMartinus/bearblog/wiki/Custom-domains)
-
 ## Can Bear Blog be self-hosted? 
 Bear Blog has been built as a platform and not as an indiviual blog system.
 It is more like Medium than Jekyll. Due to this it currently isn't possible to self-host Bear Blog as an individual blog.
