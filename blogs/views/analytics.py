@@ -1,12 +1,11 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.utils.dateparse import parse_date
+from django.db import IntegrityError
 from datetime import timedelta
 
 from blogs.models import Blog, Hit, Post
 from blogs.forms import AnalyticsForm
-from django.core.exceptions import ObjectDoesNotExist
 from blogs.helpers import daterange
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
@@ -79,5 +78,7 @@ def post_hit(request, pk):
         Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash)
     except Hit.MultipleObjectsReturned:
         print('Duplicate hit')
+    except IntegrityError as e:
+        print('Post does not exist')
 
     return HttpResponse("Logged")
