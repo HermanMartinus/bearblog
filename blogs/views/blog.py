@@ -88,6 +88,7 @@ def posts(request):
     )
 
 
+@csrf_exempt
 def post(request, slug):
     blog = resolve_address(request)
     if not blog:
