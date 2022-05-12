@@ -10,16 +10,14 @@ from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 
 import json
-import requests
 import os
 import boto3
 import tldextract
 from ipaddr import client_ip
-from datetime import datetime
 import time
 
 from blogs.forms import BlogForm, DomainForm, NavForm, PostForm, StyleForm
-from blogs.models import Blog, Post, Upvote, Image
+from blogs.models import Blog, Post, Upvote
 
 
 def resolve_subdomain(http_host, blog):
