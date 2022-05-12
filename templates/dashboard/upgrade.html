@@ -10,7 +10,7 @@
 
 {% block content %}
 <content>
-    {% if not blog.upgraded and not blog.domain %}
+    {% if not blog.upgraded %}
     {% include '../snippets/upgrade.html' %}
     {% else %}
     <h3>You've already upgraded your Bear account! \ʕ•ᴥ•ʔ/</h3>
