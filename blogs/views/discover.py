@@ -1,5 +1,6 @@
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, ExpressionWrapper, F, FloatField
 from django.utils import timezone
 from django.db.models.functions import Now
@@ -17,6 +18,7 @@ gravity = 1.2
 posts_per_page = 20
 
 
+@csrf_exempt
 def discover(request):
     ip_address = client_ip(request)
 
