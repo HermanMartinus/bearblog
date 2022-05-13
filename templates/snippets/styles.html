@@ -1,7 +1,10 @@
 {% if blog.external_stylesheet %}
     @import '{{ blog.external_stylesheet }}';
 {% else %}
-    {% include 'styles/main.css' %}
-    {% include 'styles/dark_mode.css' %}
+    {% if not blog.overwrite_styles %}
+        {% include 'styles/main.css' %}
+        {% include 'styles/dark_mode.css' %}
+    {% endif %}
 {% endif %}
+
 {{ blog.custom_styles | safe }}

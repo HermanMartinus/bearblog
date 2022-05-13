@@ -28,6 +28,10 @@ class Blog(models.Model):
 
     external_stylesheet = models.CharField(max_length=255, blank=True)
     custom_styles = models.TextField(blank=True)
+    overwrite_styles = models.BooleanField(
+        default=False,
+        choices=((True, 'Overwrite styles'), (False, 'Extend existing styles')),
+        verbose_name='')
     favicon = models.CharField(max_length=4, default="🐼")
 
     fathom_site_id = models.CharField(max_length=8, blank=True)

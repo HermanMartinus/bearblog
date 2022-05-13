@@ -122,7 +122,10 @@ class StyleForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('favicon', 'meta_image', 'external_stylesheet', 'custom_styles',)
+        widgets = {
+            'overwrite_styles': forms.RadioSelect
+        }
+        fields = ('favicon', 'meta_image', 'external_stylesheet', 'custom_styles', 'overwrite_styles')
 
 
 class DomainForm(forms.ModelForm):
