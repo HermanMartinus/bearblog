@@ -6,3 +6,4 @@ class BlogsConfig(AppConfig):
 
     def ready(self):
         import blogs.hooks
+        print('Running startup script...')
