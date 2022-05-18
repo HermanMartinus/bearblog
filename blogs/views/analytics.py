@@ -47,7 +47,7 @@ def analytics(request):
 
     delta = timezone.now() - blog.created_date
 
-    chart = pygal.Line(height=300)
+    chart = pygal.Bar(height=300)
     mark_list = [x['hits'] for x in chart_data]
     [x['date'] for x in chart_data]
     chart.add('Reads', mark_list)
