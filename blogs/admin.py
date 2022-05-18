@@ -1,7 +1,9 @@
+from datetime import timedelta
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
+from django.utils import timezone
 
 from .models import Blog, Image, Post, Upvote, Hit, Subscriber, Emailer
 from django.utils.html import escape, format_html
@@ -139,6 +141,12 @@ class HitAdmin(admin.ModelAdmin):
                            id=obj.post.pk,
                            post=escape(obj.post))
 
+    def cleanup(self, request, queryset):
+        queryset.filter(created_date__lt=timezone.now().date()-timedelta(days=7)).delete()
+
+    cleanup.short_description = "Cleanup (remove older than 7 days)"
+
+    actions = ['cleanup']
     list_display = ('created_date', 'post_link', 'ip_address')
     search_fields = ('created_date', 'post__title')
     ordering = ('-created_date',)
