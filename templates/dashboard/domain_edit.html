@@ -29,16 +29,21 @@
                 <td>3600</td>
             </tr>
         </table>
-        <h4>Then add your domain below</h4>
+        <p>
+            <small>
+                It may take some time for the DNS records to propagate.
+                <br>
+                Once your DNS record has been set correctly (you can validate that <a href="https://github.com/HermanMartinus/bearblog/wiki/Custom-domains#validating-your-custom-domain" target="_blank">here</a>)
+                add your domain below.
+            </small>
+        </p>
         <form method="POST" class="post-form">{% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="save btn btn-default">Save</button>
         </form>
         <p>
             <small>
-                It may take some time for the DNS records to propagate.
-                <br>
-                Use a CDN like Cloudflare and set the SSL connection type to Flexible to achieve this.
+                Use a CDN like Cloudflare and set the SSL connection type to Flexible to get an SSL certificate.
             </small>
         </p>
         <p>

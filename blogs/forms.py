@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator, ValidationError
 from django.template.defaultfilters import slugify
 
-from .helpers import is_protected, root, check_records
+from .helpers import check_dns_connection, is_protected, root
 from .models import Blog, Post, Emailer
 
 subdomain_validator = RegexValidator(
@@ -132,7 +132,6 @@ class DomainForm(forms.ModelForm):
     domain = forms.CharField(
         max_length=128,
         label="Custom domain",
-        help_text="eg: 'example.com'",
         validators=[domain_validator, protected_domains_validator],
         required=False
     )
@@ -143,8 +142,8 @@ class DomainForm(forms.ModelForm):
         if domain == '':
             return domain
 
-        # if not check_records(domain):
-        #     raise ValidationError(f"CNAME record for '{domain}' has not been set.")
+        if not check_dns_connection(domain):
+            raise ValidationError(f"CNAME record for '{domain}' has not been set correctly.")
 
         matching_blogs = Blog.objects.filter(domain=domain)
 

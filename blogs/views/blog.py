@@ -29,6 +29,14 @@ def resolve_address(request):
         return get_object_or_404(Blog, domain=http_host, blocked=False)
 
 
+def ping(request):
+    blog = resolve_address(request)
+    if not blog:
+        raise Http404()
+    else:
+        return HttpResponse('Ping')
+
+
 def home(request):
     blog = resolve_address(request)
     if not blog:

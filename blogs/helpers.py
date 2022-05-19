@@ -97,6 +97,14 @@ def check_records(domain):
     return ('look-for-the-bear-necessities' in str(verification_string))
 
 
+def check_dns_connection(domain):
+    if not domain:
+        return
+    response = requests.request("GET", f'http://{domain}/')
+    print(response.text)
+    return (response.status_code == 404 and 'Heroku' in response.text)
+
+
 def delete_domain(domain):
     url = f"https://api.heroku.com/apps/bear-blog/domains/{domain}"
 
