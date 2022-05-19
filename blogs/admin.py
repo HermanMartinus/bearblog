@@ -11,6 +11,10 @@ from blogs.helpers import check_records, root
 from django.urls import reverse
 
 
+admin.autodiscover()
+admin.site.enable_nav_sidebar = False
+
+
 class UserAdmin(admin.ModelAdmin):
     def subdomain_url(self, obj):
         blog = Blog.objects.get(user=obj)
