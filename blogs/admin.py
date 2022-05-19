@@ -76,6 +76,7 @@ class BlogAdmin(admin.ModelAdmin):
         'blocked',
         'subdomain_url',
         'domain_url',
+        'domain',
         'post_count',
         'user_link',
         'user_email',
