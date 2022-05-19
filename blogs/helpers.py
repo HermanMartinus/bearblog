@@ -11,7 +11,6 @@ from django.conf import settings
 from markdown import Markdown
 from io import StringIO
 from _datetime import timedelta
-from urllib3.exceptions import NewConnectionError
 
 
 def root(subdomain=''):
@@ -105,7 +104,7 @@ def check_dns_connection(domain):
         response = requests.request("GET", f'http://{domain}/')
         print(response.text)
         return ('look-for-the-bear-necessities' in response.text or 'Heroku' in response.text)
-    except NewConnectionError:
+    except requests.exceptions.ConnectionError:
         return False
 
 
