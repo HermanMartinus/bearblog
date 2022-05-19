@@ -102,7 +102,7 @@ def check_dns_connection(domain):
         return
     response = requests.request("GET", f'http://{domain}/')
     print(response.text)
-    return (response.status_code == 404 and 'Heroku' in response.text)
+    return ('look-for-the-bear-necessities' in response.text or 'Heroku' in response.text)
 
 
 def delete_domain(domain):
