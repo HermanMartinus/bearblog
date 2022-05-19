@@ -14,6 +14,11 @@
     {% if not blog.upgraded and not blog.domain %}
     {% include '../snippets/upgrade.html' %}
     {% else %}
+
+    {% if blog.domain %}
+    <h5>Your domain ({{ blog.domain }}) is currently active.</h5>
+    {% endif %}
+
     <h4>Set the following DNS record</h4>
         <table>
             <tr>
