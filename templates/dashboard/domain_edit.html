@@ -16,7 +16,8 @@
     {% else %}
 
     {% if blog.domain %}
-    <h5>Your domain ({{ blog.domain }}) is currently active.</h5>
+    <h3>Your domain (<a href="//{{ blog.domain }}" target="_blank">{{ blog.domain }}</a>) is currently active.</h3>
+    <hr>
     {% endif %}
 
     <h4>Set the following DNS record</h4>

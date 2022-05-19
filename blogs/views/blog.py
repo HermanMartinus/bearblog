@@ -162,10 +162,18 @@ def challenge(request, challenge):
 def lemon_webhook(request):
     data = json.loads(request.body, strict=False)
     print(data)
-    subdomain = str(data['meta']['custom_data']['blog'])
-    blog = get_object_or_404(Blog, subdomain=subdomain)
-    blog.upgraded = True
-    blog.save()
+    try:
+        subdomain = str(data['meta']['custom_data']['blog'])
+        blog = get_object_or_404(Blog, subdomain=subdomain)
+        print('Found subdomain, upgrading blog...')
+        blog.upgraded = True
+        blog.save()
+    except KeyError:
+        email = str(data['user_email'])
+        blog = Blog.objects.get(user__email=email)
+        print('Found email address, upgrading blog...')
+        blog.upgraded = True
+        blog.save()
     return HttpResponse(f'Upgraded {blog}')
 
 
