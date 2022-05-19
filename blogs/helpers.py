@@ -100,9 +100,12 @@ def check_records(domain):
 def check_dns_connection(domain):
     if not domain:
         return
-    response = requests.request("GET", f'http://{domain}/', verify=False, timeout=5)
-    print(response.text)
-    return ('look-for-the-bear-necessities' in response.text or 'Heroku' in response.text)
+    try:
+        response = requests.request("GET", f'http://{domain}/')
+        print(response.text)
+        return ('look-for-the-bear-necessities' in response.text or 'Heroku' in response.text)
+    except requests.exceptions.ConnectionError:
+        return False
 
 
 def delete_domain(domain):
