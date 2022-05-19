@@ -87,7 +87,11 @@ class BlogAdmin(admin.ModelAdmin):
 
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
     ordering = ('-created_date',)
-    list_filter = (('domain', admin.EmptyFieldListFilter),)
+    list_filter = (
+        ('domain', admin.EmptyFieldListFilter),
+        ('upgraded', admin.BooleanFieldListFilter),
+        ('blocked', admin.BooleanFieldListFilter),
+        )
 
     def block_blog(self, request, queryset):
         for blog in queryset:
