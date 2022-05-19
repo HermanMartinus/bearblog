@@ -41,7 +41,7 @@ class BlogAdmin(admin.ModelAdmin):
 
     def domain_url(self, obj):
         if not obj.domain:
-            return ''
+            return None
         return format_html(
             "<a href='http://{url}' target='_blank'>{url}</a>",
             url=obj.domain)
