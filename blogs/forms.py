@@ -143,8 +143,8 @@ class DomainForm(forms.ModelForm):
         if domain == '':
             return domain
 
-        if not check_records(domain):
-            raise ValidationError(f"TXT record for '{domain}' has not been set.")
+        # if not check_records(domain):
+        #     raise ValidationError(f"CNAME record for '{domain}' has not been set.")
 
         matching_blogs = Blog.objects.filter(domain=domain)
 
