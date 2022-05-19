@@ -169,7 +169,7 @@ def lemon_webhook(request):
         blog.upgraded = True
         blog.save()
     except KeyError:
-        email = str(data['user_email'])
+        email = str(data['data']['attributes']['user_email'])
         blog = Blog.objects.get(user__email=email)
         print('Found email address, upgrading blog...')
         blog.upgraded = True
