@@ -1,4 +1,3 @@
-{% load minify_css %}
 <!DOCTYPE html>
 <html lang="{% block lang %}en{% endblock %}">
 
@@ -21,8 +20,8 @@
   <style>
       {% autoescape off %}
       {% block custom_styles %}
-        {% include_css 'styles/main.css' %}
-        {% include_css 'styles/dark_mode.css' %}
+        {% include 'styles/main.css' %}
+        {% include 'styles/dark_mode.css' %}
       {% endblock %}
       {% endautoescape %} 
       body:hover {

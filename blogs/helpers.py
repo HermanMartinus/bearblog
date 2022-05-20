@@ -230,5 +230,3 @@ def validate_subscriber_email(email, blog):
         fail_silently=False,
         html_message=html_message,
     )
-
-
