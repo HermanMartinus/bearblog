@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block seo %}
+<meta name="robots" content="nofollow">
 {% include 'snippets/seo_tags.html' with title='ʕ•ᴥ•ʔ Bear Blog' url='https://bearblog.dev' description='Free, no-nonsense, super-fast blogging.' tags="blog, blogging, write, writing" image="https://i.imgur.com/b499n4R.png" %}
 <link rel="alternate" type="application/rss+xml" href="feed/?type=rss{% if newest %}&newest=True{% endif %}" />
 {% endblock %}
