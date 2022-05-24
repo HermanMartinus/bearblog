@@ -1,4 +1,3 @@
-import json
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
@@ -6,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
 from django.db.models import Count
 from django.utils import timezone
+from django.db.models import Q
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_post, get_posts, sanitise_int, unmark
@@ -13,6 +13,7 @@ from blogs.helpers import get_post, get_posts, sanitise_int, unmark
 from ipaddr import client_ip
 from taggit.models import Tag
 import tldextract
+import json
 
 
 def resolve_address(request):
@@ -24,15 +25,18 @@ def resolve_address(request):
             print('Bad proxy request')
 
     sites = Site.objects.all()
-    if any(http_host == site.domain for site in sites):
-        # Homepage
-        return None
-    elif any(site.domain in http_host for site in sites):
-        # Subdomained blog
-        return get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain, blocked=False)
-    else:
-        # Custom domain blog
-        return get_object_or_404(Blog, domain=http_host, blocked=False)
+    for site in sites:
+        if http_host == site.domain:
+            # Homepage
+            return None
+        elif site.domain in http_host:
+            print('Subdomain')
+            # Subdomained blog
+            return get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain, blocked=False)
+        else:
+            # Custom domain blog
+            print('Custom')
+            return get_object_or_404(Blog, Q(domain__contains=http_host), blocked=False)
 
 
 def ping(request):
