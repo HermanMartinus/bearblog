@@ -34,11 +34,17 @@ a {
     border: 0;
 }
 
-.title h1 {
+.title p {
+    color: #222;
     font-size: 1.5em;
+    font-weight: bold;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
 }
 
-.title span {
+.title-bear {
     font-weight: 400;
 }
 
