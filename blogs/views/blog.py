@@ -17,6 +17,7 @@ import tldextract
 
 def resolve_address(request):
     http_host = request.META['HTTP_HOST']
+    print(http_host)
     sites = Site.objects.all()
     if any(http_host == site.domain for site in sites):
         # Homepage
