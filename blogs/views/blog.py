@@ -30,11 +30,7 @@ def resolve_address(request):
 
 
 def ping(request):
-    blog = resolve_address(request)
-    if not blog:
-        raise Http404()
-    else:
-        return HttpResponse('Ping')
+    return HttpResponse('Ping')
 
 
 def home(request):
