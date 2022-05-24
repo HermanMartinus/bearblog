@@ -17,7 +17,9 @@ import tldextract
 
 def resolve_address(request):
     http_host = request.META['HTTP_HOST']
-    print(request.META)
+    if http_host == 'bear-blog.herokuapp.com':
+        http_host = request.META['HTTP_X_FORWARDED_HOST']
+
     sites = Site.objects.all()
     if any(http_host == site.domain for site in sites):
         # Homepage
