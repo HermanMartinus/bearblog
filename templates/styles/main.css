@@ -29,21 +29,6 @@ a {
     /*color: #ff5e6c;*/
 }
 
-.title {
-    text-decoration: none;
-    border: 0;
-}
-
-.title p {
-    color: #222;
-    font-size: 1.5em;
-    font-weight: bold;
-    margin-block-start: 0.67em;
-    margin-block-end: 0.67em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-}
-
 .title-bear {
     font-weight: 400;
 }
@@ -55,10 +40,6 @@ a {
 .bear:hover::before {
     content: "ᕙʕ ಠᴥಠʔᕗ";
     font-weight: 400;
-}
-
-nav a {
-    margin-right: 10px;
 }
 
 textarea,

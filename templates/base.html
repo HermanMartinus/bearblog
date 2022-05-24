@@ -24,21 +24,21 @@
         {% include 'styles/dark_mode.css' %}
       {% endblock %}
       {% endautoescape %} 
-      body:hover {
-        border-image: {% block hitcount %}{% endblock %};
-        border-width: 0;
-      }
+    body:hover {
+      border-image: {% block hitcount %}{% endblock %};
+      border-width: 0;
+    }
   </style>
 </head>
 
 <body>
   <header>
     <a class="title" href="/">
-      <p>
+      <b>
         {% block heading %}
         <span class="title-bear">ʕ•ᴥ•ʔ</span> Bear
         {% endblock %}
-      </p>
+      </b>
     </a>
     <nav>
       {% block nav %}
