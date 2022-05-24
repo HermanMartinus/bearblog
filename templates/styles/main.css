@@ -29,6 +29,18 @@ a {
     /*color: #ff5e6c;*/
 }
 
+.title {
+    text-decoration: none;
+}
+
+.title h1 {
+    font-size: 1.5em;
+}
+
+nav a {
+    margin-right: 10px;
+}
+
 .title-bear {
     font-weight: 400;
 }

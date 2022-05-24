@@ -1,38 +1,14 @@
 {% if blog.external_stylesheet %}
     @import '{{ blog.external_stylesheet }}';
-    header {
-        padding: 0.8em 0 0 0;
-    }
-    
-    header > a {
-        line-height: 1.8em;
-        border: 0;
-        text-decoration: none;
-        font-size: 1.5em;
-    }
-
-    nav a {
-        margin-right: 10px;
-    }
 {% else %}
-    header {
-        padding: 0.8em 0 0 0;
-    }
-
-    header > a {
-        line-height: 1.8em;
-        border: 0;
-        text-decoration: none;
-        font-size: 1.5em;
-    }
-    
-    nav a {
-        margin-right: 10px;
-    }
     {% if not blog.overwrite_styles %}
         {% include 'styles/main.css' %}
         {% include 'styles/dark_mode.css' %}
     {% endif %}
 {% endif %}
+
+nav a {
+    margin-right: 10px;
+}
 
 {{ blog.custom_styles | safe }}
