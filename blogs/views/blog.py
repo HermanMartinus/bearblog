@@ -37,7 +37,10 @@ def resolve_address(request):
 
 
 def ping(request):
-    return HttpResponse('Ping')
+    domain = request.GET.get("domain", None)
+    print(f'Attempting to issue a certificate for {domain}')
+    blog = get_object_or_404(domain=domain)
+    return HttpResponse('Ping', status=200)
 
 
 def home(request):
