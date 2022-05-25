@@ -36,10 +36,12 @@ def resolve_address(request):
         return get_object_or_404(Blog, domain=http_host, blocked=False)
 
 
+@csrf_exempt
 def ping(request):
     domain = request.GET.get("domain", None)
     print(f'Attempting to issue a certificate for {domain}')
     blog = get_object_or_404(Blog, domain=domain)
+    print('Found correct blog. Issuing certificate.')
     return HttpResponse('Ping', status=200)
 
 

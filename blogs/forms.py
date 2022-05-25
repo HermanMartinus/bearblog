@@ -142,9 +142,6 @@ class DomainForm(forms.ModelForm):
         if domain == '':
             return domain
 
-        if not check_dns_connection(domain):
-            raise ValidationError(f"CNAME record for '{domain}' has not been set correctly.")
-
         matching_blogs = Blog.objects.filter(domain=domain)
 
         if self.instance:

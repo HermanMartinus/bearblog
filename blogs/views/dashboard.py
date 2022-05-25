@@ -17,6 +17,7 @@ from ipaddr import client_ip
 import time
 
 from blogs.forms import BlogForm, DomainForm, NavForm, PostForm, StyleForm
+from blogs.helpers import check_dns_connection
 from blogs.models import Blog, Post, Upvote
 
 
@@ -228,6 +229,7 @@ def domain_edit(request):
     return render(request, 'dashboard/domain_edit.html', {
         'form': form,
         'blog': blog,
+        'valid': blog.domain and check_dns_connection(blog.domain),
         'root': blog.useful_domain(),
     })
 
