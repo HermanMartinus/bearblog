@@ -56,6 +56,8 @@ coverage.xml
 local_settings.py
 db.sqlite3
 dev.db
+dev.db.backup
+db.json
 
 # Flask stuff:
 instance/
@@ -105,5 +107,3 @@ venv.bak/
 # mypy
 .mypy_cache/
 .jsbeautifyrc
-
-tasklist.txt

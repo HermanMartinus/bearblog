@@ -1,10 +1,7 @@
 from django.db import models
-from django.db.models.signals import pre_delete
-from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
-from .helpers import delete_domain, add_new_domain
 from taggit.managers import TaggableManager
 
 
@@ -79,18 +76,6 @@ class Post(models.Model):
         super(Post, self).save(*args, **kwargs)
 
 
-class Image(models.Model):
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200, blank=True)
-    optimised_url = models.CharField(max_length=200, blank=True)
-    large_url = models.CharField(max_length=200, blank=True)
-    icon_url = models.CharField(max_length=200, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.title
-
-
 class Upvote(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -107,21 +92,6 @@ class Hit(models.Model):
 
     def __str__(self):
         return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.ip_address} - {self.post}"
-
-
-class Emailer(models.Model):
-    blog = models.OneToOneField(
-        Blog,
-        on_delete=models.CASCADE,
-        primary_key=True,
-    )
-    notify = models.BooleanField(default=False)
-    notification_text = models.TextField(
-        blank=True,
-        default="Hey, I've just published a new post! Check out the link below.")
-
-    def __str__(self):
-        return f"Emailer settings for {self.blog}"
 
 
 class Subscriber(models.Model):

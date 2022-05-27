@@ -8,8 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from blogs.helpers import validate_subscriber_email
-from blogs.models import Blog, Subscriber, Emailer
-from blogs.forms import NotifyForm
+from blogs.models import Blog, Subscriber
 from blogs.views.blog import resolve_address, not_found
 from blogs.views.dashboard import resolve_subdomain
 
@@ -47,29 +46,6 @@ def email_list(request):
     return render(request, "dashboard/subscribers.html", {
         "blog": blog,
         "subscribers": subscribers,
-    })
-
-
-@login_required
-def notification_settings(request):
-    blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
-
-    Emailer.objects.get_or_create(blog=blog)
-
-    if request.method == "POST":
-        form = NotifyForm(request.POST, instance=blog.emailer)
-        if form.is_valid():
-            emailer_info = form.save(commit=False)
-            emailer_info.save()
-            return redirect("/dashboard/subscribers/")
-    else:
-        form = NotifyForm(instance=blog.emailer)
-
-    return render(request, "dashboard/notification_settings.html", {
-        "blog": blog,
-        "form": form
     })
 
 
