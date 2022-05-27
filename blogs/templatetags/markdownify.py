@@ -37,7 +37,7 @@ def markdown(content):
                 new_tag.append(html.escape(str(match.contents[0])))
                 match.replace_with(new_tag)
 
-    host_whitelist = ['www.youtube.com', 'www.slideshare.net', 'player.vimeo.com']
+    host_whitelist = ['www.youtube.com', 'www.slideshare.net', 'player.vimeo.com', 'w.soundcloud.com']
     cleaner = Cleaner(host_whitelist=host_whitelist)
     cleaned_markup = cleaner.clean_html(str(soup))
 
