@@ -229,7 +229,6 @@ def domain_edit(request):
     return render(request, 'dashboard/domain_edit.html', {
         'form': form,
         'blog': blog,
-        'valid': blog.domain and check_dns_connection(blog.domain),
         'root': blog.useful_domain(),
     })
 

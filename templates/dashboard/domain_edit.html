@@ -15,14 +15,6 @@
     {% include '../snippets/upgrade.html' %}
     {% else %}
 
-    {% if valid %}
-    <b>Your domain (<a href="//{{ blog.domain }}" target="_blank">{{ blog.domain }}</a>) is currently active.</b>
-    <hr>
-    {% elif blog.domain %}
-    <b>Your DNS records for {{ blog.domain }} have not been set correctly.</b>
-    <hr>
-    {% endif %}
-
     <h4>Set the following DNS record</h4>
         <table>
             <tr>
