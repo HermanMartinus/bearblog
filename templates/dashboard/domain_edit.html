@@ -24,15 +24,9 @@
                 <th>TTL</th>
             </tr>
             <tr>
-                <td>A</td>
-                <td><small>{your domain}</small></td>
-                <td><small>159.223.204.176</small></td>
-                <td>3600</td>
-            </tr>
-            <tr>
-                <td>AAAA</td>
-                <td><small>{your domain}</small></td>
-                <td><small>2604:a880:4:1d0::30e:7000</small></td>
+                <td>CNAME</td>
+                <td><small>{your domain or subdomain}</small></td>
+                <td><small>domain-proxy.bearblog.dev</small></td>
                 <td>3600</td>
             </tr>
         </table>
@@ -48,6 +42,9 @@
         <p>
             Having issues? More info
             <a href="https://github.com/HermanMartinus/bearblog/wiki/Custom-domains" target="_blank">here</a>.
+        </p>
+        <p>
+            View site: <a href="{{ root }}" target="_blank">{{ root }}</a>
         </p>
     {% endif %}
 </content>
