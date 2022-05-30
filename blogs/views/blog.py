@@ -40,7 +40,7 @@ def resolve_address(request):
             if 'www.' in http_host:
                 return get_object_or_404(Blog, domain=http_host.replace('www.', ''), blocked=False)
             else:
-                return get_object_or_404(domain=f'www.{http_host}', blocked=False)
+                return get_object_or_404(Blog, domain=f'www.{http_host}', blocked=False)
 
 
 @csrf_exempt
