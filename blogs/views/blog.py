@@ -33,7 +33,14 @@ def resolve_address(request):
         return get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain, blocked=False)
     else:
         # Custom domain blog
-        return get_object_or_404(Blog, domain=http_host, blocked=False)
+        try:
+            return Blog.objects.get(domain=http_host, blocked=False)
+        except Blog.DoesNotExist:
+            # Handle www subdomain if necessary
+            if 'www.' in http_host:
+                return get_object_or_404(Blog, domain=http_host.replace('www.', ''), blocked=False)
+            else:
+                return get_object_or_404(domain=f'www.{http_host}', blocked=False)
 
 
 @csrf_exempt
