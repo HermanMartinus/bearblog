@@ -78,6 +78,7 @@ def discover(request):
             .select_related("blog")
             .prefetch_related("upvote_set")[posts_from:posts_to]
         )
+        print(posts.query)
 
     upvoted_posts = []
     for post in posts:
