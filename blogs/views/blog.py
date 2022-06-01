@@ -8,7 +8,7 @@ from django.db.models import Count
 from django.utils import timezone
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_post, get_posts, sanitise_int, unmark
+from blogs.helpers import get_blog_with_domain, get_post, get_posts, sanitise_int, unmark
 
 from ipaddr import client_ip
 from taggit.models import Tag
@@ -33,25 +33,19 @@ def resolve_address(request):
         return get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain, blocked=False)
     else:
         # Custom domain blog
-        try:
-            return Blog.objects.get(domain=http_host, blocked=False)
-        except Blog.DoesNotExist:
-            # Handle www subdomain if necessary
-            if 'www.' in http_host:
-                return get_object_or_404(Blog, domain=http_host.replace('www.', ''), blocked=False)
-            else:
-                return get_object_or_404(Blog, domain=f'www.{http_host}', blocked=False)
+        return get_blog_with_domain(http_host)
 
 
 @csrf_exempt
 def ping(request):
     domain = request.GET.get("domain", None)
     print(f'Attempting to issue a certificate for {domain}')
-    if domain:
-        blog = get_object_or_404(Blog, domain=domain)
+
+    if get_blog_with_domain(domain):
         print('Found correct blog. Issuing certificate.')
         return HttpResponse('Ping', status=200)
     else:
+        print(f'Could not find blog with domain {domain}')
         return Http404()
 
 

@@ -1,6 +1,7 @@
 import bleach
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 import requests
 import hashlib
@@ -12,6 +13,8 @@ from markdown import Markdown
 from io import StringIO
 from _datetime import timedelta
 
+from blogs.models import Blog
+
 
 def root(subdomain=''):
     domain = Site.objects.get_current().domain
@@ -19,6 +22,19 @@ def root(subdomain=''):
         return f"{domain}"
     else:
         return f"{subdomain}.{domain}"
+
+
+def get_blog_with_domain(domain):
+    if not domain:
+        return False
+    try:
+        return Blog.objects.get(domain=domain, blocked=False)
+    except Blog.DoesNotExist:
+        # Handle www subdomain if necessary
+        if 'www.' in domain:
+            return get_object_or_404(Blog, domain=domain.replace('www.', ''), blocked=False)
+        else:
+            return get_object_or_404(Blog, domain=f'www.{domain}', blocked=False)
 
 
 def get_posts(all_posts):
