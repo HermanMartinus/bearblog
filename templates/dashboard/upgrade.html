@@ -14,6 +14,13 @@
     {% include '../snippets/upgrade.html' %}
     {% else %}
     <h3>You've already upgraded your Bear account! \ʕ•ᴥ•ʔ/</h3>
+    <p>
+        If you'd like you can make another
+        <a href="https://bear.lemonsqueezy.com/checkout/buy/4aca490f-f6a2-4d62-81d6-75f2cd034961?discount=0&embed=1&checkout[custom][blog]={{blog.subdomain}}" class="lemonsqueezy-button">
+            once-off contribution
+        </a>.
+    </p>
     {% endif %}
 </content>
+<script src="https://app.lemonsqueezy.com/js/checkout.js" defer></script>
 {% endblock %}
