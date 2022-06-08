@@ -3,6 +3,7 @@ import mistune
 import html
 from bs4 import BeautifulSoup as html_parser
 from lxml.html.clean import Cleaner
+import lxml
 from slugify import slugify
 
 register = template.Library()
@@ -37,8 +38,11 @@ def markdown(content):
                 new_tag.append(html.escape(str(match.contents[0])))
                 match.replace_with(new_tag)
 
+    safe_attrs = list(lxml.html.clean.defs.safe_attrs) + ['style', 'controls']
+    lxml.html.clean.defs.safe_attrs = safe_attrs
+    lxml.html.clean.Cleaner.safe_attrs = lxml.html.clean.defs.safe_attrs
     host_whitelist = ['www.youtube.com', 'www.slideshare.net', 'player.vimeo.com', 'w.soundcloud.com']
-    cleaner = Cleaner(host_whitelist=host_whitelist)
+    cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
     cleaned_markup = cleaner.clean_html(str(soup))
 
     # TODO: add 'sandbox' attribute to all iframes
