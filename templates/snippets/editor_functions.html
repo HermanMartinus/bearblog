@@ -51,25 +51,7 @@
     {% else %}
     document.querySelector('#upload-image').onclick = event => {
         event.preventDefault()
-        if (confirm(`
-Hey, Herman here ʕ •ᴥ•ʔゝ
-
-Most “free” websites subsist by displaying ads or selling user data. That, however, would be against the spirit of the Bear project. 
-In order to keep the servers running and the coffee hot, I've decided to charge for the most resource-intensive parts of the project:
-
-- Custom domains (this is time-consuming)
-- Image uploading (due to the cost of hosting images)
-- Email subscriber lists (since it gets complicated)
-- Beta features (since they aren't ready yet)
-
-You can support the project on an on-going basis or make a once-off contribution.
-
-(Click OK below to upgrade)
-
-Keep the tiny internet awesome! \ʕ•ᴥ•ʔ/
-        `)) {
-            window.open('https://bear.lemonsqueezy.com/checkout/buy/4aca490f-f6a2-4d62-81d6-75f2cd034961?media=0&name=0&checkout[custom][blog]={{blog.subdomain}}')
-        }
+        window.open('/dashboard/upgrade/')
     }
     {% endif %}
 </script>
