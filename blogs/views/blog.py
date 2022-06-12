@@ -150,6 +150,7 @@ def post(request, slug):
             'content': post.content,
             'post': post,
             'root': blog.useful_domain(),
+            'full_path': f'{blog.useful_domain()}/{post.slug}',
             'meta_description': meta_description,
             'meta_image': post.meta_image or blog.meta_image,
             'upvoted': upvoted
