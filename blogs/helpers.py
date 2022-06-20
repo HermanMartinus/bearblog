@@ -241,7 +241,7 @@ def validate_subscriber_email(email, blog):
     send_mail(
         'Confirm your email address',
         text_message,
-        'subscriptions@bearblog.dev',
+        'no_reply@bearblog.dev',
         [email],
         fail_silently=False,
         html_message=html_message,

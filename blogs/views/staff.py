@@ -38,22 +38,22 @@ def approve(request, pk):
     blog.save()
     if not request.GET.get("no-email", ""):
         send_mail(
-            'Some blogging extras 🐻',
+            "Your blog has been reviewed",
             f'''
-Hey, welcome to your "bear" blogging experience!
+Hey, Herman here :)
 
-I'm Herman, the creator and maintainer of Bear.
+I've just finished reviewing your blog. It looks good and has been approved.
 
-I've built Bear to be open-source, community centric, and awesome.
-If you're keen to support the project you can do that here: https://bearblog.dev/contribute/
+If you're keen to support the project you can do that in your dashboard: https://bearblog.dev/dashboard/upgrade/
 
-Supporters will receive access to features like email capture, custom domains, and image uploading.
+This will give you access to features like email capture, custom domains, and image uploading.
 
-Have an awesome week!
+Have an great week!
 
 Herman
+Creator and maintainer of Bear
             ''',
-            'Herman at Bear Blog <hi@bearblog.dev>',
+            'Herman Martinus <herman@bearblog.dev>',
             [blog.user.email]
         )
     return redirect('review_flow')
