@@ -50,7 +50,6 @@ def get_post(all_posts, slug):
 
 def sanitise_int(input, length):
     try:
-        print(len(input))
         if len(input) < length:
             return int(bleach.clean(input))
         else:
@@ -84,28 +83,6 @@ def is_protected(subdomain):
     return subdomain in protected_subdomains
 
 
-def add_new_domain(domain):
-    url = "https://api.heroku.com/apps/bear-blog/domains"
-
-    payload = {
-        "hostname": domain,
-        "sni_endpoint": "saurolophus-08033"
-    }
-
-    headers = {
-        'content-type': "application/json",
-        'accept': "application/vnd.heroku+json; version=3",
-        'authorization': f'Bearer {settings.HEROKU_BEARER_TOKEN}',
-    }
-
-    response = requests.request(
-        "POST", url, data=json.dumps(payload), headers=headers)
-
-    print(response.text)
-
-    return id
-
-
 def check_records(domain):
     if not domain:
         return
@@ -113,7 +90,7 @@ def check_records(domain):
     return ('look-for-the-bear-necessities' in str(verification_string))
 
 
-def check_dns_connection(domain):
+def check_connection(domain):
     if not domain:
         return
     try:
@@ -122,25 +99,6 @@ def check_dns_connection(domain):
         return ('look-for-the-bear-necessities' in response.text or 'Heroku' in response.text)
     except requests.exceptions.ConnectionError:
         return False
-
-
-def delete_domain(domain):
-    url = f"https://api.heroku.com/apps/bear-blog/domains/{domain}"
-
-    payload = {
-        "hostname": domain
-    }
-
-    headers = {
-        'content-type': "application/json",
-        'accept': "application/vnd.heroku+json; version=3",
-        'authorization': f'Bearer {settings.HEROKU_BEARER_TOKEN}',
-    }
-
-    response = requests.request(
-        "DELETE", url, data=json.dumps(payload), headers=headers)
-
-    print(response.text)
 
 
 def unmark_element(element, stream=None):

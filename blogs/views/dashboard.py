@@ -17,7 +17,6 @@ from ipaddr import client_ip
 import time
 
 from blogs.forms import BlogForm, DomainForm, NavForm, PostForm, StyleForm
-from blogs.helpers import check_dns_connection
 from blogs.models import Blog, Post, Upvote
 
 
