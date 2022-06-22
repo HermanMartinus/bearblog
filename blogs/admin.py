@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from .models import Blog, Post, Upvote, Hit, Subscriber
 from django.utils.html import escape, format_html
-from blogs.helpers import check_records, root
+from blogs.helpers import root
 from django.urls import reverse
 
 
@@ -102,15 +102,6 @@ class BlogAdmin(admin.ModelAdmin):
             print(f"Blocked {blog} and banned {blog.user}")
 
     block_blog.short_description = "Block selected blogs"
-
-    def validate_domains(self, request, queryset):
-        for blog in queryset:
-            check_records(blog.domain)
-            blog.domain = None
-            blog.save()
-            print(f"Removed domain of {blog}")
-
-    validate_domains.short_description = "Validate domain records"
 
     actions = ['approve_blog', 'block_blog', 'validate_domains', 'unsubscribe']
 
