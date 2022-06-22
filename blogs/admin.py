@@ -112,14 +112,6 @@ class BlogAdmin(admin.ModelAdmin):
 
     validate_domains.short_description = "Validate domain records"
 
-    def unsubscribe(self, request, queryset):
-        for blog in queryset:
-            blog.subscribed = False
-            blog.save()
-            print(f"Unsubscribed {blog.user}")
-
-    unsubscribe.short_description = "Unsubscribe user"
-
     actions = ['approve_blog', 'block_blog', 'validate_domains', 'unsubscribe']
 
 

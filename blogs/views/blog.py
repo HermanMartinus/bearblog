@@ -158,19 +158,6 @@ def post(request, slug):
     )
 
 
-def challenge(request, challenge):
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
-
-    print(challenge)
-    print(blog.challenge)
-    if challenge == blog.challenge.split('.')[0]:
-        return HttpResponse(blog.challenge)
-    else:
-        raise Http404()
-
-
 @csrf_exempt
 def lemon_webhook(request):
     data = json.loads(request.body, strict=False)
@@ -179,16 +166,16 @@ def lemon_webhook(request):
         subdomain = str(data['meta']['custom_data']['blog'])
         blog = get_object_or_404(Blog, subdomain=subdomain)
         print('Found subdomain, upgrading blog...')
-        blog.reviewed = True
-        blog.upgraded = True
-        blog.save()
     except KeyError:
         email = str(data['data']['attributes']['user_email'])
         blog = Blog.objects.get(user__email=email)
         print('Found email address, upgrading blog...')
-        blog.reviewed = True
-        blog.upgraded = True
-        blog.save()
+
+    blog.reviewed = True
+    blog.upgraded = True
+    blog.upgraded_date = timezone.now()
+    blog.save()
+
     return HttpResponse(f'Upgraded {blog}')
 
 

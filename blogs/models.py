@@ -11,7 +11,7 @@ class Blog(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
-    challenge = models.CharField(max_length=128, blank=True)
+
     nav = models.CharField(max_length=500, default="[Home](/)\n[Blog](/blog/)", blank=True)
     content = models.TextField(default="Hello World!", blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
@@ -20,8 +20,8 @@ class Blog(models.Model):
 
     reviewed = models.BooleanField(default=False)
     upgraded = models.BooleanField(default=False)
+    upgraded_date = models.DateTimeField(blank=True, null=True)
     blocked = models.BooleanField(default=False)
-    subscribed = models.BooleanField(default=True)
 
     external_stylesheet = models.CharField(max_length=255, blank=True)
     custom_styles = models.TextField(blank=True)

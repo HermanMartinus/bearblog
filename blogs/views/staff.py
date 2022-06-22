@@ -3,10 +3,7 @@ from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from blogs.templatetags.markdownify import markdown
 from blogs.models import Blog
-from blogs.helpers import bulk_email
-import djqscsv
 
 
 @staff_member_required

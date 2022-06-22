@@ -30,7 +30,6 @@ urlpatterns = [
     path('discover/', discover.discover, name='discover'),
     path('discover/feed/', discover.feed, name='discover_feed'),
 
-    path('.well-known/acme-challenge/<challenge>', blog.challenge, name='challenge'),
     path('lemon-webhook/', blog.lemon_webhook, name='lemon_webhook'),
 
     path('ping/', blog.ping, name='ping'),

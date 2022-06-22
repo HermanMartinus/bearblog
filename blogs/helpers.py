@@ -195,29 +195,6 @@ def send_mass_html_mail(datatuple, fail_silently=False, user=None, password=None
     return connection.send_messages(messages)
 
 
-def bulk_email(queryset, subject, body):
-    recipient_list = queryset.filter(subscribed=True).values_list('user__email', flat=True)
-    messages = [(
-        subject,
-        f'{body}\n\n\nUnsubscribe: https://bearblog.dev/bulk_mail_unsubscribe/{recipient}',
-        f'''{body}
-        <br>
-        <p style="text-align: center">
-            <small>
-                <a href="https://bearblog.dev/">
-                    ʕ•ᴥ•ʔ Bear
-                </a> |
-                <a href="https://bearblog.dev/bulk_mail_unsubscribe/{recipient}">
-                    Unsubscribe
-                </a>
-            </small>
-        </p>''',
-        'hi@bearblog.dev',
-        [recipient]
-    ) for recipient in recipient_list]
-    send_mass_html_mail(messages)
-
-
 def validate_subscriber_email(email, blog):
     token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()
     confirmation_link = f'{blog.useful_domain()}/confirm-subscription/?token={token}&email={email}'
