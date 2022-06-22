@@ -1,0 +1,27 @@
+<small>
+    <form action="/upvote/{{ post.pk }}/" method="post" style="display: inline">
+        <input hidden name="pk" value="{{ post.pk }}" style="display:none"/>
+        <input hidden name="title" style="display:none"/>
+        {% csrf_token %}
+        {% if upvoted %}
+        <button disabled=true>▵ Toasted</button>
+        {% else %}
+        <button>▵ Toast this post</button>
+        {% endif %}
+    </form>
+    - <small>{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</small>
+</small>
+<script>
+    document.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        fetch(form.action, {
+            method: form.method,
+            body: new FormData(form),
+        });
+        const button = form.querySelector('button')
+        button.disabled = true
+        button.innerText = "▵ Toasted"
+        
+    });
+</script>

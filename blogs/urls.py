@@ -34,6 +34,7 @@ urlpatterns = [
 
     path('ping/', blog.ping, name='ping'),
     path('blog/', blog.posts, name='posts'),
+    path('upvote/<pk>/', blog.upvote, name='upvote'),
     path('subscribe/', emailer.subscribe, name='subscribe'),
     path('confirm-subscription/', emailer.confirm_subscription, name='confirm_subscription'),
     path('hit/<pk>/', analytics.post_hit, name='post_hit'),

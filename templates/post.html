@@ -90,18 +90,7 @@ url("/hit/{{ post.pk }}")
 </p>
 
 {% if post.show_in_feed %}
-<small>
-    <form action="" method="post" style="display: inline">
-        <input hidden name="pk" value="{{ post.pk }}" style="display:none"/>
-        {% csrf_token %}
-        {% if upvoted %}
-        <button disabled=true>▵ Toasted</button>
-        {% else %}
-        <button>▵ Toast this post</button>
-        {% endif %}
-    </form>
-    - <small>{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</small>
-</small>
+{% include 'snippets/upvote_form.html' with post=post %}
 {% endif %}
 {% endblock %}
 

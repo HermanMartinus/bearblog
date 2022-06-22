@@ -116,16 +116,6 @@ def post(request, slug):
 
     ip_address = client_ip(request)
 
-    if request.method == "POST":
-        if request.POST.get("pk", ""):
-            # Upvoting
-            pk = sanitise_int(request.POST.get("pk", ""), 7)
-            post = get_object_or_404(Post, pk=pk)
-            posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
-            if len(posts_upvote_dupe) == 0:
-                upvote = Upvote(post=post, ip_address=ip_address)
-                upvote.save()
-
     if request.GET.get('preview'):
         all_posts = blog.post_set.annotate(
             upvote_count=Count('upvote')).all().order_by('-published_date')
@@ -156,6 +146,20 @@ def post(request, slug):
             'upvoted': upvoted
         }
     )
+
+
+def upvote(request, pk):
+    ip_address = client_ip(request)
+    if pk == request.POST.get("pk", "") and not request.POST.get("title", False):
+        pk = sanitise_int(pk, 7)
+        post = get_object_or_404(Post, pk=pk)
+        posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
+        if len(posts_upvote_dupe) == 0:
+            upvote = Upvote(post=post, ip_address=ip_address)
+            upvote.save()
+            return HttpResponse(f'Upvoted {post.title}')
+        raise Http404('Duplicate upvote')
+    raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
 
 @csrf_exempt
