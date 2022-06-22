@@ -39,17 +39,9 @@
                         ({{ post.blog.useful_domain }})
                     </a>
                     <br>
-                    <form action="" method="post" style="display: inline">
-                        <input hidden name="pk" value="{{ post.pk }}" />
-                        {% csrf_token %}
-                        {% if post.pk in upvoted_posts%}
-                        <button disabled=true>▵ Toasted</button>
-                        {% else %}
-                        <button>▵ Toast this post</button>
-                        {% endif %}
-                    </form>
-                    <small>- {{ post.upvote_count }} toasts</small>
-                    <small>({{ post.published_date|timesince }} ago)</small>
+                    <small>Published {{ post.published_date|timesince }} ago</small>
+                    -
+                    <small><b>{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</b></small>
                 </small>
             </div>
         </li>

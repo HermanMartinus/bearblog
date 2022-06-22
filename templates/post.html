@@ -90,7 +90,7 @@ url("/hit/{{ post.pk }}")
 </p>
 
 {% if post.show_in_feed %}
-{% include 'snippets/upvote_form.html' with post=post %}
+{% include 'snippets/upvote_form.html' with post=post upvoted=upvoted %}
 {% endif %}
 {% endblock %}
 
