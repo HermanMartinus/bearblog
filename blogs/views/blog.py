@@ -1,3 +1,4 @@
+import hashlib
 import json
 from django.http import HttpResponse
 from django.http.response import Http404
@@ -114,8 +115,6 @@ def post(request, slug):
     if not blog:
         return not_found(request)
 
-    ip_address = client_ip(request)
-
     if request.GET.get('preview'):
         all_posts = blog.post_set.annotate(
             upvote_count=Count('upvote')).all().order_by('-published_date')
@@ -125,9 +124,12 @@ def post(request, slug):
 
     post = get_post(all_posts, slug)
 
+    # Check if upvoted
+    ip_address = client_ip(request)
+    ip_hash = hashlib.md5(f"{ip_address}-{timezone.now().year}".encode('utf-8')).hexdigest()
     upvoted = False
     for upvote in post.upvote_set.all():
-        if upvote.ip_address == ip_address:
+        if upvote.ip_address == ip_hash or upvote.ip_address == ip_address:
             upvoted = True
 
     meta_description = post.meta_description or unmark(post.content)[:160]
@@ -149,13 +151,14 @@ def post(request, slug):
 
 
 def upvote(request, pk):
-    ip_address = client_ip(request)
+    ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().year}".encode('utf-8')).hexdigest()
+
     if pk == request.POST.get("pk", "") and not request.POST.get("title", False):
         pk = sanitise_int(pk, 7)
         post = get_object_or_404(Post, pk=pk)
-        posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
+        posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_hash)
         if len(posts_upvote_dupe) == 0:
-            upvote = Upvote(post=post, ip_address=ip_address)
+            upvote = Upvote(post=post, ip_address=ip_hash)
             upvote.save()
             return HttpResponse(f'Upvoted {post.title}')
         raise Http404('Duplicate upvote')
