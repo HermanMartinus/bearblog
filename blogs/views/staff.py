@@ -35,20 +35,14 @@ def approve(request, pk):
     blog.save()
     if not request.GET.get("no-email", ""):
         send_mail(
-            "Your blog has been reviewed",
+            "I've just reviewed your blog",
             f'''
-Hey, Herman here :)
+Hey, I've just reviewed your blog. It looks good and has been approved. 
 
-I've just finished reviewing your blog. It looks good and has been approved.
-
-If you're keen to support the project you can do that in your dashboard: https://bearblog.dev/dashboard/upgrade/
-
-This will give you access to features like email capture, custom domains, and image uploading.
+If you're keen you can upgrade your blog and support the project here: https://bearblog.dev/dashboard/upgrade/
 
 Have an great week!
-
 Herman
-Creator and maintainer of Bear
             ''',
             'Herman Martinus <herman@bearblog.dev>',
             [blog.user.email]
