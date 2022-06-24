@@ -69,14 +69,10 @@ def discover(request):
         posts = (
             Post.objects.annotate(
                 upvote_count=Count("upvote"),
-                rating=ExpressionWrapper(
-                    (
+                rating=(
                         (Log(Count("upvote"), 10))
                         / ((Seconds(Now() - F("published_date"))) + 4) ** gravity
                     )
-                    * 100000,
-                    output_field=FloatField(),
-                ),
             )
             .filter(
                 publish=True,
