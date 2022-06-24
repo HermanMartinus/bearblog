@@ -84,6 +84,7 @@ def discover(request):
                 blog__blocked=False,
                 show_in_feed=True,
                 published_date__lte=timezone.now(),
+                upvote_count__gt=1
             )
             .order_by("-rating", "-published_date")
             .select_related("blog")
