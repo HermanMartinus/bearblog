@@ -1,8 +1,10 @@
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from taggit.managers import TaggableManager
+from math import log10
 
 
 class Blog(models.Model):
@@ -64,6 +66,9 @@ class Post(models.Model):
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
 
+    upvotes = models.IntegerField(default=0)
+    score = models.FloatField(default=0)
+
     @property
     def contains_code(self):
         return "```" in self.content
@@ -74,6 +79,27 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         self.slug = self.slug.lower()
         super(Post, self).save(*args, **kwargs)
+
+    def update_score(self):
+
+        if self.upvotes == 0:
+            self.upvotes = len(self.upvote_set.all())
+
+        if self.upvotes > 1:
+            log_of_upvotes = log10(self.upvotes)
+
+            seconds = self.published_date.timestamp()
+            if seconds > 0:
+                print(f"Seconds: {(seconds - 1134028003) / (7 * 8600)}")
+                print(f"Upvotes: {log_of_upvotes}")
+                score = log_of_upvotes + (seconds - 1134028003) / (30 * 8600)
+                self.score = score
+                print(f"Score: {score}")
+
+                print("---")
+
+                self.save()
+        return
 
 
 class Upvote(models.Model):

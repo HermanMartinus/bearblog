@@ -116,9 +116,16 @@ class PostAdmin(admin.ModelAdmin):
 
     upvote_count.short_description = ('Upvotes')
 
+    def update_score(self, request, queryset):
+        for post in queryset:
+            post.update_score()
+
+    update_score.short_description = "Update post score"
+
     list_display = ('title', 'blog', 'upvote_count', 'published_date')
     search_fields = ('title', 'blog__title')
     ordering = ('-published_date',)
+    actions = ['update_score']
 
 
 admin.site.register(Upvote)

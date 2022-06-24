@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
@@ -20,16 +21,6 @@ posts_per_page = 20
 
 @csrf_exempt
 def discover(request):
-    ip_address = client_ip(request)
-
-    if request.method == "POST":
-        pk = sanitise_int(request.POST.get("pk", ""), 7)
-        post = get_object_or_404(Post, pk=pk)
-        posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_address)
-        if len(posts_upvote_dupe) == 0:
-            upvote = Upvote(post=post, ip_address=ip_address)
-            upvote.save()
-
     page = 0
 
     if request.GET.get("page", 0):
@@ -39,6 +30,7 @@ def discover(request):
     posts_to = (page * posts_per_page) + posts_per_page
 
     newest = request.GET.get("newest")
+    top = request.GET.get("top")
     if newest:
         posts = (
             Post.objects.annotate(
@@ -54,11 +46,28 @@ def discover(request):
             .order_by("-published_date")
             .select_related("blog")[posts_from:posts_to]
         )
-    else:
+    elif top:
         posts = (
             Post.objects.annotate(
                 upvote_count=Count("upvote"),
-                score=ExpressionWrapper(
+            )
+            .filter(
+                publish=True,
+                blog__reviewed=True,
+                blog__blocked=False,
+                show_in_feed=True,
+                published_date__lte=timezone.now(),
+            )
+            .order_by("-score", "-published_date")
+            .select_related("blog")
+            .prefetch_related("upvote_set")[posts_from:posts_to]
+        )
+    else:
+        # Trending
+        posts = (
+            Post.objects.annotate(
+                upvote_count=Count("upvote"),
+                rating=ExpressionWrapper(
                     (
                         (Count("upvote") - 1)
                         / ((Seconds(Now() - F("published_date"))) + 4) ** gravity
@@ -74,17 +83,10 @@ def discover(request):
                 show_in_feed=True,
                 published_date__lte=timezone.now(),
             )
-            .order_by("-score", "-published_date")
+            .order_by("-rating", "-published_date")
             .select_related("blog")
             .prefetch_related("upvote_set")[posts_from:posts_to]
         )
-        print(posts.query)
-
-    upvoted_posts = []
-    for post in posts:
-        for upvote in post.upvote_set.all():
-            if upvote.ip_address == ip_address:
-                upvoted_posts.append(post.pk)
 
     return render(request, "discover.html", {
             "site": Site.objects.get_current(),
@@ -94,7 +96,6 @@ def discover(request):
             "posts_from": posts_from,
             "gravity": gravity,
             "newest": newest,
-            "upvoted_posts": upvoted_posts,
         },
     )
 
@@ -130,7 +131,7 @@ def feed(request):
         all_posts = (
             Post.objects.annotate(
                 upvote_count=Count("upvote"),
-                score=ExpressionWrapper(
+                rating=ExpressionWrapper(
                     (
                         (Count("upvote") - 1)
                         / ((Seconds(Now() - F("published_date"))) + 4) ** gravity
@@ -146,7 +147,7 @@ def feed(request):
                 show_in_feed=True,
                 published_date__lte=timezone.now(),
             )
-            .order_by("-score", "-published_date")
+            .order_by("-rating", "-published_date")
             .select_related("blog")
             .prefetch_related("upvote_set")[0:posts_per_page]
         )
