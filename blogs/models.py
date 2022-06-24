@@ -90,7 +90,7 @@ class Post(models.Model):
 
             seconds = self.published_date.timestamp()
             if seconds > 0:
-                score = log_of_upvotes + (seconds - 1134028003) / (90 * 8600)
+                score = log_of_upvotes + (seconds - 1134028003) / (180 * 8600)
                 self.score = score
 
                 self.save()
