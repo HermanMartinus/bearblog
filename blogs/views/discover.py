@@ -65,6 +65,30 @@ def discover(request):
             .select_related("blog")
             .prefetch_related("upvote_set")[posts_from:posts_to]
         )
+    elif request.GET.get('test', False):
+        posts = (
+            Post.objects.annotate(
+                upvote_count=Count("upvote"),
+                rating=ExpressionWrapper(
+                    (
+                        (Log(Count("upvote"), 10))
+                        / ((Seconds(Now() - F("published_date"))) + 4) ** gravity
+                    )
+                    * 100000,
+                    output_field=FloatField(),
+                ),
+            )
+            .filter(
+                publish=True,
+                blog__reviewed=True,
+                blog__blocked=False,
+                show_in_feed=True,
+                published_date__lte=timezone.now(),
+            )
+            .order_by("-rating", "-published_date")
+            .select_related("blog")
+            .prefetch_related("upvote_set")[posts_from:posts_to]
+        )
     else:
         # Trending
         posts = (
