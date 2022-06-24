@@ -160,6 +160,7 @@ def upvote(request, pk):
         if len(posts_upvote_dupe) == 0:
             upvote = Upvote(post=post, ip_address=ip_hash)
             upvote.save()
+            post.update_score()
             return HttpResponse(f'Upvoted {post.title}')
         raise Http404('Duplicate upvote')
     raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")

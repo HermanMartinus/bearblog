@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from taggit.managers import TaggableManager
-from math import log10
+from math import log
 
 
 class Blog(models.Model):
@@ -82,21 +82,15 @@ class Post(models.Model):
 
     def update_score(self):
 
-        if self.upvotes == 0:
-            self.upvotes = len(self.upvote_set.all())
+        self.upvotes = len(self.upvote_set.all())
 
         if self.upvotes > 1:
-            log_of_upvotes = log10(self.upvotes)
+            log_of_upvotes = log(self.upvotes, 10)
 
             seconds = self.published_date.timestamp()
             if seconds > 0:
-                print(f"Seconds: {(seconds - 1134028003) / (7 * 8600)}")
-                print(f"Upvotes: {log_of_upvotes}")
-                score = log_of_upvotes + (seconds - 1134028003) / (30 * 8600)
+                score = (log_of_upvotes) + ((seconds - 1577811600) / (14 * 86400))
                 self.score = score
-                print(f"Score: {score}")
-
-                print("---")
 
                 self.save()
         return

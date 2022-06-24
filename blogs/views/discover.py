@@ -3,6 +3,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, ExpressionWrapper, F, FloatField
+from django.db.models.functions import Log
 from django.utils import timezone
 from django.db.models.functions import Now
 from django.contrib.sites.models import Site
@@ -22,6 +23,8 @@ posts_per_page = 20
 @csrf_exempt
 def discover(request):
     page = 0
+    gravity = float(request.GET.get("gravity", 1.2))
+    log_base = float(request.GET.get("log_base", 10))
 
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
@@ -30,7 +33,6 @@ def discover(request):
     posts_to = (page * posts_per_page) + posts_per_page
 
     newest = request.GET.get("newest")
-    top = request.GET.get("top")
     if newest:
         posts = (
             Post.objects.annotate(
@@ -46,7 +48,7 @@ def discover(request):
             .order_by("-published_date")
             .select_related("blog")[posts_from:posts_to]
         )
-    elif top:
+    elif request.GET.get("top"):
         posts = (
             Post.objects.annotate(
                 upvote_count=Count("upvote"),
@@ -62,6 +64,23 @@ def discover(request):
             .select_related("blog")
             .prefetch_related("upvote_set")[posts_from:posts_to]
         )
+    elif request.GET.get('sandbox', False):
+        posts = (
+            Post.objects.annotate(
+                upvote_count=Count("upvote"),
+            )
+            .filter(
+                publish=True,
+                blog__reviewed=True,
+                blog__blocked=False,
+                show_in_feed=True,
+                published_date__lte=timezone.now(),
+                upvote_count__gt=1
+            )
+            .order_by("-score", "-published_date")
+            .select_related("blog")
+            .prefetch_related("upvote_set")[posts_from:posts_to]
+        )
     else:
         # Trending
         posts = (
@@ -69,7 +88,7 @@ def discover(request):
                 upvote_count=Count("upvote"),
                 rating=ExpressionWrapper(
                     (
-                        (Count("upvote") - 1)
+                        (Count("upvote"))
                         / ((Seconds(Now() - F("published_date"))) + 4) ** gravity
                     )
                     * 100000,
