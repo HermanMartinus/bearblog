@@ -22,6 +22,7 @@ posts_per_page = 20
 @csrf_exempt
 def discover(request):
     page = 0
+    gravity = request.GET.get("gravity", gravity)
 
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
@@ -31,6 +32,7 @@ def discover(request):
 
     newest = request.GET.get("newest")
     top = request.GET.get("top")
+
     if newest:
         posts = (
             Post.objects.annotate(
