@@ -3,7 +3,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, ExpressionWrapper, F, FloatField
-from django.db.models.functions import Log
+from django.db.models.functions import Ln
 from django.utils import timezone
 from django.db.models.functions import Now
 from django.contrib.sites.models import Site
@@ -71,9 +71,9 @@ def discover(request):
                 upvote_count=Count("upvote"),
                 rating=ExpressionWrapper(
                         (
-                            (Log(Count("upvote"), 10, output_field=FloatField()))
-                            / ExpressionWrapper((Seconds(Now() - F("published_date"))) + 4,  output_field=FloatField()) ** gravity
-                        ),
+                            (Ln(Count("upvote")))
+                            / (Seconds(Now() - F("published_date")) + 4) ** gravity
+                        ) * 100000,
                         output_field=FloatField()
                     )
                 )
