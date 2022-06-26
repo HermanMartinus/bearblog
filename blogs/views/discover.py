@@ -23,8 +23,8 @@ posts_per_page = 20
 @csrf_exempt
 def discover(request):
     page = 0
-    gravity = request.GET.get("gravity", 1.2)
-    log_base = request.GET.get("log_base", 10)
+    gravity = float(request.GET.get("gravity", 1.2))
+    log_base = float(request.GET.get("log_base", 10))
 
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
@@ -71,7 +71,7 @@ def discover(request):
                 rating=ExpressionWrapper(
                         (
                             (Log(Count("upvote"), log_base))
-                            / (Seconds(Now() - F("published_date")) + 4) ** gravity
+                            / ((Seconds(Now() - F("published_date"))) + 4) ** gravity
                         ),
                         output_field=FloatField()
                     )
