@@ -3,7 +3,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, ExpressionWrapper, F, FloatField
-from django.db.models.functions import Ln
+from django.db.models.functions import Log
 from django.utils import timezone
 from django.db.models.functions import Now
 from django.contrib.sites.models import Site
@@ -24,6 +24,7 @@ posts_per_page = 20
 def discover(request):
     page = 0
     gravity = request.GET.get("gravity", 1.2)
+    log_base = request.GET.get("log_base", 10)
 
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
@@ -32,8 +33,6 @@ def discover(request):
     posts_to = (page * posts_per_page) + posts_per_page
 
     newest = request.GET.get("newest")
-    top = request.GET.get("top")
-
     if newest:
         posts = (
             Post.objects.annotate(
@@ -49,7 +48,7 @@ def discover(request):
             .order_by("-published_date")
             .select_related("blog")[posts_from:posts_to]
         )
-    elif top:
+    elif request.GET.get("top"):
         posts = (
             Post.objects.annotate(
                 upvote_count=Count("upvote"),
@@ -65,13 +64,13 @@ def discover(request):
             .select_related("blog")
             .prefetch_related("upvote_set")[posts_from:posts_to]
         )
-    elif request.GET.get('test', False):
+    elif request.GET.get('sandbox', False):
         posts = (
             Post.objects.annotate(
                 upvote_count=Count("upvote"),
                 rating=ExpressionWrapper(
                         (
-                            (Ln(Count("upvote")))
+                            (Log(Count("upvote"), log_base, output_field=FloatField()))
                             / (Seconds(Now() - F("published_date")) + 4) ** gravity
                         ) * 100000,
                         output_field=FloatField()
