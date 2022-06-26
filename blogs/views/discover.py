@@ -66,20 +66,15 @@ def discover(request):
         )
     elif request.GET.get('sandbox', False):
         posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-            )
-            .filter(
+            Post.objects.filter(
                 publish=True,
                 blog__reviewed=True,
                 blog__blocked=False,
                 show_in_feed=True,
-                published_date__lte=timezone.now(),
-                upvote_count__gt=1
+                published_date__lte=timezone.now()
             )
             .order_by("-score", "-published_date")
-            .select_related("blog")
-            .prefetch_related("upvote_set")[posts_from:posts_to]
+            .select_related("blog")[posts_from:posts_to]
         )
     else:
         # Trending
