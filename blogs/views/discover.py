@@ -70,7 +70,7 @@ def discover(request):
                 upvote_count=Count("upvote"),
                 rating=ExpressionWrapper(
                         (
-                            (Log(Count("upvote"), log_base))
+                            (Log(Count("upvote"), log_base, output_field=FloatField()))
                             / ((Seconds(Now() - F("published_date"))) + 4) ** gravity
                         ),
                         output_field=FloatField()
