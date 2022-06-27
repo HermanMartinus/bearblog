@@ -64,20 +64,7 @@ def discover(request):
             .select_related("blog")
             .prefetch_related("upvote_set")[posts_from:posts_to]
         )
-    elif request.GET.get('sandbox', False):
-        posts = (
-            Post.objects.filter(
-                publish=True,
-                blog__reviewed=True,
-                blog__blocked=False,
-                show_in_feed=True,
-                published_date__lte=timezone.now()
-            )
-            .order_by("-score", "-published_date")
-            .select_related("blog")[posts_from:posts_to]
-        )
-    else:
-        # Trending
+    elif request.GET.get('old', False):
         posts = (
             Post.objects.annotate(
                 upvote_count=Count("upvote"),
@@ -100,6 +87,19 @@ def discover(request):
             .order_by("-rating", "-published_date")
             .select_related("blog")
             .prefetch_related("upvote_set")[posts_from:posts_to]
+        )
+    else:
+        # Trending
+        posts = (
+            Post.objects.filter(
+                publish=True,
+                blog__reviewed=True,
+                blog__blocked=False,
+                show_in_feed=True,
+                published_date__lte=timezone.now()
+            )
+            .order_by("-score", "-published_date")
+            .select_related("blog")[posts_from:posts_to]
         )
 
     return render(request, "discover.html", {
@@ -143,27 +143,15 @@ def feed(request):
         fg.subtitle("Trending posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/", rel="alternate")
         all_posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-                rating=ExpressionWrapper(
-                    (
-                        (Count("upvote") - 1)
-                        / ((Seconds(Now() - F("published_date"))) + 4) ** gravity
-                    )
-                    * 100000,
-                    output_field=FloatField(),
-                ),
-            )
-            .filter(
+            Post.objects.filter(
                 publish=True,
                 blog__reviewed=True,
                 blog__blocked=False,
                 show_in_feed=True,
-                published_date__lte=timezone.now(),
+                published_date__lte=timezone.now()
             )
-            .order_by("-rating", "-published_date")
-            .select_related("blog")
-            .prefetch_related("upvote_set")[0:posts_per_page]
+            .order_by("-score", "-published_date")
+            .select_related("blog")[0:posts_per_page]
         )
 
     for post in all_posts:

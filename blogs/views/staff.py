@@ -37,7 +37,7 @@ def approve(request, pk):
         send_mail(
             "I've just reviewed your blog",
             f'''
-Hey, I've just reviewed your blog. It looks good and has been approved. 
+Hey, I've just reviewed your blog. It looks good and has been approved.
 
 If you're keen you can upgrade your blog and support the project here: https://bearblog.dev/dashboard/upgrade/
 

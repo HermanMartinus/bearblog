@@ -72,12 +72,16 @@
         <pre class="code">
 
 This page is ranked according to the following algorithm:
-Score = U / (T+4)^G
+Score = log10(U) + (S / D * 8600)
 
 Where,
 U = Upvotes (toasts) of a post
-T = Time since submission (in hours)
-G = Gravity (currently at {{ gravity }}) to keep page content fresh
+S = Seconds since Jan 1st, 2020
+D = Days modifier (currently at 14)
+
+--
+D values is used to specify that content D days old needs to have 10 times
+as many upvotes as something published now in order to outrank it.
         </pre>
     </small>
 </p>
