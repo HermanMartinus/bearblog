@@ -1,6 +1,8 @@
 from django import forms
 from django.core.validators import RegexValidator, ValidationError
 from django.template.defaultfilters import slugify
+from django.urls import reverse_lazy
+from django.utils.text import format_lazy
 
 from .helpers import is_protected, root
 from .models import Blog, Post
@@ -209,7 +211,8 @@ class PostForm(forms.ModelForm):
     )
 
     show_in_feed = forms.BooleanField(
-        help_text=f"Make post discoverable at <a href='http://{root()}/discover/' target='_blank'>{root()}/discover</a>",
+        help_text=format_lazy("Make post discoverable at <a href='{0}' target='_blank'>{0}</a>",
+                              reverse_lazy("discover")),
         required=False,
         initial=True)
 
