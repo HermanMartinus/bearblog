@@ -23,7 +23,7 @@
 <meta name="robots" content="noindex">
 <meta name="robots" content="nofollow">
 {% endif %}
-{% include 'snippets/seo_tags.html' with title=blog.title url=root description=meta_description tags="blog, blogging, write, writing" image=blog.meta_image %}
+{% include 'snippets/seo_tags.html' with title=blog.title url=root description=meta_description tags="blog, blogging, write, writing" image=blog.meta_image meta_tag=blog.meta_tag %}
 <link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}
 

@@ -16,7 +16,7 @@ import tldextract
 from ipaddr import client_ip
 import time
 
-from blogs.forms import BlogForm, DomainForm, NavForm, PostForm, StyleForm
+from blogs.forms import AccountForm, BlogForm, DomainForm, NavForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote
 
 
@@ -247,7 +247,18 @@ def account(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"{blog.useful_domain()}/dashboard")
 
-    return render(request, "dashboard/account.html", {"blog": blog})
+    if request.method == "POST":
+        form = AccountForm(request.POST, instance=blog)
+        if form.is_valid():
+            blog_info = form.save(commit=False)
+            blog_info.save()
+    else:
+        form = AccountForm(instance=blog)
+
+    return render(request, "dashboard/account.html", {
+        "blog": blog,
+        'form': form,
+    })
 
 
 @login_required

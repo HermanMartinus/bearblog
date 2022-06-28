@@ -19,6 +19,7 @@ class Blog(models.Model):
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
     lang = models.CharField(max_length=10, default='en', blank=True)
+    meta_tag = models.CharField(max_length=500, blank=True, help_text="Custom meta tag")
 
     reviewed = models.BooleanField(default=False)
     upgraded = models.BooleanField(default=False)

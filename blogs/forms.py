@@ -251,3 +251,7 @@ class AnalyticsForm(forms.ModelForm):
         fields = ('fathom_site_id',)
 
 
+class AccountForm(forms.ModelForm):
+    class Meta:
+        model = Blog
+        fields = ('meta_tag',)

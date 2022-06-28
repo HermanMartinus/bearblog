@@ -1,3 +1,4 @@
+{% load markdownify %}
 <!-- Primary Meta Tags -->
 <meta name="title" content="{{ title }}">
 <meta name="description"
@@ -22,6 +23,7 @@
 {% if image %}
   <meta property="twitter:image" content="{{ image }}">
 {% endif %}
+{{ meta_tag | safe }}
 
 <!-- Microdata -->
 <script type="application/ld+json">

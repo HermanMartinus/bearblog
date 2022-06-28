@@ -11,6 +11,10 @@
 {% block content %}
 <content>
     <h1>Account</h1>
+    <form method="POST" class="post-form full-width">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
     <p>
         <a href="/accounts/email/">Update email address</a>
     </p>

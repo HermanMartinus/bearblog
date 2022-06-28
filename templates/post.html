@@ -33,7 +33,7 @@
 {% if not blog.reviewed %}
 <meta name="robots" content="noindex">
 {% endif %}
-{% include 'snippets/seo_tags.html' with title=post.title url=full_path description=meta_description image=meta_image %}
+{% include 'snippets/seo_tags.html' with title=post.title url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
 {% endblock %}
 
 {% block imports %}
