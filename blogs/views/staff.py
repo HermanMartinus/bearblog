@@ -41,7 +41,7 @@ Hey, I've just reviewed your blog. It looks good and has been approved.
 
 If you're keen you can upgrade your blog and support the project here: https://bearblog.dev/dashboard/upgrade/
 
-Have an great week!
+Have a great week!
 Herman
             ''',
             'Herman Martinus <herman@bearblog.dev>',
