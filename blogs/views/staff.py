@@ -1,7 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from blogs.helpers import send_async_mail
 
 from blogs.models import Blog
 
@@ -34,12 +34,12 @@ def approve(request, pk):
     blog.reviewed = True
     blog.save()
     if not request.GET.get("no-email", ""):
-        send_mail(
+        send_async_mail(
             "I've just reviewed your blog",
             f'''
 Hey, I've just reviewed your blog. It looks good and has been approved.
 
-If you're keen you can upgrade your blog and support the project here: https://bearblog.dev/dashboard/upgrade/
+If you're keen you can upgrade your blog and support the project <a href="https://bearblog.dev/dashboard/upgrade/">here</a>.
 
 Have a great week!
 Herman

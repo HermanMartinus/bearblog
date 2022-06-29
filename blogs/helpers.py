@@ -1,3 +1,4 @@
+import threading
 import bleach
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
@@ -173,11 +174,31 @@ def validate_subscriber_email(email, blog):
 
         Made with Bear ʕ•ᴥ•ʔ
     '''
-    send_mail(
+    send_async_mail(
         'Confirm your email address',
-        text_message,
-        'no_reply@bearblog.dev',
+        html_message,
+        'Bear ʕ•ᴥ•ʔ <no_reply@bearblog.dev>',
         [email],
-        fail_silently=False,
-        html_message=html_message,
     )
+
+
+class EmailThread(threading.Thread):
+    def __init__(self, subject, html_message, from_email, recipient_list):
+        self.subject = subject
+        self.html_message = html_message
+        self.from_email = from_email
+        self.recipient_list = recipient_list
+        threading.Thread.__init__(self)
+
+    def run(self):
+        send_mail(
+            self.subject,
+            self.html_message,
+            self.from_email,
+            self.recipient_list,
+            fail_silently=True,
+            html_message=self.html_message)
+
+
+def send_async_mail(subject, html_message, from_email, recipient_list):
+    EmailThread(subject, html_message, from_email, recipient_list).start()

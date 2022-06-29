@@ -1,0 +1,18 @@
+<form class="email-signup" action="/email-subscribe/" method="post">
+    <input type="text" name="name" style="display:none"/>
+    <input type="email" placeholder="Email address..." name="email"/>
+    <input type="submit" value="Subscribe" />
+</form>
+<script>
+    const signupForm = document.querySelector('.email-signup')
+    signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetch(signupForm.action, {
+            method: signupForm.method,
+            body:  new FormData(signupForm),
+        }).then(response => {
+            signupForm.innerHTML = "<i>You've been subscribed! ＼ʕ •ᴥ•ʔ／</i>"
+        });
+        signupForm.innerHTML = "<i>Submitting...</i>"
+    });
+</script>

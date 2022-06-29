@@ -1,5 +1,5 @@
 <small>
-    <form action="/upvote/{{ post.pk }}/" method="post" style="display: inline">
+    <form id="upvote-form" action="/upvote/{{ post.pk }}/" method="post" style="display: inline">
         <input hidden name="pk" value="{{ post.pk }}" style="display:none"/>
         <input hidden name="title" style="display:none"/>
         {% csrf_token %}
@@ -12,7 +12,7 @@
     - <small>{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</small>
 </small>
 <script>
-    document.addEventListener('submit', (e) => {
+    document.querySelector('#upvote-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const form = e.target;
         fetch(form.action, {

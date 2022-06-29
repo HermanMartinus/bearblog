@@ -31,15 +31,10 @@
 {% block content %}
 
 {% if blog.upgraded and not subscribe_message %}
-<form action="" method="post" style="display: inline">
-    <p>
-        <b>Subscribe to this blog</b>
-    </p>
-    <input type="text" name="name" style="display:none"/>
-    <input type="email" placeholder="Email address..." name="email"/>
-    {% csrf_token %}
-    <input type="submit" value="Subscribe" />
-</form>
+<p>
+    <b>Subscribe to this blog</b>
+</p>
+{% include './snippets/email_subscribe_form.html' %}
 {% endif %}
 
 {% if subscribe_message %}

@@ -1,3 +1,4 @@
+from curses.ascii import HT
 import hashlib
 import re
 
@@ -6,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 from blogs.helpers import validate_subscriber_email
 from blogs.models import Blog, Subscriber
@@ -54,26 +56,33 @@ def subscribe(request):
     if not blog:
         return not_found(request)
 
-    subscribe_message = ""
-    if request.method == "POST":
-        if request.POST.get("email", "") and not request.POST.get("name", ""):
-            email = request.POST.get("email", "")
-            subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email)
-            if not subscriber_dupe:
-                validate_subscriber_email(email, blog)
-                subscribe_message = "You've been subscribed! ＼ʕ •ᴥ•ʔ／"
-            else:
-                subscribe_message = "You are already subscribed."
-
     return render(
         request,
         'subscribe.html',
         {
             'blog': blog,
             'root': blog.useful_domain(),
-            'subscribe_message': subscribe_message
         }
     )
+
+
+@csrf_exempt
+def email_subscribe(request):
+    blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+
+    if request.method == "POST":
+        if request.POST.get("email", "") and not request.POST.get("name", False):
+            email = request.POST.get("email", "")
+            subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email)
+            if not subscriber_dupe:
+                validate_subscriber_email(email, blog)
+                return HttpResponse("You've been subscribed! ＼ʕ •ᴥ•ʔ／")
+            else:
+                return HttpResponse("You are already subscribed.")
+
+    return HttpResponse("Something went wrong.")
 
 
 def confirm_subscription(request):

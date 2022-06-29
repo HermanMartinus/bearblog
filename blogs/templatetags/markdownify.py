@@ -45,6 +45,7 @@ def markdown(content):
     cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
     cleaned_markup = cleaner.clean_html(str(soup))
 
+    cleaned_markup = cleaned_markup.replace('{{ email-signup }}', template.loader.render_to_string('snippets/email_subscribe_form.html'))
     # TODO: add 'sandbox' attribute to all iframes
 
     return cleaned_markup
