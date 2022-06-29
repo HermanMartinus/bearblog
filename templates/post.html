@@ -83,7 +83,7 @@ url("/hit/{{ post.pk }}")
 </p>
 {% endif %}
 
-<p>
+<p class="tags">
 {% for tag in post.tags.all %}
     <a href="/blog/?q={{tag}}">#{{ tag }}</a>
 {% endfor %}

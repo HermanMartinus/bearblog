@@ -65,7 +65,7 @@ Blog | {{ blog.title }}
     </ul>
     {% if not query %}
     <small>
-        <div>
+        <div class="tags">
             {% for tag in tags %}
                 <a href="/blog/?q={{ tag }}">#{{ tag }}</a>
             {% endfor %}
