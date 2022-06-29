@@ -15,6 +15,7 @@ import boto3
 import tldextract
 from ipaddr import client_ip
 import time
+import djqscsv
 
 from blogs.forms import AccountForm, BlogForm, DomainForm, NavForm, PostForm, StyleForm
 from blogs.models import Blog, Post, Upvote
@@ -254,6 +255,9 @@ def account(request):
             blog_info.save()
     else:
         form = AccountForm(instance=blog)
+
+    if request.GET.get("export", ""):
+        return djqscsv.render_to_csv_response(blog.post_set)
 
     return render(request, "dashboard/account.html", {
         "blog": blog,
