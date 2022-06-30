@@ -1,5 +1,6 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from blogs.helpers import send_async_mail
 
@@ -8,7 +9,14 @@ from blogs.models import Blog
 
 @staff_member_required
 def review_flow(request):
-    unreviewed_blogs = Blog.objects.filter(reviewed=False, blocked=False).exclude(content='Hello World!').order_by('created_date')
+    blogs = Blog.objects.filter(reviewed=False, blocked=False).annotate(
+        post_count=Count("post"),
+    ).prefetch_related("post_set").order_by('created_date')
+
+    unreviewed_blogs = []
+    for blog in blogs:
+        if blog.post_count > 0 and blog.content != "Hello world!":
+            unreviewed_blogs.append(blog)
 
     if unreviewed_blogs:
         blog = unreviewed_blogs[0]
