@@ -1,3 +1,5 @@
+from datetime import timedelta
+from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 from django.db.models import Count, Q
@@ -15,7 +17,11 @@ def review_flow(request):
 
     unreviewed_blogs = []
     for blog in blogs:
-        if blog.post_count > 0 and blog.content != "Hello world!":
+        one_week = timezone.now() - timedelta(days=7)
+        if "-new" in blog.subdomain and blog.content == "Hello World!" and blog.post_count == 0 and blog.created_date < one_week:
+            # Delete empty blogs
+            blog.delete()
+        else:
             unreviewed_blogs.append(blog)
 
     if unreviewed_blogs:
