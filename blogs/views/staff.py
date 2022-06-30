@@ -17,8 +17,13 @@ def review_flow(request):
 
     unreviewed_blogs = []
     for blog in blogs:
-        one_week = timezone.now() - timedelta(days=7)
-        if "-new" in blog.subdomain and blog.content == "Hello World!" and blog.post_count == 0 and blog.created_date < one_week:
+        one_month = timezone.now() - timedelta(days=30)
+        if (blog.content == "Hello World!"
+            and blog.post_count == 0
+            and blog.created_date < one_month
+            and not blog.domain
+            and not blog.custom_styles
+                and blog.nav != "[Home](/)[Blog](/blog/)"):
             # Delete empty blogs
             blog.delete()
         else:
@@ -65,4 +70,11 @@ def block(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.blocked = True
     blog.save()
+    return redirect('review_flow')
+
+
+@staff_member_required
+def delete(request, pk):
+    blog = get_object_or_404(Blog, pk=pk)
+    blog.delete()
     return redirect('review_flow')
