@@ -201,4 +201,8 @@ class EmailThread(threading.Thread):
 
 
 def send_async_mail(subject, html_message, from_email, recipient_list):
-    EmailThread(subject, html_message, from_email, recipient_list).start()
+    if settings.DEBUG:
+        print(html_message)
+    else:
+        print('Sent email to ', recipient_list)
+        EmailThread(subject, html_message, from_email, recipient_list).start()

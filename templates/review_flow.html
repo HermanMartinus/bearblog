@@ -25,13 +25,20 @@
 {% endblock %}
 
 {% block nav %}
-<p style="position:fixed; top: -20px; background-color: wheat; padding: 20px 10px 10px">
-<a href="approve/{{ blog.pk }}">Approve</a>|
-<a href="approve/{{ blog.pk }}?no-email=True">Approve (no email)</a>|
-<a href="block/{{ blog.pk }}">Block</a>
-<br>
-{{ still_to_go }} blog(s) still to go
-</p>
+<div style="position:fixed; bottom: 0px; background-color: wheat; padding: 20px 10px 10px">
+    <form method="post" action="approve/{{ blog.pk }}"> 
+        {% csrf_token %}
+        <input name="message" type="text" placeholder="Message..." onchange="addMessage()"/>
+        <br>
+        <input type="submit" value="Approve" /> |
+        <small>
+            <a href="approve/{{ blog.pk }}?no-email=True">Approve (no email)</a>|
+            <a href="block/{{ blog.pk }}">Block</a>
+        </small>
+    </form>
+    <br>
+    {{ still_to_go }} blog(s) still to go
+</div>
 {% endblock %}
 
 {% block content %}

@@ -33,15 +33,19 @@ def approve(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.reviewed = True
     blog.save()
+
+    message = request.POST.get("message", "")
+
     if not request.GET.get("no-email", ""):
         send_async_mail(
             "I've just reviewed your blog",
             f'''
 Hey, I've just reviewed your blog. It looks good and has been approved.
-
+{message}
 If you're keen you can upgrade your blog and support the project <a href="https://bearblog.dev/dashboard/upgrade/">here</a>.
-
+<br>
 Have a great week!
+<br>
 Herman
             ''',
             'Herman Martinus <herman@bearblog.dev>',
