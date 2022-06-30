@@ -17,15 +17,16 @@ def review_flow(request):
 
     unreviewed_blogs = []
     for blog in blogs:
-        one_month = timezone.now() - timedelta(days=30)
+        one_month = timezone.now() - timedelta(days=14)
         if (blog.content == "Hello World!"
             and blog.post_count == 0
-            and blog.created_date < one_month
             and not blog.domain
             and not blog.custom_styles
                 and blog.nav != "[Home](/)[Blog](/blog/)"):
-            # Delete empty blogs
-            blog.delete()
+
+            # Delete empty blogs over a month old
+            if blog.created_date < one_month:
+                blog.delete()
         else:
             unreviewed_blogs.append(blog)
 
