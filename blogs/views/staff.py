@@ -39,15 +39,7 @@ def approve(request, pk):
     if not request.GET.get("no-email", ""):
         send_async_mail(
             "I've just reviewed your blog",
-            f'''
-Hey, I've just reviewed your blog. It looks good and has been approved.
-{message}
-If you're keen you can upgrade your blog and support the project <a href="https://bearblog.dev/dashboard/upgrade/">here</a>.
-<br>
-Have a great week!
-<br>
-Herman
-            ''',
+            message.replace('\r\n', '<br>'),
             'Herman Martinus <herman@bearblog.dev>',
             [blog.user.email]
         )

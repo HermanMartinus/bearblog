@@ -28,7 +28,13 @@
 <div style="position:fixed; bottom: 0px; background-color: wheat; padding: 20px 10px 10px">
     <form method="post" action="approve/{{ blog.pk }}"> 
         {% csrf_token %}
-        <input name="message" type="text" placeholder="Message..." onchange="addMessage()"/>
+        <textarea name="message" style="width:400px; height: 120px">
+Hey, I've just reviewed your blog. It looks good and has been approved.
+If you're keen you can upgrade your blog and support the project <a href="https://bearblog.dev/dashboard/upgrade/">here</a>.
+
+Have a great week!
+Herman
+        </textarea>
         <br>
         <input type="submit" value="Approve" /> |
         <small>
@@ -51,7 +57,7 @@
     {{ content | markdown | safe }}
 </content>
 
-<ul>
+<ul style="padding-bottom: 200px">
     {% for post in posts %}
     <li>
         #{{ forloop.counter }}
