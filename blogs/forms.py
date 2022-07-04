@@ -159,7 +159,7 @@ class DomainForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["published_date"].widget = DateInput()
+        
         self.user = user
 
     slug = forms.SlugField(
@@ -170,9 +170,10 @@ class PostForm(forms.ModelForm):
     )
 
     published_date = forms.DateTimeField(
-        label="Date",
-        help_text="eg: '2020-05-31' (leave empty to post now)",
-        required=False
+        label="Publish date",
+        help_text="Leave empty to post now",
+        required=False,
+        widget=DateTimeInput()
     )
 
     content = forms.CharField(

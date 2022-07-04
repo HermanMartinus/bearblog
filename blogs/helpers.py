@@ -49,7 +49,7 @@ def get_post(all_posts, slug):
         raise Http404("No Post matches the given query.")
 
 
-def sanitise_int(input, length):
+def sanitise_int(input, length=10):
     try:
         if len(input) < length:
             return int(bleach.clean(input))
