@@ -59,7 +59,7 @@ def approve(request, pk):
     if not request.GET.get("no-email", ""):
         send_async_mail(
             "I've just reviewed your blog",
-            message.replace('\r\n', '<br>'),
+            # message.replace('\r\n', '<br>'),
             'Herman Martinus <herman@bearblog.dev>',
             [blog.user.email]
         )
