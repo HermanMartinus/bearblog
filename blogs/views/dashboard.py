@@ -18,6 +18,7 @@ import time
 import djqscsv
 
 from blogs.forms import AccountForm, BlogForm, DomainForm, NavForm, PostForm, StyleForm
+from blogs.helpers import sanitise_int
 from blogs.models import Blog, Post, Upvote
 
 
@@ -151,6 +152,8 @@ def post_edit(request, pk):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"{blog.useful_domain()}/dashboard")
+
+    sanitise_int(pk)
 
     post = get_object_or_404(Post, blog=blog, pk=pk)
     published_date_old = post.published_date
