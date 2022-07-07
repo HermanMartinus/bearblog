@@ -2,6 +2,10 @@
 <html lang="{% block lang %}en{% endblock %}">
 
 <head>
+  {% if request.META.HTTP_HOST == "hmartinus.com" %}
+  <meta name="robots" content="noindex">
+  <meta name="robots" content="nofollow">
+  {% endif %}
   <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
   <meta charset="utf-8">
   <meta name="bear-validation" content="look-for-the-bear-necessities"/>
@@ -36,6 +40,9 @@
   <header>
     <a class="title" href="/">
       <h1>
+        {% if request.META.HTTP_HOST == "hmartinus.com" %}
+        [Testing on {{ request.META.HTTP_HOST }}]
+        {% endif %}
         {% block heading %}
         <span class="title-bear">ʕ•ᴥ•ʔ</span> Bear
         {% endblock %}
