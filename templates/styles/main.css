@@ -121,7 +121,7 @@ img {
     max-width: 100%;
 }
 
-code{
+code {
     font-family: monospace;
     padding: 2px;
     background-color: #f2f2f2;
@@ -137,6 +137,7 @@ code{
     border-radius: 3px;
     margin-block-start: 1em;
     margin-block-end: 1em;
+    overflow-x: scroll;
 }
 
 blockquote {
