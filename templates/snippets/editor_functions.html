@@ -1,57 +1,67 @@
-<input type="file" id="file" hidden multiple accept="image/*">
+<input type="file" id="file" hidden multiple accept="image/*" />
 <script>
-    document.querySelector('#toggle-full-screen').onclick = event => {
-        event.preventDefault()
-        document.querySelector('textarea').classList.toggle('full-screen')
-        event.target.classList.toggle('floating')
-    }
+	document.querySelector('#toggle-full-screen').onclick = event => {
+	    event.preventDefault()
+	    document.querySelector('textarea').classList.toggle('full-screen')
+	    event.target.classList.toggle('floating')
+	}
 
-    {% if blog.upgraded %}
-    document.querySelector('#upload-image').onclick = event => {
-        event.preventDefault()
-        document.getElementById("file").click()
-    }
+	{% if blog.upgraded %}
+	const uploadButton = document.querySelector('#upload-image')
 
-    document.getElementById("file").addEventListener("change", upload)
+	uploadButton.onclick = event => {
+	    event.preventDefault()
+	    document.getElementById("file").click()
+	}
 
-    function upload() {
-        if(document.getElementById("file").files[0].size > 2000000){
-            alert(`File over the 2mb limit. Use https://tinypng.com to minimise it.`)
-            return
-        }
+	document.getElementById("file").addEventListener("change", upload)
 
-        var formData = new FormData();
-        var target = '/dashboard/upload-image/'
+	function upload() {
+	    if(document.getElementById("file").files[0].size > 2000000){
+	        alert(`File over the 2mb limit. Use https://tinypng.com to minimise it.`)
+	        return
+	    }
 
-        var fileInput = document.getElementById("file")
-        for (var i = 0; i<fileInput.files.length; i++) {
-            formData.append("file", fileInput.files[i])
-        }
+	    var formData = new FormData();
+	    var target = '/dashboard/upload-image/'
 
-        var xhr = new XMLHttpRequest()
-        var eventSource = xhr.upload || xhr
-        eventSource.addEventListener("progress", function(e){
-            var current = e.loaded || e.position
-            var total = e.total || e.totalSize
-            var percent = parseInt((current/total)*100, 10)
-            alert('Uploading...')
-        });
-        xhr.open("POST", target, true)
-        xhr.send(formData)
-        xhr.onload = function() {
-            if (this.status === 200) {
-                textarea = document.querySelector('textarea')
-                JSON.parse(this.responseText).forEach(image => {
-                    textarea.value += '\n\n![Image title]('+image+')'
-                })
-                alert('The image(s) have been added to the bottom of your content')
-            }
-        };
-    }
-    {% else %}
-    document.querySelector('#upload-image').onclick = event => {
-        event.preventDefault()
-        window.open('/dashboard/upgrade/')
-    }
-    {% endif %}
+	    var fileInput = document.getElementById("file")
+	    for (var i = 0; i<fileInput.files.length; i++) {
+	        formData.append("file", fileInput.files[i])
+	    }
+	    const textarea = document.querySelector('textarea')
+	    const position = textarea.selectionStart || 0
+
+	    var xhr = new XMLHttpRequest()
+	    var eventSource = xhr.upload || xhr
+
+	    eventSource.addEventListener("progress", function(e){
+	        var current = e.loaded || e.position
+	        var total = e.total || e.totalSize
+	        var percent = parseInt((current/total)*100, 10)
+	        uploadButton.innerText = "Uploading..."
+	    });
+	    xhr.open("POST", target, true)
+	    xhr.send(formData)
+	    xhr.onload = function() {
+	        if (this.status === 200) {
+	            JSON.parse(this.responseText).forEach(image => {
+	                  const toInsert = '\n![Image title]('+image+')\n'
+	                  if (position == 0) {
+	                      textarea.value += toInsert
+	                  } else {
+	                      textarea.value = textarea.value.substring(0, position) + toInsert + textarea.value.substring(position, textarea.value.length)
+	                  }
+	            })
+	            uploadButton.innerText = 'The image(s) have been added'
+	            setTimeout(() => uploadButton.innerText = "Insert image", 3000)
+	        }
+	    };
+	}
+	{% else %}
+	document.querySelector('#upload-image').onclick = event => {
+	    event.preventDefault()
+	    window.open('/dashboard/upgrade/')
+	}
+	{% endif %}
 </script>
