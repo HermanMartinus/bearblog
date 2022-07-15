@@ -3,7 +3,7 @@
 {% else %}
     {% if not blog.overwrite_styles %}
         {% include 'styles/main.css' %}
-        {% if not blog.dark_mode %}
+        {% if blog.dark_mode %}
             {% include 'styles/dark_mode.css' %}
         {% endif %}
     {% endif %}
