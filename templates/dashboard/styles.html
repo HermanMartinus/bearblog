@@ -1,29 +1,26 @@
 {% extends 'base.html' %}
-
-{% block title %}
-    Styling | Bear Blog
-{% endblock %}
-
-{% block nav %}
-{% include '../snippets/dashboard_nav.html' %}
-{% endblock %}
-
+{% block title %} Styling | Bear Blog {% endblock %}
+{% block nav %} {% include '../snippets/dashboard_nav.html' %} {% endblock %}
 {% block content %}
 <content>
-    <h1>Custom styling</h1>
+  <h1>Custom styling</h1>
 
-    <form method="POST" class="post-form full-width">{% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Save</button>
-    </form>
-    <p>
-        <small>
-            If extending styling, ensure it caters to dark mode.
-            See the dark mode styling <a href="https://github.com/HermanMartinus/bearblog/blob/master/templates/styles/dark_mode.css">here</a> for more information.
-        </small>
-    </p>
-    <p>
-        View site: <a href="{{ root }}" target="_blank">{{ root }}</a>
-    </p>
+  <form method="POST" class="post-form full-width">
+    {% csrf_token %} {{ form.as_p }}
+    <button type="submit" class="save btn btn-default">Save</button>
+  </form>
+  <p>
+    <small>
+      If extending styling, ensure it caters to dark mode or disable dark mode above.
+      <br>
+      See the dark mode styling
+      <a
+        href="https://github.com/HermanMartinus/bearblog/blob/master/templates/styles/dark_mode.css"
+        >here</a
+      >
+      for more information.
+    </small>
+  </p>
+  <p>View site: <a href="{{ root }}" target="_blank">{{ root }}</a></p>
 </content>
 {% endblock %}

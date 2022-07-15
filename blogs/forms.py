@@ -120,12 +120,18 @@ class StyleForm(forms.ModelForm):
         required=False,
     )
 
+    dark_mode = forms.BooleanField(
+        label="Auto dark mode",
+        help_text="<br>Automatically sets dark mode according to viewer's system preferences",
+        required=False
+    )
+
     class Meta:
         model = Blog
         widgets = {
             'overwrite_styles': forms.RadioSelect
         }
-        fields = ('favicon', 'meta_image', 'external_stylesheet', 'custom_styles', 'overwrite_styles')
+        fields = ('favicon', 'meta_image', 'dark_mode', 'external_stylesheet', 'custom_styles', 'overwrite_styles')
 
 
 class DomainForm(forms.ModelForm):
