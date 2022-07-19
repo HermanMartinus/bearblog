@@ -150,6 +150,7 @@ def post(request, slug):
     )
 
 
+@csrf_exempt
 def upvote(request, pk):
     ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().year}".encode('utf-8')).hexdigest()
 
