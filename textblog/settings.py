@@ -22,6 +22,7 @@ ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 # Application definition
 SITE_ID = 1
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.sites',

@@ -132,7 +132,12 @@ def post(request, slug):
         if upvote.ip_address == ip_hash or upvote.ip_address == ip_address:
             upvoted = True
 
+    root = blog.useful_domain()
     meta_description = post.meta_description or unmark(post.content)[:160]
+    full_path = f'{root}/{post.slug}'
+    canonical_url = full_path
+    if post.canonical_url and post.canonical_url.startswith('https://'):
+        canonical_url = post.canonical_url
 
     return render(
         request,
@@ -142,7 +147,8 @@ def post(request, slug):
             'content': post.content,
             'post': post,
             'root': blog.useful_domain(),
-            'full_path': f'{blog.useful_domain()}/{post.slug}',
+            'full_path': full_path,
+            'canonical_url': canonical_url,
             'meta_description': meta_description,
             'meta_image': post.meta_image or blog.meta_image,
             'upvoted': upvoted

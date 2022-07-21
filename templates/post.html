@@ -14,9 +14,7 @@
 {% endblock %}
 
 {% block canonical %}
-{% if post.canonical_url %}
-<link rel="canonical" href="{{ post.canonical_url }}" />
-{% endif %}
+<link rel="canonical" href="{{ canonical_url }}" />
 {% endblock %}
 
 {% block analytics %}
@@ -75,10 +73,10 @@ url("/hit/{{ post.pk }}")
     {{ content | markdown | safe }}
 {% endpygmentify %}
 </content>
-{% if post.canonical_url %}
+{% if canonical_url != full_path %}
 <p>
     <small>
-        <a href="{{ post.canonical_url }}">View original</a>
+        <a href="{{ canonical_url }}">View original</a>
     </small>
 </p>
 {% endif %}

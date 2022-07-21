@@ -42,13 +42,13 @@ class Blog(models.Model):
         return "```" in self.content
 
     def bear_domain(self):
-        return f'http://{self.subdomain}.{Site.objects.get_current().domain}'
+        return f'https://{self.subdomain}.{Site.objects.get_current().domain}'
 
     def useful_domain(self):
         if self.domain:
-            return f'http://{self.domain}'
+            return f'https://{self.domain}'
         else:
-            return f'http://{self.subdomain}.{Site.objects.get_current().domain}'
+            return f'https://{self.subdomain}.{Site.objects.get_current().domain}'
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain()})'
