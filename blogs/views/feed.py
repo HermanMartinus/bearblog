@@ -21,7 +21,7 @@ def feed(request):
     fg.id(blog.useful_domain())
     fg.author({'name': blog.subdomain, 'email': 'hidden'})
     fg.title(blog.title)
-    fg.subtitle(blog.meta_description or clean_text(unmark(blog.content)[:160]) or blog.title)
+    fg.subtitle(blog.meta_description or unmark(blog.content) or blog.title)
     fg.link(href=f"{blog.useful_domain()}/", rel='alternate')
 
     for post in all_posts:

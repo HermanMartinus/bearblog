@@ -1,9 +1,11 @@
 import threading
 import bleach
+from bs4 import BeautifulSoup
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+import mistune
 import requests
 import hashlib
 from django.http import Http404
@@ -102,26 +104,9 @@ def check_connection(domain):
         return False
 
 
-def unmark_element(element, stream=None):
-    if stream is None:
-        stream = StringIO()
-    if element.text:
-        stream.write(element.text)
-    for sub in element:
-        unmark_element(sub, stream)
-    if element.tail:
-        stream.write(element.tail)
-    return stream.getvalue()
-
-
-# patching Markdown
-Markdown.output_formats["plain"] = unmark_element
-__md = Markdown(output_format="plain")
-__md.stripTopLevelTags = False
-
-
-def unmark(text):
-    return __md.convert(text)
+def unmark(markdown):
+    markup = mistune.html(markdown)
+    return BeautifulSoup(markup, "lxml").text.strip()[:157] + '...'
 
 
 def clean_text(text):

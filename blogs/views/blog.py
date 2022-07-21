@@ -57,7 +57,7 @@ def home(request):
 
     all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
-    meta_description = blog.meta_description or unmark(blog.content)[:160]
+    meta_description = blog.meta_description or unmark(blog.content)
 
     return render(
         request,
@@ -93,7 +93,7 @@ def posts(request):
         tags += post.tags.most_common()[:10]
     tags = list(dict.fromkeys(tags))
 
-    meta_description = blog.meta_description or unmark(blog.content)[:160]
+    meta_description = blog.meta_description or unmark(blog.content)
 
     return render(
         request,
@@ -133,7 +133,7 @@ def post(request, slug):
             upvoted = True
 
     root = blog.useful_domain()
-    meta_description = post.meta_description or unmark(post.content)[:160]
+    meta_description = post.meta_description or unmark(post.content)
     full_path = f'{root}/{post.slug}'
     canonical_url = full_path
     if post.canonical_url and post.canonical_url.startswith('https://'):
