@@ -11,6 +11,10 @@
 Blog | {{ blog.title }}
 {% endblock %}
 
+{% block canonical %}
+<link rel="canonical" href="{{ root }}" />
+{% endblock %}
+
 {% block analytics %}
 {% if blog.fathom_site_id %}
 <script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>
