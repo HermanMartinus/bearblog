@@ -42,7 +42,7 @@ def discover(request):
                 publish=True,
                 blog__reviewed=True,
                 blog__blocked=False,
-                show_in_feed=True,
+                make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
             .order_by("-published_date")
@@ -57,7 +57,7 @@ def discover(request):
                 publish=True,
                 blog__reviewed=True,
                 blog__blocked=False,
-                show_in_feed=True,
+                make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
             .order_by("-score", "-published_date")
@@ -81,7 +81,7 @@ def discover(request):
                 publish=True,
                 blog__reviewed=True,
                 blog__blocked=False,
-                show_in_feed=True,
+                make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
             .order_by("-rating", "-published_date")
@@ -95,7 +95,7 @@ def discover(request):
                 publish=True,
                 blog__reviewed=True,
                 blog__blocked=False,
-                show_in_feed=True,
+                make_discoverable=True,
                 published_date__lte=timezone.now()
             )
             .order_by("-score", "-published_date")
@@ -132,7 +132,7 @@ def feed(request):
                 publish=True,
                 blog__reviewed=True,
                 blog__blocked=False,
-                show_in_feed=True,
+                make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
             .order_by("-published_date")
@@ -147,7 +147,7 @@ def feed(request):
                 publish=True,
                 blog__reviewed=True,
                 blog__blocked=False,
-                show_in_feed=True,
+                make_discoverable=True,
                 published_date__lte=timezone.now()
             )
             .order_by("-score", "-published_date")

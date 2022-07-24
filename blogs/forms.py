@@ -214,7 +214,7 @@ class PostForm(forms.ModelForm):
         required=False
     )
 
-    show_in_feed = forms.BooleanField(
+    make_discoverable = forms.BooleanField(
         help_text=f"Make post discoverable at <a href='https://{root()}/discover/' target='_blank'>{root()}/discover</a>",
         required=False,
         initial=True)
@@ -248,7 +248,7 @@ class PostForm(forms.ModelForm):
             'tags',
             'is_page',
             'publish',
-            'show_in_feed')
+            'make_discoverable')
 
 
 class AnalyticsForm(forms.ModelForm):

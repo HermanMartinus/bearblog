@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import blog, dashboard, feed, discover, analytics, emailer, staff
+from .views import blog, dashboard, studio, feed, discover, analytics, emailer, staff
 
 urlpatterns = [
     path('', blog.home, name='home'),
@@ -27,6 +27,11 @@ urlpatterns = [
     path('dashboard/posts/new/', dashboard.post_new, name='post_new'),
     path('dashboard/posts/<pk>/', dashboard.post_edit, name='post_edit'),
     path('dashboard/posts/<pk>/delete/', dashboard.PostDelete.as_view(), name='post_delete'),
+
+    path('studio/', studio.studio, name="studio"),
+    path('studio/posts/new/', studio.post, name="post_new"),
+    path('studio/posts/<pk>/', studio.post, name="post_edit"),
+    path('studio/preview/', studio.preveiw, name="preview"),
 
     path('discover/', discover.discover, name='discover'),
     path('discover/feed/', discover.feed, name='discover_feed'),

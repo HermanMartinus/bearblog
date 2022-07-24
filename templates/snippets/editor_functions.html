@@ -1,9 +1,43 @@
 <input type="file" id="file" hidden multiple accept="image/*" />
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/markdown/markdown.min.js"></script> {% endcomment %}
+
 <script>
-	document.querySelector('#toggle-full-screen').onclick = event => {
-	    event.preventDefault()
-	    document.querySelector('textarea').classList.toggle('full-screen')
-	    event.target.classList.toggle('floating')
+	var textarea = document.querySelector('textarea')
+	//var myCodeMirror = CodeMirror.fromTextArea(textarea, {
+	//	wordwrap: true,
+	//	linebreaks: true,
+	//	mode: "markdown"
+	//})
+	const fullscreenToggle = document.querySelector('#toggle-full-screen')
+	if (fullscreenToggle) {
+		fullscreenToggle.onclick = event => {
+			event.preventDefault()
+			textarea.classList.toggle('full-screen')
+			event.target.classList.toggle('floating')
+		}
+	}
+
+	const previewButton = document.querySelector('#preview')
+	if (previewButton) {
+		const previewForm = document.createElement('form')
+		previewForm.target = "print_popup"
+		previewForm.method = "POST"
+		previewForm.action = "/studio/preview/"
+		
+		const contentField = document.createElement("input");
+		contentField.type = "hidden"
+		contentField.name = "raw_content"
+		previewForm.appendChild(contentField)
+		document.body.appendChild(previewForm)
+	
+		previewButton.onclick = event => {
+			console.log("Opening preveiw")
+			window.open('about:blank','print_popup','width=1000,height=800');
+			contentField.value = textarea.value
+			previewForm.submit()
+		}
 	}
 
 	{% if blog.upgraded %}

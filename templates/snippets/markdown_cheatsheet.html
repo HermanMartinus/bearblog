@@ -1,0 +1,138 @@
+<div><h2 id="emphasis">Emphasis</h2>
+<div class="highlight"><pre class="markdown"><span></span><span class="gs">**bold**</span> <span class="ge">*italics*</span> <span class="gd">~~strikethrough~~</span>
+</pre></div>
+<p><strong>bold</strong> <em>italics</em> <del>strikethrough</del></p>
+<hr>
+<h2 id="headers">Headers</h2>
+<div class="highlight"><pre class="markdown"><span></span><span class="gh"># Big header</span>
+<span class="gu">## Medium header</span>
+<span class="gu">### Small header</span>
+<span class="gu">#### Tiny header</span>
+</pre></div>
+<h1 id="big-header">Big header</h1>
+<h2 id="medium-header">Medium header</h2>
+<h3 id="small-header">Small header</h3>
+<h4 id="tiny-header">Tiny header</h4>
+<hr>
+<h2 id="lists">Lists</h2>
+<div class="highlight"><pre class="markdown"><span></span><span class="k">*</span> Generic list item
+<span class="k">*</span> Generic list item
+<span class="k">*</span> Generic list item
+
+<span class="k">1.</span> Numbered list item
+<span class="k">2.</span> Numbered list item
+<span class="k">3.</span> Numbered list item
+</pre></div>
+<ul>
+<li>Generic list item</li>
+<li>Generic list item</li>
+<li>Generic list item</li>
+</ul>
+<ol>
+<li>Numbered list item</li>
+<li>Numbered list item</li>
+<li>Numbered list item</li>
+</ol>
+<hr>
+<h2 id="links">Links</h2>
+<div class="highlight"><pre class="markdown"><span></span>&lt;http://www.example.com&gt;
+
+[<span class="nt">Open in same tab</span>](<span class="na">http://www.example.com</span>)
+
+[<span class="nt">Open in new tab</span>](<span class="na">tab:http://www.example.com</span>)
+
+Or use the heading id (the slugified name of the header) as an internal link...
+
+[<span class="nt">Internal link</span>](<span class="na">#headers</span>)
+</pre></div>
+<p><a href="http://www.example.com">http://www.example.com</a></p>
+<p><a href="http://www.example.com">Open in same tab</a></p>
+<p><a href="http://www.example.com" target="_blank">Open in new tab</a></p>
+<p><a href="#headers">Internal link</a></p>
+<hr>
+<h2 id="footnotes">Footnotes</h2>
+<div class="highlight"><pre class="markdown"><span></span>Here is a simple footnote,[^1] and here is a longer one.[^named-note]
+
+Then at the bottom of your post...
+
+[<span class="nl">^1</span>]: <span class="na">This is the first footnote.</span>
+
+[<span class="nl">^named-note</span>]: <span class="na">Here is another one.</span>
+</pre></div>
+<p>Here's a simple footnote,<sup class="footnote-ref" id="fnref-1"><a href="#fn-1">1</a></sup> and here's a longer one.<sup class="footnote-ref" id="fnref-2"><a href="#fn-2">2</a></sup></p>
+<hr>
+<h2 id="quotes">Quotes</h2>
+<div class="highlight"><pre class="markdown"><span></span><span class="k">&gt; </span><span class="ge">This is a quote.</span>
+<span class="k">&gt; </span><span class="ge">It can span multiple lines!</span>
+</pre></div>
+<blockquote>
+<p>This is a quote.</p>
+</blockquote>
+<blockquote>
+<p>It can span multiple lines!</p>
+</blockquote>
+<hr>
+<h2 id="images">Images</h2>
+<h4 id="need-to-upload-an-image-imgur-has-a-great-interface">Need to upload an image? <a href="https://imgur.com">Imgur</a> has a great interface.</h4>
+<div class="highlight"><pre class="markdown"><span></span>![<span class="nt">Cheatsheet image example</span>](<span class="na">https://i.imgur.com/3jxqrKP.jpeg</span>)
+</pre></div>
+<p><img alt="Cheatsheet image example" src="https://i.imgur.com/3jxqrKP.jpeg"></p>
+<hr>
+<h2 id="tables">Tables</h2>
+<div class="highlight"><pre class="markdown"><span></span>| Column 1 | Column 2 | Column 3 |
+| -------- | -------- | -------- |
+| John     | Doe      | Male     |
+| Mary     | Smith    | Female   |
+
+Or without aligning the columns...
+
+| Column 1 | Column 2 | Column 3 |
+| -------- | -------- | -------- |
+| John | Doe | Male |
+| Mary | Smith | Female |
+</pre></div>
+<table>
+<thead>
+<tr>
+<th>Column 1</th>
+<th>Column 2</th>
+<th>Column 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>John</td>
+<td>Doe</td>
+<td>Male</td>
+</tr>
+<tr>
+<td>Mary</td>
+<td>Smith</td>
+<td>Female</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="displaying-code">Displaying code</h2>
+<div class="highlight"><pre class="markdown"><span></span><span class="sb">`var example = "hello!";`</span>
+
+Or spanning multiple lines...
+
+<span class="sb">```javascript</span>
+<span class="kd">var</span><span class="w"> </span><span class="nx">example</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"hello!"</span><span class="p">;</span><span class="w"></span>
+<span class="nx">alert</span><span class="p">(</span><span class="nx">example</span><span class="p">);</span><span class="w"></span>
+<span class="sb">```</span>
+</pre></div>
+<p><code>var example = "hello!";</code></p>
+<div class="highlight"><pre class="javascript"><span></span><span class="kd">var</span><span class="w"> </span><span class="nx">example</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"hello!"</span><span class="p">;</span><span class="w"></span>
+<span class="nx">alert</span><span class="p">(</span><span class="nx">example</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+<p><em>For language specific syntax highlighting, specify the language at the beginning of the code block.</em></p>
+<hr>
+<section class="footnotes">
+<ol>
+<li id="fn-1"><p>This is the first footnote.<a class="footnote" href="#fnref-1">↩</a></p></li>
+<li id="fn-2"><p>Here's another one<a class="footnote" href="#fnref-2">↩</a></p></li>
+</ol>
+</section>
+</div>

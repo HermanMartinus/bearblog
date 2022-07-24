@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Dashboard | Bear Blog
+{% endblock %}
+
+{% block nav %}
+<a href="#">Home</a>
+<a href="#">Posts</a>
+<a href="#">Email lists</a>
+<a href="#">Home</a>
+
+{% endblock %}
+
+{% block content %}
+
+    {% if not blog.upgraded %}
+    <p style="border: 1px dashed; text-align:center; padding: 5px">
+        <i>
+            <a href="/dashboard/upgrade/">Upgrade</a> to get neat stuff and support the Tiny Internet!
+        </i>
+    </p>
+    {% endif %}
+
+    <h1>Home</h1>
+
+    <form>
+        <textarea style="width: calc(100% - 13px); height:400px">
+---
+title: Erwin's blog
+domain: erwin.bearblog.dev
+lang: en
+description: This is a pretty neat bloggo.
+nav: [Home](/) [Blog](/blog/)
+---
+
+Hello world!
+        </textarea>
+    </form>
+    <small>
+        Content is written in <a href="#">markdown</a>
+        <span style="float:right">
+        <a id='upload-image'>Insert image</a> |
+        <a id="preview">Preview</a>
+        </span>
+    </small>
+    <p>
+    <button>Save</button>
+    </p>
+
+{% include '../snippets/editor_functions.html' with blog=blog%}
+{% endblock %}

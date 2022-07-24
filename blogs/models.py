@@ -61,7 +61,7 @@ class Post(models.Model):
     published_date = models.DateTimeField(blank=True)
     tags = TaggableManager(blank=True)
     publish = models.BooleanField(default=True)
-    show_in_feed = models.BooleanField(default=True)
+    make_discoverable = models.BooleanField(default=True)
     is_page = models.BooleanField(default=False)
     content = models.TextField()
     canonical_url = models.CharField(max_length=200, blank=True)

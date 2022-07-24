@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if post %}
+        Editing {{ post.title }} | Bear Blog
+    {% else %}
+        New post | Bear Blog
+    {% endif %}
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>
+        
+        {% if post %}
+        Edit post
+        {% else %}
+        New post
+        {% endif %}
+    </h1>
+    <form method="POST" class="post-form full-width">
+        <p style="line-height: 0">
+            <button onclick="event.preventDefault(); window.location = '/dashboard/posts/'">&#8592; Back</button>
+            <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
+            <button type="submit" onclick="document.getElementById('publish').value = false;">
+                {% if post.publish %}
+                Unpublish
+                {% else %}
+                Save as draft
+                {% endif %}
+            </button>
+            {% if post %}
+                <button onclick="event.preventDefault(); window.open('{{ root }}/{{ post.slug }}{% if not post.publish %}?preview=true{% endif %}');">
+                    View{% if not post.publish %} draft{% endif %}
+                </button>
+            {% endif %}
+            {% if post %}
+                <button style="color: red; float: right;" onclick="event.preventDefault(); window.location = 'delete/';">Delete</button>
+            {% endif %}
+                <details style="font-size: 12px">
+                    <summary>Available headers</summary>
+                    <p style="display:grid;grid-template-columns: auto auto;">
+                        <span>---</span><span></span>
+                        <span>
+                            <b>title:</b> I like Bears
+                        </span>
+                        <span>
+                            <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#title" target="_blank" style="text-decoration:none">
+                                &#9432;
+                            </a>
+                            required
+                        </span>
+                        <span>
+                            <b>link:</b> i-like-bears
+                        </span>
+                        <span style="color: grey">
+                            <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#link" target="_blank" style="text-decoration:none">
+                                &#9432;
+                            </a>
+                            optional - leave empty to auto-generate
+                        </span>
+                        <span>
+                            <b>canonical_url:</b> https://example.com/i-like-bears
+                        </span>
+                        <span style="color: grey">
+                            <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#canonical_url" target="_blank" style="text-decoration:none">
+                                &#9432;
+                            </a>
+                            optional - leave empty to auto-generate
+                        </span>
+                        <span>
+                            <b>published_date:</b> 2022-12-30
+                        </span>
+                        <span style="color: grey">
+                            <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#published_date" target="_blank" style="text-decoration:none">
+                                &#9432;
+                            </a>
+                            optional - leave empty to publish now
+                        </span>
+                        <span>
+                            <b>is_page:</b> false
+                        </span>
+                        <span style="color: grey">
+                            <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#is_page" target="_blank" style="text-decoration:none">
+                                &#9432;
+                            </a>
+                            optional - set as page
+                        </span>
+                        <span>
+                            <b>meta_description:</b> Bears are pretty cool, according to science.
+                        </span>
+                        <span style="color: grey">
+                            <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#meta_description" target="_blank" style="text-decoration:none">
+                                &#9432;
+                            </a>
+                            optional - a description of the post
+                        </span>
+                        <span>
+                            <b>meta_image:</b> https://i.imgur.com/3jxqrKP.jpeg
+                        </span>
+                        <span style="color: grey">
+                            <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#meta_image" target="_blank" style="text-decoration:none">
+                                &#9432;
+                            </a>
+                            optional - valid image url for previews
+                        </span>
+                        <span>
+                            <b>tags:</b> bears, writing, thoughts
+                        </span>
+                        <span style="color: grey">
+                            <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#tags" target="_blank" style="text-decoration:none">
+                                &#9432;
+                            </a>
+                            optional - comma separated list of tags
+                        </span>
+                        <span>
+                            <b>make_discoverable:</b> true
+                        </span>
+                        <span style="color: grey">
+                            <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#make_discoverable" target="_blank" style="text-decoration:none">
+                                &#9432;
+                            </a>
+                            optional - show in the <a href="https://bearblog.dev/discover/" target="_blank" style="text-decoration:none">discovery feed</a>
+                        </span>
+                        <span>---</span><span></span>
+                    </p>
+                    </code>
+                </details>
+        </p>
+        {% csrf_token %}
+        <textarea name="raw_content" style="width: calc(100% - 13px); height: 500px">{% if post %}---
+title: {{ post.title }}
+link: {{ post.slug }}
+published_date: {{ post.published_date|date:"Y-m-d" }}{% if post.canonical_url %}
+canonical_url: {{ post.canonical_url }}{% endif %}{% if post.meta_description %}
+meta_description: {{ post.meta_description }}{% endif %}{% if post.meta_image %}
+meta_image: {{ post.meta_image }}{% endif %}{% if tags %}
+tags: {% for tag in tags %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if post.is_page %}
+is_page: {{ post.is_page|lower }}{% endif %}{% if not post.make_discoverable %}
+make_discoverable: {{ post.make_discoverable|lower }}{% endif %}
+---
+
+{{ post.content }}
+{% else %}
+---
+title: Post title
+---
+
+# Big header
+## Medium header
+### Small header
+
+**bold**
+*italics*
+~~strikethrough~~
+
+This is a [link](http://www.example.com) and this one opens in a [new tab](tab:https://www.example.com).
+
+![Inserted image](https://i.imgur.com/3jxqrKP.jpeg)
+{% endif %}
+        </textarea>
+        <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden />
+        <small>
+            <span>
+                Content in <a href="https://herman.bearblog.dev/markdown-cheatsheet/" target="_blank">markdown</a>
+            </span>
+            <span style="float:right">
+                <a id='upload-image'>Insert image</a> |
+                <a id="preview">Preview</a>
+            </span>
+        </small>
+    </form>
+</content>
+
+{% include '../snippets/editor_functions.html' with blog=blog%}
+{% endblock %}
