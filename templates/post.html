@@ -58,6 +58,7 @@
 {% if preview %}
 <p style="width:100%;padding:10px;background-color:lightsalmon;color:white;display:flex;justify-content:space-between;line-height:15px;">
     PREVIEW
+        {% if error_message %}<span>{{ error_message }}</span>{% endif %}
     <small>
         Close and re-open to refresh
     </small>

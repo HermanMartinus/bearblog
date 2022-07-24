@@ -10,6 +10,7 @@
 	//	linebreaks: true,
 	//	mode: "markdown"
 	//})
+	
 	const fullscreenToggle = document.querySelector('#toggle-full-screen')
 	if (fullscreenToggle) {
 		fullscreenToggle.onclick = event => {
@@ -25,7 +26,7 @@
 		previewForm.target = "print_popup"
 		previewForm.method = "POST"
 		previewForm.action = "/studio/preview/"
-		
+
 		const contentField = document.createElement("input");
 		contentField.type = "hidden"
 		contentField.name = "raw_content"

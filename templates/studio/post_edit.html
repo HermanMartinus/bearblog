@@ -14,13 +14,17 @@
 {% block content %}
 <content>
     <h1>
-        
         {% if post %}
         Edit post
         {% else %}
         New post
         {% endif %}
     </h1>
+    {% if error_message %}
+    <p style="color:lightsalmon">
+        {{ error_message }}
+    </p>
+    {% endif %}
     <form method="POST" class="post-form full-width">
         <p style="line-height: 0">
             <button onclick="event.preventDefault(); window.location = '/dashboard/posts/'">&#8592; Back</button>
@@ -38,10 +42,10 @@
                 </button>
             {% endif %}
             {% if post %}
-                <button style="color: red; float: right;" onclick="event.preventDefault(); window.location = 'delete/';">Delete</button>
+                <button style="color: red; float: right;" onclick="event.preventDefault(); window.location = '/dashboard/posts/{{ post.pk }}/delete/';">Delete</button>
             {% endif %}
                 <details style="font-size: 12px">
-                    <summary>Available headers</summary>
+                    <summary>Available header options</summary>
                     <p style="display:grid;grid-template-columns: auto auto;">
                         <span>---</span><span></span>
                         <span>
@@ -96,7 +100,7 @@
                             <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#meta_description" target="_blank" style="text-decoration:none">
                                 &#9432;
                             </a>
-                            optional - a description of the post
+                            optional - leave empty to auto-generate
                         </span>
                         <span>
                             <b>meta_image:</b> https://i.imgur.com/3jxqrKP.jpeg
@@ -131,7 +135,11 @@
                 </details>
         </p>
         {% csrf_token %}
-        <textarea name="raw_content" style="width: calc(100% - 13px); height: 500px">{% if post %}---
+        <textarea
+            name="raw_content"
+            style="width: calc(100% - 13px); height: 500px"
+            rows="10" 
+        >{% if error_message and raw_content  %}{{ raw_content }}{% elif post %}---
 title: {{ post.title }}
 link: {{ post.slug }}
 published_date: {{ post.published_date|date:"Y-m-d" }}{% if post.canonical_url %}
@@ -159,13 +167,12 @@ title: Post title
 
 This is a [link](http://www.example.com) and this one opens in a [new tab](tab:https://www.example.com).
 
-![Inserted image](https://i.imgur.com/3jxqrKP.jpeg)
-{% endif %}
-        </textarea>
+![Image](https://i.imgur.com/3jxqrKP.jpeg){% endif %}</textarea>
+
         <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden />
         <small>
             <span>
-                Content in <a href="https://herman.bearblog.dev/markdown-cheatsheet/" target="_blank">markdown</a>
+                Write in <a href="https://herman.bearblog.dev/markdown-cheatsheet/" target="_blank">markdown</a>
             </span>
             <span style="float:right">
                 <a id='upload-image'>Insert image</a> |

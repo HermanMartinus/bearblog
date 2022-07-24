@@ -78,33 +78,42 @@ def post(request, pk=None):
         post = None
         tags = []
 
+    error_message = ""
     raw_content = request.POST.get("raw_content", "")
 
     if raw_content:
         if post is None:
             post = Post(blog=blog)
 
-        parse_raw_content(raw_content, post)
-        if len(Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk)) > 0:
-            post.slug = post.slug + '-' + str(randint(0, 9))
+        try:
+            tags = parse_raw_content(raw_content, post)
+            if len(Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk)) > 0:
+                post.slug = post.slug + '-' + str(randint(0, 9))
 
-        post.publish = request.POST.get("publish", False) == "true"
+            post.publish = request.POST.get("publish", False) == "true"
 
-        post.save()
+            post.save()
 
-        # Add tags after saved
-        post.tags.clear()
-        if tags:
-            for tag in tags.split(','):
-                post.tags.add(slugify(tag.strip()))
+            # Add tags after saved
+            post.tags.clear()
+            if tags:
+                for tag in tags.split(','):
+                    if slugify(tag.strip()) != '':
+                        post.tags.add(slugify(tag.strip()))
 
-        return redirect(f"/studio/posts/{post.id}/")
+            return redirect(f"/studio/posts/{post.id}/")
+        except ValidationError:
+            error_message = "One of the header options is invalid"
+        except IndexError:
+            error_message = "One of the header options is invalid"
 
     return render(request, 'studio/post_edit.html', {
         'blog': blog,
         'root': blog.useful_domain(),
         'tags': tags,
-        'post': post
+        'post': post,
+        'error_message': error_message,
+        'raw_content': raw_content
     })
 
 
@@ -136,6 +145,7 @@ def parse_raw_content(raw_content, post):
             post.slug = slugify(value)
         if name == 'published_date':
             # Check if previously posted 'now'
+            value = value.replace('/', '-')
             if not str(post.published_date).startswith(value):
                 try:
                     post.published_date = timezone.datetime.fromisoformat(value)
@@ -163,6 +173,8 @@ def parse_raw_content(raw_content, post):
 
     post.content = raw_content[raw_content.replace('---', '', 1).index('---') + 8:].strip()
 
+    return tags
+
 
 @csrf_exempt
 @login_required
@@ -171,11 +183,17 @@ def preveiw(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"{blog.useful_domain()}/dashboard")
 
+    error_message = ""
     raw_content = request.POST.get("raw_content", "")
     post = Post(blog=blog)
 
     if raw_content:
-        parse_raw_content(raw_content, post)
+        try:
+            parse_raw_content(raw_content, post)
+        except ValidationError:
+            error_message = "One of the header options is invalid"
+        except IndexError:
+            error_message = "One of the header options is invalid"
 
         root = blog.useful_domain()
         meta_description = post.meta_description or unmark(post.content)
@@ -196,6 +214,7 @@ def preveiw(request):
             'canonical_url': canonical_url,
             'meta_description': meta_description,
             'meta_image': post.meta_image or blog.meta_image,
-            'preview': True
+            'preview': True,
+            'error_message': error_message
         }
     )
