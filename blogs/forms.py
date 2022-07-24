@@ -258,6 +258,17 @@ class AnalyticsForm(forms.ModelForm):
 
 
 class AccountForm(forms.ModelForm):
+    meta_tag = forms.CharField(
+        max_length=255,
+        label="Custom meta tag",
+        required=False
+    )
+    old_editor = forms.BooleanField(
+        label="Use the old editor",
+        required=False,
+        help_text="<br>Note: the old editor does not support real-time previews"
+    )
+
     class Meta:
         model = Blog
-        fields = ('meta_tag',)
+        fields = ('meta_tag', 'old_editor')

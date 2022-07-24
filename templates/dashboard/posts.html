@@ -11,7 +11,7 @@
 {% block content %}
 <content>
     <h1>Posts</h1>
-    <a href="/dashboard/posts/new">New post</a>
+    <a href="/{% if blog.old_editor %}dashboard{% else %}studio{% endif %}/posts/new">New post</a>
     <ul class="post-list">
         {% for post in posts %}
         <li>
@@ -22,7 +22,7 @@
                     </time>
                 </i>
             </span>
-            <a href="/dashboard/posts/{{ post.pk }}">
+            <a href="/{% if blog.old_editor %}dashboard{% else %}studio{% endif %}/posts/{{ post.pk }}">
                 {% if post.is_page %}
                     [Page]
                 {% endif %}
