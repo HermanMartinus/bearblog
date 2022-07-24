@@ -215,7 +215,7 @@ class PostForm(forms.ModelForm):
     )
 
     make_discoverable = forms.BooleanField(
-        help_text=f"Make post discoverable at <a href='https://{root()}/discover/' target='_blank'>{root()}/discover</a>",
+        help_text=f"Show in the <a href='https://{root()}/discover/' target='_blank'>discovery feed</a>",
         required=False,
         initial=True)
 

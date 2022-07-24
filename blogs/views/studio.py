@@ -1,6 +1,5 @@
 from email import header
 from random import randint
-from turtle import title
 from django.contrib.auth.decorators import login_required
 from django.forms import ValidationError
 from django.http import HttpResponse
