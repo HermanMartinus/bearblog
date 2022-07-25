@@ -35,15 +35,20 @@
             Save as draft
             {% endif %}
         </button>
+        <button
+            style="color: red; float:right;"
+            onclick="event.preventDefault();if(confirm('Are you sure you want to delete {{ post.title }}?')){window.location = 'delete/'}"
+        >
+            Delete
+        </button>
     </form>
     {% if post %}
         <p>
             {% if post.publish == True %}
-                <a href="{{ root }}/{{ post.slug }}" target="_blank">View post</a> |
+                <a href="{{ root }}/{{ post.slug }}" target="_blank">View post</a>
             {% elif post %}
-                <a href="{{ root }}/{{ post.slug }}?preview=true" target="_blank">Preview post</a> |
+                <a href="{{ root }}/{{ post.slug }}?preview=true" target="_blank">Preview post</a>
             {% endif %}
-            <a href="delete/">Delete post</a>
         </p>
         {% if not blog.reviewed %}
             <p>
