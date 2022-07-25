@@ -55,7 +55,7 @@ ___</pre>
             rows="10" 
         >{% if error_message and raw_content  %}{{ raw_content }}{% else %}
 title: {{ blog.title }}
-bear_domain: {{ blog.blank_domain }}{% if blog.domain %}
+bear_domain: {{ blog.blank_bear_domain }}{% if blog.domain %}
 custom_domain: {{ blog.domain }}{% endif %}
 favicon: {{ blog.favicon }}{% if blog.meta_description %}
 meta_description: {{ blog.meta_description }}{% endif %}{% if blog.meta_image %}
