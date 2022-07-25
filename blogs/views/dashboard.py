@@ -182,6 +182,13 @@ def post_edit(request, pk):
     })
 
 
+def post_delete(request, pk):
+    blog = get_object_or_404(Blog, user=request.user)
+    post = get_object_or_404(Post, blog=blog, pk=pk)
+    print(post)
+    return HttpResponse("Deleted")
+
+
 @csrf_exempt
 def upload_image(request):
     blog = get_object_or_404(Blog, user=request.user)
