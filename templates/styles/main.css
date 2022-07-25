@@ -95,6 +95,12 @@ textarea.full-screen {
     }
 }
 
+
+input[type='checkbox'], input[type='radio'] {
+    height: 15px;
+    margin-right: 10px;
+}
+
 button.floating {
     position: fixed;
     bottom: 20px;
