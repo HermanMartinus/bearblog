@@ -1,16 +1,24 @@
 <input type="file" id="file" hidden multiple accept="image/*" />
 {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/markdown/markdown.min.js"></script> {% endcomment %}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/markdown/markdown.min.js">
+	
+</script>
+<style>
+	.CodeMirror {
+		height: unset;
+		border: 1px dashed black;
+		padding: 10px;
+	}
+</style> {% endcomment %}
 <script>
 	var textarea = document.querySelector('textarea')
-	//var myCodeMirror = CodeMirror.fromTextArea(textarea, {
-	//	wordwrap: true,
-	//	linebreaks: true,
-	//	mode: "markdown"
-	//})
-	
+	{% comment %} var codemirror = CodeMirror.fromTextArea(textarea, {
+		mode: "markdown",
+		lineWrapping: true,
+		spellcheck: true
+	})  {% endcomment %}
+
 	const fullscreenToggle = document.querySelector('#toggle-full-screen')
 	if (fullscreenToggle) {
 		fullscreenToggle.onclick = event => {
