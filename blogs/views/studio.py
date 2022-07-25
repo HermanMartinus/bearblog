@@ -1,28 +1,17 @@
-from email import header
 from random import randint
+import re
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 from django.forms import ValidationError
-from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic.edit import DeleteView
 from django.utils import timezone
-from django.db.models import Count
-from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 
-import json
-import os
-import boto3
-import re
 import tldextract
-from ipaddr import client_ip
-import time
-import djqscsv
 
-from blogs.forms import AccountForm, BlogForm, DomainForm, NavForm, PostForm, StyleForm
-from blogs.helpers import get_post, sanitise_int, unmark
-from blogs.models import Blog, Post, Upvote
+from blogs.helpers import unmark
+from blogs.models import Blog, Post
 from blogs.views.blog import post
 
 
@@ -35,41 +24,101 @@ def resolve_subdomain(http_host, blog):
 
 @login_required
 def studio(request):
+    blog = None
     try:
         blog = Blog.objects.get(user=request.user)
         if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-            return redirect(f"{blog.useful_domain()}/dashboard")
-
-        if request.method == "POST":
-            form = BlogForm(request.POST, instance=blog)
-            if form.is_valid():
-                blog_info = form.save(commit=False)
-                blog_info.save()
-        else:
-            form = BlogForm(instance=blog)
-
+            return redirect(f"https://bearblog.dev/dashboard")
     except Blog.DoesNotExist:
         blog = Blog(
             user=request.user,
-            title=f"{request.user.username}'s blog",
-            subdomain=slugify(f"{request.user.username}-new"),
-            created_date=timezone.now()
-        )
+            title="My blog",
+            subdomain=request.user.username)
         blog.save()
-        form = BlogForm(instance=blog)
+
+    error_message = ""
+    raw_content = request.POST.get('raw_content', '')
+    if raw_content:
+        try:
+            parse_raw_homepage(raw_content, blog)
+            blog.save()
+        except IntegrityError:
+            error_message = "This bear_domain is already taken"
+        except IndexError:
+            error_message = "One of the header options is invalid"
+        except ValueError as error:
+            error_message = error
 
     return render(request, 'studio/studio.html', {
-        'form': form,
         'blog': blog,
-        'root': blog.useful_domain()
+        'error_message': error_message,
+        'raw_content': raw_content
     })
+
+
+def parse_raw_homepage(raw_content, blog):
+    raw_header = list(filter(None, raw_content.split('___')[0].split('\r\n')))
+
+    # Clear out data
+    blog.title = ''
+    blog.subdomain = ''
+    blog.domain = ''
+    blog.meta_description = ''
+    blog.meta_image = ''
+    blog.meta_tag = ''
+
+    # Parse and populate header data
+    for item in raw_header:
+        item = item.split(':', 1)
+        name = item[0].strip()
+        value = item[1].strip()
+        if str(value).lower() == 'true':
+            value = True
+        if str(value).lower() == 'false':
+            value = False
+
+        if name == 'title':
+            blog.title = value
+        elif name == 'bear_domain':
+            blog.subdomain = slugify(value.split('.')[0])
+        elif name == "custom_domain":
+            if blog.upgraded:
+                blog.domain = value
+            else:
+                raise ValueError("Upgrade your blog to add a custom domain")
+        elif name == 'favicon':
+            blog.favicon = value
+        elif name == 'meta_description':
+            blog.meta_description = value
+        elif name == 'meta_image':
+            blog.meta_image = value
+        elif name == 'lang':
+            blog.lang = value
+        elif name == 'nav':
+            blog.nav = value
+        elif name == 'custom_meta_tag':
+            if re.search(r'<meta (.*?)/>', value) and "url" not in value and "data" not in value:
+                blog.meta_tag = value
+            else:
+                raise ValueError("Invalid custom_meta_tag")
+        else:
+            raise ValueError(f"Unrecognised value: {name}")
+
+    if not blog.title:
+        blog.title = "My blog"
+    if not blog.subdomain:
+        blog.slug = slugify(blog.user.username)
+    if not blog.favicon:
+        blog.favicon = "🐻"
+
+    blog.content = raw_content[raw_content.index('___') + 3:].strip()
 
 
 @login_required
 def post(request, pk=None):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
+        return redirect(f"//bearblog.dev/dashboard")
 
     try:
         post = Post.objects.get(blog=blog, pk=pk)
@@ -86,7 +135,7 @@ def post(request, pk=None):
             post = Post(blog=blog)
 
         try:
-            tags = parse_raw_content(raw_content, post)
+            tags = parse_raw_post(raw_content, post)
             if len(Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk)) > 0:
                 post.slug = post.slug + '-' + str(randint(0, 9))
 
@@ -106,6 +155,8 @@ def post(request, pk=None):
             error_message = "One of the header options is invalid"
         except IndexError:
             error_message = "One of the header options is invalid"
+        except ValueError as error:
+            error_message = error
 
     return render(request, 'studio/post_edit.html', {
         'blog': blog,
@@ -117,8 +168,8 @@ def post(request, pk=None):
     })
 
 
-def parse_raw_content(raw_content, post):
-    raw_header = list(filter(None, raw_content.split('---')[1].split('\r\n')))
+def parse_raw_post(raw_content, post):
+    raw_header = list(filter(None, raw_content.split('___')[0].split('\r\n')))
 
     # Clear out data
     post.slug = ''
@@ -141,28 +192,36 @@ def parse_raw_content(raw_content, post):
 
         if name == 'title':
             post.title = value
-        if name == 'link':
+        elif name == 'link':
             post.slug = slugify(value)
-        if name == 'published_date':
+        elif name == 'published_date':
             # Check if previously posted 'now'
             value = value.replace('/', '-')
             if not str(post.published_date).startswith(value):
                 try:
                     post.published_date = timezone.datetime.fromisoformat(value)
                 except ValueError:
-                    print('Bad date')
-        if name == 'tags':
+                    raise ValueError('Bad date format. Use YYYY-MM-DD')
+        elif name == 'tags':
             tags = value
-        if name == 'make_discoverable':
-            post.make_discoverable = value
-        if name == 'is_page':
-            post.is_page = value
-        if name == 'canonical_url':
+        elif name == 'make_discoverable':
+            if type(value) is bool:
+                post.make_discoverable = value
+            else:
+                raise ValueError('make_discoverable needs to be "true" or "false"')
+        elif name == 'is_page':
+            if type(value) is bool:
+                post.is_page = value
+            else:
+                raise ValueError('is_page needs to be "true" or "false"')
+        elif name == 'canonical_url':
             post.canonical_url = value
-        if name == 'meta_description':
+        elif name == 'meta_description':
             post.meta_description = value
-        if name == 'meta_image':
+        elif name == 'meta_image':
             post.meta_image = value
+        else:
+            raise ValueError(f"Unrecognised value: {name}")
 
     if not post.title:
         post.title = "New post"
@@ -171,7 +230,7 @@ def parse_raw_content(raw_content, post):
     if not post.published_date:
         post.published_date = timezone.now()
 
-    post.content = raw_content[raw_content.replace('---', '', 1).index('---') + 8:].strip()
+    post.content = raw_content[raw_content.index('___') + 3:].strip()
 
     return tags
 
@@ -181,7 +240,7 @@ def parse_raw_content(raw_content, post):
 def preveiw(request):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
+        return redirect(f"https://bearblog.dev/dashboard")
 
     error_message = ""
     raw_content = request.POST.get("raw_content", "")
@@ -189,11 +248,13 @@ def preveiw(request):
 
     if raw_content:
         try:
-            parse_raw_content(raw_content, post)
+            parse_raw_post(raw_content, post)
         except ValidationError:
             error_message = "One of the header options is invalid"
         except IndexError:
             error_message = "One of the header options is invalid"
+        except ValueError as error:
+            error_message = error
 
         root = blog.useful_domain()
         meta_description = post.meta_description or unmark(post.content)

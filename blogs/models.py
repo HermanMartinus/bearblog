@@ -14,7 +14,7 @@ class Blog(models.Model):
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
 
-    nav = models.CharField(max_length=500, default="[Home](/)\n[Blog](/blog/)", blank=True)
+    nav = models.CharField(max_length=500, default="[Home](/)[Blog](/blog/)", blank=True)
     content = models.TextField(default="Hello World!", blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
@@ -46,11 +46,26 @@ class Blog(models.Model):
     def bear_domain(self):
         return f'https://{self.subdomain}.{Site.objects.get_current().domain}'
 
-    def useful_domain(self):
+    def blank_bear_domain(self):
+        return f'{self.subdomain}.{Site.objects.get_current().domain}'
+
+    def useful_domain(self, protocol='https://'):
         if self.domain:
-            return f'https://{self.domain}'
+            return f'{protocol}{self.domain}'
         else:
-            return f'https://{self.subdomain}.{Site.objects.get_current().domain}'
+            return f'{protocol}{self.subdomain}.{Site.objects.get_current().domain}'
+
+    def blank_domain(self):
+        if self.domain:
+            return self.domain
+        else:
+            return f'{self.subdomain}.{Site.objects.get_current().domain}'
+
+    def dynamic_domain(self):
+        if self.domain:
+            return f'//{self.domain}'
+        else:
+            return f'//{self.subdomain}.{Site.objects.get_current().domain}'
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain()})'

@@ -5,11 +5,7 @@
 {% endblock %}
 
 {% block nav %}
-<a href="#">Home</a>
-<a href="#">Posts</a>
-<a href="#">Email lists</a>
-<a href="#">Home</a>
-
+{% include '../snippets/dashboard_nav.html' %}
 {% endblock %}
 
 {% block content %}
@@ -17,35 +13,68 @@
     {% if not blog.upgraded %}
     <p style="border: 1px dashed; text-align:center; padding: 5px">
         <i>
-            <a href="/dashboard/upgrade/">Upgrade</a> to get neat stuff and support the Tiny Internet!
+            <a href="/dashboard/upgrade/">Upgrade</a> to get neat features and support the Tiny Internet!
         </i>
     </p>
     {% endif %}
 
     <h1>Home</h1>
 
-    <form>
-        <textarea style="width: calc(100% - 13px); height:400px">
----
-title: Erwin's blog
-domain: erwin.bearblog.dev
-lang: en
-description: This is a pretty neat bloggo.
-nav: [Home](/) [Blog](/blog/)
----
+    {% if error_message %}
+    <p style="color:lightsalmon">
+        {{ error_message }}
+    </p>
+    {% endif %}
 
-Hello world!
-        </textarea>
+    <form method="POST" class="post-form full-width">
+        <p style="line-height: 0">
+            <button type="submit">Save</button>
+            {% if blog %}
+            <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}')">View</button>
+            {% endif %}
+            <button style="color: red; float: right;" onclick="event.preventDefault(); window.location = '/accounts/delete/';">Delete</button>
+        </p>
+        <details style="font-size: 12px; margin-bottom: 10px;">
+            <summary>Available header options</summary>
+            <pre style="">
+title: Baloo's blog
+bear_domain: baloo.bearblog.dev
+custom_domain: baloothebear.com
+favicon: 🐻
+meta_description: Look for the bear necessities
+meta_image: https://i.imgur.com/3jxqrKP.jpeg
+lang: en
+custom_meta_tag: &lt;meta name='bear-id' content='baloo' /&gt;
+___</pre>
+        </details>
+        
+        {% csrf_token %}
+        <textarea
+            name="raw_content"
+            style="width: calc(100% - 13px); height: 500px"
+            rows="10" 
+        >{% if error_message and raw_content  %}{{ raw_content }}{% else %}
+title: {{ blog.title }}
+bear_domain: {{ blog.blank_domain }}{% if blog.domain %}
+custom_domain: {{ blog.domain }}{% endif %}
+favicon: {{ blog.favicon }}{% if blog.meta_description %}
+meta_description: {{ blog.meta_description }}{% endif %}{% if blog.meta_image %}
+meta_image: {{ blog.meta_image }}{% endif %}{% if blog.lang != 'en' %}
+lang: {{ blog.lang }}{% endif %}{% if blog.meta_tag and blog.meta_tag != "<meta name='' property='' content='' />" %}
+custom_meta_tag: {{ blog.meta_tag }}{% endif %}
+___
+
+{{ blog.content }}{% endif %}</textarea>
     </form>
     <small>
-        Content is written in <a href="#">markdown</a>
+        Write in <a href="#">markdown</a>
         <span style="float:right">
-        <a id='upload-image'>Insert image</a> |
-        <a id="preview">Preview</a>
+        <a id='upload-image'>Insert image</a>
+        {% comment %} | <a id="preview">Preview</a> {% endcomment %}
         </span>
     </small>
     <p>
-    <button>Save</button>
+   
     </p>
 
 {% include '../snippets/editor_functions.html' with blog=blog%}

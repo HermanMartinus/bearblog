@@ -19,12 +19,7 @@
     </p>
     {% endif %}
 
-    <h1>Home page</h1>
-
-    <p>
-        <input type="text" value="required" required style="width: 70px; font-size: 10px;" readonly/>
-        <input type="text" value="optional" style="width: 70px; font-size: 10px;" readonly/>
-    </p>
+    <h1>Dashboard</h1>
 
     <form method="POST" class="post-form full-width">{% csrf_token %}
         {{ form.as_p }}

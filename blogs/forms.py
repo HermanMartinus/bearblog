@@ -52,11 +52,12 @@ class BlogForm(forms.ModelForm):
     )
 
     content = forms.CharField(
-        label="Homepage content (markdown)",
+        label="Home page",
         help_text='''
-        <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown cheatsheet</a> |
-        <a id='upload-image'>Insert image</a>
-        <button id='toggle-full-screen'>&#10529;</button>''',
+        Write in <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>markdown</a>
+        <span style="float:right">
+            <a id='upload-image'>Insert image</a>
+        </span>''',
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
         required=False,
     )
@@ -84,11 +85,15 @@ class NavForm(forms.ModelForm):
     nav = forms.CharField(
         label="Nav",
         widget=forms.Textarea(attrs={'rows': 10, 'cols': 40}),
-        help_text='''Add nav links in
+        help_text='''Add navigation links in
                     <a href='https://herman.bearblog.dev/markdown-cheatsheet/#links' target='_blank'>
                         Markdown
-                    </a>.
-                    Each link should be on a new line.''',
+                    </a>
+                    <br>
+                    [Home](/) [About me](/about-me/) Blog(/blog/)
+                    <br>
+                    To add a page to the nav menu set the link value to the link of a published post or page
+                    ''',
         required=False,
     )
 
@@ -263,6 +268,7 @@ class AccountForm(forms.ModelForm):
         label="Custom meta tag",
         required=False
     )
+
     old_editor = forms.BooleanField(
         label="Use the old editor",
         required=False,
