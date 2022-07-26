@@ -12,7 +12,6 @@ import tldextract
 
 from blogs.helpers import sanitise_int, unmark
 from blogs.models import Blog, Post
-from blogs.views.blog import post
 
 
 def resolve_subdomain(http_host, blog):
@@ -30,10 +29,13 @@ def studio(request):
         if not resolve_subdomain(request.META['HTTP_HOST'], blog):
             return redirect(f"https://bearblog.dev/dashboard")
     except Blog.DoesNotExist:
+        subdomain = request.user.username
+        if Blog.objects.filter(subdomain=request.user.username):
+            subdomain = request.user.username + '-' + str(randint(0, 9))
         blog = Blog(
             user=request.user,
             title="My blog",
-            subdomain=request.user.username)
+            subdomain=subdomain)
         blog.save()
 
     error_message = ""
@@ -97,7 +99,7 @@ def parse_raw_homepage(raw_content, blog):
         elif name == 'nav':
             blog.nav = value
         elif name == 'custom_meta_tag':
-            if re.search(r'<meta (.*?)/>', value) and "url" not in value and "data" not in value:
+            if re.search(r'<meta (.*?)/>', value) and "url" not in value and "javascript" not in value and "script" not in value:
                 blog.meta_tag = value
             else:
                 raise ValueError("Invalid custom_meta_tag")
@@ -120,12 +122,16 @@ def post(request, pk=None):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"//bearblog.dev/dashboard")
 
-    try:
-        post = Post.objects.get(blog=blog, pk=pk)
-        tags = post.tags.all()
-    except Post.DoesNotExist:
+    if pk is None:
         post = None
         tags = []
+    else:
+        try:
+            post = Post.objects.get(blog=blog, pk=sanitise_int(pk))
+            tags = post.tags.all()
+        except Post.DoesNotExist:
+            post = None
+            tags = []
 
     error_message = ""
     raw_content = request.POST.get("raw_content", "")

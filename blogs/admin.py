@@ -1,13 +1,15 @@
 from datetime import timedelta
+from ssl import CertificateError
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
 from django.utils import timezone
+from requests import TooManyRedirects
 
 from .models import Blog, Post, Upvote, Hit, Subscriber
 from django.utils.html import escape, format_html
-from blogs.helpers import root
+from blogs.helpers import check_connection, root
 from django.urls import reverse
 
 
@@ -103,7 +105,18 @@ class BlogAdmin(admin.ModelAdmin):
 
     block_blog.short_description = "Block selected blogs"
 
-    actions = ['approve_blog', 'block_blog', 'validate_domains', 'unsubscribe']
+    def validate_domains(self, request, queryset):
+        for blog in queryset:
+            print(f'Checking {blog.domain}')
+            try:
+                if check_connection(blog.useful_domain('http://')):
+                    print('good')
+                else:
+                    print('borked!')
+            except TooManyRedirects:
+                print('borked!')
+
+    actions = ['block_blog', 'validate_domains']
 
 
 @admin.register(Post)

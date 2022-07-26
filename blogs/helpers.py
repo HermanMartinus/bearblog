@@ -9,11 +9,8 @@ import mistune
 import requests
 import hashlib
 from django.http import Http404
-import json
 import subprocess
 from django.conf import settings
-from markdown import Markdown
-from io import StringIO
 from _datetime import timedelta
 
 from blogs.models import Blog
@@ -61,6 +58,18 @@ def sanitise_int(input, length=10):
         raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
 
+def sanitise_text(text):
+    htmlCodes = (
+        ('&', '&amp;'),
+        ('<', '&lt;'),
+        ('>', '&gt;'),
+        ('"', '&quot;'),
+        ("'", '&#39;'),)
+    for c, html_code in htmlCodes:
+        cleaned_text = text.replace(html_code, c)
+    return cleaned_text
+
+
 def is_protected(subdomain):
     protected_subdomains = [
         'login',
@@ -97,9 +106,9 @@ def check_connection(domain):
     if not domain:
         return
     try:
-        response = requests.request("GET", f'http://{domain}/')
-        print(response.text)
-        return ('look-for-the-bear-necessities' in response.text or 'Heroku' in response.text)
+        response = requests.request("GET", domain)
+        # print(response.text)
+        return ('look-for-the-bear-necessities' in response.text)
     except requests.exceptions.ConnectionError:
         return False
 

@@ -33,6 +33,8 @@ def resolve_subdomain(http_host, blog):
 def dashboard(request):
     try:
         blog = Blog.objects.get(user=request.user)
+        if not blog.old_editor:
+            return redirect("/studio/")
         if not resolve_subdomain(request.META['HTTP_HOST'], blog):
             return redirect(f"{blog.useful_domain()}/dashboard")
 
@@ -45,6 +47,7 @@ def dashboard(request):
             form = BlogForm(instance=blog)
 
     except Blog.DoesNotExist:
+        return redirect("/studio/")
         blog = Blog(
             user=request.user,
             title=f"{request.user.username}'s blog",
