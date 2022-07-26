@@ -121,7 +121,7 @@ def post(request, pk=None):
         return redirect(f"//bearblog.dev/dashboard")
 
     try:
-        post = Post.objects.get(blog=blog, pk=sanitise_int(pk))
+        post = Post.objects.get(blog=blog, pk=pk)
         tags = post.tags.all()
     except Post.DoesNotExist:
         post = None
