@@ -10,7 +10,7 @@ from django.utils.text import slugify
 
 import tldextract
 
-from blogs.helpers import unmark
+from blogs.helpers import sanitise_int, unmark
 from blogs.models import Blog, Post
 from blogs.views.blog import post
 
@@ -121,7 +121,7 @@ def post(request, pk=None):
         return redirect(f"//bearblog.dev/dashboard")
 
     try:
-        post = Post.objects.get(blog=blog, pk=pk)
+        post = Post.objects.get(blog=blog, pk=sanitise_int(pk))
         tags = post.tags.all()
     except Post.DoesNotExist:
         post = None

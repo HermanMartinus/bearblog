@@ -153,9 +153,7 @@ def post_edit(request, pk):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"{blog.useful_domain()}/dashboard")
 
-    sanitise_int(pk)
-
-    post = get_object_or_404(Post, blog=blog, pk=pk)
+    post = get_object_or_404(Post, blog=blog, pk=sanitise_int(pk))
     published_date_old = post.published_date
     if request.method == "POST":
         form = PostForm(request.user, request.POST, instance=post)
@@ -184,7 +182,7 @@ def post_edit(request, pk):
 
 def post_delete(request, pk):
     blog = get_object_or_404(Blog, user=request.user)
-    post = get_object_or_404(Post, blog=blog, pk=pk)
+    post = get_object_or_404(Post, blog=blog, pk=sanitise_int(pk))
     post.delete()
     return redirect('/dashboard/posts/')
 
