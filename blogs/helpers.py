@@ -2,6 +2,7 @@ import threading
 import bleach
 from bs4 import BeautifulSoup
 from django.contrib.sites.models import Site
+from requests.exceptions import ConnectionError
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
