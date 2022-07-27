@@ -2,6 +2,15 @@
     font-weight: 400;
 }
 
+.bear::before {
+    content: "ᕦʕ •ᴥ•ʔᕤ";
+    font-weight: 400;
+}
+.bear:hover::before {
+    content: "ᕙʕ ಠᴥಠʔᕗ";
+    font-weight: 400;
+}
+
 textarea,
 input:not([type="submit"]) {
     background-color: inherit;
