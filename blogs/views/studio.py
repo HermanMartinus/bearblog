@@ -10,7 +10,7 @@ from django.utils.text import slugify
 
 import tldextract
 
-from blogs.helpers import sanitise_int, unmark
+from blogs.helpers import check_connection, sanitise_int, unmark
 from blogs.models import Blog, Post
 
 
@@ -39,6 +39,7 @@ def studio(request):
         blog.save()
 
     error_message = ""
+    info_message = ""
     raw_content = request.POST.get('raw_content', '')
     if raw_content:
         try:
@@ -51,10 +52,38 @@ def studio(request):
         except ValueError as error:
             error_message = error
 
+    if blog.domain and not check_connection(blog):
+        info_message = f'''
+        The DNS records for <b>{blog.domain}</b> have not been set up.
+        <h4>Set the following DNS record</h4>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Content</th>
+                <th>TTL</th>
+            </tr>
+            <tr>
+                <td>CNAME</td>
+                <td><small>{blog.blank_domain()}</small></td>
+                <td><small>domain-proxy.bearblog.dev</small></td>
+                <td>3600</td>
+            </tr>
+        </table>
+        <p>
+            <small>
+                It may take some time for the DNS records to propagate.
+                <br>
+                <b>If you're using Cloudflare turn off the proxy (the little orange cloud).</b>
+            </small>
+        </p>
+        '''
+
     return render(request, 'studio/studio.html', {
         'blog': blog,
         'error_message': error_message,
-        'raw_content': raw_content
+        'raw_content': raw_content,
+        'info_message': info_message
     })
 
 

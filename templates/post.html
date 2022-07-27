@@ -30,7 +30,11 @@
 {% block seo %}
 {% if not blog.reviewed %}
 <meta name="robots" content="noindex">
+<meta name="robots" content="nofollow">
 {% endif %}
+
+<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
+
 {% include 'snippets/seo_tags.html' with title=post.title url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
 {% endblock %}
 

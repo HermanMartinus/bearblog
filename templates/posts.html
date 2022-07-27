@@ -28,7 +28,11 @@ Blog | {{ blog.title }}
 {% block seo %}
 {% if not blog.reviewed %}
 <meta name="robots" content="noindex">
+<meta name="robots" content="nofollow">
 {% endif %}
+
+<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
+
 {% include 'snippets/seo_tags.html' with title=blog.title url=root description=blog.content tags="blog, blogging, write, writing" image=blog.meta_image meta_tag=blog.meta_tag %}
 <link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}

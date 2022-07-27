@@ -26,6 +26,12 @@
     </p>
     {% endif %}
 
+    {% if info_message %}
+    <p style="color: black">
+        {{ info_message | safe }}
+    </p>
+    {% endif  %}
+
     <form method="POST" class="post-form full-width">
         <p style="line-height: 0">
             <button type="submit">Save</button>
@@ -34,7 +40,12 @@
             {% endif %}
         </p>
         <details style="font-size: 12px; margin-bottom: 10px;">
-            <summary>Available header options</summary>
+            <summary>
+                Available header options
+                <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-the-home-page" target="_blank" style="text-decoration:none">
+                    &#9432;
+                </a>
+            </summary>
             <pre style="">
 title: Baloo's blog
 bear_domain: baloo.bearblog.dev

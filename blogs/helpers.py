@@ -102,15 +102,12 @@ def check_records(domain):
     return ('look-for-the-bear-necessities' in str(verification_string))
 
 
-def check_connection(domain):
-    if not domain:
+def check_connection(blog):
+    if not blog.domain:
         return
-    try:
-        response = requests.request("GET", domain)
-        # print(response.text)
-        return ('look-for-the-bear-necessities' in response.text)
-    except requests.exceptions.ConnectionError:
-        return False
+    else:
+        response = requests.request("GET", blog.useful_domain())
+        return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities"/>' in response.text)
 
 
 def unmark(markdown):

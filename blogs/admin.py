@@ -109,7 +109,7 @@ class BlogAdmin(admin.ModelAdmin):
         for blog in queryset:
             print(f'Checking {blog.domain}')
             try:
-                if check_connection(blog.useful_domain('http://')):
+                if check_connection(blog):
                     print('good')
                 else:
                     print('borked!')

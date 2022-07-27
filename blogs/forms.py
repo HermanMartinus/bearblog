@@ -103,18 +103,6 @@ class NavForm(forms.ModelForm):
 
 
 class StyleForm(forms.ModelForm):
-    favicon = forms.CharField(
-        max_length=4,
-        help_text="<a href='https://getemoji.com/' target='_blank'>Emoji cheatsheet</a>",
-        required=True
-    )
-
-    meta_image = forms.CharField(
-        label="Meta image URL",
-        help_text="<a href='https://github.com/HermanMartinus/bearblog/wiki/Meta-information' target='_blank'>Learn more</a>",
-        required=False
-    )
-
     external_stylesheet = forms.CharField(
         help_text="<br>List of <a href='https://www.cssbed.com/' target='_blank'>no-class css themes</a> (only paste the CDN link)",
         required=False,
@@ -136,7 +124,7 @@ class StyleForm(forms.ModelForm):
         widgets = {
             'overwrite_styles': forms.RadioSelect
         }
-        fields = ('favicon', 'meta_image', 'dark_mode', 'external_stylesheet', 'custom_styles', 'overwrite_styles')
+        fields = ('external_stylesheet', 'custom_styles', 'dark_mode', 'overwrite_styles')
 
 
 class DomainForm(forms.ModelForm):
