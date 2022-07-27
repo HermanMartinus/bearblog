@@ -21,9 +21,6 @@ def email_list(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"{blog.useful_domain()}/dashboard")
 
-    if request.GET.get("delete", ""):
-        Subscriber.objects.filter(blog=blog, pk=request.GET.get("delete", "")).delete()
-
     subscribers = Subscriber.objects.filter(blog=blog)
 
     if request.GET.get("export-csv", ""):
@@ -39,15 +36,26 @@ def email_list(request):
         response['Content-Disposition'] = 'attachment; filename="emails.txt"'
         return response
 
+    email_addresses_text = ""
     if request.POST.get("email_addresses", ""):
         email_addresses = re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", request.POST.get("email_addresses", ""))
 
-        for email in email_addresses:
+        subscribers_list = list(subscribers.values_list('email_address', flat=True))
+        removed = list(set(subscribers_list) - set(email_addresses))
+        added = list(set(email_addresses) - set(subscribers_list))
+        for email in added:
             Subscriber.objects.get_or_create(blog=blog, email_address=email)
+        for email in removed:
+            Subscriber.objects.filter(blog=blog, email_address=email).delete()
+
+        for email in email_addresses:
+            email_addresses_text += f'''{email}
+'''
 
     return render(request, "dashboard/subscribers.html", {
         "blog": blog,
         "subscribers": subscribers,
+        "email_addresses_text": email_addresses_text
     })
 
 

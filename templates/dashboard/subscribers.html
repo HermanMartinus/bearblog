@@ -16,43 +16,29 @@
     <h1>Email list ({{ subscribers|length }})</h1>
     <p>
         <small>
-            Include the following snippet in your blog posts or on your home page:
+            Include the following snippet in your blog posts, navbar, or home page:
             <br>
             <code>Subscribe to my blog via [email](/subscribe/) or [RSS feed](/feed/).</code>
         </small>
     </p>
     <p>
         <small>
-            <b>Bear does not send emails to subscribers. This is an email list.</b>
+            <b>Bear does not send emails to subscribers. This is an email subscriber list.</b>
             <br>
-            Check out <a href="https://github.com/HermanMartinus/bearblog/wiki/Sending-emails" target="_blank">this guide</a> to sending emails.
+            <a href="https://github.com/HermanMartinus/bearblog/wiki/Sending-emails" target="_blank">Guide</a> for sending emails.
         </small>
     </p>
-    <p>
-        <a href="#import-contacts">Import contacts</a> |
-        Export as <a href="?export-csv=True" download>csv</a> | <a href="?export-txt=True" download>txt</a>
-    </p>
-    <ul>
-    {% for subscriber in subscribers %}
-        <li>
-            {{ subscriber.email_address }} -
-            <small>
-                <a href="?delete={{subscriber.pk}}">
-                    [delete]
-                </a>
-            </small>
-        </li>
-    {% empty %}
-        <li>No emails yet</li>
-    {% endfor %}
-    </ul>
     <form method="POST" id="import-contacts" class="full-width">
+        <p>
+        <input type="submit" value="Save" />
+        <button onclick="event.preventDefault();window.location = '?export-csv=True'" download>Export csv</button>
+        <button onclick="event.preventDefault();window.location = '?export-txt=True'" download>Export txt</button>
+        </p>
         {% csrf_token %}
-        <label for="email_addresses">
-            <b>Import contacts</b> - One email address per line
-        </label>
-        <textarea name="email_addresses" rows="10"></textarea>
-        <input type="submit" value="Add contacts" />
+        <textarea name="email_addresses" style="height: 400px">{% if email_addresses_text %}{{email_addresses_text}}{% else %}
+{% for subscriber in subscribers %}{{ subscriber.email_address }}
+{% empty %}No emails yet{% endfor %}{% endif %}</textarea>
+            <small>One email address per line</small>
     </form>
 </content>
 {% endif %}

@@ -175,14 +175,12 @@ footer {
 }
 
 #date-range,
-#initial-values,
-#import-contacts {
+#initial-values {
     display: none;
 }
 
 #date-range:target,
-#initial-values:target,
-#import-contacts:target {
+#initial-values:target {
     display: block;
 }
 
