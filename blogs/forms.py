@@ -1,3 +1,4 @@
+from email.policy import default
 from django import forms
 from django.core.validators import RegexValidator, ValidationError
 from django.template.defaultfilters import slugify
@@ -109,8 +110,8 @@ class StyleForm(forms.ModelForm):
 
     custom_styles = forms.CharField(
         label="Styles",
-        widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
-        required=False,
+        widget=forms.Textarea(),
+        required=False
     )
 
     class Meta:

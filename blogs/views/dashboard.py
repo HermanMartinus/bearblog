@@ -95,12 +95,17 @@ def styles(request):
         return redirect(f"{blog.useful_domain()}/dashboard")
 
     if request.method == "POST":
-        form = StyleForm(request.POST, instance=blog)
+        form = StyleForm(
+            request.POST,
+            instance=blog
+        )
         if form.is_valid():
             blog_info = form.save(commit=False)
             blog_info.save()
     else:
-        form = StyleForm(instance=blog)
+        form = StyleForm(
+            instance=blog
+        )
 
     if request.GET.get("style", False):
         style = request.GET.get("style", "default")
