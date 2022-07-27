@@ -72,9 +72,9 @@ def studio(request):
         </table>
         <p>
             <small>
-                It may take some time for the DNS records to propagate.
-                <br>
                 <b>If you're using Cloudflare turn off the proxy (the little orange cloud).</b>
+                <br>
+                It may take some time for the DNS records to propagate.
             </small>
         </p>
         '''

@@ -20,6 +20,8 @@ Restart service: systemctl restart bearblog
 
 ## DB backups run in a crontab:
 
+Backup is running in a cron job: crontab -e
+ 
 script: /root/deploy/backup.sh
 local backups: /root/backups/
 remote backups: https://sqlite.sfo3.digitaloceanspaces.com/backups/
