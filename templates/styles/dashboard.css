@@ -139,13 +139,9 @@ ul.discover-posts li div {
     padding-bottom: 8px;
 }
 
-{% comment %} ul.discover-posts li small {
-    color: #777 !important;
-}
-
 ul.discover-posts li small a {
     color: #777 !important;
-} {% endcomment %}
+}
 
 
 @media (prefers-color-scheme: dark) {
