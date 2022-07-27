@@ -26,7 +26,6 @@ class Blog(models.Model):
     upgraded_date = models.DateTimeField(blank=True, null=True)
     blocked = models.BooleanField(default=False)
 
-    dark_mode = models.BooleanField(default=True)
     external_stylesheet = models.CharField(max_length=255, blank=True)
     custom_styles = models.TextField(blank=True)
     overwrite_styles = models.BooleanField(
@@ -61,6 +60,7 @@ class Blog(models.Model):
         else:
             return f'{self.subdomain}.{Site.objects.get_current().domain}'
 
+    @property
     def dynamic_domain(self):
         if self.domain:
             return f'//{self.domain}'

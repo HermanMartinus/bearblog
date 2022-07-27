@@ -104,19 +104,13 @@ class NavForm(forms.ModelForm):
 
 class StyleForm(forms.ModelForm):
     external_stylesheet = forms.CharField(
-        help_text="<br>List of <a href='https://www.cssbed.com/' target='_blank'>no-class css themes</a> (only paste the CDN link)",
         required=False,
     )
 
     custom_styles = forms.CharField(
+        label="Styles",
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
         required=False,
-    )
-
-    dark_mode = forms.BooleanField(
-        label="Auto dark mode",
-        help_text="<br>Automatically sets dark mode according to viewer's system preferences",
-        required=False
     )
 
     class Meta:
@@ -124,7 +118,7 @@ class StyleForm(forms.ModelForm):
         widgets = {
             'overwrite_styles': forms.RadioSelect
         }
-        fields = ('external_stylesheet', 'custom_styles', 'dark_mode', 'overwrite_styles')
+        fields = ('custom_styles', 'external_stylesheet', 'overwrite_styles')
 
 
 class DomainForm(forms.ModelForm):

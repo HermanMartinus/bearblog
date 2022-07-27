@@ -1,9 +1,7 @@
 <input type="file" id="file" hidden multiple accept="image/*" />
 {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/markdown/markdown.min.js">
-	
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/markdown/markdown.min.js"></script>
 <style>
 	.CodeMirror {
 		height: unset;
@@ -33,7 +31,7 @@
 		const previewForm = document.createElement('form')
 		previewForm.target = "print_popup"
 		previewForm.method = "POST"
-		previewForm.action = "/studio/preview/"
+		previewForm.action = "/studio/preview/?type={% if post %}post{% else %}homepage{% endif %}"
 
 		const contentField = document.createElement("input");
 		contentField.type = "hidden"

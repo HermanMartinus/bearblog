@@ -2,10 +2,7 @@
     @import '{{ blog.external_stylesheet }}';
 {% else %}
     {% if not blog.overwrite_styles %}
-        {% include 'styles/main.css' %}
-        {% if blog.dark_mode %}
-            {% include 'styles/dark_mode.css' %}
-        {% endif %}
+        {% include 'styles/blog/default.css' %}
     {% endif %}
 {% endif %}
 

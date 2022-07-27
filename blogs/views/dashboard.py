@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
+from django.template.loader import render_to_string
 
 import json
 import os
@@ -100,6 +101,14 @@ def styles(request):
             blog_info.save()
     else:
         form = StyleForm(instance=blog)
+
+    if request.GET.get("style", False):
+        style = request.GET.get("style", "default")
+        blog.custom_styles = render_to_string(f'styles/blog/{style}.css')
+        blog.overwrite_styles = True
+        blog.external_stylesheet = ""
+        blog.save()
+        return redirect('/dashboard/styles/')
 
     return render(request, 'dashboard/styles.html', {
         'blog': blog,

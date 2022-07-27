@@ -24,14 +24,14 @@
   <style>
       {% autoescape off %}
       {% block custom_styles %}
-        {% include 'styles/main.css' %}
-        {% include 'styles/dark_mode.css' %}
+        {% include 'styles/blog/default.css' %}
+        {% include 'styles/dashboard.css' %}
       {% endblock %}
       {% endautoescape %} 
-    body:hover {
-      border-image: {% block hitcount %}{% endblock %};
-      border-width: 0;
-    }
+body:hover {
+  border-image: {% block hitcount %}{% endblock %};
+  border-width: 0;
+}
   </style>
 </head>
 

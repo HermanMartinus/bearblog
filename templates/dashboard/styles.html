@@ -1,26 +1,60 @@
-{% extends 'base.html' %}
-{% block title %} Styling | Bear Blog {% endblock %}
+{% extends 'base.html' %} {% block title %} Styling | Bear Blog {% endblock %}
 {% block nav %} {% include '../snippets/dashboard_nav.html' %} {% endblock %}
 {% block content %}
 <content>
-  <h1>Custom styling</h1>
+  <h1>Styling</h1>
+  <h3>Themes</h3>
+  <p>
+    <button onclick="setStyle('default')">Default</button>
+    <button onclick="setStyle('plainhtml')">Plain HTML</button>
+    <button onclick="setStyle('writer')">Writer</button>
+    <button onclick="setStyle('delightful')">Delightful</button>
+  </p>
+  <hr>
 
   <form method="POST" class="post-form full-width">
+    <p>
+      <button type="submit" class="save btn btn-default">Save</button>
+      <button onclick="event.preventDefault();window.open('{{ blog.dynamic_domain }}');">
+        View
+      </button>
+    </p>
     {% csrf_token %} {{ form.as_p }}
-    <button type="submit" class="save btn btn-default">Save</button>
+
+      <span class="helptext">
+        <b>If extending styling, ensure it caters to existing dark mode styles.</b>
+        <br />
+        See the dark mode styling
+        <a
+          href="https://github.com/HermanMartinus/bearblog/blob/master/templates/styles/blog/default.css"
+          >here</a
+        >
+        for more information.
+      </small>
   </form>
-  <p>
-    <small>
-      If extending styling, ensure it caters to existing dark mode styles or disable dark.
-      <br>
-      See the dark mode styling
-      <a
-        href="https://github.com/HermanMartinus/bearblog/blob/master/templates/styles/dark_mode.css"
-        >here</a
-      >
-      for more information.
-    </small>
-  </p>
-  <p>View site: <a href="{{ root }}" target="_blank">{{ root }}</a></p>
+
 </content>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/css/css.min.js"></script>
+<style>
+	.CodeMirror {
+		height: unset;
+		border: 1px dashed black;
+		padding: 2px;
+	}
+</style>
+<script>
+  var codemirror = CodeMirror.fromTextArea(document.querySelector('textarea'), {
+		mode: "css",
+		lineWrapping: true,
+		spellcheck: true
+	})
+  const setStyle = name => {
+    if (confirm("This will overwrite your current styles, are you sure?")) {
+      window.location = '?style=' + name
+    }
+  }
+</script>
 {% endblock %}
