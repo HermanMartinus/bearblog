@@ -106,8 +106,11 @@ def check_connection(blog):
     if not blog.domain:
         return
     else:
-        response = requests.request("GET", blog.useful_domain())
-        return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities"/>' in response.text)
+        try:
+            response = requests.request("GET", blog.useful_domain())
+            return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities"/>' in response.text)
+        except ConnectionError:
+            return False
 
 
 def unmark(markdown):
