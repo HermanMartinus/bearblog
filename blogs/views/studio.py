@@ -114,7 +114,10 @@ def parse_raw_homepage(raw_content, blog):
             blog.subdomain = slugify(value.split('.')[0])
         elif name == "custom_domain":
             if blog.upgraded:
-                blog.domain = value
+                if len(Blog.objects.filter(domain=value).exclude(pk=blog.pk)) == 0:
+                    blog.domain = value
+                else:
+                    raise ValueError("This domain is already in use")
             else:
                 raise ValueError("Upgrade your blog to add a custom domain")
         elif name == 'favicon':
