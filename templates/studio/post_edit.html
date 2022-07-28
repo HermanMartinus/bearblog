@@ -29,19 +29,20 @@
         <p style="line-height: 0">
             <button onclick="event.preventDefault(); window.location = '/dashboard/posts/'">&#8592; Back</button>
             <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
-            <button type="submit" onclick="document.getElementById('publish').value = false;">
-                {% if post.publish %}
-                Unpublish
-                {% else %}
-                Save as draft
-                {% endif %}
-            </button>
+            
             {% if post %}
                 <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}/{{ post.slug }}{% if not post.publish %}?preview=true{% endif %}');">
                     View{% if not post.publish %} draft{% endif %}
                 </button>
                 <button style="color: red; float: right;" onclick="event.preventDefault();if(confirm('Are you sure you want to delete {{ post.title }}?')){window.location = '/dashboard/posts/{{ post.pk }}/delete/';}">Delete</button>
             {% endif %}
+            <button type="submit" {% if post.publish %}style="color: lightsalmon;"{% endif %} onclick="document.getElementById('publish').value = false;">
+                {% if post.publish %}
+                Unpublish
+                {% else %}
+                Save as draft
+                {% endif %}
+            </button>
         </p>
 
         <details style="font-size: 12px; margin-bottom: 10px;">
@@ -167,7 +168,7 @@ This is a [link](http://www.example.com) and this one opens in a [new tab](tab:h
 ![Image](https://i.imgur.com/3jxqrKP.jpeg){% endif %}</textarea>
 
         <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden />
-        <small>
+        <span class="helptext">
             <span>
                 Write in <a href="https://herman.bearblog.dev/markdown-cheatsheet/" target="_blank">markdown</a>
             </span>
@@ -175,7 +176,7 @@ This is a [link](http://www.example.com) and this one opens in a [new tab](tab:h
                 <a id='upload-image'>Insert image</a> |
                 <a id="preview">Preview</a>
             </span>
-        </small>
+        </span>
     </form>
 </content>
 

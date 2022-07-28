@@ -34,7 +34,7 @@
 
     <form method="POST" class="post-form full-width">
         <p style="line-height: 0">
-            <button type="submit">Save</button>
+            <button type="submit">Publish</button>
             {% if blog %}
             <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}')">View</button>
             {% endif %}
@@ -76,13 +76,13 @@ ___
 
 {{ blog.content }}{% endif %}</textarea>
     </form>
-    <small>
+    <span class="helptext">
         Write in <a href="#">markdown</a>
         <span style="float:right">
         <a id='upload-image'>Insert image</a>
         {% comment %} | <a id="preview">Preview</a> {% endcomment %}
         </span>
-    </small>
+    </span>
     <p>
    
     </p>

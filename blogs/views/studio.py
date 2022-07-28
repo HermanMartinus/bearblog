@@ -121,7 +121,10 @@ def parse_raw_homepage(raw_content, blog):
             else:
                 raise ValueError("Upgrade your blog to add a custom domain")
         elif name == 'favicon':
-            blog.favicon = value
+            if len(value) < 20:
+                blog.favicon = value
+            else:
+                raise ValueError("Favicon is too long")
         elif name == 'meta_description':
             blog.meta_description = value
         elif name == 'meta_image':

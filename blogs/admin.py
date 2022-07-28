@@ -93,6 +93,7 @@ class BlogAdmin(admin.ModelAdmin):
         ('domain', admin.EmptyFieldListFilter),
         ('upgraded', admin.BooleanFieldListFilter),
         ('blocked', admin.BooleanFieldListFilter),
+        ('external_stylesheet', admin.EmptyFieldListFilter)
         )
 
     def block_blog(self, request, queryset):
@@ -116,7 +117,15 @@ class BlogAdmin(admin.ModelAdmin):
             except TooManyRedirects:
                 print('borked!')
 
-    actions = ['block_blog', 'validate_domains']
+    def migrate_external_stylesheet(self, request, queryset):
+        blogs = queryset.exclude(external_stylesheet__exact='')
+        for blog in blogs:
+            blog.custom_styles = f"@import '{blog.external_stylesheet}';\r\n\r\n{blog.custom_styles}"
+            blog.external_stylesheet = ""
+            blog.overwrite_styles = True
+            blog.save()
+
+    actions = ['block_blog', 'validate_domains', 'migrate_external_stylesheet']
 
 
 @admin.register(Post)

@@ -47,11 +47,8 @@
 	}
 </style>
 <script>
-  var codemirror = CodeMirror.fromTextArea(document.querySelector('textarea'), {
-		mode: "css",
-		lineWrapping: true,
-		spellcheck: true
-	})
+  var codemirror = CodeMirror.fromTextArea(document.querySelector('textarea'), {mode: "css"})
+
   const setStyle = name => {
     if (confirm("This will overwrite your current styles, are you sure?")) {
       window.location = '?style=' + name
