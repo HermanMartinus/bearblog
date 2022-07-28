@@ -104,10 +104,6 @@ class NavForm(forms.ModelForm):
 
 
 class StyleForm(forms.ModelForm):
-    external_stylesheet = forms.CharField(
-        required=False,
-    )
-
     custom_styles = forms.CharField(
         label="Styles",
         widget=forms.Textarea(),
@@ -119,7 +115,7 @@ class StyleForm(forms.ModelForm):
         widgets = {
             'overwrite_styles': forms.RadioSelect
         }
-        fields = ('custom_styles', 'external_stylesheet', 'overwrite_styles')
+        fields = ('custom_styles', 'overwrite_styles')
 
 
 class DomainForm(forms.ModelForm):

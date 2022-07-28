@@ -120,7 +120,7 @@ class BlogAdmin(admin.ModelAdmin):
     def migrate_external_stylesheet(self, request, queryset):
         blogs = queryset.exclude(external_stylesheet__exact='')
         for blog in blogs:
-            blog.custom_styles = f"@import '{blog.external_stylesheet}';\r\n\r\n{blog.custom_styles}"
+            blog.custom_styles = f"@import '{blog.external_stylesheet.replace('url(', '').replace(')','')}';\r\n\r\n{blog.custom_styles}"
             blog.external_stylesheet = ""
             blog.overwrite_styles = True
             blog.save()
