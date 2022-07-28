@@ -111,7 +111,6 @@ def styles(request):
         style = request.GET.get("style", "default")
         blog.custom_styles = render_to_string(f'styles/blog/{style}.css')
         blog.overwrite_styles = True
-        blog.external_stylesheet = ""
         blog.save()
         return redirect('/dashboard/styles/')
 

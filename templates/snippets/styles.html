@@ -1,9 +1,2 @@
-{% if blog.external_stylesheet %}
-    @import '{{ blog.external_stylesheet }}';
-{% else %}
-    {% if not blog.overwrite_styles %}
-        {% include 'styles/blog/default.css' %}
-    {% endif %}
-{% endif %}
-
+{% if not blog.overwrite_styles %}{% include 'styles/blog/default.css' %}{% endif %}
 {{ blog.custom_styles | safe }}

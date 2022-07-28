@@ -9,6 +9,7 @@
     <button onclick="setStyle('plainhtml')">Plain HTML</button>
     <button onclick="setStyle('writer')">Writer</button>
     <button onclick="setStyle('delightful')">Delightful</button>
+    <small>More coming soon...</small>
   </p>
   <hr>
 
@@ -22,7 +23,8 @@
     {% csrf_token %} {{ form.as_p }}
 
       <span class="helptext">
-        <b>If extending styling, ensure it caters to existing dark mode styles.</b>
+        
+        <b>If extending styling, ensure your styling caters to existing dark mode styles.</b>
         <br />
         See the dark mode styling
         <a
