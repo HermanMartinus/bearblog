@@ -17,19 +17,20 @@ def review_flow(request):
 
     unreviewed_blogs = []
     for blog in blogs:
-        grace_period = timezone.now() - timedelta(days=14)
+        grace_period = timezone.now() - timedelta(days=30)
         if (
             blog.content == "Hello World!"
             and blog.post_count == 0
-            and blog.nav == "[Home](/)[Blog](/blog/)"
             and not blog.custom_styles
         ):
 
-            # Delete empty blogs 14 days old
+            # Delete empty blogs 30 days old
             if blog.created_date < grace_period:
                 blog.delete()
         else:
-            unreviewed_blogs.append(blog)
+            delay_period = timezone.now() - timedelta(days=2)
+            if blog.created_date < delay_period:
+                unreviewed_blogs.append(blog)
 
     if unreviewed_blogs:
         blog = unreviewed_blogs[0]
