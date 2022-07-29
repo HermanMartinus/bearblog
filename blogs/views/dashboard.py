@@ -111,7 +111,7 @@ def styles(request):
         blog.custom_styles = Stylesheet.objects.get(identifier=style).css
         blog.overwrite_styles = True
         if request.GET.get("preview", False):
-            return render(request, 'home.html', {'blog': blog, 'root': blog.useful_domain()})
+            return render(request, 'home.html', {'blog': blog})
         blog.save()
         return redirect('/dashboard/styles/')
 
