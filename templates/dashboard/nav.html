@@ -13,11 +13,9 @@
     <h1>Navigation</h1>
     
     <form method="POST" class="post-form full-width">{% csrf_token %}
+        <button type="submit">Publish</button>
+        <button onclick="event.preventDefault();window.open('{{blog.dynamic_domain}}');">View</button>
         {{ form.as_p }}
-        <button type="submit">Update nav</button>
     </form>
-    <p>
-        View site: <a href="{{ root }}" target="_blank">{{ root }}</a>
-    </p>
 </content>
 {% endblock %}

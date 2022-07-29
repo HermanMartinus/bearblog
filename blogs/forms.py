@@ -55,7 +55,7 @@ class BlogForm(forms.ModelForm):
     content = forms.CharField(
         label="Home page",
         help_text='''
-        Write in <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>markdown</a>
+        Learn <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>markdown syntax</a>
         <span style="float:right">
             <a id='upload-image'>Insert image</a>
         </span>''',

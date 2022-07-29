@@ -3,6 +3,7 @@ import re
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.forms import ValidationError
+from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -303,6 +304,8 @@ def preveiw(request):
         canonical_url = full_path
         if post.canonical_url and post.canonical_url.startswith('https://'):
             canonical_url = post.canonical_url
+    else:
+        raise Http404()
 
     return render(
         request,

@@ -64,7 +64,6 @@ def home(request):
         'home.html',
         {
             'blog': blog,
-            'content': blog.content,
             'posts': get_posts(all_posts),
             'root': blog.useful_domain(),
             'meta_description': meta_description

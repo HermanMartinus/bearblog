@@ -4,13 +4,16 @@
 <content>
   <h1>Styling</h1>
   <h3>Themes</h3>
-  <p>
-    <button onclick="setStyle('default')">Default</button>
-    <button onclick="setStyle('plainhtml')">Plain HTML</button>
-    <button onclick="setStyle('writer')">Writer</button>
-    <button onclick="setStyle('delightful')">Delightful</button>
-    <small>More coming soon...</small>
-  </p>
+  <div style="display: grid;grid-template-columns: auto auto auto auto auto auto;grid-gap: 0 40px;">
+      Default <a onclick="preview('default')">Preview</a> <button onclick="setStyle('default')">Apply theme</button> 
+      Plain HTML <a onclick="preview('plainhtml')">Preview</a> <button onclick="setStyle('plainhtml')">Apply theme</button> 
+      Writer <a onclick="preview('writer')">Preview</a> <button onclick="setStyle('writer')">Apply theme</button> 
+      Delightful <a onclick="preview('delightful')">Preview</a> <button onclick="setStyle('delightful')">Apply theme</button> 
+      {% comment %} Bamboo <a onclick="preview('delightful')">Preview</a> <button onclick="setStyle('delightful')">Apply theme</button>  {% endcomment %}
+      {% comment %} Sakura Vader <a onclick="preview('delightful')">Preview</a> <button onclick="setStyle('delightful')">Apply theme</button>  {% endcomment %}
+  </div>
+  <small>More coming soon...</small>
+
   <hr>
 
   <form method="POST" class="post-form full-width">
@@ -54,7 +57,12 @@
   const setStyle = name => {
     if (confirm("This will overwrite your current styles, are you sure?")) {
       window.location = '?style=' + name
+      // window.open('?style=' + name)
     }
+  }
+
+  const preview = name => {
+    window.open('?preview=True&style=' + name)
   }
 </script>
 {% endblock %}

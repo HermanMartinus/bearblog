@@ -17,14 +17,14 @@ def review_flow(request):
 
     unreviewed_blogs = []
     for blog in blogs:
-        grace_period = timezone.now() - timedelta(days=30)
+        grace_period = timezone.now() - timedelta(days=14)
         if (
             blog.content == "Hello World!"
             and blog.post_count == 0
             and not blog.custom_styles
         ):
 
-            # Delete empty blogs 30 days old
+            # Delete empty blogs 14 days old
             if blog.created_date < grace_period:
                 blog.delete()
         else:
