@@ -4,21 +4,26 @@
 <content>
   <h1>Styling</h1>
   <h3>Themes</h3>
-  <div style="display: grid;grid-template-columns: auto auto auto auto auto auto;grid-gap: 0 40px;">
-      Default <a onclick="preview('default')">Preview</a> <button onclick="setStyle('default')">Apply theme</button> 
-      Plain HTML <a onclick="preview('plainhtml')">Preview</a> <button onclick="setStyle('plainhtml')">Apply theme</button> 
-      Writer <a onclick="preview('writer')">Preview</a> <button onclick="setStyle('writer')">Apply theme</button> 
-      Delightful <a onclick="preview('delightful')">Preview</a> <button onclick="setStyle('delightful')">Apply theme</button> 
-      {% comment %} Bamboo <a onclick="preview('delightful')">Preview</a> <button onclick="setStyle('delightful')">Apply theme</button>  {% endcomment %}
-      {% comment %} Sakura Vader <a onclick="preview('delightful')">Preview</a> <button onclick="setStyle('delightful')">Apply theme</button>  {% endcomment %}
+  <div style="display: grid;grid-template-columns: 130px 100px 85px;">
+    {% for style in stylesheets %}
+    {{ style.title }}
+    <a onclick="preview('{{ style.identifier }}')">Preview</a>
+    <button onclick="setStyle('{{ style.identifier }}')">Apply theme</button> 
+    {% endfor %}
   </div>
-  <small>More coming soon...</small>
+  <small>
+    More coming soon...
+    <br>
+      Include
+      <a href="https://cssbed.com" target="_blank">no-class themes</a>
+      by using <code>@import 'https://link-to-stylesheet.css';</code>
+  </small>
 
   <hr>
 
   <form method="POST" class="post-form full-width">
     <p>
-      <button type="submit" class="save btn btn-default">Save</button>
+      <button type="submit" class="save btn btn-default">Publish</button>
       <button onclick="event.preventDefault();window.open('{{ blog.dynamic_domain }}');">
         View
       </button>
@@ -26,7 +31,6 @@
     {% csrf_token %} {{ form.as_p }}
 
       <span class="helptext">
-        
         <b>If extending styling, ensure your styling caters to existing dark mode styles.</b>
         <br />
         See the dark mode styling

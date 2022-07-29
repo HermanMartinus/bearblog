@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.utils import timezone
 from requests import TooManyRedirects
 
-from .models import Blog, Post, Upvote, Hit, Subscriber
+from .models import Blog, Post, Stylesheet, Upvote, Hit, Subscriber
 from django.utils.html import escape, format_html
 from blogs.helpers import check_connection, root
 from django.urls import reverse
@@ -151,6 +151,7 @@ class PostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Upvote)
+admin.site.register(Stylesheet)
 
 
 @admin.register(Hit)

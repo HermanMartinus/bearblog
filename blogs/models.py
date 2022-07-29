@@ -14,7 +14,7 @@ class Blog(models.Model):
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
 
-    nav = models.CharField(max_length=500, default="[Home](/)[Blog](/blog/)", blank=True)
+    nav = models.CharField(max_length=500, default="[Home](/) [Blog](/blog/)", blank=True)
     content = models.TextField(default="Hello World!", blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
@@ -137,3 +137,13 @@ class Subscriber(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     email_address = models.EmailField()
     subscribed_date = models.DateTimeField(auto_now_add=True)
+
+
+class Stylesheet(models.Model):
+    title = models.CharField(max_length=100)
+    identifier = models.SlugField(max_length=100, unique=True)
+    css = models.TextField(blank=True)
+    external = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title

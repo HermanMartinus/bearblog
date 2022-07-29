@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
-from django.template.loader import render_to_string
 
 import json
 import os
@@ -20,7 +19,7 @@ import djqscsv
 
 from blogs.forms import AccountForm, BlogForm, DomainForm, NavForm, PostForm, StyleForm
 from blogs.helpers import sanitise_int
-from blogs.models import Blog, Post, Upvote
+from blogs.models import Blog, Post, Stylesheet, Upvote
 
 
 def resolve_subdomain(http_host, blog):
@@ -109,7 +108,7 @@ def styles(request):
 
     if request.GET.get("style", False):
         style = request.GET.get("style", "default")
-        blog.custom_styles = render_to_string(f'styles/blog/{style}.css')
+        blog.custom_styles = Stylesheet.objects.get(identifier=style).css
         blog.overwrite_styles = True
         if request.GET.get("preview", False):
             return render(request, 'home.html', {'blog': blog, 'root': blog.useful_domain()})
@@ -119,7 +118,7 @@ def styles(request):
     return render(request, 'dashboard/styles.html', {
         'blog': blog,
         'form': form,
-        'root': blog.useful_domain(),
+        'stylesheets': Stylesheet.objects.all()
     })
 
 
