@@ -135,6 +135,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Static files
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
@@ -146,6 +147,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 
+# Emailer
+
 DEFAULT_FROM_EMAIL = "ʕ•ᴥ•ʔ Bear Blog <noreply@bearblog.dev>"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.eu.mailgun.org'
@@ -155,3 +158,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 EMAILOCTOPUS_API = os.getenv('EMAILOCTOPUS_API', False)
+
+# Referrer policy
+SECURE_REFERRER_POLICY = "cross-origin"
