@@ -26,7 +26,6 @@ class Blog(models.Model):
     upgraded_date = models.DateTimeField(blank=True, null=True)
     blocked = models.BooleanField(default=False)
 
-    external_stylesheet = models.CharField(max_length=255, blank=True)
     custom_styles = models.TextField(blank=True)
     overwrite_styles = models.BooleanField(
         default=False,
@@ -74,7 +73,7 @@ class Blog(models.Model):
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=100)
+    slug = models.SlugField(max_length=200)
     published_date = models.DateTimeField(blank=True)
     tags = TaggableManager(blank=True)
     publish = models.BooleanField(default=True)

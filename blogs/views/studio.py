@@ -1,7 +1,7 @@
 from random import randint
 import re
 from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
+from django.db import DataError, IntegrityError
 from django.forms import ValidationError
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -51,6 +51,8 @@ def studio(request):
         except IndexError:
             error_message = "One of the header options is invalid"
         except ValueError as error:
+            error_message = error
+        except DataError as error:
             error_message = error
 
     if blog.domain and not check_connection(blog):
@@ -198,6 +200,8 @@ def post(request, pk=None):
         except IndexError:
             error_message = "One of the header options is invalid"
         except ValueError as error:
+            error_message = error
+        except DataError as error:
             error_message = error
 
     return render(request, 'studio/post_edit.html', {
