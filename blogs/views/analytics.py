@@ -74,15 +74,14 @@ def analytics(request):
 
 
 def post_hit(request, pk):
-    print(httpagentparser.detect(request.META['HTTP_USER_AGENT']))
-    print(request.META['HTTP_REFERER'])
+    print(httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None)))
 
     ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
     try:
         Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash)
     except Hit.MultipleObjectsReturned:
         print('Duplicate hit')
-    except IntegrityError as e:
+    except IntegrityError:
         print('Post does not exist')
 
     return HttpResponse("Logged")
