@@ -126,4 +126,4 @@ class HitThread(threading.Thread):
             print('Duplicate hit')
         except IntegrityError:
             print('Post does not exist')
-            
+

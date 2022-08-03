@@ -354,7 +354,7 @@ def analytics(request):
 
     referrers = hits.values('referrer').distinct()
     for distinct in referrers:
-        if distinct['referrer'] == '':
+        if distinct['referrer'] is None:
             del distinct['referrer']
         else:
             distinct['number'] = len(hits.filter(referrer=distinct['referrer']))
