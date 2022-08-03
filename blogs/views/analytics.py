@@ -75,7 +75,7 @@ def analytics(request):
 
 def post_hit(request, pk):
     # print(httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None)))
-    print(request.GET.get('ref', None))
+    print("Ref: " + str(request.GET.get('ref', None)))
 
     ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
     try:

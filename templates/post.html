@@ -46,7 +46,7 @@
 
 {% block hitcount %}
 {% if not preview %}
-    url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}")
+    url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
 {% endif %}
 {% endblock %}
 
