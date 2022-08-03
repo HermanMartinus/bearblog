@@ -13,31 +13,33 @@
     <h1>Analytics</h1>
     --Timeframe--
 
-    <p><b>Unique reads:</b> {{ unique_reads.hit_count__sum }}<br>
-    <b>Unique visitors:</b> {{ unique_visitors }}</p>
+    <p>
+        <b>Unique reads:</b> {{ unique_reads.hit_count__sum }}<br>
+        <b>Unique visitors:</b> {{ unique_visitors }}
+    </p>
 
-    {% for post in posts %}
-        <p>
-        {{post.title}}
-        <br>Hits: {{post.hit_count}}
-        </p>
-    {% endfor %}
-    <hr>
-    <h3>Need more in-depth analytics?</h3>
-    <p>
-        For more in-depth analytics sign up for
-        <a href="https://usefathom.com/ref/GMAGWL" title="Fathom Analytics" target="_blank">
-            Fathom Analytics
-        </a>
-        who are comitted to simple, fast and privacy-focused analytics.
-    </p>
-    <p>
-        Check out the 
-        <a href="https://app.usefathom.com/share/wkwmftpv/herman.bearblog.dev" target="_blank">example analytics</a>.
-    </p>
-    <form method="POST" class="post-form">{% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Save</button>
-    </form>
+    <div style="display:flex;justify-content:space-between; font-size: 12px;">
+        <div style="width:48%">
+            <h3>Pages</h3>
+            {% for post in posts %}
+            <ul style="padding: 0;">
+                <li style="display:flex;justify-content:space-between;">
+                {{post.title}} <span>{{post.hit_count}}
+                </li>
+            </ul>
+            {% endfor %}
+        </div>
+        <div style="width:48%">
+            <h3>Referrers</h3>
+            <ul style="padding: 0;">
+                {% for referrer in referrers %}
+                <li style="display:flex;justify-content:space-between;">
+                    {{ referrer.referrer }}
+                    <span>{{ referrer.number }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </content>
 {% endblock %}

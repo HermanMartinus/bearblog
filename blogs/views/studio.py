@@ -337,7 +337,7 @@ def analytics(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"https://bearblog.dev/dashboard")
 
-    days = 365
+    days = 99999
 
     time_threshold = timezone.now() - timedelta(days=days)
 
@@ -352,9 +352,14 @@ def analytics(request):
     unique_reads = posts.aggregate(Sum('hit_count'))
     unique_visitors = len(hits.values('ip_address').distinct())
 
+    referrers = hits.values('referrer').distinct()
+    for distinct in referrers:
+        distinct['number'] = len(hits.filter(referrer=distinct['referrer']))
+
     return render(request, 'studio/analytics.html', {
         'blog': blog,
         'posts': posts,
         'unique_reads': unique_reads,
-        'unique_visitors': unique_visitors
+        'unique_visitors': unique_visitors,
+        'referrers': referrers
     })
