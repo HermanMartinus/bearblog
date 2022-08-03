@@ -31,7 +31,8 @@ urlpatterns = [
     path('studio/', studio.studio, name="studio"),
     path('studio/posts/new/', studio.post, name="post_new"),
     path('studio/posts/<pk>/', studio.post, name="post_edit"),
-    path('studio/preview/', studio.preveiw, name="preview"),
+    path('studio/preview/', studio.preview, name="preview"),
+    path('studio/analytics/', studio.analytics, name="analytics"),
 
     path('discover/', discover.discover, name='discover'),
     path('discover/feed/', discover.feed, name='discover_feed'),

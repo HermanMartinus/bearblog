@@ -60,7 +60,6 @@ def home(request):
 
     meta_description = blog.meta_description or unmark(blog.content)
 
-    print(httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None)))
     return render(
         request,
         'home.html',

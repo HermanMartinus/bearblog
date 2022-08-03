@@ -1,5 +1,7 @@
+from datetime import timedelta
 from random import randint
 import re
+from django.db.models import Count, Sum, Q
 from django.contrib.auth.decorators import login_required
 from django.db import DataError, IntegrityError
 from django.forms import ValidationError
@@ -12,7 +14,7 @@ from django.utils.text import slugify
 import tldextract
 
 from blogs.helpers import check_connection, sanitise_int, unmark
-from blogs.models import Blog, Post
+from blogs.models import Blog, Hit, Post
 
 
 def resolve_subdomain(http_host, blog):
@@ -283,7 +285,7 @@ def parse_raw_post(raw_content, post):
 
 @csrf_exempt
 @login_required
-def preveiw(request):
+def preview(request):
     blog = get_object_or_404(Blog, user=request.user)
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"https://bearblog.dev/dashboard")
@@ -327,3 +329,32 @@ def preveiw(request):
             'error_message': error_message
         }
     )
+
+
+@login_required
+def analytics(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
+        return redirect(f"https://bearblog.dev/dashboard")
+
+    days = 365
+
+    time_threshold = timezone.now() - timedelta(days=days)
+
+    posts = Post.objects.annotate(
+            hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))
+            ).prefetch_related('hit_set', 'upvote_set').filter(
+                blog=blog,
+                publish=True,
+            ).order_by('-hit_count', '-published_date')
+
+    hits = Hit.objects.filter(post__blog=blog, created_date__gt=time_threshold)
+    unique_reads = posts.aggregate(Sum('hit_count'))
+    unique_visitors = len(hits.values('ip_address').distinct())
+
+    return render(request, 'studio/analytics.html', {
+        'blog': blog,
+        'posts': posts,
+        'unique_reads': unique_reads,
+        'unique_visitors': unique_visitors
+    })

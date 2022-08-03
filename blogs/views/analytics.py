@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.db import IntegrityError
 from datetime import timedelta
 
+import requests
+
 from blogs.models import Blog, Hit, Post
 from blogs.forms import AnalyticsForm
 from blogs.helpers import daterange
@@ -72,15 +74,16 @@ def analytics(request):
 
 
 def post_hit(request, pk):
-    print(httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None)))
-    # print("Ref: " + str(request.GET.get('ref', None)))
+    # device = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
+
+    # location = requests.request("GET", f'https://geolocation-db.com/json/{client_ip(request)}')
 
     ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
     try:
-        hit = Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash, referrer=request.GET.get('ref', None))
+        Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash, referrer=request.GET.get('ref', None))
     except Hit.MultipleObjectsReturned:
         print('Duplicate hit')
     except IntegrityError:
         print('Post does not exist')
 
-    return HttpResponse("Logged")
+    return HttpResponse('Logged')

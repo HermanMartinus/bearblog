@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Analytics | Bear Blog
+{% endblock %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>Analytics</h1>
+    --Timeframe--
+
+    <p><b>Unique reads:</b> {{ unique_reads.hit_count__sum }}<br>
+    <b>Unique visitors:</b> {{ unique_visitors }}</p>
+
+    {% for post in posts %}
+        <p>
+        {{post.title}}
+        <br>Hits: {{post.hit_count}}
+        </p>
+    {% endfor %}
+    <hr>
+    <h3>Need more in-depth analytics?</h3>
+    <p>
+        For more in-depth analytics sign up for
+        <a href="https://usefathom.com/ref/GMAGWL" title="Fathom Analytics" target="_blank">
+            Fathom Analytics
+        </a>
+        who are comitted to simple, fast and privacy-focused analytics.
+    </p>
+    <p>
+        Check out the 
+        <a href="https://app.usefathom.com/share/wkwmftpv/herman.bearblog.dev" target="_blank">example analytics</a>.
+    </p>
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
+</content>
+{% endblock %}
