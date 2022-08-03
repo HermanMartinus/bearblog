@@ -127,6 +127,7 @@ class Hit(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     ip_address = models.CharField(max_length=200)
+    referrer = models.URLField(default=None, blank=True, null=True)
 
     def __str__(self):
         return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.ip_address} - {self.post}"

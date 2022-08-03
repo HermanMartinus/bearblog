@@ -1,5 +1,3 @@
-import hashlib
-import json
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
@@ -13,7 +11,10 @@ from blogs.helpers import get_blog_with_domain, get_post, get_posts, sanitise_in
 
 from ipaddr import client_ip
 from taggit.models import Tag
+import hashlib
+import json
 import tldextract
+import httpagentparser
 
 
 def resolve_address(request):
@@ -59,6 +60,7 @@ def home(request):
 
     meta_description = blog.meta_description or unmark(blog.content)
 
+    print(httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None)))
     return render(
         request,
         'home.html',

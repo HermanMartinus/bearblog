@@ -13,8 +13,6 @@ from django.http import HttpResponse
 from ipaddr import client_ip
 import httpagentparser
 import pygal
-import json
-from django.utils.datetime_safe import date
 import hashlib
 
 
@@ -74,12 +72,12 @@ def analytics(request):
 
 
 def post_hit(request, pk):
-    # print(httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None)))
-    print("Ref: " + str(request.GET.get('ref', None)))
+    print(httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None)))
+    # print("Ref: " + str(request.GET.get('ref', None)))
 
     ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
     try:
-        hit = Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash)
+        hit = Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash, referrer=request.GET.get('ref', None))
     except Hit.MultipleObjectsReturned:
         print('Duplicate hit')
     except IntegrityError:
