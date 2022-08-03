@@ -31,11 +31,11 @@
                 #{{ forloop.counter|add:posts_from }}
             </span>
             <div>
-                <a href="{{ post.blog.useful_domain }}/{{ post.slug }}/">
+                <a href="{{ post.blog.dynamic_domain }}/{{ post.slug }}" referrerpolicy="unsafe-url">
                     {{ post.title }}
                 </a>
                 <small>
-                    <span>(<a href="{{ post.blog.useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>
+                    <span>(<a href="{{ post.blog.dynamic_domain }}" referrerpolicy="unsafe-url">{{ post.blog.useful_domain }}</a>)</span>
                     <br>
                     <small>Published {{ post.published_date|timesince }} ago</small>
                     -
