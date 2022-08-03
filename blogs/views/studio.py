@@ -354,8 +354,10 @@ def analytics(request):
 
     referrers = hits.values('referrer').distinct()
     for distinct in referrers:
-
-        distinct['number'] = len(hits.filter(referrer=distinct['referrer']))
+        if distinct['referrer'] == '':
+            del distinct['referrer']
+        else:
+            distinct['number'] = len(hits.filter(referrer=distinct['referrer']))
 
     devices = hits.values('device').distinct()
     for distinct in devices:
