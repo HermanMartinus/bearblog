@@ -11,7 +11,11 @@
 {% block content %}
 <content>
     <h1>Posts</h1>
-    <a href="/{% if blog.old_editor %}dashboard{% else %}studio{% endif %}/posts/new">New post</a>
+    <a href="/{% if blog.old_editor %}dashboard{% else %}studio{% endif %}/posts/new">
+        <button>
+        New post
+        </button>
+    </a>
     <ul class="post-list">
         {% for post in posts %}
         <li>

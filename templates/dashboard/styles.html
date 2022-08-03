@@ -4,11 +4,13 @@
 <content>
   <h1>Styling</h1>
   <h3>Themes</h3>
-  <div style="display: grid;grid-template-columns: 130px 100px 85px;">
+  <div style="display: grid;grid-template-columns: auto 200px auto 200px;grid-gap: 0 27px;">
     {% for style in stylesheets %}
     {{ style.title }}
-    <a onclick="preview('{{ style.identifier }}')">Preview</a>
-    <button onclick="setStyle('{{ style.identifier }}')">Apply theme</button> 
+    <span>
+      <button onclick="preview('{{ style.identifier }}')">Preview</button>
+      <button onclick="setStyle('{{ style.identifier }}')">Apply theme</button> 
+    </span>
     {% endfor %}
   </div>
   <small>

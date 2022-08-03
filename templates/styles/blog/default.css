@@ -48,11 +48,15 @@ h1, h2, h3, h4, h5, h6 {
 a {
     color: var(--link-color);
     cursor: pointer;
-    text-decoration: underline;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline; 
 }
 
 nav a {
-    margin-right: 5px;
+    margin-right: 8px;
 }
 
 strong, b {
@@ -61,6 +65,7 @@ strong, b {
 
 button {
     margin: 0;
+    cursor: pointer;
 }
 
 content {
@@ -88,7 +93,6 @@ code {
     border-radius: 3px;
 }
 
-
 blockquote {
     border-left: 1px solid #999;
     color: var(--code-color);
@@ -101,7 +105,7 @@ footer {
     text-align: center;
 }
 
-.title {
+.title:hover {
     text-decoration: none;
 }
 

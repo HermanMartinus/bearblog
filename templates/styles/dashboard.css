@@ -139,7 +139,7 @@ ul.discover-posts li div {
     padding-bottom: 8px;
 }
 
-ul.discover-posts li small a {
+ul.discover-posts li small span, ul.discover-posts li small span a {
     color: #777 !important;
 }
 

@@ -35,9 +35,7 @@
                     {{ post.title }}
                 </a>
                 <small>
-                    <a href="{{ post.blog.useful_domain }}">
-                        ({{ post.blog.useful_domain }})
-                    </a>
+                    <span>(<a href="{{ post.blog.useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>
                     <br>
                     <small>Published {{ post.published_date|timesince }} ago</small>
                     -
