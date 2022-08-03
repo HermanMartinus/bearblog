@@ -26,7 +26,6 @@ class Blog(models.Model):
     upgraded_date = models.DateTimeField(blank=True, null=True)
     blocked = models.BooleanField(default=False)
 
-    external_stylesheet = models.CharField(max_length=255, blank=True)
     custom_styles = models.TextField(blank=True)
     overwrite_styles = models.BooleanField(
         default=False,
@@ -85,6 +84,7 @@ class Post(models.Model):
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
 
+    hits = models.JSONField(default=dict, blank=True, null=True)
     upvotes = models.IntegerField(default=0)
     score = models.FloatField(default=0)
 

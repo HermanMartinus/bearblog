@@ -19,7 +19,7 @@ import hashlib
 
 
 @login_required
-def analytics(request):
+def analytics_old(request):
     blog = get_object_or_404(Blog, user=request.user)
 
     time_threshold = False
@@ -81,7 +81,29 @@ def post_hit(request, pk):
         Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash)
     except Hit.MultipleObjectsReturned:
         print('Duplicate hit')
-    except IntegrityError as e:
+    except IntegrityError:
         print('Post does not exist')
 
     return HttpResponse("Logged")
+
+
+def analytics(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    posts = Post.objects.filter(blog=blog).prefetch_related("upvote_set").prefetch_related("hit_set")
+    return render(request, 'studio/analytics.html', {'blog': blog})
+
+
+def agregate_hits(pk):
+    post = get_object_or_404(Post, pk=pk)
+    hits = Hit.objects.filter(post_id=pk)
+
+    start_date = hits[0].created_date
+    end_date = timezone.now()-timedelta(days=1)
+    delta = timedelta(days=1)
+    while start_date <= end_date:
+        day_hit_count = len(hits.filter(created_date__gt=start_date, created_date__lt=start_date+delta))
+        if day_hit_count > 0:
+            post.hits[start_date.strftime("%Y-%m-%d")] = day_hit_count
+        start_date += delta
+    post.save()
+    print(len(hits))

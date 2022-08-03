@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Analytics | Bear Blog
+{% endblock %}
+
+{% block nav %}
+{% include '../snippets/dashboard_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<content>
+    <h1>Analytics (7 days)</h1>
+    <ul>
+        <li><b>Unique reads:</b> {{ blog.hit_count__sum }}</li>
+        <li><b>Unique visitors:</b> {{ blog.hit_count__sum }}</li>
+    </ul>
+   
+    {% for post in blog.post_set.all %}
+        {{ post.title }} - Upvotes: {{ post.upvote_set.all|length }} - Views: {{ post.hit_set.all|length }}
+        <br>
+    {% endfor %}
+</content>
+{% endblock %}
