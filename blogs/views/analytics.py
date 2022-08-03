@@ -1,3 +1,4 @@
+import threading
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -74,16 +75,58 @@ def analytics(request):
 
 
 def post_hit(request, pk):
-    # device = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
-
-    # location = requests.request("GET", f'https://geolocation-db.com/json/{client_ip(request)}')
-
     ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
     try:
-        Hit.objects.get_or_create(post_id=pk, ip_address=ip_hash, referrer=request.GET.get('ref', None))
+        response = requests.request("GET", f'https://geolocation-db.com/json/{client_ip(request)}')
+        location = response.json()
+        country = ''
+        device = ''
+        browser = ''
+        try:
+            if location['country_name'] and location['country_name'] != 'Not found':
+                country = location['country_name']
+        except KeyError:
+            print('Country not found')
+
+        user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
+
+        try:
+            if not user_agent['bot']:
+                device = user_agent['platform']['name']
+        except KeyError:
+            print('Platform not found')
+
+        try:
+            if not user_agent['bot']:
+                browser = user_agent['browser']['name']
+        except KeyError:
+            print('Platform not found')
+
+        Hit.objects.get_or_create(
+            post_id=pk,
+            ip_address=ip_hash,
+            referrer=request.GET.get('ref', None),
+            country=country,
+            device=device,
+            browser=browser)
+
+        # HitThread(hit, client_ip(request)).start()
     except Hit.MultipleObjectsReturned:
         print('Duplicate hit')
     except IntegrityError:
         print('Post does not exist')
 
-    return HttpResponse('Logged')
+    return HttpResponse("Logged")
+
+
+class HitThread(threading.Thread):
+    def __init__(self, hit, ip_address):
+        self.ip_address = ip_address
+        self.hit = hit
+        threading.Thread.__init__(self)
+
+    def run(self):
+        response = requests.request("GET", f'https://geolocation-db.com/json/{self.ip_address}')
+        self.hit.country = response.json()
+        self.hit.save()
+        print(self.hit)
