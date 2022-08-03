@@ -41,5 +41,41 @@
             </ul>
         </div>
     </div>
+
+    <div style="padding-top:20px;display:flex;justify-content:space-between; font-size: 12px;">
+        <div style="width:30%">
+            <h3>Devices</h3>
+            <ul style="padding: 0;">
+                {% for device in devices %}
+                <li style="display:flex;justify-content:space-between;">
+                    {{ device.device }}
+                    <span>{{ device.number }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div style="width:30%">
+            <h3>Browsers</h3>
+            <ul style="padding: 0;">
+                {% for browser in browsers %}
+                <li style="display:flex;justify-content:space-between;">
+                    {{ browser.browser }}
+                    <span>{{ browser.number }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div style="width:30%">
+            <h3>Countries</h3>
+            <ul style="padding: 0;">
+                {% for country in countries %}
+                <li style="display:flex;justify-content:space-between;">
+                    {{ country.country }}
+                    <span>{{ country.number }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </content>
 {% endblock %}

@@ -354,12 +354,37 @@ def analytics(request):
 
     referrers = hits.values('referrer').distinct()
     for distinct in referrers:
+
         distinct['number'] = len(hits.filter(referrer=distinct['referrer']))
+
+    devices = hits.values('device').distinct()
+    for distinct in devices:
+        if distinct['device'] == '':
+            del distinct['device']
+        else:
+            distinct['number'] = len(hits.filter(device=distinct['device']))
+
+    browsers = hits.values('browser').distinct()
+    for distinct in browsers:
+        if distinct['browser'] == '':
+            del distinct['browser']
+        else:
+            distinct['number'] = len(hits.filter(browser=distinct['browser']))
+
+    countries = hits.values('country').distinct()
+    for distinct in countries:
+        if distinct['country'] == '':
+            del distinct['country']
+        else:
+            distinct['number'] = len(hits.filter(country=distinct['country']))
 
     return render(request, 'studio/analytics.html', {
         'blog': blog,
         'posts': posts,
         'unique_reads': unique_reads,
         'unique_visitors': unique_visitors,
-        'referrers': referrers
+        'referrers': referrers,
+        'devices': devices,
+        'browsers': browsers,
+        'countries': countries
     })
