@@ -11,7 +11,8 @@
 {% block content %}
 <content>
     <h1>Analytics</h1>
-    --Timeframe--
+    
+    {{chart|safe}}
 
     <p>
         <b>Unique reads:</b> {{ unique_reads.hit_count__sum }}<br>

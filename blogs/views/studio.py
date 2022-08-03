@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 import tldextract
+import pygal
 
 from blogs.helpers import check_connection, sanitise_int, unmark
 from blogs.models import Blog, Hit, Post
@@ -337,7 +338,7 @@ def analytics(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"https://bearblog.dev/dashboard")
 
-    days = 99999
+    days = 30
 
     time_threshold = timezone.now() - timedelta(days=days)
 
@@ -348,7 +349,7 @@ def analytics(request):
                 publish=True,
             ).order_by('-hit_count', '-published_date')
 
-    hits = Hit.objects.filter(post__blog=blog, created_date__gt=time_threshold)
+    hits = Hit.objects.filter(post__blog=blog, created_date__gt=time_threshold).order_by('created_date')
     unique_reads = posts.aggregate(Sum('hit_count'))
     unique_visitors = len(hits.values('ip_address').distinct())
 
@@ -380,11 +381,29 @@ def analytics(request):
         else:
             distinct['number'] = len(hits.filter(country=distinct['country']))
 
+    end_date = timezone.now()
+    delta = timedelta(days=1)
+    chart_data = []
+    while time_threshold <= end_date:
+        day_hit_count = len(hits.filter(created_date__gt=time_threshold, created_date__lt=time_threshold+delta))
+        chart_data.append({'date': time_threshold.strftime("%Y-%m-%d"), 'hits': day_hit_count})
+        time_threshold += delta
+
+    print(len(chart_data))
+
+    chart = pygal.Bar(height=300)
+    mark_list = [x['hits'] for x in chart_data]
+    [x['date'] for x in chart_data]
+    chart.add('Reads', mark_list)
+    chart.x_labels = [x['date'] for x in chart_data]
+    chart_render = chart.render().decode('utf-8')
+
     return render(request, 'studio/analytics.html', {
         'blog': blog,
         'posts': posts,
         'unique_reads': unique_reads,
         'unique_visitors': unique_visitors,
+        'chart': chart_render,
         'referrers': referrers,
         'devices': devices,
         'browsers': browsers,
