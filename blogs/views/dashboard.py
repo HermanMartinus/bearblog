@@ -48,14 +48,6 @@ def dashboard(request):
 
     except Blog.DoesNotExist:
         return redirect("/studio/")
-        blog = Blog(
-            user=request.user,
-            title=f"{request.user.username}'s blog",
-            subdomain=slugify(f"{request.user.username}-new"),
-            created_date=timezone.now()
-        )
-        blog.save()
-        form = BlogForm(instance=blog)
 
     return render(request, 'dashboard/dashboard.html', {
         'form': form,
@@ -213,7 +205,7 @@ def upload_image(request):
 
         for file in request.FILES.getlist('file'):
             extention = file.name.split('.')[-1]
-            if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg')):
+            if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp')):
                 filepath = blog.subdomain + '-' + str(time.time()).split('.')[0] + '.' + extention
                 url = f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{filepath}'
 
