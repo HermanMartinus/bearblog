@@ -13,12 +13,12 @@
     <h1>Analytics</h1>
 
     <span style="float:right">
-        <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}'">Last week</button>
-        <button onclick="window.location = '?days=30{% if post_filter %}&post={{post_filter}}{% endif %}'">Last month</button>
-        <button onclick="window.location = '?days=60{% if post_filter %}&post={{post_filter}}{% endif %}'">Last 3 months</button>
-        <button onclick="window.location = '?days=180{% if post_filter %}&post={{post_filter}}{% endif %}'">Last 6 months</button>
-        <button onclick="window.location = '?days=365{% if post_filter %}&post={{post_filter}}{% endif %}'">Last year</button>
-        <button onclick="window.location = '?days=99999{% if post_filter %}&post={{post_filter}}{% endif %}'">All time</button>
+        <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last week</button>
+        <button onclick="window.location = '?days=30{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last month</button>
+        <button onclick="window.location = '?days=60{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 3 months</button>
+        <button onclick="window.location = '?days=180{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 6 months</button>
+        <button onclick="window.location = '?days=365{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last year</button>
+        <button onclick="window.location = '?days=99999{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">All time</button>
     </span>
     <embed type="image/svg+xml" src= {{ chart|safe }} />
     <span class="helptext" style="display: flex; justify-content:space-between;">
@@ -26,14 +26,17 @@
         <span>{{ end_date|date:"j F Y" }}</span> 
     </span>
 
-    {% if post_filter %}
     <p>
-        <small><b>{{ posts.first }}</b></small>
-        <a href="?days={{days_filter}}">
-            <button>Remove filter</button>
-        </a>
-    </p>
+    {% if post_filter %}
+        <small>Post: <b>{{ posts.first }}</b></small>
+        <a href="?days={{days_filter}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}"><button>Remove filter</button></a>
+        <br>
     {% endif %}
+    {% if referrer_filter %}
+        <small>Referrer: <b>{{ referrer_filter }}</b></small>
+        <a href="?days={{days_filter}}{% if post_filter %}&post={{post_filter}}{% endif %}"><button>Remove filter</button></a>
+    {% endif %}
+    </p>
 
     <p>
         <b>Unique reads:</b> {{ unique_reads }}<br>
@@ -46,7 +49,7 @@
             <ul style="padding: 0;">
                 {% for post in posts %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
-                <a href="?days={{days_filter}}&post={{post.pk}}">{{post.title}}</a>
+                <a href="?days={{days_filter}}&post={{post.pk}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">{{post.title}}</a>
                 <span>{{post.hit_count}}</span>
                 </li>
                 {% endfor %}
@@ -57,7 +60,7 @@
             <ul style="padding: 0;">
                 {% for referrer in referrers %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
-                    {{ referrer.referrer }}
+                    <a href="?days={{days_filter}}&referrer={{referrer.referrer}}{% if post_filter %}&post={{post_filter}}{% endif %}">{{referrer.referrer}}</a>
                     <span>{{ referrer.number }}</span>
                 </li>
                 {% endfor %}

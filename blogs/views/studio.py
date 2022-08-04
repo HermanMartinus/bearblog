@@ -356,9 +356,16 @@ def analytics(request):
             ).order_by('-hit_count', '-published_date')
 
         if referrer_filter:
-            hits = Hit.objects.filter(post__blog=blog, post__id=post_filter, referrer=referrer_filter, created_date__gt=start_date).order_by('created_date')
+            hits = Hit.objects.filter(
+                post__blog=blog,
+                post__id=post_filter,
+                referrer=referrer_filter,
+                created_date__gt=start_date).order_by('created_date')
         else:
-            hits = Hit.objects.filter(post__blog=blog, post__id=post_filter, created_date__gt=start_date).order_by('created_date')
+            hits = Hit.objects.filter(
+                post__blog=blog,
+                post__id=post_filter,
+                created_date__gt=start_date).order_by('created_date')
     else:
         posts = Post.objects.annotate(
             hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
@@ -368,9 +375,14 @@ def analytics(request):
             ).order_by('-hit_count', '-published_date')
 
         if referrer_filter:
-            hits = Hit.objects.filter(post__blog=blog, referrer=referrer_filter, created_date__gt=start_date).order_by('created_date')
+            hits = Hit.objects.filter(
+                post__blog=blog,
+                referrer=referrer_filter,
+                created_date__gt=start_date).order_by('created_date')
         else:
-            hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date).order_by('created_date')
+            hits = Hit.objects.filter(
+                post__blog=blog,
+                created_date__gt=start_date).order_by('created_date')
 
     if len(hits) > 0:
         start_date = hits[0].created_date.date()
@@ -411,7 +423,8 @@ def analytics(request):
         'browsers': browsers,
         'countries': countries,
         'days_filter': days_filter,
-        'post_filter': post_filter
+        'post_filter': post_filter,
+        'referrer_filter': referrer_filter
     })
 
 
