@@ -14,6 +14,7 @@ from django.utils.text import slugify
 import tldextract
 import pygal
 from pygal.style import LightColorizedStyle
+import djqscsv
 
 from blogs.helpers import check_connection, sanitise_int, unmark
 from blogs.models import Blog, Hit, Post
@@ -341,6 +342,19 @@ def analytics(request):
 
     if not blog.upgraded:
         return redirect('/dashboard/upgrade/')
+
+    if request.GET.get('share', False):
+        if request.GET.get('share') == 'public':
+            blog.public_analytics = True
+            blog.save()
+            return redirect(f'{blog.dynamic_domain}/public-analytics/')
+        else:
+            blog.public_analytics = False
+            blog.save()
+
+    if request.GET.get('export', False):
+        hits = Hit.objects.filter(post__blog=blog).order_by('created_date')
+        return djqscsv.render_to_csv_response(hits)
     return render_analytics(request, blog)
 
 

@@ -12,7 +12,7 @@
 
 {% block content %}
 <content style="word-break:break-all;">
-    <h1>Analytics</h1>
+    <h1>{% if public %}Public {% endif %}Analytics</h1>
 
     <span style="float:right">
         <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last week</button>
@@ -105,6 +105,22 @@
             </ul>
         </div>
     </div>
+    {% if not public %}
+    <hr>
+    <p>
+        {% if blog.public_analytics %}
+        <small>
+            Public analytics available at 
+            <a href="{{blog.dynamic_domain}}/public-analytics/" target="_blank">{{ blog.useful_domain }}/public-analytics/</a>
+        </small>
+        <br>
+        <button onclick="window.location = '?share=private'">Make analytics private</button>
+        {% else %}
+        <button onclick="window.location = '?share=public'">Make analytics public</button>
+        {% endif %}
+        <button onclick="window.open('?export=True')">Export all</button>
+    </p>
+    {% endif %}
 </content>
 {% endblock %}
 

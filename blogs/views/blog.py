@@ -176,8 +176,9 @@ def upvote(request, pk):
 
 def public_analytics(request):
     blog = resolve_address(request)
-    if not blog or not blog.upgraded:
-        return not_found(request)
+    if not blog or not request.user.is_staff:
+        if not blog.upgraded or not blog.public_analytics:
+            return not_found(request)
 
     return render_analytics(request, blog, True)
 
