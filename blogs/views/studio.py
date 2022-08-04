@@ -352,6 +352,9 @@ def analytics(request):
             ).order_by('-hit_count', '-published_date')
 
     hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date).order_by('created_date')
+
+    start_date = hits[0].created_date.date()
+
     unique_reads = posts.aggregate(Sum('hit_count'))
     unique_visitors = len(hits.values('ip_address').distinct().order_by())
 
