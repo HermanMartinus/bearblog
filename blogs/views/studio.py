@@ -339,9 +339,9 @@ def analytics(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"https://bearblog.dev/dashboard")
 
-    days = int(request.GET.get('days', 7))
+    days_filter = int(request.GET.get('days', 7))
     delta = timedelta(days=1)
-    start_date = (timezone.now() - timedelta(days=days)).date()
+    start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 
     post_filter = request.GET.get('post', False)
@@ -404,6 +404,7 @@ def analytics(request):
         'devices': devices,
         'browsers': browsers,
         'countries': countries,
+        'days_filter': days_filter,
         'post_filter': post_filter
     })
 
