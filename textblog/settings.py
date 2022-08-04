@@ -15,6 +15,7 @@ DEBUG = (os.environ.get('DEBUG') == 'True')
 DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
 ALLOWED_HOSTS = ['*']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INTERNAL_IPS = ['127.0.0.1']
 
