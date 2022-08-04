@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-<content style="word-break:break-all;">
+<content>
     <h1>{% if public %}Public {% endif %}Analytics</h1>
 
     <span style="float:right">
@@ -59,7 +59,7 @@
         </div>
         <div style="width:48%">
             <h3>Referrers</h3>
-            <ul style="padding: 0;">
+            <ul style="padding: 0;word-break:break-all;">
                 {% for referrer in referrers %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     <a href="?days={{days_filter}}&referrer={{referrer.referrer}}{% if post_filter %}&post={{post_filter}}{% endif %}">{{referrer.referrer}}</a>
