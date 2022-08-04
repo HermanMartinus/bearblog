@@ -339,6 +339,12 @@ def analytics(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"https://bearblog.dev/dashboard")
 
+    if not blog.upgraded:
+        return redirect('/dashboard/upgrade/')
+    return render_analytics(request, blog)
+
+
+def render_analytics(request, blog, public=False):
     post_filter = request.GET.get('post', False)
     referrer_filter = request.GET.get('referrer', False)
     days_filter = int(request.GET.get('days', 7))
@@ -423,6 +429,7 @@ def analytics(request):
     chart_render = chart.render_data_uri()
 
     return render(request, 'studio/analytics.html', {
+        'public': public,
         'blog': blog,
         'posts': posts,
         'start_date': start_date,

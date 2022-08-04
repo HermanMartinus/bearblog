@@ -6,7 +6,7 @@ from django.contrib.sites.models import Site
 from django.db.models import Count
 from django.utils import timezone
 
-from blogs.models import Blog, Post, Stylesheet, Upvote
+from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_blog_with_domain, get_post, get_posts, sanitise_int, unmark
 
 from ipaddr import client_ip
@@ -14,7 +14,8 @@ from taggit.models import Tag
 import hashlib
 import json
 import tldextract
-import httpagentparser
+
+from blogs.views.studio import render_analytics
 
 
 def resolve_address(request):
@@ -171,6 +172,14 @@ def upvote(request, pk):
             return HttpResponse(f'Upvoted {post.title}')
         raise Http404('Duplicate upvote')
     raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
+
+
+def public_analytics(request):
+    blog = resolve_address(request)
+    if not blog or not blog.upgraded:
+        return not_found(request)
+
+    return render_analytics(request, blog, True)
 
 
 @csrf_exempt

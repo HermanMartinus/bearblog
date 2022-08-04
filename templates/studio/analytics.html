@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block nav %}
+{% if not public %}
 {% include '../snippets/dashboard_nav.html' %}
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -104,4 +106,13 @@
         </div>
     </div>
 </content>
+{% endblock %}
+
+
+{% block footer %}
+{% if public %}
+Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+{% else %}
+{% include 'snippets/dashboard_footer.html' %}
+{% endif %}
 {% endblock %}
