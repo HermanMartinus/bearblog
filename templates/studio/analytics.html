@@ -11,10 +11,17 @@
 {% block content %}
 <content>
     <h1>Analytics</h1>
+    <span style="float:right">
+        <button onclick="window.location = '?days=7'">Last week</button>
+        <button onclick="window.location = '?days=30'">Last month</button>
+        <button onclick="window.location = '?days=60'">Last 3 months</button>
+        <button onclick="window.location = '?days=180'">Last 6 months</button>
+        <button onclick="window.location = '?days=365'">Last year</button>
+    </span>
     <embed type="image/svg+xml" src= {{ chart|safe }} />
     <span class="helptext" style="display: flex; justify-content:space-between;">
-    <span>04 July, 2022</span>
-    <span>04 August, 2022</span> 
+    <span>{{ start_date|date:"j F Y" }}</span>
+    <span>{{ end_date|date:"j F Y" }}</span> 
     </span>
     <p>
         <b>Unique reads:</b> {{ unique_reads.hit_count__sum }}<br>

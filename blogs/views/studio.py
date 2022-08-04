@@ -339,10 +339,10 @@ def analytics(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"https://bearblog.dev/dashboard")
 
-    days = 30
-
-    start_date = timezone.now() - timedelta(days=days)
-    end_date = timezone.now()
+    days = int(request.GET.get('days', 7))
+    delta = timedelta(days=1)
+    start_date = (timezone.now() - timedelta(days=days)).date()
+    end_date = timezone.now().date()
 
     posts = Post.objects.annotate(
             hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
@@ -360,12 +360,12 @@ def analytics(request):
     browsers = distinct_count(hits, 'browser')
     countries = distinct_count(hits, 'country')
 
-    delta = timedelta(days=1)
     chart_data = []
-    while start_date <= end_date:
-        day_hit_count = len(hits.filter(created_date__gt=start_date, created_date__lt=start_date+delta))
-        chart_data.append({'date': start_date.strftime("%Y-%m-%d"), 'hits': day_hit_count})
-        start_date += delta
+    date_iterator = start_date
+    while date_iterator <= end_date:
+        day_hit_count = len(hits.filter(created_date__gt=date_iterator, created_date__lt=date_iterator+delta))
+        chart_data.append({'date': date_iterator.strftime("%Y-%m-%d"), 'hits': day_hit_count})
+        date_iterator += delta
 
     chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
     chart.force_uri_protocol = 'http'
@@ -378,6 +378,8 @@ def analytics(request):
     return render(request, 'studio/analytics.html', {
         'blog': blog,
         'posts': posts,
+        'start_date': start_date,
+        'end_date': end_date,
         'unique_reads': unique_reads,
         'unique_visitors': unique_visitors,
         'chart': chart_render,
