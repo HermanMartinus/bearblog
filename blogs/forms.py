@@ -250,4 +250,4 @@ class AccountForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('old_editor',)
+        fields = ('old_editor', 'fathom_site_id')

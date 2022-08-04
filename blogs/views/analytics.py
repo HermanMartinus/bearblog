@@ -1,5 +1,5 @@
 import threading
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db import IntegrityError
@@ -22,6 +22,9 @@ import hashlib
 @login_required
 def analytics(request):
     blog = get_object_or_404(Blog, user=request.user)
+
+    if blog.upgraded:
+        return redirect('/studio/analytics/')
 
     time_threshold = False
     chart_data = []
@@ -47,36 +50,25 @@ def analytics(request):
     unique_reads = posts.aggregate(Sum('hit_count'))
     unique_visitors = len(hits.values('ip_address').distinct())
 
-    delta = timezone.now() - blog.created_date
-
-    chart = pygal.Bar(height=300)
+    chart = pygal.Bar(height=300, show_legend=False)
     mark_list = [x['hits'] for x in chart_data]
     [x['date'] for x in chart_data]
     chart.add('Reads', mark_list)
     chart.x_labels = [x['date'] for x in chart_data]
     chart_render = chart.render().decode('utf-8')
 
-    if request.method == "POST":
-        form = AnalyticsForm(request.POST, instance=blog)
-        if form.is_valid():
-            blog_info = form.save(commit=False)
-            blog_info.save()
-    else:
-        form = AnalyticsForm(instance=blog)
-
     return render(request, 'dashboard/analytics.html', {
         'unique_reads': unique_reads,
         'unique_visitors': unique_visitors,
         'posts': posts,
         'blog': blog,
-        'chart': chart_render,
-        'form': form
+        'chart': chart_render
     })
 
 
 def post_hit(request, pk):
     HitThread(request, pk).start()
-    
+
     return HttpResponse("Logged")
 
 

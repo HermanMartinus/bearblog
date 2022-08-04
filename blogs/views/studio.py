@@ -341,7 +341,7 @@ def analytics(request):
         return redirect(f"https://bearblog.dev/dashboard")
 
     if not blog.upgraded:
-        return redirect('/dashboard/upgrade/')
+        return redirect('/dashboard/analytics/')
 
     if request.GET.get('share', False):
         if request.GET.get('share') == 'public':
