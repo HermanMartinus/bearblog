@@ -353,33 +353,10 @@ def analytics(request):
     unique_reads = posts.aggregate(Sum('hit_count'))
     unique_visitors = len(hits.values('ip_address').distinct())
 
-    referrers = hits.values('referrer').distinct()
-    for distinct in referrers:
-        if distinct['referrer'] is None:
-            del distinct['referrer']
-        else:
-            distinct['number'] = len(hits.filter(referrer=distinct['referrer']))
-
-    devices = hits.values('device').distinct()
-    for distinct in devices:
-        if distinct['device'] == '':
-            del distinct['device']
-        else:
-            distinct['number'] = len(hits.filter(device=distinct['device']))
-
-    browsers = hits.values('browser').distinct()
-    for distinct in browsers:
-        if distinct['browser'] == '':
-            del distinct['browser']
-        else:
-            distinct['number'] = len(hits.filter(browser=distinct['browser']))
-
-    countries = hits.values('country').distinct()
-    for distinct in countries:
-        if distinct['country'] == '':
-            del distinct['country']
-        else:
-            distinct['number'] = len(hits.filter(country=distinct['country']))
+    referrers = distinct_count(hits, 'referrer')
+    devices = distinct_count(hits, 'device')
+    browsers = distinct_count(hits, 'browser')
+    countries = distinct_count(hits, 'country')
 
     end_date = timezone.now()
     delta = timedelta(days=1)
@@ -389,13 +366,13 @@ def analytics(request):
         chart_data.append({'date': time_threshold.strftime("%Y-%m-%d"), 'hits': day_hit_count})
         time_threshold += delta
 
-    print(len(chart_data))
+    # print(len(chart_data))
 
     chart = pygal.Bar(height=300)
     mark_list = [x['hits'] for x in chart_data]
     [x['date'] for x in chart_data]
     chart.add('Reads', mark_list)
-    chart.x_labels = [x['date'] for x in chart_data]
+    chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
     chart_render = chart.render().decode('utf-8')
 
     return render(request, 'studio/analytics.html', {
@@ -409,3 +386,17 @@ def analytics(request):
         'browsers': browsers,
         'countries': countries
     })
+
+
+def distinct_count(hits, parameter):
+    distinct_list = hits.values(parameter).distinct().order_by()
+    for distinct in distinct_list:
+        # if distinct[parameter] == '' or distinct[parameter] is None:
+        #     del distinct[parameter]
+        # else:
+        parameter_filter = {}
+        parameter_filter[parameter] = distinct[parameter]
+        distinct['number'] = len(hits.filter(**parameter_filter))
+
+    distinct_list = [x for x in distinct_list if x[parameter]]
+    return list(distinct_list)
