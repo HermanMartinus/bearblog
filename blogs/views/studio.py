@@ -344,16 +344,30 @@ def analytics(request):
     start_date = (timezone.now() - timedelta(days=days)).date()
     end_date = timezone.now().date()
 
-    posts = Post.objects.annotate(
+    post_filter = request.GET.get('post', False)
+
+    if post_filter:
+        posts = Post.objects.annotate(
+            hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
+            ).prefetch_related('hit_set', 'upvote_set').filter(
+                blog=blog,
+                pk=post_filter,
+                publish=True,
+            ).order_by('-hit_count', '-published_date')
+
+        hits = Hit.objects.filter(post__blog=blog, post__id=post_filter, created_date__gt=start_date).order_by('created_date')
+    else:
+        posts = Post.objects.annotate(
             hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
             ).prefetch_related('hit_set', 'upvote_set').filter(
                 blog=blog,
                 publish=True,
             ).order_by('-hit_count', '-published_date')
 
-    hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date).order_by('created_date')
+        hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date).order_by('created_date')
 
-    start_date = hits[0].created_date.date()
+    if len(hits) > 0:
+        start_date = hits[0].created_date.date()
 
     unique_reads = posts.aggregate(Sum('hit_count'))
     unique_visitors = len(hits.values('ip_address').distinct().order_by())
@@ -389,7 +403,8 @@ def analytics(request):
         'referrers': referrers,
         'devices': devices,
         'browsers': browsers,
-        'countries': countries
+        'countries': countries,
+        'post_filter': post_filter
     })
 
 

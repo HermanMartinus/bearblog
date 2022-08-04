@@ -11,6 +11,7 @@
 {% block content %}
 <content>
     <h1>Analytics</h1>
+
     <span style="float:right">
         <button onclick="window.location = '?days=7'">Last week</button>
         <button onclick="window.location = '?days=30'">Last month</button>
@@ -21,9 +22,16 @@
     </span>
     <embed type="image/svg+xml" src= {{ chart|safe }} />
     <span class="helptext" style="display: flex; justify-content:space-between;">
-    <span>{{ start_date|date:"j F Y" }}</span>
-    <span>{{ end_date|date:"j F Y" }}</span> 
+        <span>{{ start_date|date:"j F Y" }}</span>
+        <span>{{ end_date|date:"j F Y" }}</span> 
     </span>
+
+    <p>
+        {% if post_filter %}
+        <a href="?" style="color:lightsalmon; font-size: 14px;">Remove post filter</a>
+        {% endif %}
+        </p>
+
     <p>
         <b>Unique reads:</b> {{ unique_reads.hit_count__sum }}<br>
         <b>Unique visitors:</b> {{ unique_visitors }}
@@ -35,7 +43,8 @@
             <ul style="padding: 0;">
                 {% for post in posts %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
-                {{post.title}} <span>{{post.hit_count}}
+                <a href="?post={{post.pk}}">{{post.title}}</a>
+                <span>{{post.hit_count}}</span>
                 </li>
                 {% endfor %}
             </ul>
