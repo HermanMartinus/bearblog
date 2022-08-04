@@ -399,4 +399,4 @@ def distinct_count(hits, parameter):
         distinct['number'] = len(hits.filter(**parameter_filter))
 
     distinct_list = [x for x in distinct_list if x[parameter]]
-    return list(distinct_list)
+    return sorted(distinct_list, key=lambda item: item['number'])
