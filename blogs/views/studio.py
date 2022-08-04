@@ -13,6 +13,7 @@ from django.utils.text import slugify
 
 import tldextract
 import pygal
+from pygal.style import LightColorizedStyle
 
 from blogs.helpers import check_connection, sanitise_int, unmark
 from blogs.models import Blog, Hit, Post
@@ -366,12 +367,13 @@ def analytics(request):
         chart_data.append({'date': start_date.strftime("%Y-%m-%d"), 'hits': day_hit_count})
         start_date += delta
 
-    chart = pygal.Bar(height=300, show_legend=False)
+    chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
+    chart.force_uri_protocol = 'http'
     mark_list = [x['hits'] for x in chart_data]
     [x['date'] for x in chart_data]
     chart.add('Reads', mark_list)
     chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
-    chart_render = chart.render().decode('utf-8')
+    chart_render = chart.render_data_uri()
 
     return render(request, 'studio/analytics.html', {
         'blog': blog,

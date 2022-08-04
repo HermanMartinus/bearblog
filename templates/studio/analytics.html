@@ -11,9 +11,11 @@
 {% block content %}
 <content>
     <h1>Analytics</h1>
-    
-    {{chart|safe}}
-
+    <embed type="image/svg+xml" src= {{ chart|safe }} />
+    <span class="helptext" style="display: flex; justify-content:space-between;">
+    <span>04 July, 2022</span>
+    <span>04 August, 2022</span> 
+    </span>
     <p>
         <b>Unique reads:</b> {{ unique_reads.hit_count__sum }}<br>
         <b>Unique visitors:</b> {{ unique_visitors }}
