@@ -346,11 +346,9 @@ def analytics(request):
     if request.GET.get('share', False):
         if request.GET.get('share') == 'public':
             blog.public_analytics = True
-            blog.save()
-            return redirect(f'{blog.dynamic_domain}/public-analytics/')
         else:
             blog.public_analytics = False
-            blog.save()
+        blog.save()
 
     if request.GET.get('export', False):
         hits = Hit.objects.filter(post__blog=blog).order_by('created_date')
