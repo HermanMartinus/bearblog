@@ -352,7 +352,7 @@ def analytics(request):
 
     hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date).order_by('created_date')
     unique_reads = posts.aggregate(Sum('hit_count'))
-    unique_visitors = len(hits.values('ip_address').distinct())
+    unique_visitors = len(hits.values('ip_address').distinct().order_by())
 
     referrers = distinct_count(hits, 'referrer')
     devices = distinct_count(hits, 'device')
@@ -365,8 +365,6 @@ def analytics(request):
         day_hit_count = len(hits.filter(created_date__gt=start_date, created_date__lt=start_date+delta))
         chart_data.append({'date': start_date.strftime("%Y-%m-%d"), 'hits': day_hit_count})
         start_date += delta
-
-    # print(len(chart_data))
 
     chart = pygal.Bar(height=300, show_legend=False)
     mark_list = [x['hits'] for x in chart_data]
@@ -396,4 +394,4 @@ def distinct_count(hits, parameter):
         distinct['number'] = len(hits.filter(**parameter_filter))
 
     distinct_list = [x for x in distinct_list if x[parameter]]
-    return sorted(distinct_list, key=lambda item: item['number'])
+    return sorted(distinct_list, key=lambda item: item['number'], reverse=True)

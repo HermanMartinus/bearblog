@@ -22,19 +22,19 @@
     <div style="display:flex;justify-content:space-between; font-size: 12px;">
         <div style="width:48%">
             <h3>Pages</h3>
-            {% for post in posts %}
             <ul style="padding: 0;">
-                <li style="display:flex;justify-content:space-between;">
+                {% for post in posts %}
+                <li style="display:flex;justify-content:space-between;padding:5px 0;">
                 {{post.title}} <span>{{post.hit_count}}
                 </li>
+                {% endfor %}
             </ul>
-            {% endfor %}
         </div>
         <div style="width:48%">
             <h3>Referrers</h3>
             <ul style="padding: 0;">
                 {% for referrer in referrers %}
-                <li style="display:flex;justify-content:space-between;">
+                <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ referrer.referrer }}
                     <span>{{ referrer.number }}</span>
                 </li>
@@ -48,7 +48,7 @@
             <h3>Devices</h3>
             <ul style="padding: 0;">
                 {% for device in devices %}
-                <li style="display:flex;justify-content:space-between;">
+                <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ device.device }}
                     <span>{{ device.number }}</span>
                 </li>
@@ -59,7 +59,7 @@
             <h3>Browsers</h3>
             <ul style="padding: 0;">
                 {% for browser in browsers %}
-                <li style="display:flex;justify-content:space-between;">
+                <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ browser.browser }}
                     <span>{{ browser.number }}</span>
                 </li>
@@ -70,7 +70,7 @@
             <h3>Countries</h3>
             <ul style="padding: 0;">
                 {% for country in countries %}
-                <li style="display:flex;justify-content:space-between;">
+                <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ country.country }}
                     <span>{{ country.number }}</span>
                 </li>
