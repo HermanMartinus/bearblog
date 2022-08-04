@@ -25,7 +25,7 @@ httpagentparser==1.9.2
 idna==2.9
 lxml==4.6.5
 Markdown==2.6.11
-mistune==2.0.2
+mistune==2.0.3
 oauthlib==3.1.0
 Paperboy==1.0.1
 psycopg2==2.8.5
