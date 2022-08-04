@@ -347,39 +347,51 @@ def analytics(request):
     end_date = timezone.now().date()
 
     if post_filter:
-        posts = Post.objects.annotate(
-            hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
-            ).prefetch_related('hit_set', 'upvote_set').filter(
-                blog=blog,
-                pk=post_filter,
-                publish=True,
-            ).order_by('-hit_count', '-published_date')
-
         if referrer_filter:
+            posts = Post.objects.annotate(
+                hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date, hit__referrer=referrer_filter))
+                ).prefetch_related('hit_set', 'upvote_set').filter(
+                    blog=blog,
+                    pk=post_filter,
+                    publish=True,
+                ).order_by('-hit_count', '-published_date')
             hits = Hit.objects.filter(
                 post__blog=blog,
                 post__id=post_filter,
                 referrer=referrer_filter,
                 created_date__gt=start_date).order_by('created_date')
         else:
+            posts = Post.objects.annotate(
+                hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
+                ).prefetch_related('hit_set', 'upvote_set').filter(
+                    blog=blog,
+                    pk=post_filter,
+                    publish=True,
+                ).order_by('-hit_count', '-published_date')
             hits = Hit.objects.filter(
                 post__blog=blog,
                 post__id=post_filter,
                 created_date__gt=start_date).order_by('created_date')
     else:
-        posts = Post.objects.annotate(
-            hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
-            ).prefetch_related('hit_set', 'upvote_set').filter(
-                blog=blog,
-                publish=True,
-            ).order_by('-hit_count', '-published_date')
-
         if referrer_filter:
+            posts = Post.objects.annotate(
+                hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date, hit__referrer=referrer_filter))
+                ).prefetch_related('hit_set', 'upvote_set').filter(
+                    blog=blog,
+                    publish=True,
+                ).order_by('-hit_count', '-published_date')
+
             hits = Hit.objects.filter(
                 post__blog=blog,
                 referrer=referrer_filter,
                 created_date__gt=start_date).order_by('created_date')
         else:
+            posts = Post.objects.annotate(
+                hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
+                ).prefetch_related('hit_set', 'upvote_set').filter(
+                    blog=blog,
+                    publish=True,
+                ).order_by('-hit_count', '-published_date')
             hits = Hit.objects.filter(
                 post__blog=blog,
                 created_date__gt=start_date).order_by('created_date')
