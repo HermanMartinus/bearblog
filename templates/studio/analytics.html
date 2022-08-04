@@ -14,7 +14,7 @@
 <content>
     <h1>Analytics{% if public %} for {{ blog.title }}{% endif %}</h1>
 
-    <span style="float:right">
+    <span style="float:right; padding: 5px 0">
         <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last week</button>
         <button onclick="window.location = '?days=30{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last month</button>
         <button onclick="window.location = '?days=60{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 3 months</button>
@@ -41,12 +41,13 @@
     </p>
 
     <p>
-        <b>Unique reads:</b> {{ unique_reads }}<br>
+        <b>Unique reads:</b> {{ unique_reads }}
+        <br>
         <b>Unique visitors:</b> {{ unique_visitors }}
     </p>
 
-    <div style="display:flex;justify-content:space-between; font-size: 12px;">
-        <div style="width:48%">
+    <div style="display:flex;flex-flow:row wrap;justify-content:space-between; font-size: 12px;">
+        <div style="min-width: 340px">
             <h3>Pages</h3>
             <ul style="padding: 0;">
                 {% for post in posts %}
@@ -57,7 +58,7 @@
                 {% endfor %}
             </ul>
         </div>
-        <div style="width:48%">
+        <div style="min-width: 340px">
             <h3>Referrers</h3>
             <ul style="padding: 0;word-break:break-all;">
                 {% for referrer in referrers %}
@@ -70,8 +71,8 @@
         </div>
     </div>
 
-    <div style="padding-top:20px;display:flex;justify-content:space-between; font-size: 12px;">
-        <div style="width:30%">
+    <div style="padding-top:20px;display:flex; flex-flow: row wrap;justify-content:space-between; font-size: 12px;">
+        <div style="min-width:220px">
             <h3>Devices</h3>
             <ul style="padding: 0;">
                 {% for device in devices %}
@@ -82,7 +83,7 @@
                 {% endfor %}
             </ul>
         </div>
-        <div style="width:30%">
+        <div style="min-width:220px">
             <h3>Browsers</h3>
             <ul style="padding: 0;">
                 {% for browser in browsers %}
@@ -93,7 +94,7 @@
                 {% endfor %}
             </ul>
         </div>
-        <div style="width:30%">
+        <div style="min-width:220px">
             <h3>Countries</h3>
             <ul style="padding: 0;">
                 {% for country in countries %}
