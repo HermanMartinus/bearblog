@@ -340,16 +340,17 @@ def analytics(request):
 
     days = 30
 
-    time_threshold = timezone.now() - timedelta(days=days)
+    start_date = timezone.now() - timedelta(days=days)
+    end_date = timezone.now()
 
     posts = Post.objects.annotate(
-            hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))
+            hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
             ).prefetch_related('hit_set', 'upvote_set').filter(
                 blog=blog,
                 publish=True,
             ).order_by('-hit_count', '-published_date')
 
-    hits = Hit.objects.filter(post__blog=blog, created_date__gt=time_threshold).order_by('created_date')
+    hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date).order_by('created_date')
     unique_reads = posts.aggregate(Sum('hit_count'))
     unique_visitors = len(hits.values('ip_address').distinct())
 
@@ -358,17 +359,16 @@ def analytics(request):
     browsers = distinct_count(hits, 'browser')
     countries = distinct_count(hits, 'country')
 
-    end_date = timezone.now()
     delta = timedelta(days=1)
     chart_data = []
-    while time_threshold <= end_date:
-        day_hit_count = len(hits.filter(created_date__gt=time_threshold, created_date__lt=time_threshold+delta))
-        chart_data.append({'date': time_threshold.strftime("%Y-%m-%d"), 'hits': day_hit_count})
-        time_threshold += delta
+    while start_date <= end_date:
+        day_hit_count = len(hits.filter(created_date__gt=start_date, created_date__lt=start_date+delta))
+        chart_data.append({'date': start_date.strftime("%Y-%m-%d"), 'hits': day_hit_count})
+        start_date += delta
 
     # print(len(chart_data))
 
-    chart = pygal.Bar(height=300)
+    chart = pygal.Bar(height=300, show_legend=False)
     mark_list = [x['hits'] for x in chart_data]
     [x['date'] for x in chart_data]
     chart.add('Reads', mark_list)
@@ -391,9 +391,6 @@ def analytics(request):
 def distinct_count(hits, parameter):
     distinct_list = hits.values(parameter).distinct().order_by()
     for distinct in distinct_list:
-        # if distinct[parameter] == '' or distinct[parameter] is None:
-        #     del distinct[parameter]
-        # else:
         parameter_filter = {}
         parameter_filter[parameter] = distinct[parameter]
         distinct['number'] = len(hits.filter(**parameter_filter))
