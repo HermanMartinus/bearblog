@@ -7,7 +7,6 @@ from django.views.generic.edit import DeleteView
 from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
-from django.utils.text import slugify
 
 import json
 import os
@@ -22,21 +21,12 @@ from blogs.helpers import sanitise_int
 from blogs.models import Blog, Post, Stylesheet, Upvote
 
 
-def resolve_subdomain(http_host, blog):
-    extracted = tldextract.extract(http_host)
-    if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return False
-    return True
-
-
 @login_required
 def dashboard(request):
     try:
         blog = Blog.objects.get(user=request.user)
         if not blog.old_editor:
             return redirect("/studio/")
-        if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-            return redirect(f"{blog.useful_domain()}/dashboard")
 
         if request.method == "POST":
             form = BlogForm(request.POST, instance=blog)
@@ -59,8 +49,6 @@ def dashboard(request):
 @login_required
 def nav(request):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
 
     if request.method == "POST":
         form = NavForm(request.POST, instance=blog)
@@ -82,8 +70,6 @@ def nav(request):
 @login_required
 def styles(request):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
 
     if request.method == "POST":
         form = StyleForm(
@@ -117,8 +103,6 @@ def styles(request):
 @login_required
 def posts_edit(request):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
 
     posts = Post.objects.annotate(
             hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
@@ -132,8 +116,6 @@ def posts_edit(request):
 @login_required
 def post_new(request):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
 
     if request.method == "POST":
         form = PostForm(request.user, request.POST)
@@ -159,8 +141,6 @@ def post_new(request):
 @login_required
 def post_edit(request, pk):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
 
     post = get_object_or_404(Post, blog=blog, pk=sanitise_int(pk))
     published_date_old = post.published_date
@@ -232,8 +212,6 @@ def upload_image(request):
 @login_required
 def domain_edit(request):
     blog = Blog.objects.get(user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
 
     if request.method == "POST":
         form = DomainForm(request.POST, instance=blog)
@@ -253,8 +231,6 @@ def domain_edit(request):
 @login_required
 def upgrade(request):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
 
     return render(request, "dashboard/upgrade.html", {"blog": blog})
 
@@ -262,8 +238,6 @@ def upgrade(request):
 @login_required
 def account(request):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
 
     if request.method == "POST":
         form = AccountForm(request.POST, instance=blog)

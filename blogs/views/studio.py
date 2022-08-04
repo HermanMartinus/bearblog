@@ -20,20 +20,11 @@ from blogs.helpers import check_connection, sanitise_int, unmark
 from blogs.models import Blog, Hit, Post
 
 
-def resolve_subdomain(http_host, blog):
-    extracted = tldextract.extract(http_host)
-    if extracted.subdomain and extracted.subdomain != blog.subdomain:
-        return False
-    return True
-
-
 @login_required
 def studio(request):
     blog = None
     try:
         blog = Blog.objects.get(user=request.user)
-        if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-            return redirect(f"https://bearblog.dev/dashboard")
     except Blog.DoesNotExist:
         subdomain = request.user.username
         if Blog.objects.filter(subdomain=request.user.username):
@@ -162,8 +153,6 @@ def parse_raw_homepage(raw_content, blog):
 @login_required
 def post(request, pk=None):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"//bearblog.dev/dashboard")
 
     if pk is None:
         post = None
@@ -290,8 +279,6 @@ def parse_raw_post(raw_content, post):
 @login_required
 def preview(request):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"https://bearblog.dev/dashboard")
 
     error_message = ""
     raw_content = request.POST.get("raw_content", "")
@@ -337,8 +324,6 @@ def preview(request):
 @login_required
 def analytics(request):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"https://bearblog.dev/dashboard")
 
     if not blog.upgraded:
         return redirect('/dashboard/analytics/')

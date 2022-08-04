@@ -12,14 +12,11 @@ from django.views.decorators.csrf import csrf_exempt
 from blogs.helpers import validate_subscriber_email
 from blogs.models import Blog, Subscriber
 from blogs.views.blog import resolve_address, not_found
-from blogs.views.dashboard import resolve_subdomain
 
 
 @login_required
 def email_list(request):
     blog = get_object_or_404(Blog, user=request.user)
-    if not resolve_subdomain(request.META['HTTP_HOST'], blog):
-        return redirect(f"{blog.useful_domain()}/dashboard")
 
     subscribers = Subscriber.objects.filter(blog=blog)
 
