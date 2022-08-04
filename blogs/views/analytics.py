@@ -8,7 +8,6 @@ from datetime import timedelta
 import requests
 
 from blogs.models import Blog, Hit, Post
-from blogs.forms import AnalyticsForm
 from blogs.helpers import daterange
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse

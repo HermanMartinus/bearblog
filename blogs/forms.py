@@ -235,17 +235,17 @@ class PostForm(forms.ModelForm):
             'make_discoverable')
 
 
-class AnalyticsForm(forms.ModelForm):
-    class Meta:
-        model = Blog
-        fields = ('fathom_site_id',)
-
-
 class AccountForm(forms.ModelForm):
     old_editor = forms.BooleanField(
         label="Use the old editor",
         required=False,
         help_text="<br>Note: the old editor does not support real-time previews"
+    )
+
+    fathom_site_id = forms.CharField(
+        max_length=20,
+        required=False,
+        help_text="More in-depth analytics using <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a>."
     )
 
     class Meta:
