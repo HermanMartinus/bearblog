@@ -339,12 +339,12 @@ def analytics(request):
     if not resolve_subdomain(request.META['HTTP_HOST'], blog):
         return redirect(f"https://bearblog.dev/dashboard")
 
+    post_filter = request.GET.get('post', False)
+    referrer_filter = request.GET.get('referrer', False)
     days_filter = int(request.GET.get('days', 7))
     delta = timedelta(days=1)
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
-
-    post_filter = request.GET.get('post', False)
 
     if post_filter:
         posts = Post.objects.annotate(
@@ -355,7 +355,10 @@ def analytics(request):
                 publish=True,
             ).order_by('-hit_count', '-published_date')
 
-        hits = Hit.objects.filter(post__blog=blog, post__id=post_filter, created_date__gt=start_date).order_by('created_date')
+        if referrer_filter:
+            hits = Hit.objects.filter(post__blog=blog, post__id=post_filter, referrer=referrer_filter, created_date__gt=start_date).order_by('created_date')
+        else:
+            hits = Hit.objects.filter(post__blog=blog, post__id=post_filter, created_date__gt=start_date).order_by('created_date')
     else:
         posts = Post.objects.annotate(
             hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
@@ -364,12 +367,15 @@ def analytics(request):
                 publish=True,
             ).order_by('-hit_count', '-published_date')
 
-        hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date).order_by('created_date')
+        if referrer_filter:
+            hits = Hit.objects.filter(post__blog=blog, referrer=referrer_filter, created_date__gt=start_date).order_by('created_date')
+        else:
+            hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date).order_by('created_date')
 
     if len(hits) > 0:
         start_date = hits[0].created_date.date()
 
-    unique_reads = posts.aggregate(Sum('hit_count'))
+    unique_reads = len(hits)
     unique_visitors = len(hits.values('ip_address').distinct().order_by())
 
     referrers = distinct_count(hits, 'referrer')
