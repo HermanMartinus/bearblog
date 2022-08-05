@@ -405,6 +405,8 @@ def render_analytics(request, blog, public=False):
     unique_reads = len(hits)
     unique_visitors = len(hits.values('ip_address').distinct().order_by())
 
+    on_site = len(hits.filter(created_date__gt=timezone.now()-timedelta(minutes=4)))
+
     referrers = distinct_count(hits, 'referrer')
     devices = distinct_count(hits, 'device')
     browsers = distinct_count(hits, 'browser')
@@ -433,6 +435,7 @@ def render_analytics(request, blog, public=False):
         'end_date': end_date,
         'unique_reads': unique_reads,
         'unique_visitors': unique_visitors,
+        'on_site': on_site,
         'chart': chart_render,
         'referrers': referrers,
         'devices': devices,
