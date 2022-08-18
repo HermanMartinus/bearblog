@@ -323,6 +323,7 @@ def preview(request):
     )
 
 
+@login_required
 def post_template(request):
     blog = get_object_or_404(Blog, user=request.user)
 
