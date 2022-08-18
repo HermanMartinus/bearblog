@@ -3,5 +3,7 @@ Sitemap: /sitemap.xml
 Disallow: /accounts/
 Disallow: /dashboard/
 Disallow: /mothership/
+Disallow: /studio/
+Disallow: /public-analytics/
 Disallow: /subscribe/
 Disallow: /confirm-subscription/
