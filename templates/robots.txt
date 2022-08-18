@@ -1,4 +1,5 @@
 User-Agent: *
+Sitemap: /sitemap.xml
 Disallow: /accounts/
 Disallow: /dashboard/
 Disallow: /mothership/
