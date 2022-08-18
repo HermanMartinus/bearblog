@@ -55,7 +55,7 @@ input[type='checkbox'], input[type='radio'] {
 }
 
 button {
-    margin: 0;
+    margin: 5px 0;
 }
 
 button.floating {
