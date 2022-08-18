@@ -41,6 +41,7 @@ urlpatterns = [
 
     path('ping/', blog.ping, name='ping'),
     path('blog/', blog.posts, name='posts'),
+    path('sitemap.xml', blog.sitemap, name='sitemap'),
     path('public-analytics/', blog.public_analytics, name="public_analytics"),
     path('upvote/<pk>/', blog.upvote, name='upvote'),
     path('subscribe/', emailer.subscribe, name='subscribe'),

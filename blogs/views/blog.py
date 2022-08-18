@@ -206,3 +206,12 @@ def lemon_webhook(request):
 
 def not_found(request, *args, **kwargs):
     return render(request, '404.html', status=404)
+
+
+def sitemap(request):
+    blog = resolve_address(request)
+    try:
+        posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
+    except AttributeError:
+        posts = []
+    return render(request, 'sitemap.xml', {'blog': blog, 'posts': posts}, content_type='text/xml')
