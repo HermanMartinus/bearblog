@@ -29,6 +29,7 @@ urlpatterns = [
     path('dashboard/posts/<pk>/delete/', dashboard.post_delete, name='post_delete'),
 
     path('studio/', studio.studio, name="studio"),
+    path('studio/post-template/', studio.post_template, name="post_template"),
     path('studio/posts/new/', studio.post, name="post_new"),
     path('studio/posts/<pk>/', studio.post, name="post_edit"),
     path('studio/preview/', studio.preview, name="preview"),

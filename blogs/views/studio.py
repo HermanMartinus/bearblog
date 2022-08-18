@@ -1,7 +1,7 @@
 from datetime import timedelta
 from random import randint
 import re
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
 from django.db import DataError, IntegrityError
 from django.forms import ValidationError
@@ -11,10 +11,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.text import slugify
 
-import tldextract
 import pygal
 from pygal.style import LightColorizedStyle
 import djqscsv
+from blogs.forms import PostTemplateForm
 
 from blogs.helpers import check_connection, sanitise_int, unmark
 from blogs.models import Blog, Hit, Post
@@ -74,6 +74,8 @@ def studio(request):
                 <b>If you're using Cloudflare turn off the proxy (the little orange cloud).</b>
                 <br>
                 It may take some time for the DNS records to propagate.
+                <br>
+                <a href="https://github.com/HermanMartinus/bearblog/wiki/Custom-domains" target="_blank">Having issues?</a>
             </small>
         </p>
         '''
@@ -319,6 +321,39 @@ def preview(request):
             'error_message': error_message
         }
     )
+
+
+def post_template(request):
+    blog = get_object_or_404(Blog, user=request.user)
+
+    if request.method == "POST":
+        form = PostTemplateForm(request.POST, instance=blog)
+        if form.is_valid():
+            blog_info = form.save(commit=False)
+            blog_info.save()
+    else:
+        initial = {'post_template': '''title: Post title
+___
+
+# Big header
+## Medium header
+### Small header
+
+**bold**
+*italics*
+~~strikethrough~~
+
+This is a [link](http://www.example.com) and this one opens in a [new tab](tab:https://www.example.com).
+
+![Image](https://i.imgur.com/3jxqrKP.jpeg)'''}
+        if blog.post_template:
+            form = PostTemplateForm(instance=blog)
+        else:
+            form = PostTemplateForm(instance=blog, initial=initial)
+
+    return render(request, 'studio/post_template_edit.html', {
+        'blog': blog,
+        'form': form})
 
 
 @login_required

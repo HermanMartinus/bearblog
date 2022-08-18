@@ -50,100 +50,15 @@
             </button>
         </p>
 
-        <details style="font-size: 12px; margin-bottom: 10px;">
-            <summary>Available header options</summary>
-            <p style="display:grid;grid-template-columns: auto auto;">
-                <span>
-                    <b>title:</b> I like Bears
-                </span>
-                <span>
-                    <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#title" target="_blank" style="text-decoration:none">
-                        &#9432;
-                    </a>
-                    required
-                </span>
-                <span>
-                    <b>link:</b> i-like-bears
-                </span>
-                <span style="color: grey">
-                    <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#link" target="_blank" style="text-decoration:none">
-                        &#9432;
-                    </a>
-                    optional - leave empty to auto-generate
-                </span>
-                <span>
-                    <b>canonical_url:</b> https://example.com/i-like-bears
-                </span>
-                <span style="color: grey">
-                    <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#canonical_url" target="_blank" style="text-decoration:none">
-                        &#9432;
-                    </a>
-                    optional - leave empty to auto-generate
-                </span>
-                <span>
-                    <b>published_date:</b> 2022-12-30
-                </span>
-                <span style="color: grey">
-                    <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#published_date" target="_blank" style="text-decoration:none">
-                        &#9432;
-                    </a>
-                    optional - leave empty to publish now
-                </span>
-                <span>
-                    <b>is_page:</b> false
-                </span>
-                <span style="color: grey">
-                    <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#is_page" target="_blank" style="text-decoration:none">
-                        &#9432;
-                    </a>
-                    optional - set as page
-                </span>
-                <span>
-                    <b>meta_description:</b> Bears are pretty cool, according to science.
-                </span>
-                <span style="color: grey">
-                    <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#meta_description" target="_blank" style="text-decoration:none">
-                        &#9432;
-                    </a>
-                    optional - leave empty to auto-generate
-                </span>
-                <span>
-                    <b>meta_image:</b> https://i.imgur.com/3jxqrKP.jpeg
-                </span>
-                <span style="color: grey">
-                    <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#meta_image" target="_blank" style="text-decoration:none">
-                        &#9432;
-                    </a>
-                    optional - valid image url for previews
-                </span>
-                <span>
-                    <b>tags:</b> bears, writing, thoughts
-                </span>
-                <span style="color: grey">
-                    <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#tags" target="_blank" style="text-decoration:none">
-                        &#9432;
-                    </a>
-                    optional - comma separated list of tags
-                </span>
-                <span>
-                    <b>make_discoverable:</b> true
-                </span>
-                <span style="color: grey">
-                    <a href="https://github.com/HermanMartinus/bearblog/wiki/Anatomy-of-a-post#make_discoverable" target="_blank" style="text-decoration:none">
-                        &#9432;
-                    </a>
-                    optional - show in the <a href="https://bearblog.dev/discover/" target="_blank" style="text-decoration:none">discovery feed</a>
-                </span>
-                <span>___</span><span></span>
-            </p>
-        </details>
+        {% include '../snippets/post_header_options.html' %}
         
         {% csrf_token %}
-        <textarea
-            name="raw_content"
-            style="width: calc(100% - 13px); height: 500px"
-            rows="10" 
-        >{% if error_message and raw_content  %}{{ raw_content }}{% elif post %}
+        <p>
+            <textarea
+                name="raw_content"
+                style="width: calc(100% - 13px); height: 500px"
+                rows="10" 
+            >{% if error_message and raw_content  %}{{ raw_content }}{% elif post %}
 title: {{ post.title }}
 link: {{ post.slug }}
 published_date: {{ post.published_date|date:"Y-m-d" }}{% if post.canonical_url %}
@@ -156,7 +71,7 @@ make_discoverable: {{ post.make_discoverable|lower }}{% endif %}
 ___
 
 {{ post.content }}
-{% else %}
+{% elif blog.post_template %}{{ blog.post_template }}{% else %}
 title: Post title
 ___
 
@@ -171,7 +86,7 @@ ___
 This is a [link](http://www.example.com) and this one opens in a [new tab](tab:https://www.example.com).
 
 ![Image](https://i.imgur.com/3jxqrKP.jpeg){% endif %}</textarea>
-
+        </p>
         <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden />
         <span class="helptext">
             <span>

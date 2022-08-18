@@ -251,3 +251,15 @@ class AccountForm(forms.ModelForm):
     class Meta:
         model = Blog
         fields = ('old_editor', 'fathom_site_id')
+
+
+class PostTemplateForm(forms.ModelForm):
+    post_template = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),
+        required=False,
+        label=''
+    )
+
+    class Meta:
+        model = Blog
+        fields = ('post_template',)

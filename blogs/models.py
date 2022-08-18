@@ -39,6 +39,8 @@ class Blog(models.Model):
 
     old_editor = models.BooleanField(default=False)
 
+    post_template = models.TextField(blank=True)
+
     @property
     def contains_code(self):
         return "```" in self.content
