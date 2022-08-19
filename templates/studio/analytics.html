@@ -33,7 +33,7 @@
 
     <p>
     {% if post_filter %}
-        <small>Post: <b>{{ posts.first }}</b></small>
+        <small>Post: <b>{{ posts.first.title }}</b></small>
         <a href="?days={{days_filter}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}"><button>Remove filter</button></a>
         <br>
     {% endif %}
@@ -55,7 +55,11 @@
             <ul style="padding: 0;max-height: 300px;overflow-y: scroll;">
                 {% for post in posts %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
-                <a href="?days={{days_filter}}&post={{post.pk}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">{{post.title}}</a>
+                    {% if post.hit_count > 0 %}
+                    <a href="?days={{days_filter}}&post={{post.pk}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">{{post.title}}</a>
+                    {% else %}
+                    {{post.title}}
+                    {% endif %}
                 <span>{{post.hit_count|intcomma}}</span>
                 </li>
                 {% endfor %}
