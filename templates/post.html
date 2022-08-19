@@ -2,6 +2,8 @@
 {% load pygmentify_tags %}
 {% load markdownify %}
 
+{% block page_type %}{% if post.is_page %}page{% else %}post{% endif %}{% endblock %}
+
 {% block lang %}{% if post.lang %}{{ post.lang }}{% else %}{{ blog.lang }}{% endif %}{% endblock %}
 
 {% block favicon %}
