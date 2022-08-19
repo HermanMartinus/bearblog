@@ -96,7 +96,7 @@ ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-
+CONN_MAX_AGE = 1
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

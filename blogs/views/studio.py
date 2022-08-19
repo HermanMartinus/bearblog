@@ -115,7 +115,7 @@ def parse_raw_homepage(raw_content, blog):
             blog.subdomain = slugify(value.split('.')[0])
         elif name == "custom_domain":
             if blog.upgraded:
-                if len(Blog.objects.filter(domain=value).exclude(pk=blog.pk)) == 0:
+                if Blog.objects.filter(domain=value).exclude(pk=blog.pk).count() == 0:
                     blog.domain = value
                 else:
                     raise ValueError("This domain is already in use")
@@ -176,7 +176,7 @@ def post(request, pk=None):
 
         try:
             tags = parse_raw_post(raw_content, post)
-            if len(Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk)) > 0:
+            if Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk).count() > 0:
                 post.slug = post.slug + '-' + str(randint(0, 9))
 
             post.publish = request.POST.get("publish", False) == "true"
@@ -435,13 +435,13 @@ def render_analytics(request, blog, public=False):
                 post__blog=blog,
                 created_date__gt=start_date).order_by('created_date')
 
-    if len(hits) > 0:
+    if hits.count() > 0:
         start_date = hits[0].created_date.date()
 
-    unique_reads = len(hits)
-    unique_visitors = len(hits.values('ip_address').distinct().order_by())
+    unique_reads = hits.count()
+    unique_visitors = hits.values('ip_address').distinct().order_by().count()
 
-    on_site = len(hits.filter(created_date__gt=timezone.now()-timedelta(minutes=4)))
+    on_site = hits.filter(created_date__gt=timezone.now()-timedelta(minutes=4)).count()
 
     referrers = distinct_count(hits, 'referrer')
     devices = distinct_count(hits, 'device')
@@ -450,11 +450,15 @@ def render_analytics(request, blog, public=False):
 
     chart_data = []
     date_iterator = start_date
-    if request.GET.get('test', '') != 'no-iterate':
-        while date_iterator <= end_date:
-            day_hit_count = len(hits.filter(created_date__gt=date_iterator, created_date__lt=date_iterator+delta))
-            chart_data.append({'date': date_iterator.strftime("%Y-%m-%d"), 'hits': day_hit_count})
-            date_iterator += delta
+    # {date: 2020-01-01: hits: 43}, date: 2020-01-02, hits:26…}
+    # subscribers = Subscriber.objects.filter(
+    #         page__in=user.user_page_set.all()).annotate(
+    #             month=TruncDay('created_at')).values('month').annotate(
+    #                 total=Count('pk')).order_by()
+    while date_iterator <= end_date:
+        day_hit_count = hits.filter(created_date__gt=date_iterator, created_date__lt=date_iterator+delta).count()
+        chart_data.append({'date': date_iterator.strftime("%Y-%m-%d"), 'hits': day_hit_count})
+        date_iterator += delta
 
     chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
     chart.force_uri_protocol = 'http'
@@ -489,7 +493,7 @@ def distinct_count(hits, parameter):
     for distinct in distinct_list:
         parameter_filter = {}
         parameter_filter[parameter] = distinct[parameter]
-        distinct['number'] = len(hits.filter(**parameter_filter))
+        distinct['number'] = hits.filter(**parameter_filter).count()
 
     distinct_list = [x for x in distinct_list if x[parameter]]
     return sorted(distinct_list, key=lambda item: item['number'], reverse=True)
