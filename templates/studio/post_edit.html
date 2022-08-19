@@ -62,10 +62,10 @@
 title: {{ post.title }}
 link: {{ post.slug }}
 published_date: {{ post.published_date|date:"Y-m-d" }}{% if post.canonical_url %}
-canonical_url: {{ post.canonical_url }}{% endif %}{% if post.lang %}
-lang: {{ post.lang }}{% endif %}{% if post.meta_description %}
+canonical_url: {{ post.canonical_url }}{% endif %}{% if post.meta_description %}
 meta_description: {{ post.meta_description }}{% endif %}{% if post.meta_image %}
-meta_image: {{ post.meta_image }}{% endif %}{% if tags %}
+meta_image: {{ post.meta_image }}{% endif %}{% if post.lang %}
+lang: {{ post.lang }}{% endif %}{% if tags %}
 tags: {% for tag in tags %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if post.is_page %}
 is_page: {{ post.is_page|lower }}{% endif %}{% if not post.make_discoverable %}
 make_discoverable: {{ post.make_discoverable|lower }}{% endif %}
