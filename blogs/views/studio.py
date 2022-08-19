@@ -221,6 +221,7 @@ def parse_raw_post(raw_content, post):
     post.meta_image = ''
     post.is_page = False
     post.make_discoverable = True
+    post.lang = ''
     tags = []
 
     # Parse and populate header data
@@ -259,6 +260,8 @@ def parse_raw_post(raw_content, post):
                 raise ValueError('is_page needs to be "true" or "false"')
         elif name == 'canonical_url':
             post.canonical_url = value
+        elif name == 'lang':
+            post.lang = value
         elif name == 'meta_description':
             post.meta_description = value
         elif name == 'meta_image':

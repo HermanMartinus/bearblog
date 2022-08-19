@@ -88,6 +88,7 @@ class Post(models.Model):
     canonical_url = models.CharField(max_length=200, blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
+    lang = models.CharField(max_length=10, blank=True)
 
     upvotes = models.IntegerField(default=0)
     score = models.FloatField(default=0)

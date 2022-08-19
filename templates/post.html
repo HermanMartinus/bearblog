@@ -2,7 +2,7 @@
 {% load pygmentify_tags %}
 {% load markdownify %}
 
-{% block lang %}{{ blog.lang }}{% endblock %}
+{% block lang %}{% if post.lang %}{{ post.lang }}{% else %}{{ blog.lang }}{% endif %}{% endblock %}
 
 {% block favicon %}
 {{ blog.favicon }}
