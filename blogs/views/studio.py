@@ -2,6 +2,7 @@ from datetime import timedelta
 from random import randint
 import re
 from django.db.models import Count, Q
+from django.db.models.functions import TruncDate
 from django.contrib.auth.decorators import login_required
 from django.db import DataError, IntegrityError
 from django.forms import ValidationError
@@ -450,15 +451,25 @@ def render_analytics(request, blog, public=False):
 
     chart_data = []
     date_iterator = start_date
-    # {date: 2020-01-01: hits: 43}, date: 2020-01-02, hits:26…}
-    # subscribers = Subscriber.objects.filter(
-    #         page__in=user.user_page_set.all()).annotate(
-    #             month=TruncDay('created_at')).values('month').annotate(
-    #                 total=Count('pk')).order_by()
+
+    hits_count = Hit.objects.filter(
+                post__blog=blog,
+                created_date__gt=start_date).annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
+
+    # create dates dict with zero hits
+    hit_dict = {}
     while date_iterator <= end_date:
-        day_hit_count = hits.filter(created_date__gt=date_iterator, created_date__lt=date_iterator+delta).count()
-        chart_data.append({'date': date_iterator.strftime("%Y-%m-%d"), 'hits': day_hit_count})
+        hit_dict[date_iterator.strftime("%Y-%m-%d")] = 0
         date_iterator += delta
+
+    # populate dict with hits count
+    for hit in hits_count:
+        hit_dict[hit['date'].strftime("%Y-%m-%d")] = hit['c']
+
+    # generate chart
+    for date, count in hit_dict.items():
+        chart_data.append({'date': date, 'hits': count})
+
 
     chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
     chart.force_uri_protocol = 'http'
