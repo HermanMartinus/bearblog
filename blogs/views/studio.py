@@ -452,9 +452,7 @@ def render_analytics(request, blog, public=False):
     chart_data = []
     date_iterator = start_date
 
-    hits_count = Hit.objects.filter(
-                post__blog=blog,
-                created_date__gt=start_date).annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
+    hits_count = hits.annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
 
     # create dates dict with zero hits
     hit_dict = {}
@@ -469,7 +467,6 @@ def render_analytics(request, blog, public=False):
     # generate chart
     for date, count in hit_dict.items():
         chart_data.append({'date': date, 'hits': count})
-
 
     chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
     chart.force_uri_protocol = 'http'
