@@ -53,12 +53,12 @@
         {% include '../snippets/post_header_options.html' %}
         
         {% csrf_token %}
-        <p>
-            <textarea
-                name="raw_content"
-                style="width: calc(100% - 13px); height: 500px"
-                rows="10" 
-            >{% if error_message and raw_content  %}{{ raw_content }}{% elif post %}
+        <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden />
+        <textarea
+            name="raw_content"
+            style="width: calc(100% - 13px); height: 500px"
+            rows="10" 
+        >{% if error_message and raw_content  %}{{ raw_content }}{% elif post %}
 title: {{ post.title }}
 link: {{ post.slug }}
 published_date: {{ post.published_date|date:"Y-m-d" }}{% if post.canonical_url %}
@@ -87,8 +87,7 @@ ___
 This is a [link](http://www.example.com) and this one opens in a [new tab](tab:https://www.example.com).
 
 ![Image](https://i.imgur.com/3jxqrKP.jpeg){% endif %}</textarea>
-        </p>
-        <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden />
+
         <span class="helptext">
             <span>
                 Learn <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>markdown syntax</a>
