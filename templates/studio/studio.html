@@ -10,11 +10,25 @@
 
 {% block content %}
 
-    {% if not blog.upgraded %}
+    {% if blog.older_than_one_day %}
+        {% if not blog.upgraded %}
+        <p style="border: 1px dashed; text-align:center; padding: 5px">
+            <i>
+                <a href="/dashboard/upgrade/">Upgrade</a> to get more neat features and support the Tiny Internet!
+            </i>
+        </p>
+        {% endif %}
+    {% else %}
     <p style="border: 1px dashed; text-align:center; padding: 5px">
+        Welcome to your <b>Bear Blog dashboard</b>.
+        <br>
+        Here's a <a href="https://herman.bearblog.dev/a-bear-quickstart/?preview=true" target="_blank">short video</a> illustrating how everything works.
+        <br>
+        {% if not blog.upgraded %}
         <i>
-            <a href="/dashboard/upgrade/">Upgrade</a> to get neat features and support the Tiny Internet!
+            <a href="/dashboard/upgrade/">Upgrade</a> to get more neat features and support the Tiny Internet!
         </i>
+        {% endif %}
     </p>
     {% endif %}
 

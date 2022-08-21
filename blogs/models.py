@@ -41,6 +41,9 @@ class Blog(models.Model):
 
     post_template = models.TextField(blank=True)
 
+    def older_than_one_day(self):
+        return (timezone.now() - self.created_date).days > 1
+
     @property
     def contains_code(self):
         return "```" in self.content
