@@ -76,7 +76,7 @@ def studio(request):
                 <br>
                 It may take some time for the DNS records to propagate.
                 <br>
-                <a href="https://github.com/HermanMartinus/bearblog/wiki/Custom-domains" target="_blank">Having issues?</a>
+                <a href="https://docs.bearblog.dev/custom-domains/" target="_blank">Having issues?</a>
             </small>
         </p>
         '''

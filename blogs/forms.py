@@ -72,7 +72,7 @@ class BlogForm(forms.ModelForm):
 
     lang = forms.CharField(
         label="lang",
-        help_text="<a href='https://gist.github.com/JamieMason/3748498/' target='_blank'>Language code cheatsheet</a>",
+        help_text="<a href='https://docs.bearblog.dev/language-cheatsheet' target='_blank'>Language code cheatsheet</a>",
         widget=forms.TextInput(attrs={'class': "inline"}),
         required=False
     )
@@ -183,7 +183,6 @@ class PostForm(forms.ModelForm):
 
     meta_image = forms.CharField(
         label="Meta image URL",
-        help_text="<a href='https://github.com/HermanMartinus/bearblog/wiki/Meta-information' target='_blank'>Learn more</a>",
         required=False
     )
 
