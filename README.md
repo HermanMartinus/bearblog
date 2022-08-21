@@ -16,15 +16,7 @@ It is more like Medium than Jekyll. Due to this it currently isn't possible to s
 There is currently a [Bear Blog Hugo theme](https://github.com/janraasch/hugo-bearblog) available built by [Jan Raasch](https://www.janraasch.com/), and a self-hosted version ([Polar Bear Blog](https://github.com/josephspurrier/polarbearblog)) written in Go and hosted on the serverless [Google Cloud Run](https://cloud.google.com/run) architecture by [Joseph Spurrier](https://www.josephspurrier.com).
 
 ## Wiki
-- [Custom domains](https://github.com/HermanMartinus/bearblog/wiki/Custom-domains)
-- [Pages & posts](https://github.com/HermanMartinus/bearblog/wiki/Pages-and-Posts)
-- [Navigation](https://github.com/HermanMartinus/bearblog/wiki/Navigation)
-- [Roadmap](https://github.com/HermanMartinus/bearblog/wiki/Roadmap)
-- [Contributions/upgrading](https://github.com/HermanMartinus/bearblog/wiki/Contributions)
-- [Mathematical notation](https://github.com/HermanMartinus/bearblog/wiki/Mathematical-notation)
-- [RSS & Atom feeds](https://github.com/HermanMartinus/bearblog/wiki/RSS-and-Atom-feeds)
-- [Meta info](https://github.com/HermanMartinus/bearblog/wiki/Meta-information)
-
+The full documentation for Bear can be found at https://docs.bearblog.dev
 
 ## Some Bear faces
 
