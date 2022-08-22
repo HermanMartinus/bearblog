@@ -27,11 +27,7 @@
         {% include 'styles/blog/default.css' %}
         {% include 'styles/dashboard.css' %}
       {% endblock %}
-      {% endautoescape %} 
-body:hover {
-  border-image: {% block hitcount %}{% endblock %};
-  border-width: 0;
-}
+      {% endautoescape %}
   </style>
 </head>
 
@@ -60,6 +56,12 @@ body:hover {
     {% block footer %}
     {% include 'snippets/dashboard_footer.html' %}
     {% endblock %}
+    <style>
+      body:hover {
+        border-image: {% block hitcount %}{% endblock %};
+        border-width: 0;
+      }
+    </style>
   </footer>
 </body>
 </html>
