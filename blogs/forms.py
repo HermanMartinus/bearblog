@@ -252,6 +252,18 @@ class AccountForm(forms.ModelForm):
         fields = ('old_editor', 'fathom_site_id')
 
 
+class AnalyticsForm(forms.ModelForm):
+    fathom_site_id = forms.CharField(
+        max_length=20,
+        required=False,
+        help_text="8 upper-case characters"
+    )
+
+    class Meta:
+        model = Blog
+        fields = ('fathom_site_id',)
+
+
 class PostTemplateForm(forms.ModelForm):
     post_template = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40}),

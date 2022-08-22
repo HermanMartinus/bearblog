@@ -15,7 +15,7 @@ from django.utils.text import slugify
 import pygal
 from pygal.style import LightColorizedStyle
 import djqscsv
-from blogs.forms import PostTemplateForm
+from blogs.forms import AnalyticsForm, PostTemplateForm
 
 from blogs.helpers import check_connection, sanitise_int, unmark
 from blogs.models import Blog, Hit, Post
@@ -479,6 +479,14 @@ def render_analytics(request, blog, public=False):
     chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
     chart_render = chart.render_data_uri()
 
+    if request.method == "POST":
+        form = AnalyticsForm(request.POST, instance=blog)
+        if form.is_valid():
+            blog_info = form.save(commit=False)
+            blog_info.save()
+    else:
+        form = AnalyticsForm(instance=blog)
+
     return render(request, 'studio/analytics.html', {
         'public': public,
         'blog': blog,
@@ -495,7 +503,8 @@ def render_analytics(request, blog, public=False):
         'countries': countries,
         'days_filter': days_filter,
         'post_filter': post_filter,
-        'referrer_filter': referrer_filter
+        'referrer_filter': referrer_filter,
+        'form': form
     })
 
 
