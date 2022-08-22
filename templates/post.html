@@ -46,11 +46,7 @@
 {% endif %}
 {% endblock %}
 
-{% block hitcount %}
-{% if not preview %}
-    url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
-{% endif %}
-{% endblock %}
+{% block hitcount %}{% if not preview %}url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}"){% endif %}{% endblock %}
 
 {% block custom_styles %}
     {% include 'snippets/styles.html' with blog=blog %}
