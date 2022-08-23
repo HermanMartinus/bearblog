@@ -40,6 +40,12 @@
                     <small>Published {{ post.published_date|timesince }} ago</small>
                     -
                     <small><b>{{ post.upvotes }} toast{{ post.upvotes|pluralize }}</b></small>
+                    {% if request.user.is_staff %}
+                        <form method="POST" style="display:inline;">
+                            <input hidden name="hide-post" value="{{ post.pk }}" />
+                            <button>Hide</button>
+                        </form>
+                    {% endif %}
                 </small>
             </div>
         </li>

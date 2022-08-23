@@ -95,6 +95,7 @@ class Post(models.Model):
 
     upvotes = models.IntegerField(default=0)
     score = models.FloatField(default=0)
+    hidden = models.BooleanField(default=False)
 
     @property
     def contains_code(self):

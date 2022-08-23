@@ -24,7 +24,12 @@ posts_per_page = 20
 def discover(request):
     page = 0
     gravity = float(request.GET.get("gravity", 1.2))
-    log_base = float(request.GET.get("log_base", 10))
+
+    if request.user.is_staff:
+        if request.POST.get("hide-post", False):
+            post = Post.objects.get(pk=request.POST.get("hide-post", ''))
+            post.hidden = True
+            post.save()
 
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
@@ -40,6 +45,7 @@ def discover(request):
             )
             .filter(
                 publish=True,
+                hidden=False,
                 blog__reviewed=True,
                 blog__blocked=False,
                 make_discoverable=True,
@@ -55,6 +61,7 @@ def discover(request):
             )
             .filter(
                 publish=True,
+                hidden=False,
                 blog__reviewed=True,
                 blog__blocked=False,
                 make_discoverable=True,
@@ -79,6 +86,7 @@ def discover(request):
             )
             .filter(
                 publish=True,
+                hidden=False,
                 blog__reviewed=True,
                 blog__blocked=False,
                 make_discoverable=True,
@@ -93,6 +101,7 @@ def discover(request):
         posts = (
             Post.objects.filter(
                 publish=True,
+                hidden=False,
                 blog__reviewed=True,
                 blog__blocked=False,
                 make_discoverable=True,
@@ -130,6 +139,7 @@ def feed(request):
             )
             .filter(
                 publish=True,
+                hidden=False,
                 blog__reviewed=True,
                 blog__blocked=False,
                 make_discoverable=True,
@@ -145,6 +155,7 @@ def feed(request):
         all_posts = (
             Post.objects.filter(
                 publish=True,
+                hidden=False,
                 blog__reviewed=True,
                 blog__blocked=False,
                 make_discoverable=True,
