@@ -38,12 +38,13 @@ def discover(request):
     posts_to = (page * posts_per_page) + posts_per_page
 
     newest = request.GET.get("newest")
+
     if newest:
+        # New
         posts = (
             Post.objects.annotate(
                 upvote_count=Count("upvote"),
-            )
-            .filter(
+            ).filter(
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
@@ -54,52 +55,12 @@ def discover(request):
             .order_by("-published_date")
             .select_related("blog")[posts_from:posts_to]
         )
-    elif request.GET.get("top"):
-        posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-            )
-            .filter(
-                publish=True,
-                hidden=False,
-                blog__reviewed=True,
-                blog__blocked=False,
-                make_discoverable=True,
-                published_date__lte=timezone.now(),
-            )
-            .order_by("-score", "-published_date")
-            .select_related("blog")
-            .prefetch_related("upvote_set")[posts_from:posts_to]
-        )
-    elif request.GET.get('old', False):
-        posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-                rating=ExpressionWrapper(
-                    (
-                        (Count("upvote"))
-                        / ((Seconds(Now() - F("published_date"))) + 4) ** gravity
-                    )
-                    * 100000,
-                    output_field=FloatField(),
-                ),
-            )
-            .filter(
-                publish=True,
-                hidden=False,
-                blog__reviewed=True,
-                blog__blocked=False,
-                make_discoverable=True,
-                published_date__lte=timezone.now(),
-            )
-            .order_by("-rating", "-published_date")
-            .select_related("blog")
-            .prefetch_related("upvote_set")[posts_from:posts_to]
-        )
     else:
         # Trending
         posts = (
-            Post.objects.filter(
+            Post.objects.annotate(
+                upvote_count=Count("upvote"),
+            ).filter(
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
