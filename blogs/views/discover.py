@@ -1,19 +1,14 @@
-
 from django.http.response import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count, ExpressionWrapper, F, FloatField
-from django.db.models.functions import Log
+from django.db.models import Count
 from django.utils import timezone
-from django.db.models.functions import Now
 from django.contrib.sites.models import Site
 
 from blogs.models import Post, Upvote
 from blogs.helpers import clean_text, sanitise_int
 
 from feedgen.feed import FeedGenerator
-from pg_utils import Seconds
-from ipaddr import client_ip
 import mistune
 
 gravity = 1.2
@@ -22,14 +17,25 @@ posts_per_page = 20
 
 @csrf_exempt
 def discover(request):
-    page = 0
-    gravity = float(request.GET.get("gravity", 1.2))
-
+    # admin actions
     if request.user.is_staff:
         if request.POST.get("hide-post", False):
             post = Post.objects.get(pk=request.POST.get("hide-post", ''))
             post.hidden = True
             post.save()
+        if request.POST.get("block-blog", False):
+            post = Post.objects.get(pk=request.POST.get("block-blog", ''))
+            post.blog.blocked = True
+            post.blog.save()
+        if request.POST.get("boost-post", False):
+            post = Post.objects.get(pk=request.POST.get("boost-post", ''))
+            for i in range(0, 5):
+                upvote = Upvote(post=post, ip_address=f"boost-{i}")
+                upvote.save()
+            post.update_score()
+
+    page = 0
+    gravity = float(request.GET.get("gravity", 1.2))
 
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
