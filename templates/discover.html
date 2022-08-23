@@ -41,10 +41,21 @@
                     -
                     <small><b>{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</b></small>
                     {% if request.user.is_staff %}
-                        <form method="POST" style="display:inline;">
-                            <input hidden name="hide-post" value="{{ post.pk }}" />
-                            <button>Hide</button>
-                        </form>
+                        <details>
+                            <summary></summary>
+                            <form method="POST" style="display:inline">
+                                <input hidden name="hide-post" value="{{ post.pk }}" />
+                                <button onclick="event.preventDefault();if(confirm('Are you sure?')){event.target.parentElement.submit()}">Hide post</button>
+                            </form>
+                            <form method="POST" style="display:inline">
+                                <input hidden name="block-blog" value="{{ post.pk }}" />
+                                <button onclick="event.preventDefault();if(confirm('Are you sure?')){event.target.parentElement.submit()}">Block blog</button>
+                            </form>
+                            <form method="POST" style="display:inline">
+                                <input hidden name="boost-post" value="{{ post.pk }}" />
+                                <button onclick="event.preventDefault();if(confirm('Are you sure?')){event.target.parentElement.submit()}">Boost post</button>
+                            </form>
+                        </details>
                     {% endif %}
                 </small>
             </div>
