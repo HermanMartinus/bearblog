@@ -109,8 +109,7 @@ class Post(models.Model):
         super(Post, self).save(*args, **kwargs)
 
     def update_score(self):
-
-        self.upvotes = len(self.upvote_set.all())
+        self.upvotes = self.upvote_set.count()
 
         if self.upvotes > 1:
             log_of_upvotes = log(self.upvotes, 10)
