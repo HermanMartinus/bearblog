@@ -170,7 +170,7 @@ def validate_subscriber_email(email, blog):
         Made with Bear ʕ•ᴥ•ʔ
     '''
     send_async_mail(
-        'Confirm your email address',
+        f'Confirm your subscription to {blog.title}',
         html_message,
         'Bear ʕ•ᴥ•ʔ <no_reply@bearblog.dev>',
         [email],
