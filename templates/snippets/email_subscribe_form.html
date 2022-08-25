@@ -1,4 +1,5 @@
 <form class="email-signup" action="/email-subscribe/" method="post">
+    {% csrf_token %}
     <input type="text" name="name" style="display:none"/>
     <input type="email" placeholder="Email address..." name="email" style="border:1px dashed; padding: 5px;"/>
     <br>
@@ -11,8 +12,9 @@
         fetch(signupForm.action, {
             method: signupForm.method,
             body:  new FormData(signupForm),
-        }).then(response => {
-            signupForm.innerHTML = "<i>You've been subscribed! ＼ʕ •ᴥ•ʔ／</i>"
+        }).then((response) => response.text()).then(response => {
+            console.log(response)
+            signupForm.innerHTML = `<i>${response}</i>`
         });
         signupForm.innerHTML = "<i>Submitting...</i>"
     });

@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 
 from blogs.helpers import validate_subscriber_email
 from blogs.models import Blog, Subscriber
@@ -71,7 +70,6 @@ def subscribe(request):
     )
 
 
-@csrf_exempt
 def email_subscribe(request):
     blog = resolve_address(request)
     if not blog:
