@@ -13,7 +13,6 @@
             method: signupForm.method,
             body:  new FormData(signupForm),
         }).then((response) => response.text()).then(response => {
-            console.log(response)
             signupForm.innerHTML = `<i>${response}</i>`
         });
         signupForm.innerHTML = "<i>Submitting...</i>"
