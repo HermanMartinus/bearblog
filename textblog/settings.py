@@ -17,7 +17,8 @@ DEFAULT_LOGGING['handlers']['console']['filters'] = []
 ALLOWED_HOSTS = ['*']
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1', 'https://159.223.204.176']
+CORS_ORIGIN_ALLOW_ALL = True
+# CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1', 'https://159.223.204.176']
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True
