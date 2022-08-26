@@ -17,11 +17,6 @@ DEFAULT_LOGGING['handlers']['console']['filters'] = []
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://\*',
-    'http://*'
-]
-
 INTERNAL_IPS = ['127.0.0.1']
 
 ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
@@ -168,4 +163,4 @@ EMAIL_USE_TLS = True
 EMAILOCTOPUS_API = os.getenv('EMAILOCTOPUS_API', False)
 
 # Referrer policy
-# SECURE_REFERRER_POLICY = "cross-origin"
+SECURE_REFERRER_POLICY = "cross-origin"
