@@ -2,6 +2,8 @@
 <html lang="{% block lang %}en{% endblock %}">
 
 <head>
+  {% block referrer %}
+  {% endblock %}
   {% if request.META.HTTP_HOST == "hmartinus.com" %}
   <meta name="robots" content="noindex">
   <meta name="robots" content="nofollow">
