@@ -5,6 +5,7 @@ Bear runs on a droplet with Caddy as the web server. The Django application is s
 ## Caddy:
 
 config: /etc/caddy/Caddyfile
+logs: /var/log/caddy/access.log
 
 ## Django
 

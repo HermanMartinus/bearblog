@@ -2,6 +2,8 @@ import os
 import dj_database_url
 from django.utils.log import DEFAULT_LOGGING
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -15,9 +17,10 @@ DEBUG = (os.environ.get('DEBUG') == 'True')
 DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
 ALLOWED_HOSTS = ['*']
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SECURE = False
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-CORS_ORIGIN_ALLOW_ALL = True
 # CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1', 'https://159.223.204.176']
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
