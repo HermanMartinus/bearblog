@@ -19,7 +19,7 @@ def markdown(content):
     soup = html_parser(markup, 'html.parser')
     heading_tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
 
-    # Give headings IDs so they can be linked to 
+    # Give headings IDs so they can be linked to
     for each_tag in heading_tags:
         each_tag.attrs['id'] = slugify(each_tag.text)
 
@@ -29,7 +29,7 @@ def markdown(content):
             each_anchor.attrs['href'] = each_anchor.attrs['href'].replace('tab:', '')
             each_anchor.attrs['target'] = '_blank'
 
-    # Add pre to codeblocks and order correctly 
+    # Add pre to codeblocks and order correctly
     for match in soup.findAll('code'):
         if match.parent.name == 'pre':
             if match.has_attr('class'):

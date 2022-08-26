@@ -16,11 +16,11 @@ DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-CORS_ORIGIN_ALLOW_ALL = True
 
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = [
+    'https://\*',
+    'http://*'
+]
 
 INTERNAL_IPS = ['127.0.0.1']
 
@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'taggit',
     'pygmentify',
-    'corsheaders',
 ]
 
 AUTHENTICATION_BACKENDS = (
@@ -53,7 +52,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
