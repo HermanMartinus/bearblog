@@ -57,8 +57,8 @@ def markdown(content):
                                                 '+-', '±'))
 
             # Add email subscription form inline
-            match.string.replace_with(
-                match.string.replace('{{ email-signup }}', template.loader.render_to_string('snippets/email_subscribe_form.html')))
+            # match.string.replace_with(
+            #     match.string.replace('{{ email-signup }}', template.loader.render_to_string('snippets/email_subscribe_form.html')))
 
     safe_attrs = list(lxml.html.clean.defs.safe_attrs) + ['style', 'controls']
     lxml.html.clean.defs.safe_attrs = safe_attrs
@@ -73,5 +73,6 @@ def markdown(content):
         'stackblitz.com']
     cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
     cleaned_markup = cleaner.clean_html(str(soup))
+    cleaned_markup = cleaned_markup.replace('{{ email-signup }}', template.loader.render_to_string('snippets/email_subscribe_form.html'))
 
     return cleaned_markup
