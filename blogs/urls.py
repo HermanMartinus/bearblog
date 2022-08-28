@@ -41,7 +41,6 @@ urlpatterns = [
     path('lemon-webhook/', blog.lemon_webhook, name='lemon_webhook'),
 
     path('ping/', blog.ping, name='ping'),
-    path('form-test/', blog.form_test, name='form_test'),
     path('blog/', blog.posts, name='posts'),
     path('sitemap.xml', blog.sitemap, name='sitemap'),
     path('public-analytics/', blog.public_analytics, name="public_analytics"),
