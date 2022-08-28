@@ -71,7 +71,6 @@ def subscribe(request):
     )
 
 
-@csrf_exempt
 def email_subscribe(request):
     blog = resolve_address(request)
     if not blog:
