@@ -215,3 +215,12 @@ def sitemap(request):
     except AttributeError:
         posts = []
     return render(request, 'sitemap.xml', {'blog': blog, 'posts': posts}, content_type='text/xml')
+
+
+@csrf_exempt
+def form_test(request):
+    print(request.headers)
+    if request.POST.get('form-test', False):
+        return render(request, 'form-test.html', {'message': f'Form submitted with "{request.POST.get("form-test")}"'})
+    else:
+        return render(request, 'form-test.html', {'message': 'Test form'})
