@@ -16,6 +16,7 @@ DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = ['https://bear-blog.herokuapp.com']
 
 INTERNAL_IPS = ['127.0.0.1']
 
