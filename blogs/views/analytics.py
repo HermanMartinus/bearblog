@@ -105,10 +105,11 @@ class HitThread(threading.Thread):
             except KeyError:
                 print('Platform not found')
 
+            referrer = self.request.GET.get('ref', None).split('?')[0].split('#')[0]
             Hit.objects.get_or_create(
                 post_id=self.pk,
                 ip_address=ip_hash,
-                referrer=self.request.GET.get('ref', None),
+                referrer=referrer,
                 country=country,
                 device=device,
                 browser=browser)
@@ -117,4 +118,3 @@ class HitThread(threading.Thread):
             print('Duplicate hit')
         except IntegrityError:
             print('Post does not exist')
-
