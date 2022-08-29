@@ -19,7 +19,7 @@ def dashboard(request):
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 
-    blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).order_by('created_date')
+    blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).values('created_date').order_by('created_date')
 
     date_iterator = start_date
     blogs_count = blogs.annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
