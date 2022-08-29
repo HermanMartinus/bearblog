@@ -105,7 +105,10 @@ class HitThread(threading.Thread):
             except KeyError:
                 print('Platform not found')
 
-            referrer = self.request.GET.get('ref', None).split('?')[0].split('#')[0]
+            referrer = self.request.GET.get('ref', None)
+            if referrer:
+                referrer = referrer.split('?')[0].split('#')[0]
+
             Hit.objects.get_or_create(
                 post_id=self.pk,
                 ip_address=ip_hash,
