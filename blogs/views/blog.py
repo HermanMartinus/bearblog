@@ -215,3 +215,8 @@ def sitemap(request):
     except AttributeError:
         posts = []
     return render(request, 'sitemap.xml', {'blog': blog, 'posts': posts}, content_type='text/xml')
+
+
+def robots(request):
+    blog = resolve_address(request)
+    return render(request, 'robots.txt',  {'blog': blog}, content_type="text/plain")

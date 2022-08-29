@@ -164,4 +164,4 @@ EMAIL_USE_TLS = True
 EMAILOCTOPUS_API = os.getenv('EMAILOCTOPUS_API', False)
 
 # Referrer policy
-SECURE_REFERRER_POLICY = "cross-origin"
+SECURE_REFERRER_POLICY = "origin-when-cross-origin"
