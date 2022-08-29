@@ -10,6 +10,7 @@ urlpatterns = [
     path('review/approve/<pk>', staff.approve, name='review_approve'),
     path('review/block/<pk>', staff.block, name='review_block'),
     path('review/delete/<pk>', staff.delete, name='review_delete'),
+    path('staff/dashboard/', staff.dashboard, name='staff_dashboard'),
 
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('dashboard/', dashboard.dashboard, name='dashboard'),

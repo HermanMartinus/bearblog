@@ -5,8 +5,56 @@ from django.http import HttpResponse
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from blogs.helpers import send_async_mail
+from django.db.models.functions import TruncDate
 
 from blogs.models import Blog
+
+import pygal
+from pygal.style import LightColorizedStyle
+
+
+@staff_member_required
+def dashboard(request):
+    days_filter = int(request.GET.get('days', 7))
+    start_date = (timezone.now() - timedelta(days=days_filter)).date()
+    end_date = timezone.now().date()
+
+    blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).order_by('created_date')
+
+    date_iterator = start_date
+    blogs_count = blogs.annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
+
+    # create dates dict with zero hits
+    blog_dict = {}
+    while date_iterator <= end_date:
+        blog_dict[date_iterator.strftime("%Y-%m-%d")] = 0
+        date_iterator += timedelta(days=1)
+
+    # populate dict with hits count
+    for hit in blogs_count:
+        blog_dict[hit['date'].strftime("%Y-%m-%d")] = hit['c']
+
+    # generate chart
+    chart_data = []
+    for date, count in blog_dict.items():
+        chart_data.append({'date': date, 'signups': count})
+
+    chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
+    chart.force_uri_protocol = 'http'
+    mark_list = [x['signups'] for x in chart_data]
+    [x['date'] for x in chart_data]
+    chart.add('Reads', mark_list)
+    chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
+    chart_render = chart.render_data_uri()
+
+    return render(
+            request,
+            'staff/dashboard.html',
+            {
+                'blogs': blogs,
+                'chart': chart_render,
+            }
+    )
 
 
 @staff_member_required
@@ -38,7 +86,7 @@ def review_flow(request):
 
         return render(
             request,
-            'review_flow.html',
+            'staff/review_flow.html',
             {
                 'blog': blog,
                 'content': blog.content or "~nothing here~",
