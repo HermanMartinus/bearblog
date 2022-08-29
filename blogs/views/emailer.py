@@ -81,6 +81,7 @@ def email_subscribe(request):
         if request.POST.get("email", "") and not request.POST.get("name", False):
             email = request.POST.get("email", "")
             subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email)
+            # TODO: if 10 subscribers in the past minute return false
             if not subscriber_dupe:
                 validate_subscriber_email(email, blog)
                 return HttpResponse("You've been subscribed! ＼ʕ •ᴥ•ʔ／")
