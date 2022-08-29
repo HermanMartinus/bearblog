@@ -78,11 +78,14 @@ def email_subscribe(request):
         return not_found(request)
 
     if request.method == "POST":
+
         if request.POST.get("email", "") and not request.POST.get("name", False):
+            recent_subscriptions = Subscriber.objects.filter(subscribed_date__gt=timezone.now()-timezone.timedelta(minutes=2)).count()
+            if recent_subscriptions > 10:
+                return HttpResponse("Too many recent subscriptions timeout")
             email = request.POST.get("email", "")
-            subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email)
-            # TODO: if 10 subscribers in the past minute return false
-            if not subscriber_dupe:
+            subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email).count()
+            if subscriber_dupe < 1:
                 validate_subscriber_email(email, blog)
                 return HttpResponse("You've been subscribed! ＼ʕ •ᴥ•ʔ／")
             else:
