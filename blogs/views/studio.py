@@ -33,7 +33,7 @@ def studio(request):
         blog = Blog(
             user=request.user,
             title="My blog",
-            subdomain=subdomain)
+            subdomain=slugify(subdomain).replace('_', '-'))
         blog.save()
 
     error_message = ""
@@ -113,7 +113,7 @@ def parse_raw_homepage(raw_content, blog):
         if name == 'title':
             blog.title = value
         elif name == 'bear_domain':
-            blog.subdomain = slugify(value.split('.')[0])
+            blog.subdomain = slugify(value.split('.')[0]).replace('_', '-')
         elif name == "custom_domain":
             if blog.upgraded:
                 if Blog.objects.filter(domain=value).exclude(pk=blog.pk).count() == 0:
