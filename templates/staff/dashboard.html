@@ -20,11 +20,20 @@ Nav here
 
 {% block content %}
 <content>
-<h2>Signups<h2>
+<h2>Signups</h2>
 <embed type="image/svg+xml" src= {{ signup_chart|safe }} />
+<span class="helptext" style="display: flex; justify-content:space-between;">
+    <span>{{ start_date|date:"j F Y" }}</span>
+    <span>{{ end_date|date:"j F Y" }}</span> 
+</span>
 
 <h2>Upgrades</h2>
 <embed type="image/svg+xml" src= {{ upgrade_chart|safe }} />
+<span class="helptext" style="display: flex; justify-content:space-between;">
+    <span>{{ start_date|date:"j F Y" }}</span>
+    <span>{{ end_date|date:"j F Y" }}</span> 
+</span>
+
 </content>
 {% endblock %}
 

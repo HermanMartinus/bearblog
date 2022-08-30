@@ -83,6 +83,8 @@ def dashboard(request):
                 'blogs': blogs,
                 'signup_chart': signup_chart,
                 'upgrade_chart': upgrade_chart,
+                'start_date': start_date,
+                'end_date': end_date
             }
     )
 
