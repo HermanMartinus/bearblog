@@ -11,7 +11,7 @@ class Blog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     title = models.CharField(max_length=200)
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
-    last_modified = models.DateTimeField(auto_now=True, blank=True)
+    last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
 
@@ -82,7 +82,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)
     published_date = models.DateTimeField(blank=True)
-    last_modified = models.DateTimeField(auto_now=True, blank=True)
+    last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     tags = TaggableManager(blank=True)
     publish = models.BooleanField(default=True)
     make_discoverable = models.BooleanField(default=True)

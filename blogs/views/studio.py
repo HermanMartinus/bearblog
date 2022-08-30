@@ -42,6 +42,7 @@ def studio(request):
     if raw_content:
         try:
             parse_raw_homepage(raw_content, blog)
+            blog.last_modified = timezone.now()
             blog.save()
         except IntegrityError:
             error_message = "This bear_domain is already taken"
@@ -181,6 +182,7 @@ def post(request, pk=None):
                 post.slug = post.slug + '-' + str(randint(0, 9))
 
             post.publish = request.POST.get("publish", False) == "true"
+            post.last_modified = timezone.now()
 
             post.save()
 
