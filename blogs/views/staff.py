@@ -19,20 +19,21 @@ def dashboard(request):
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 
-    blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).values('created_date').order_by('created_date')
+    blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).values('created_date', 'upgraded_date').order_by('created_date')
 
+    # SIGNUPS
     date_iterator = start_date
     blogs_count = blogs.annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
 
-    # create dates dict with zero hits
+    # create dates dict with zero signups
     blog_dict = {}
     while date_iterator <= end_date:
         blog_dict[date_iterator.strftime("%Y-%m-%d")] = 0
         date_iterator += timedelta(days=1)
 
-    # populate dict with hits count
-    for hit in blogs_count:
-        blog_dict[hit['date'].strftime("%Y-%m-%d")] = hit['c']
+    # populate dict with signup count
+    for signup in blogs_count:
+        blog_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
 
     # generate chart
     chart_data = []
@@ -43,16 +44,45 @@ def dashboard(request):
     chart.force_uri_protocol = 'http'
     mark_list = [x['signups'] for x in chart_data]
     [x['date'] for x in chart_data]
-    chart.add('Reads', mark_list)
+    chart.add('Signups', mark_list)
     chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
-    chart_render = chart.render_data_uri()
+    signup_chart = chart.render_data_uri()
+
+    # UPGRADES
+    date_iterator = start_date
+    upgrades_count = blogs.annotate(date=TruncDate('upgraded_date')).values('date').annotate(c=Count('date')).order_by()
+
+    # create dates dict with zero upgrades
+    blog_dict = {}
+    while date_iterator <= end_date:
+        blog_dict[date_iterator.strftime("%Y-%m-%d")] = 0
+        date_iterator += timedelta(days=1)
+
+    # populate dict with signup count
+    for signup in upgrades_count:
+        if signup['date']:
+            blog_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
+
+    # generate chart
+    chart_data = []
+    for date, count in blog_dict.items():
+        chart_data.append({'date': date, 'upgrades': count})
+
+    chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
+    chart.force_uri_protocol = 'http'
+    mark_list = [x['upgrades'] for x in chart_data]
+    [x['date'] for x in chart_data]
+    chart.add('Upgrades', mark_list)
+    chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
+    upgrade_chart = chart.render_data_uri()
 
     return render(
             request,
             'staff/dashboard.html',
             {
                 'blogs': blogs,
-                'chart': chart_render,
+                'signup_chart': signup_chart,
+                'upgrade_chart': upgrade_chart,
             }
     )
 

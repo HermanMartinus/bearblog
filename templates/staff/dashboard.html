@@ -19,8 +19,13 @@ Nav here
 {% endblock %}
 
 {% block content %}
-<embed type="image/svg+xml" src= {{ chart|safe }} />
+<content>
+<h2>Signups<h2>
+<embed type="image/svg+xml" src= {{ signup_chart|safe }} />
 
+<h2>Upgrades</h2>
+<embed type="image/svg+xml" src= {{ upgrade_chart|safe }} />
+</content>
 {% endblock %}
 
 {% block footer %}
