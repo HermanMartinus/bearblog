@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Account | Bear Blog
+Account | Bear Blog
 {% endblock %}
 
 {% block nav %}
@@ -11,15 +11,54 @@
 {% block content %}
 <content>
     {% if not blog.upgraded %}
-    {% include '../snippets/upgrade.html' %}
+    <h3>Hey, Herman here  ʕ •ᴥ•ʔゝ</h3>
+    <p>
+        Bear will never sell your data, or display ads.
+        <br>
+        <br>
+        To keep the servers running and the coffee hot,<br>
+        I charge for the most resource-intensive features:
+        <ul>
+            <li>Custom domains</li>
+            <li>Image uploading</li>
+            <li>In-depth analytics</li>
+            <li>Email subscriber lists</li>
+            <li>Beta features</li>
+        </ul>
+    </p>
+    <p>
+        <b>
+            Upgrade for $18 per year <small style="font-size: 10px; color: grey;">(thats $1.50 per month)</small>
+        </b>
+    </p>
+    <p>
+        <button onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?discount=0&checkout[custom][blog]={{blog.subdomain}}')">Upgrade</button>
+    </p>
+    <small>
+        <details>
+            <summary>Need convincing?</summary>
+            <p>
+                Bear's relative cost is great when compared to stringing together disparate services.
+                <br>
+                <br>
+                Privacy respecting analytics comes at a premium of <a href="https://usefathom.com/pricing" target="_blank">$14/mo</a>, and hosting and image hosting can cost upwards of <a href="https://www.digitalocean.com/pricing/droplets" target="_blank">$5/mo</a> a piece.
+                Overall a custom built blog can cost upwards of $24/mo.
+                <br>
+                <br>
+                Bear integrates all of these services. You don't even have to buy themes separately. 
+                <br>
+                <br>
+                Even when compared to other blogging platforms such as Ghost <a href="https://ghost.org/pricing/" target="_blank">($9/mo)</a> and Weebly <a href="https://www.weebly.com/za/pricing" target="_blank">($12/mo without ads)</a>, Bear comes in as being faster and more affordable.
+                You could choose Wordpress <a href="https://wordpress.com/pricing/" target="_blank">($4/mo)</a>, but who in their right mind wants to use Wordpress?
+                <br>
+                <br>
+                Most importantly, you'll be supporting the small, fast internet, and a blogging platform built to last forever.
+            </p>
+        </details>
+    </small>
+    <h3>Keep the tiny internet awesome!  \ʕ•ᴥ•ʔ/</h2>
     {% else %}
     <h3>You've already upgraded your Bear account! \ʕ•ᴥ•ʔ/</h3>
-    <p>
-        If you'd like you can make another
-        <a target="_blank" href="https://bear.lemonsqueezy.com/checkout/buy/4aca490f-f6a2-4d62-81d6-75f2cd034961?discount=0&checkout[custom][blog]={{blog.subdomain}}">
-            once-off contribution.
-        </a>
-    </p>
     {% endif %}
 </content>
 {% endblock %}
