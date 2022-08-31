@@ -58,9 +58,9 @@
 
 {% block content %}
 {% if request.user == blog.user %}
-<h1 style="position:relative;height:0;margin:0">
-   <a href="/studio/posts/{{ post.pk }}/" target="_blank" style="position:absolute;right:0;"><button>Edit</button></a>
-</h1>
+<h3 style="position:relative;height:0;margin:0">
+   <a href="/studio/posts/{{ post.pk }}/" target="_blank" style="position:absolute;right:0;color:lightgrey;text-decoration:none;">✎</a>
+</h3>
 {% endif %}
 
 {% if preview %}

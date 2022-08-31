@@ -43,7 +43,7 @@
 {% endblock %}
 
 {% block custom_styles %}
-    {% include 'snippets/styles.html' with blog=blog %}
+{% include 'snippets/styles.html' with blog=blog %}
 {% endblock %}
 
 {% block heading %}
@@ -55,6 +55,12 @@
 {% endblock %}
 
 {% block content %}
+{% if request.user == blog.user %}
+<h3 style="position:relative;height:0;margin:0">
+   <a href="/dashboard/" target="_blank" style="position:absolute;right:0;color:lightgrey;text-decoration:none;">✎</a>
+</h3>
+{% endif %}
+
 {% if blog.content %}
 <content>
 {% pygmentify %}
