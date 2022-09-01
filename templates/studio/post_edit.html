@@ -1,14 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    {% if post %}
-        Editing {{ post.title }} | Bear Blog
-    {% else %}
-        New post | Bear Blog
-    {% endif %}
-{% endblock %}
-
-{% block nav %}
+{% if post %}
+Editing {{ post.title }} | Bear Blog
+{% else %}
+New post | Bear Blog
+{% endif %}
 {% endblock %}
 
 {% block content %}

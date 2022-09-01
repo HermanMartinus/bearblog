@@ -1,12 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Email list | Bear Blog
-{% endblock %}
+{% block title %}Email list | Bear Blog{% endblock %}
 
-{% block nav %}
-{% include '../snippets/dashboard_nav.html' %}
-{% endblock %}
+{% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
 <content>
@@ -35,7 +31,7 @@
         <textarea name="email_addresses" style="height: 400px">{% if email_addresses_text %}{{email_addresses_text}}{% else %}
 {% for subscriber in subscribers %}{{ subscriber.email_address }}
 {% empty %}No emails yet{% endfor %}{% endif %}</textarea>
-            <small>One email address per line</small>
+        <small>One email address per line</small>
     </form>
 </content>
 {% endblock %}

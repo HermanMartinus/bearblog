@@ -88,7 +88,7 @@ class NavForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'rows': 10, 'cols': 40}),
         help_text='''Add navigation links in
                     <a href='https://herman.bearblog.dev/markdown-cheatsheet/#links' target='_blank'>
-                        Markdown
+                        markdown
                     </a>
                     <br>
                     [Home](/) [About me](/about-me/) Blog(/blog/)

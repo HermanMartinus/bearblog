@@ -5,7 +5,9 @@
 
 {% block favicon %}{{ blog.favicon }}{% endblock %}
 
-{% block title %}{{ post.title }} | {{ blog.title }}{% endblock %}
+{% block title %}Subscribe | {{ blog.title }}{% endblock %}
+
+{% block canonical %}<link rel="canonical" href="{{ root }}/blog/" />{% endblock %}
 
 {% block analytics %}
 {% if blog.fathom_site_id %}
