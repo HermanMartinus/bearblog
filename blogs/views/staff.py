@@ -15,7 +15,10 @@ from pygal.style import LightColorizedStyle
 
 @staff_member_required
 def dashboard(request):
-    days_filter = int(request.GET.get('days', 14))
+    days_filter = 14
+    if request.GET.get('days', False):
+        days_filter = int(request.GET.get('days', 14))
+
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 

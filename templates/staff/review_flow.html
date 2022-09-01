@@ -1,13 +1,9 @@
 {% extends 'base.html' %}
 {% load markdownify %}
 
-{% block favicon %}
-{{ blog.favicon }}
-{% endblock %}
+{% block favicon %}{{ blog.favicon }}{% endblock %}
 
-{% block title %}
-{{ blog.title }}
-{% endblock %}
+{% block title %}{{ blog.title }}{% endblock %}
 
 
 {% block seo %}
@@ -15,9 +11,7 @@
 {% endblock %}
 
 
-{% block custom_styles %}
-    {% include 'snippets/styles.html' with blog=blog %}
-{% endblock %}
+{% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
 
 {% block heading %}
 <br>
