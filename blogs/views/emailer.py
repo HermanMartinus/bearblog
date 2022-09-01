@@ -18,6 +18,9 @@ from blogs.views.blog import resolve_address, not_found
 def email_list(request):
     blog = get_object_or_404(Blog, user=request.user)
 
+    if not blog.upgraded:
+        return redirect('/dashboard/upgrade/')
+
     subscribers = Subscriber.objects.filter(blog=blog)
 
     if request.GET.get("export-csv", ""):
