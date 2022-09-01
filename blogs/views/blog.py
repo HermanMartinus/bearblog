@@ -1,13 +1,13 @@
 from django.http import HttpResponse
 from django.http.response import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
 from django.db.models import Count
 from django.utils import timezone
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_blog_with_domain, get_posts, sanitise_int, unmark
+from blogs.helpers import get_posts, sanitise_int, unmark
 
 from ipaddr import client_ip
 from taggit.models import Tag
@@ -37,6 +37,19 @@ def resolve_address(request):
     else:
         # Custom domain blog
         return get_blog_with_domain(http_host)
+
+
+def get_blog_with_domain(domain):
+    if not domain:
+        return False
+    try:
+        return Blog.objects.get(domain=domain, blocked=False)
+    except Blog.DoesNotExist:
+        # Handle www subdomain if necessary
+        if 'www.' in domain:
+            return get_object_or_404(Blog, domain=domain.replace('www.', ''), blocked=False)
+        else:
+            return get_object_or_404(Blog, domain=f'www.{domain}', blocked=False)
 
 
 @csrf_exempt

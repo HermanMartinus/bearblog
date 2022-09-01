@@ -25,19 +25,6 @@ def root(subdomain=''):
         return f"{subdomain}.{domain}"
 
 
-def get_blog_with_domain(domain):
-    if not domain:
-        return False
-    try:
-        return Blog.objects.get(domain=domain, blocked=False)
-    except Blog.DoesNotExist:
-        # Handle www subdomain if necessary
-        if 'www.' in domain:
-            return get_object_or_404(Blog, domain=domain.replace('www.', ''), blocked=False)
-        else:
-            return get_object_or_404(Blog, domain=f'www.{domain}', blocked=False)
-
-
 def get_posts(all_posts):
     return list(filter(lambda post: not post.is_page, all_posts))
 
@@ -140,34 +127,6 @@ def send_mass_html_mail(datatuple, fail_silently=False, user=None, password=None
         message.attach_alternative(html, 'text/html')
         messages.append(message)
     return connection.send_messages(messages)
-
-
-def validate_subscriber_email(email, blog):
-    token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()
-    confirmation_link = f'{blog.useful_domain()}/confirm-subscription/?token={token}&email={email}'
-
-    html_message = f'''
-        You've decided to subscribe to {blog.title} ({blog.useful_domain()}). That's awesome!
-        <br>
-        <br>
-        Follow this <a href="{confirmation_link}">link</a> to confirm your subscription.
-        <br>
-        <br>
-        Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
-    '''
-    text_message = f'''
-        You've decided to subscribe to {blog.title} ({blog.useful_domain()}). That's awesome!
-
-        Follow this link to confirm your subscription: {confirmation_link}
-
-        Made with Bear ʕ•ᴥ•ʔ
-    '''
-    send_async_mail(
-        f'Confirm your subscription to {blog.title}',
-        html_message,
-        'Bear ʕ•ᴥ•ʔ <no_reply@bearblog.dev>',
-        [email],
-    )
 
 
 class EmailThread(threading.Thread):
