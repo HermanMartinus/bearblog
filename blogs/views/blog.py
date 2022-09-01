@@ -228,6 +228,8 @@ def not_found(request, *args, **kwargs):
 
 def sitemap(request):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
     try:
         posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
     except AttributeError:
@@ -237,4 +239,6 @@ def sitemap(request):
 
 def robots(request):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
     return render(request, 'robots.txt',  {'blog': blog}, content_type="text/plain")

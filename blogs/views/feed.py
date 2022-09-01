@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 
 from blogs.helpers import unmark, clean_text
-from blogs.views.blog import resolve_address
+from blogs.views.blog import not_found, resolve_address
 
 from feedgen.feed import FeedGenerator
 import mistune
@@ -11,9 +11,8 @@ import mistune
 
 def feed(request):
     blog = resolve_address(request)
-
     if not blog:
-        raise Http404("Blog does not exist")
+        return not_found(request)
 
     all_posts = blog.post_set.filter(publish=True, is_page=False, published_date__lte=timezone.now()).order_by('-published_date')
 
