@@ -74,6 +74,8 @@ def home(request):
 
 def posts(request):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
 
     query = request.GET.get('q', '')
     if query:
@@ -111,6 +113,8 @@ def posts(request):
 @csrf_exempt
 def post(request, slug):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
 
     if request.GET.get('preview'):
         all_posts = blog.post_set.annotate(
@@ -175,6 +179,8 @@ def upvote(request, pk):
 
 def public_analytics(request):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
 
     if not blog or not blog.upgraded or not blog.public_analytics:
         return not_found(request)
