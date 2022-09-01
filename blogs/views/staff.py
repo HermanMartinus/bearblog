@@ -15,9 +15,7 @@ from pygal.style import LightColorizedStyle
 
 @staff_member_required
 def dashboard(request):
-    days_filter = 14
-    if request.GET.get('days', False):
-        days_filter = int(request.GET.get('days', 14))
+    days_filter = int(request.GET.get('days', 30))
 
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
@@ -141,7 +139,7 @@ def approve(request, pk):
 
     message = request.POST.get("message", "")
 
-    if not request.GET.get("no-email", ""):
+    if message and not request.GET.get("no-email", ""):
         send_async_mail(
             "I've just reviewed your blog",
             message,
