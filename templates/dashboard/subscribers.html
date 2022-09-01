@@ -9,9 +9,6 @@
 {% endblock %}
 
 {% block content %}
-{% if not blog.upgraded %}
-    {% include '../snippets/upgrade.html' %}
-{% else %}
 <content>
     <h1>Email list ({{ subscribers|length }})</h1>
     <p>
@@ -41,5 +38,4 @@
             <small>One email address per line</small>
     </form>
 </content>
-{% endif %}
 {% endblock %}

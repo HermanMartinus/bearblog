@@ -213,6 +213,9 @@ def upload_image(request):
 def domain_edit(request):
     blog = Blog.objects.get(user=request.user)
 
+    if not blog.upgraded:
+        return redirect('/dashboard/upgrade/')
+
     if request.method == "POST":
         form = DomainForm(request.POST, instance=blog)
         if form.is_valid():

@@ -11,10 +11,6 @@
 {% block content %}
 <content>
     <h1>Custom domain</h1>
-    {% if not blog.upgraded and not blog.domain %}
-    {% include '../snippets/upgrade.html' %}
-    {% else %}
-
     <h4>Set the following DNS record</h4>
         <table>
             <tr>
@@ -46,6 +42,5 @@
         <p>
             View site: <a href="{{ root }}" target="_blank">{{ root }}</a>
         </p>
-    {% endif %}
 </content>
 {% endblock %}
