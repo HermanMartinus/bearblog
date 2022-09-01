@@ -18,17 +18,11 @@
 {% endif %}
 {% endblock %}
 
-{% block heading %}
-{{ blog.title }}
-{% endblock %}
+{% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
 
-{% block custom_styles %}
-    {% include 'snippets/styles.html' with blog=blog %}
-{% endblock %}
+{% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}
-{{ blog.nav | markdown | safe }}
-{% endblock %}
+{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
 
 {% block content %}
 

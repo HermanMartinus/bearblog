@@ -5,13 +5,9 @@
 
 {% block lang %}{{ blog.lang }}{% endblock %}
 
-{% block favicon %}
-{{ blog.favicon }}
-{% endblock %}
+{% block favicon %}{{ blog.favicon }}{% endblock %}
 
-{% block title %}
-Blog | {{ blog.title }}
-{% endblock %}
+{% block title %}Blog | {{ blog.title }}{% endblock %}
 
 {% block canonical %}
 <link rel="canonical" href="{{ root }}/blog/" />
@@ -21,10 +17,6 @@ Blog | {{ blog.title }}
 {% if blog.fathom_site_id %}
 <script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>
 {% endif %}
-{% endblock %}
-
-{% block heading %}
-{{ blog.title }}
 {% endblock %}
 
 {% block seo %}
@@ -39,13 +31,11 @@ Blog | {{ blog.title }}
 <link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}
 
-{% block custom_styles %}
-    {% include 'snippets/styles.html' with blog=blog %}
-{% endblock %}
+{% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
 
-{% block nav %}
-{{ blog.nav | markdown | safe }}
-{% endblock %}
+{% block heading %}{{ blog.title }}{% endblock %}
+
+{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
 
 {% block content %}
 <content>

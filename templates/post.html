@@ -6,27 +6,16 @@
 
 {% block lang %}{% if post.lang %}{{ post.lang }}{% else %}{{ blog.lang }}{% endif %}{% endblock %}
 
-{% block favicon %}
-{{ blog.favicon }}
-{% endblock %}
+{% block favicon %}{{ blog.favicon }}{% endblock %}
 
-{% block title %}
-{{ post.title }} |
-{{ blog.title }}
-{% endblock %}
+{% block title %}{{ post.title }} | {{ blog.title }}{% endblock %}
 
-{% block canonical %}
-<link rel="canonical" href="{{ canonical_url }}" />
-{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ canonical_url }}" />{% endblock %}
 
 {% block analytics %}
 {% if blog.fathom_site_id %}
 <script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>
 {% endif %}
-{% endblock %}
-
-{% block heading %}
-{{ blog.title }}
 {% endblock %}
 
 {% block seo %}
@@ -40,19 +29,19 @@
 {% include 'snippets/seo_tags.html' with title=post.title url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
 {% endblock %}
 
+{% block hitcount %}{% if not preview %}url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}"){% endif %}{% endblock %}
+
 {% block imports %}
 {% if post.contains_code %}
 <link rel="stylesheet" href="{% pygmentify_css minify='false' %}">
 {% endif %}
 {% endblock %}
 
-{% block hitcount %}{% if not preview %}url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}"){% endif %}{% endblock %}
-
 {% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
 
-{% block nav %}
-{{ blog.nav | markdown | safe }}
-{% endblock %}
+{% block heading %}{{ blog.title }}{% endblock %}
+
+{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
 
 {% block content %}
 {% if request.user == blog.user %}

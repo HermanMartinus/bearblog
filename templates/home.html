@@ -6,17 +6,11 @@
 
 {% block lang %}{{ blog.lang }}{% endblock %}
 
-{% block favicon %}
-{{ blog.favicon }}
-{% endblock %}
+{% block favicon %}{{ blog.favicon }}{% endblock %}
 
-{% block title %}
-{{ blog.title }}
-{% endblock %}
+{% block title %}{{ blog.title }}{% endblock %}
 
-{% block canonical %}
-<link rel="canonical" href="{{ blog.useful_domain }}" />
-{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ blog.useful_domain }}" />{% endblock %}
 
 {% block analytics %}
 {% if blog.fathom_site_id %}
@@ -42,17 +36,11 @@
 {% endif %}
 {% endblock %}
 
-{% block custom_styles %}
-{% include 'snippets/styles.html' with blog=blog %}
-{% endblock %}
+{% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
 
-{% block heading %}
-{{ blog.title }}
-{% endblock %}
+{% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}
-{{ blog.nav | markdown | safe }}
-{% endblock %}
+{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
 
 {% block content %}
 {% if request.user == blog.user %}

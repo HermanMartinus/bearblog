@@ -1,18 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}
-404
-{% endblock %}
+{% block title %}403{% endblock %}
 
-{% block custom_styles %}
-    {% include 'snippets/styles.html' %}
-{% endblock %}
+{% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
 
-{% block heading %}
-{% endblock %}
+{% block heading %}{% endblock %}
 
-{% block nav %}
-{% endblock %}
+{% block nav %}{% endblock %}
 
 {% block content %}
 <div style="text-align: center; display: flex; flex-flow: column; justify-content: center; height: calc(100vh - 70px);">
@@ -27,5 +21,4 @@
 </div>
 {% endblock %}
 
-{% block footer %}
-{% endblock %}
+{% block footer %}{% endblock %}

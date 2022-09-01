@@ -239,6 +239,4 @@ def sitemap(request):
 
 def robots(request):
     blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
     return render(request, 'robots.txt',  {'blog': blog}, content_type="text/plain")
