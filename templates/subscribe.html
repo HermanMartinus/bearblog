@@ -3,14 +3,9 @@
 
 {% block page_type %}subscribe{% endblock %}
 
-{% block favicon %}
-{{ blog.favicon }}
-{% endblock %}
+{% block favicon %}{{ blog.favicon }}{% endblock %}
 
-{% block title %}
-{{ post.title }} |
-{{ blog.title }}
-{% endblock %}
+{% block title %}{{ post.title }} | {{ blog.title }}{% endblock %}
 
 {% block analytics %}
 {% if blog.fathom_site_id %}
@@ -25,7 +20,6 @@
 {% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
 
 {% block content %}
-
 {% if blog.upgraded and not subscribe_message %}
 <p>
     <b>Subscribe to this blog</b>
@@ -36,7 +30,6 @@
 {% if subscribe_message %}
 <p><i>{{ subscribe_message }}</i></p>
 {% endif %}
-
 {% endblock %}
 
 {% block footer %}

@@ -9,9 +9,7 @@
 
 {% block title %}Blog | {{ blog.title }}{% endblock %}
 
-{% block canonical %}
-<link rel="canonical" href="{{ root }}/blog/" />
-{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ root }}/blog/" />{% endblock %}
 
 {% block analytics %}
 {% if blog.fathom_site_id %}
