@@ -8,7 +8,6 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', include('blogs.urls')),
     path("favicon.ico", RedirectView.as_view(url='/static/favicon.ico', permanent=True)),
-    path('404/', TemplateView.as_view(template_name="404.html", content_type="text/html"))
 ]
 
 if settings.DEBUG:

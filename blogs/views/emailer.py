@@ -61,8 +61,6 @@ def email_list(request):
 
 def subscribe(request):
     blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
 
     return render(
         request,
@@ -77,8 +75,6 @@ def subscribe(request):
 @csrf_exempt
 def email_subscribe(request):
     blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
 
     if request.method == "POST":
 
@@ -99,8 +95,6 @@ def email_subscribe(request):
 
 def confirm_subscription(request):
     blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
 
     email = request.GET.get("email", "")
     token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()

@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.utils import timezone
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_blog_with_domain, get_post, get_posts, sanitise_int, unmark
+from blogs.helpers import get_blog_with_domain, get_posts, sanitise_int, unmark
 
 from ipaddr import client_ip
 from taggit.models import Tag
@@ -74,8 +74,6 @@ def home(request):
 
 def posts(request):
     blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
 
     query = request.GET.get('q', '')
     if query:
@@ -113,8 +111,6 @@ def posts(request):
 @csrf_exempt
 def post(request, slug):
     blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
 
     if request.GET.get('preview'):
         all_posts = blog.post_set.annotate(
@@ -123,7 +119,10 @@ def post(request, slug):
         all_posts = blog.post_set.annotate(
             upvote_count=Count('upvote')).filter(publish=True).order_by('-published_date')
 
-    post = get_post(all_posts, slug)
+    try:
+        post = list(filter(lambda post: post.slug == slug, all_posts))[0]
+    except IndexError:
+        return render(request, '404.html', {'blog': blog}, status=404)
 
     # Check if upvoted
     ip_address = client_ip(request)

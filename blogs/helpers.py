@@ -42,13 +42,6 @@ def get_posts(all_posts):
     return list(filter(lambda post: not post.is_page, all_posts))
 
 
-def get_post(all_posts, slug):
-    try:
-        return list(filter(lambda post: post.slug == slug, all_posts))[0]
-    except IndexError:
-        raise Http404("No Post matches the given query.")
-
-
 def sanitise_int(input, length=10):
     try:
         if len(input) < length:
