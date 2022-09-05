@@ -73,5 +73,5 @@ def markdown(content):
         'stackblitz.com']
     cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
     cleaned_markup = cleaner.clean_html(str(soup))
- 
+
     return cleaned_markup
