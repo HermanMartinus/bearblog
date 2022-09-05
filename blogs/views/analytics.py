@@ -13,6 +13,7 @@ from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
 
 from ipaddr import client_ip
+from urllib.parse import urlparse
 import httpagentparser
 import pygal
 import hashlib
@@ -79,35 +80,38 @@ class HitThread(threading.Thread):
 
     def run(self):
         try:
+            user_agent = httpagentparser.detect(self.request.META.get('HTTP_USER_AGENT', None))
+            if user_agent['bot']:
+                print('Bot traffic')
+                return
+
             ip_hash = hashlib.md5(f"{client_ip(self.request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
             response = requests.request("GET", f'https://geolocation-db.com/json/{client_ip(self.request)}')
             location = response.json()
             country = ''
             device = ''
             browser = ''
+
             try:
                 if location['country_name'] and location['country_name'] != 'Not found':
                     country = location['country_name']
             except KeyError:
                 print('Country not found')
 
-            user_agent = httpagentparser.detect(self.request.META.get('HTTP_USER_AGENT', None))
-
             try:
-                if not user_agent['bot']:
-                    device = user_agent['platform']['name']
+                device = user_agent['platform']['name']
             except KeyError:
                 print('Platform not found')
 
             try:
-                if not user_agent['bot']:
-                    browser = user_agent['browser']['name']
+                browser = user_agent['browser']['name']
             except KeyError:
                 print('Platform not found')
 
             referrer = self.request.GET.get('ref', None)
             if referrer:
-                referrer = referrer.split('?')[0].split('#')[0]
+                referrer = urlparse(referrer)
+                referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
 
             Hit.objects.get_or_create(
                 post_id=self.pk,
