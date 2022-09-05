@@ -51,6 +51,7 @@ AUTHENTICATION_BACKENDS = (
 MIDDLEWARE = [
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -58,7 +59,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'textblog.urls'
@@ -145,7 +145,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = "static/"
 
 # Enable WhiteNoise's GZip compression of static assets.
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 
