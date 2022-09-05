@@ -50,7 +50,7 @@
     <div style="display:flex;flex-flow:row wrap;justify-content:space-between; font-size: 12px;">
         <div style="width: 340px">
             <h3>Pages</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: scroll;">
+            <ul style="padding: 0;max-height: 300px;overflow-y: auto;">
                 {% for post in posts %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {% if post.hit_count > 0 %}
@@ -65,7 +65,7 @@
         </div>
         <div style="width: 340px">
             <h3>Referrers</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: scroll;word-break:break-all;">
+            <ul style="padding: 0;max-height: 300px;overflow-y: auto;word-break:break-all;">
                 {% for referrer in referrers %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     <a href="?days={{days_filter}}&referrer={{referrer.referrer}}{% if post_filter %}&post={{post_filter}}{% endif %}">{{referrer.referrer}}</a>
@@ -79,7 +79,7 @@
     <div style="padding-top:20px;display:flex; flex-flow: row wrap;justify-content:space-between; font-size: 12px;">
         <div style="width:220px">
             <h3>Devices</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: scroll">
+            <ul style="padding: 0;max-height: 300px;overflow-y: auto">
                 {% for device in devices %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ device.device }}
@@ -90,7 +90,7 @@
         </div>
         <div style="width:220px">
             <h3>Browsers</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: scroll">
+            <ul style="padding: 0;max-height: 300px;overflow-y: auto">
                 {% for browser in browsers %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ browser.browser }}
@@ -101,7 +101,7 @@
         </div>
         <div style="width:220px">
             <h3>Countries</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: scroll">
+            <ul style="padding: 0;max-height: 300px;overflow-y: auto">
                 {% for country in countries %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ country.country }}
