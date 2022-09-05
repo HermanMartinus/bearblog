@@ -190,8 +190,8 @@ def post(request, pk=None):
             post.tags.clear()
             if tags:
                 for tag in tags.split(','):
-                    if slugify(tag.strip()) != '':
-                        post.tags.add(slugify(tag.strip()))
+                    if tag.strip() != '':
+                        post.tags.add(tag.strip())
 
             return redirect(f"/studio/posts/{post.id}/")
         except ValidationError:
