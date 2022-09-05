@@ -81,6 +81,7 @@ class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)
+    alias = models.CharField(max_length=200, blank=True)
     published_date = models.DateTimeField(blank=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     tags = TaggableManager(blank=True)

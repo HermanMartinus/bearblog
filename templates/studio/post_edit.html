@@ -57,7 +57,8 @@ New post | Bear Blog
             rows="10" 
         >{% if error_message and raw_content  %}{{ raw_content }}{% elif post %}
 title: {{ post.title }}
-link: {{ post.slug }}
+link: {{ post.slug }}{% if post.alias %}
+alias: {{ post.alias }}{% endif %}
 published_date: {{ post.published_date|date:"Y-m-d" }}{% if post.canonical_url %}
 canonical_url: {{ post.canonical_url }}{% endif %}{% if post.meta_description %}
 meta_description: {{ post.meta_description }}{% endif %}{% if post.meta_image %}

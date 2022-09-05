@@ -173,6 +173,15 @@ def post(request, slug):
     )
 
 
+def post_alias(request, resource):
+    blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+
+    post = get_object_or_404(Post, blog=blog, alias=resource)
+    return redirect(f"/{post.slug}")
+
+
 @csrf_exempt
 def upvote(request, pk):
     ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().year}".encode('utf-8')).hexdigest()

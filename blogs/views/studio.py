@@ -218,6 +218,7 @@ def parse_raw_post(raw_content, post):
 
     # Clear out data
     post.slug = ''
+    post.alias = ''
     post.canonical_url = ''
     post.meta_description = ''
     post.meta_image = ''
@@ -240,6 +241,8 @@ def parse_raw_post(raw_content, post):
             post.title = value
         elif name == 'link':
             post.slug = slugify(value)
+        elif name == 'alias':
+            post.alias = value
         elif name == 'published_date':
             # Check if previously posted 'now'
             value = value.replace('/', '-')
