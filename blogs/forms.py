@@ -91,7 +91,7 @@ class NavForm(forms.ModelForm):
                         markdown
                     </a>
                     <br>
-                    [Home](/) [About me](/about-me/) Blog(/blog/)
+                    [Home](/) [About me](/about-me/) [Blog](/blog/)
                     <br>
                     To add a page to the nav menu set the link value to the link of a published post or page
                     ''',
