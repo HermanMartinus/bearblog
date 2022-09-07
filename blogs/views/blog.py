@@ -223,7 +223,7 @@ def lemon_webhook(request):
     # signature = base64.b64encode(digest).decode()
     # print(signature)
 
-    # print(request.META['HTTP_X_SIGNATURE'])
+    print(request.META['HTTP_X_SIGNATURE'])
 
     # if request.META['HTTP_X_SIGNATURE'] != signature:
     #     print('Success')
