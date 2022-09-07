@@ -44,12 +44,6 @@
 {% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
 
 {% block content %}
-{% if request.user == blog.user %}
-<h3 style="position:relative;height:0;margin:0">
-   <a href="/studio/posts/{{ post.pk }}/" target="_blank" style="position:absolute;right:0;color:lightgrey;text-decoration:none;">✎</a>
-</h3>
-{% endif %}
-
 {% if preview %}
 <p style="width:100%;padding:10px;background-color:lightsalmon;color:white;display:flex;justify-content:space-between;line-height:15px;">
     PREVIEW
@@ -58,6 +52,12 @@
         Close and re-open to refresh
     </small>
 </p>
+{% else %}
+{% if request.user == blog.user %}
+<h3 style="position:relative;height:0;margin:0">
+   <a href="/studio/posts/{{ post.pk }}/" target="_blank" style="position:absolute;right:0;color:lightgrey;text-decoration:none;">✎</a>
+</h3>
+{% endif %}
 {% endif %}
 
 {% if not post.is_page %}

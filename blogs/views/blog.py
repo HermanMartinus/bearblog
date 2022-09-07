@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
 from django.db.models import Count
 from django.utils import timezone
+from django.conf import settings
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_posts, sanitise_int, unmark
@@ -14,6 +15,9 @@ from taggit.models import Tag
 import hashlib
 import json
 import tldextract
+import hashlib
+import base64
+import hmac
 
 from blogs.views.studio import render_analytics
 
@@ -212,6 +216,15 @@ def public_analytics(request):
 
 @csrf_exempt
 def lemon_webhook(request):
+    digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE, msg=request.body, digestmod=hashlib.sha256).digest()
+    signature = base64.b64encode(digest).decode()
+    print(signature)
+    print(request.META['HTTP_X_SIGNATURE'])
+
+    if request.META['HTTP_X_SIGNATURE'] != signature:
+        print('Success')
+    else:
+        print('Failed')
     data = json.loads(request.body, strict=False)
     print(data)
     try:
