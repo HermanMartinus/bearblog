@@ -216,16 +216,21 @@ def public_analytics(request):
 
 @csrf_exempt
 def lemon_webhook(request):
+    digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode(), msg=request.body.encode(), digestmod=hashlib.sha256).digest()
+    signature = base64.b64encode(digest).decode()
+    print(signature)
     # digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE, msg=request.body, digestmod=hashlib.sha256).digest()
     # signature = base64.b64encode(digest).decode()
     # print(signature)
-    print(request.META)
-    print(request.META['HTTP_X_SIGNATURE'])
+
+    # print(request.META['HTTP_X_SIGNATURE'])
 
     # if request.META['HTTP_X_SIGNATURE'] != signature:
     #     print('Success')
     # else:
     #     print('Failed')
+
+    return HttpResponse("test")
     data = json.loads(request.body, strict=False)
     print(data)
     try:
