@@ -216,8 +216,8 @@ def public_analytics(request):
 
 @csrf_exempt
 def lemon_webhook(request):
-    digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode(), msg=request.body, digestmod=hashlib.sha256).digest()
-    signature = base64.b64encode(digest).decode()
+    digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode('utf-8'), msg=request.body, digestmod=hashlib.sha256).digest('utf-8')
+    signature = base64.b64encode(digest).decode('utf-8')
     print(signature)
     # digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE, msg=request.body, digestmod=hashlib.sha256).digest()
     # signature = base64.b64encode(digest).decode()
