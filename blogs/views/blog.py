@@ -222,7 +222,7 @@ def lemon_webhook(request):
         return Http404('Blog not found')
 
     data = json.loads(request.body, strict=False)
-    print(data)
+
     try:
         subdomain = str(data['meta']['custom_data']['blog'])
         blog = get_object_or_404(Blog, subdomain=subdomain)

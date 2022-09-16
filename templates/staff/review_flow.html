@@ -22,9 +22,10 @@
 <div style="position:fixed; bottom: 0px; background-color: wheat; padding: 20px 10px 10px">
     <form method="post" action="approve/{{ blog.pk }}"> 
         {% csrf_token %}
-        <textarea name="message" style="width:400px; height: 120px">
+        <textarea name="message" style="width:600px; height: 300px">
 Hey, I've just reviewed your blog. It looks good and has been approved.
-If you're keen you can upgrade your blog to get some extra features and support the project.
+If you need help setting up your blog check out this quick-start video: https://docs.bearblog.dev/quick-start/
+I've set up a handy migration guide to help you move your blog over: https://docs.bearblog.dev/migrate/
 <br><br>
 Have a great week!
 Herman
