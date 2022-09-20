@@ -110,6 +110,7 @@ def posts(request):
     for post in all_posts:
         tags += post.tags.most_common()[:10]
     tags = list(dict.fromkeys(tags))
+    tags.sort()
 
     meta_description = blog.meta_description or unmark(blog.content)
 
