@@ -133,6 +133,10 @@ def post(request, slug):
     if not blog:
         return not_found(request)
 
+    # Check for a custom blogreel path and render the blog page
+    if slug == blog.blog_path:
+        return posts(request)
+
     if request.GET.get('preview'):
         all_posts = blog.post_set.annotate(
             upvote_count=Count('upvote')).all().order_by('-published_date')

@@ -249,7 +249,7 @@ class AccountForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('old_editor', 'fathom_site_id')
+        fields = ('old_editor', 'fathom_site_id', 'blog_path')
 
 
 class AnalyticsForm(forms.ModelForm):
