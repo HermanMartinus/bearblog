@@ -70,7 +70,9 @@ def markdown(content):
         'w.soundcloud.com',
         'www.google.com',
         'codepen.io',
-        'stackblitz.com']
+        'stackblitz.com',
+        'onedrive.live.com',
+        ]
     cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
     cleaned_markup = cleaner.clean_html(str(soup))
 
