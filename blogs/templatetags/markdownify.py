@@ -60,7 +60,7 @@ def markdown(content):
             match.string.replace_with(
                 match.string.replace('{{ email-signup }}', template.loader.render_to_string('snippets/email_subscribe_form.html')))
 
-    safe_attrs = list(lxml.html.clean.defs.safe_attrs) + ['style', 'controls', 'allowfullscreen']
+    safe_attrs = list(lxml.html.clean.defs.safe_attrs) + ['style', 'controls', 'allowfullscreen', 'autoplay', 'loop']
     lxml.html.clean.defs.safe_attrs = safe_attrs
     lxml.html.clean.Cleaner.safe_attrs = lxml.html.clean.defs.safe_attrs
     host_whitelist = [
