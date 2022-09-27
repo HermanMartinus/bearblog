@@ -219,6 +219,7 @@ def parse_raw_post(raw_content, post):
     # Clear out data
     post.slug = ''
     post.alias = ''
+    post.class_name = ''
     post.canonical_url = ''
     post.meta_description = ''
     post.meta_image = ''
@@ -263,6 +264,8 @@ def parse_raw_post(raw_content, post):
                 post.is_page = value
             else:
                 raise ValueError('is_page needs to be "true" or "false"')
+        elif name == 'class_name':
+            post.class_name = slugify(value)
         elif name == 'canonical_url':
             post.canonical_url = value
         elif name == 'lang':

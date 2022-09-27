@@ -65,7 +65,8 @@ meta_description: {{ post.meta_description }}{% endif %}{% if post.meta_image %}
 meta_image: {{ post.meta_image }}{% endif %}{% if post.lang %}
 lang: {{ post.lang }}{% endif %}{% if tags %}
 tags: {% for tag in tags %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if post.is_page %}
-is_page: {{ post.is_page|lower }}{% endif %}{% if not post.make_discoverable %}
+is_page: {{ post.is_page|lower }}{% endif %}{% if post.class_name %}
+class_name: {{ post.class_name }}{% endif %}{% if not post.make_discoverable %}
 make_discoverable: {{ post.make_discoverable|lower }}{% endif %}
 ___
 
