@@ -146,9 +146,12 @@ def post(request, slug):
             upvote_count=Count('upvote')).filter(publish=True).order_by('-published_date')
 
     try:
+        # Find by post slug
         post = list(filter(lambda post: post.slug == slug, all_posts))[0]
     except IndexError:
-        return render(request, '404.html', {'blog': blog}, status=404)
+        # Find by post alias
+        post = get_object_or_404(Post, blog=blog, alias=slug)
+        return redirect(f"/{post.slug}")
 
     # Check if upvoted
     ip_address = client_ip(request)
