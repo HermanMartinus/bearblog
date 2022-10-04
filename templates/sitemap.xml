@@ -2,12 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>{% if blog %}{{ blog.useful_domain }}{% else %}https://bearblog.dev{% endif %}/</loc>
-        <lastmod>{{ blog.last_modified }}</lastmod>
+        <lastmod>{{ blog.last_modified|date:'Y-m-d' }}</lastmod>
     </url>
     {% for post in posts %}
     <url>
         <loc>{{ blog.useful_domain }}/{{ post.slug }}/</loc>
-        <lastmod>{{ post.last_modified }}</lastmod>
+        <lastmod>{{ post.last_modified|date:'Y-m-d' }}</lastmod>
     </url>
     {% endfor %}
 </urlset>
