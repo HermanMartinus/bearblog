@@ -241,6 +241,12 @@ class AccountForm(forms.ModelForm):
         help_text="<br>Note: the old editor does not support real-time previews"
     )
 
+    analytics_active = forms.BooleanField(
+        label="Collect analytics",
+        required=False,
+        help_text="<br>Disable the collection of analytics"
+    )
+
     fathom_site_id = forms.CharField(
         max_length=20,
         required=False,
@@ -249,7 +255,7 @@ class AccountForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('old_editor', 'fathom_site_id', 'blog_path')
+        fields = ('old_editor', 'analytics_active', 'fathom_site_id', 'blog_path')
 
 
 class AnalyticsForm(forms.ModelForm):

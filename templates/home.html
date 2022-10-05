@@ -12,12 +12,6 @@
 
 {% block canonical %}<link rel="canonical" href="{{ blog.useful_domain }}" />{% endblock %}
 
-{% block analytics %}
-{% if blog.fathom_site_id %}
-<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>
-{% endif %}
-{% endblock %}
-
 {% block seo %}
 {% if not blog.reviewed %}
 <meta name="robots" content="noindex">
@@ -31,9 +25,8 @@
 {% endblock %}
 
 {% block imports %}
-{% if blog.contains_code %}
-<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">
-{% endif %}
+{% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
+{% if blog.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}
 {% endblock %}
 
 {% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}

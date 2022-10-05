@@ -35,6 +35,7 @@ class Blog(models.Model):
         verbose_name='')
     favicon = models.CharField(max_length=10, default="🐼")
 
+    analytics_active = models.BooleanField(default=True)
     fathom_site_id = models.CharField(max_length=8, blank=True)
     public_analytics = models.BooleanField(default=False)
 

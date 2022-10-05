@@ -9,10 +9,8 @@
 
 {% block canonical %}<link rel="canonical" href="{{ root }}/blog/" />{% endblock %}
 
-{% block analytics %}
-{% if blog.fathom_site_id %}
-<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>
-{% endif %}
+{% block imports %}
+{% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
 {% endblock %}
 
 {% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
