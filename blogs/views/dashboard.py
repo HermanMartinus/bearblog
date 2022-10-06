@@ -192,6 +192,7 @@ def upload_image(request):
                 filepath = f'{blog.subdomain}-{time_string}-{count}.{extention}'
                 url = f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{filepath}'
                 count = count + 1
+                file_links.append(url)
 
                 session = boto3.session.Session()
                 client = session.client(
@@ -209,7 +210,6 @@ def upload_image(request):
                     ACL='public-read',
                     )
 
-                file_links.append(url)
         return HttpResponse(json.dumps(file_links), 200)
 
 
