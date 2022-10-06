@@ -1,9 +1,6 @@
-from datetime import timedelta
-from random import randint
-import re
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
-from django.contrib.auth.decorators import login_required
 from django.db import DataError, IntegrityError
 from django.forms import ValidationError
 from django.http import Http404
@@ -11,12 +8,16 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.validators import URLValidator
 
+from datetime import timedelta
+from random import randint
+import re
 import pygal
 from pygal.style import LightColorizedStyle
 import djqscsv
-from blogs.forms import AnalyticsForm, PostTemplateForm
 
+from blogs.forms import AnalyticsForm, PostTemplateForm
 from blogs.helpers import check_connection, sanitise_int, unmark
 from blogs.models import Blog, Hit, Post
 
@@ -114,13 +115,22 @@ def parse_raw_homepage(raw_content, blog):
         if name == 'title':
             blog.title = value
         elif name == 'bear_domain':
-            blog.subdomain = slugify(value.split('.')[0]).replace('_', '-')
+            subdomain = slugify(value.split('.')[0]).replace('_', '-')
+            if not subdomain:
+                raise ValueError("Please provide a valid bear_domain")
+            else:
+                blog.subdomain = subdomain
         elif name == "custom_domain":
             if blog.upgraded:
                 if Blog.objects.filter(domain=value).exclude(pk=blog.pk).count() == 0:
-                    blog.domain = value
+                    try:
+                        validator = URLValidator()
+                        validator('http://' + value)
+                        blog.domain = value
+                    except ValidationError:
+                        raise ValueError('This is an invalid custom_domain')   
                 else:
-                    raise ValueError("This domain is already in use")
+                    raise ValueError("This domain is already taken")
             else:
                 raise ValueError("Upgrade your blog to add a custom domain")
         elif name == 'favicon':
