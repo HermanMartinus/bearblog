@@ -181,13 +181,17 @@ def upload_image(request):
     blog = get_object_or_404(Blog, user=request.user)
 
     if request.method == "POST":
-        fileLinks = []
+        file_links = []
+        time_string = str(time.time()).split('.')[0]
+        count = 0
 
         for file in request.FILES.getlist('file'):
             extention = file.name.split('.')[-1]
             if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp')):
-                filepath = blog.subdomain + '-' + str(randint(0, 9)) + str(time.time()).split('.')[0] + '.' + extention
+
+                filepath = f'{blog.subdomain}-{time_string}-{count}.{extention}'
                 url = f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{filepath}'
+                count = count + 1
 
                 session = boto3.session.Session()
                 client = session.client(
@@ -205,8 +209,8 @@ def upload_image(request):
                     ACL='public-read',
                     )
 
-                fileLinks.append(url)
-        return HttpResponse(json.dumps(fileLinks), 200)
+                file_links.append(url)
+        return HttpResponse(json.dumps(file_links), 200)
 
 
 @login_required

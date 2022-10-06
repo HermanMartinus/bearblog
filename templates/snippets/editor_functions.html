@@ -87,12 +87,13 @@
 	    xhr.onload = function() {
 	        if (this.status === 200) {
 	            JSON.parse(this.responseText).forEach(image => {
-	                  const toInsert = '\n![Image title]('+image+')\n'
-	                  if (position == 0) {
-	                      textarea.value += toInsert
-	                  } else {
-	                      textarea.value = textarea.value.substring(0, position) + toInsert + textarea.value.substring(position, textarea.value.length)
-	                  }
+						const blogTitle = "{{ blog.title|safe }}"
+						const toInsert = `\n![${blogTitle}](${image})\n`
+						if (position == 0) {
+							textarea.value += toInsert
+						} else {
+							textarea.value = textarea.value.substring(0, position) + toInsert + textarea.value.substring(position, textarea.value.length)
+						}
 	            })
 	            uploadButton.innerText = 'The image(s) have been added'
 	            setTimeout(() => uploadButton.innerText = "Insert image", 3000)
