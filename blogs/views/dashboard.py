@@ -210,7 +210,7 @@ def upload_image(request):
                     ACL='public-read',
                     )
 
-        return HttpResponse(json.dumps(file_links), 200)
+        return HttpResponse(json.dumps(sorted(file_links)), 200)
 
 
 @login_required
