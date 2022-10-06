@@ -8,11 +8,11 @@ from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 
+from random import randint
+from ipaddr import client_ip
 import json
 import os
 import boto3
-import tldextract
-from ipaddr import client_ip
 import time
 import djqscsv
 
@@ -186,7 +186,7 @@ def upload_image(request):
         for file in request.FILES.getlist('file'):
             extention = file.name.split('.')[-1]
             if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp')):
-                filepath = blog.subdomain + '-' + str(time.time()).split('.')[0] + '.' + extention
+                filepath = blog.subdomain + '-' + str(randint(0, 9)) + str(time.time()).split('.')[0] + '.' + extention
                 url = f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{filepath}'
 
                 session = boto3.session.Session()
