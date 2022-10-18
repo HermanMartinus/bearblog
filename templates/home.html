@@ -20,7 +20,7 @@
 
 <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
 
-{% include 'snippets/seo_tags.html' with title=blog.title url=blog.useful_domain description=meta_description tags="blog, blogging, write, writing" image=blog.meta_image meta_tag=blog.meta_tag %}
+{% include 'snippets/seo_tags.html' with site_name=blog.title title=blog.title type="website" url=blog.useful_domain description=meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
 <link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}
 

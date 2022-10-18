@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block seo %}
-{% include 'snippets/seo_tags.html' with title='ʕ•ᴥ•ʔ Bear Blog' url='https://bearblog.dev' description='Free, no-nonsense, super-fast blogging.' tags="blog, blogging, write, writing" image="https://i.imgur.com/b499n4R.png" %}
+{% include 'snippets/seo_tags.html' with site_name='ʕ•ᴥ•ʔ Bear Blog' type="website" title='ʕ•ᴥ•ʔ Bear Blog' url='https://bearblog.dev' description='Free, no-nonsense, super-fast blogging' image="https://i.imgur.com/b499n4R.png" %}
 {% endblock %}
 
 {% block nav %}
@@ -17,7 +17,8 @@
     <a href="/accounts/signup/">Sign up</a>
     <a href="/accounts/login/">Log in</a>
     {% endif %}
-    <a href="/discover/">Discovery feed</a>
+    <a>Details</a>
+    <a href="/discover/">Discover</a>
 </nav>
 <p>
     This is a blogging platform where words matter most.

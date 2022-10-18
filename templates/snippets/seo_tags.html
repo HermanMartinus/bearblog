@@ -2,13 +2,12 @@
 <!-- Primary Meta Tags -->
 <meta name="title" content="{{ title }}">
 <meta name="description" content="{{ description }}">
-<meta name="keywords" content="{{ tags }}" />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="{{ title }}">
-<meta property="og:url" content="{{ url }}">
+<meta property="og:site_name" content="{{ site_name }}">
 <meta property="og:title" content="{{ title }}">
+<meta property="og:type" content="{{ type }}">
+<meta property="og:url" content="{{ url }}">
 <meta property="og:description" content="{{ description }}">
 {% if image %}
   <meta property="og:image" content="{{ image }}">
@@ -28,7 +27,7 @@
 <script type="application/ld+json">
   {
     "@context": "http://schema.org",
-    "@type": "Website",
+    "@type": "{{ type }}",
     "name": "{{ title }}",
     "url": "{{ url }}",
     "description": "{{ description }}",

@@ -20,7 +20,7 @@
 
 <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
 
-{% include 'snippets/seo_tags.html' with title=post.title url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
+{% include 'snippets/seo_tags.html' with site_name=blog.title title=post.title type="article" url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
 {% endblock %}
 
 {% block hitcount %}{% if blog.analytics_active and not preview %}url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}"){% endif %}{% endblock %}
