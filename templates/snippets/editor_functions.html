@@ -16,15 +16,10 @@
 		lineWrapping: true,
 		spellcheck: true
 	})  {% endcomment %}
-
-	const fullscreenToggle = document.querySelector('#toggle-full-screen')
-	if (fullscreenToggle) {
-		fullscreenToggle.onclick = event => {
-			event.preventDefault()
-			textarea.classList.toggle('full-screen')
-			event.target.classList.toggle('floating')
-		}
-	}
+	textarea.scrollTop = sessionStorage.getItem('scrollPosition')
+	textarea.addEventListener("scroll", function(event) {
+		sessionStorage.setItem('scrollPosition', textarea.scrollTop)
+	})
 
 	const previewButton = document.querySelector('#preview')
 	if (previewButton) {
