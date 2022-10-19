@@ -23,7 +23,7 @@ New post | Bear Blog
     </p>
     {% endif %}
     <form method="POST" class="post-form full-width">
-        <p style="line-height: 0">
+        <p style="line-height: 0;position: sticky;top: 0;background-color: #fff;border-bottom: 1px dashed;">
             <button onclick="event.preventDefault(); sessionStorage.clear(); window.location = '/dashboard/posts/'">&#8592; Back</button>
             <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
             
@@ -53,7 +53,7 @@ New post | Bear Blog
         <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden />
         <textarea
             name="raw_content"
-            style="width: calc(100% - 13px); height: 500px"
+            style="width: calc(100% - 12px); height: 500px"
             rows="10" 
         >{% if error_message and raw_content  %}{{ raw_content }}{% elif post %}
 title: {{ post.title }}
