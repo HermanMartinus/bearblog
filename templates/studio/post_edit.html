@@ -10,13 +10,13 @@ New post | Bear Blog
 
 {% block content %}
 <content>
-    <h1>
+    {% comment %} <h1>
         {% if post %}
         Edit post
         {% else %}
         New post
         {% endif %}
-    </h1>
+    </h1> {% endcomment %}
     {% if error_message %}
     <p style="color:lightsalmon">
         {{ error_message }}
