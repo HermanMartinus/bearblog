@@ -19,17 +19,9 @@
     </span>
     {% endfor %}
   </div>
-  <small>
-    <br>
-      Include
-      <a href="https://cssbed.com" target="_blank">no-class themes</a>
-      by using <code>@import 'https://link-to-stylesheet.css';</code>
-  </small>
-
-  <hr>
 
   <form method="POST" class="post-form full-width">
-    <p>
+    <p class="sticky-tools">
       <button type="submit" class="save btn btn-default">Publish</button>
       <button onclick="event.preventDefault();window.open('{{ blog.dynamic_domain }}');">
         View
@@ -51,17 +43,47 @@
 	.CodeMirror {
 		height: unset;
 		border: 1px dashed black;
+    border-top: 0;
 		padding: 2px;
     min-height: 200px;
 	}
+
+  p:nth-child(3) {
+    margin-top: 0;
+  }
+
+  p:nth-child(3) > label {
+    display: none;
+  }
+
+  .sticky-tools {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    border-bottom: 1px dashed;
+    margin-bottom: 0;
+    z-index: 10;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #01242e;
+  }
 </style>
 <script>
   var codemirror = CodeMirror.fromTextArea(document.querySelector('textarea'), {mode: "css"})
 
+  setTimeout(() => {
+    window.scrollTo(0, sessionStorage.getItem('scrollY'))
+  }, 10)
+  
+
+	window.addEventListener("scroll", function(event) {
+		sessionStorage.setItem('scrollY', window.scrollY)
+	})
+
   const setStyle = name => {
     if (confirm("This will overwrite your current styles, are you sure?")) {
       window.location = '?style=' + name
-      // window.open('?style=' + name)
     }
   }
 
