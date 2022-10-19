@@ -16,7 +16,7 @@
 		lineWrapping: true,
 		spellcheck: true
 	})  {% endcomment %}
-	textarea.scrollTop = sessionStorage.getItem('textareaY') + 1 || 0
+	textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
 	{% comment %} window.scrollTo(0, sessionStorage.getItem('windowY') + 1 || 0) {% endcomment %}
 
 
