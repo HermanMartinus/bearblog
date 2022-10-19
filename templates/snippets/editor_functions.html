@@ -16,9 +16,17 @@
 		lineWrapping: true,
 		spellcheck: true
 	})  {% endcomment %}
-	textarea.scrollTop = sessionStorage.getItem('scrollPosition')
+	textarea.scrollTop = sessionStorage.getItem('textareaY') + 1 || 0
+	window.scrollTo(0, sessionStorage.getItem('windowY') + 1 || 0)
+
+
 	textarea.addEventListener("scroll", function(event) {
-		sessionStorage.setItem('scrollPosition', textarea.scrollTop)
+		sessionStorage.setItem('textareaY', textarea.scrollTop)
+	})
+
+	window.addEventListener("scroll", function(event) {
+		console.log(window.scrollY)
+		sessionStorage.setItem('windowY', window.scrollY)
 	})
 
 	const previewButton = document.querySelector('#preview')
