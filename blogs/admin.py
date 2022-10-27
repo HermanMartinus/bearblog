@@ -24,7 +24,7 @@ class UserAdmin(admin.ModelAdmin):
             "<a href='{url}' target='_blank'>{url}</a>",
             url={blog.useful_domain()})
 
-    subdomain_url.short_description = "Subomain"
+    subdomain_url.short_description = "Subdomain"
 
     list_display = ('email', 'subdomain_url', 'is_active', 'is_staff', 'date_joined')
     ordering = ('-date_joined',)
@@ -60,7 +60,7 @@ class BlogAdmin(admin.ModelAdmin):
             "<a href='http://{url}' target='_blank'>{url}</a>",
             url=root(obj.subdomain))
 
-    subdomain_url.short_description = "Subomain"
+    subdomain_url.short_description = "Subdomain"
 
     def user_link(self, obj):
         return format_html('<a href="{url}">{username}</a>',
