@@ -320,7 +320,7 @@ def preview(request):
 
         root = blog.useful_domain()
         meta_description = post.meta_description or unmark(post.content)
-        full_path = f'{root}/{post.slug}'
+        full_path = f'{root}/{post.slug}/'
         canonical_url = full_path
         if post.canonical_url and post.canonical_url.startswith('https://'):
             canonical_url = post.canonical_url
