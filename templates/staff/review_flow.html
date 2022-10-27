@@ -22,7 +22,7 @@
 <div style="position:fixed; bottom: 0px; background-color: wheat; padding: 20px 10px 10px">
     <form method="post" action="approve/{{ blog.pk }}"> 
         {% csrf_token %}
-        <textarea name="message" style="width:600px; height: 300px">
+        <textarea name="message" style="width:600px; height: 200px">
 Hey, I've just reviewed your blog. It looks good and has been approved.
 If you're stuck check out this quick-start video: https://docs.bearblog.dev/quick-start/
 <br><br>
@@ -52,7 +52,7 @@ Herman
     {{ content | markdown | safe }}
 </content>
 
-<ul style="padding-bottom: 200px">
+<ul style="padding-bottom: 300px">
     {% for post in posts %}
     <li>
         #{{ forloop.counter }}
