@@ -13,7 +13,7 @@ def feed(request):
     if not blog:
         return not_found(request)
 
-    all_posts = blog.post_set.filter(publish=True, is_page=False, published_date__lte=timezone.now()).order_by('-published_date')
+    all_posts = blog.post_set.filter(publish=True, is_page=False, published_date__lte=timezone.now()).order_by('-published_date')[:10]
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain())
