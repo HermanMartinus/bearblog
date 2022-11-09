@@ -75,6 +75,10 @@ def markdown(content):
         'docs.google.com'
         ]
     cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
-    cleaned_markup = cleaner.clean_html(str(soup))
+
+    try:
+        cleaned_markup = cleaner.clean_html(str(soup))
+    except lxml.etree.ParserError:
+        cleaned_markup = ""
 
     return cleaned_markup
