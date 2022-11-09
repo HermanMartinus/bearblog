@@ -142,15 +142,13 @@ def post(request, slug):
         # Find by post slug
         post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, slug=slug)[0]
 
-        if not post:
-            # Find by post alias
-            post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, alias=slug)[0]
-            if post:
-                return redirect(f"/{post.slug}")
-            else:
-                return render(request, '404.html', {'blog': blog}, status=404)
     except IndexError:
-        return render(request, '404.html', {'blog': blog}, status=404)
+        # Find by post alias
+        try:
+            post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, alias=slug)[0]
+            return redirect(f"/{post.slug}")
+        except IndexError:
+            return render(request, '404.html', {'blog': blog}, status=404)
 
     # Check if upvoted
     ip_address = client_ip(request)
