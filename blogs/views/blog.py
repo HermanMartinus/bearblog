@@ -138,15 +138,15 @@ def post(request, slug):
     if slug == blog.blog_path:
         return posts(request)
 
-    try:
-        # Find by post slug
-        post = Post.objects.annotate(upvote_count=Count('upvote')).get(blog=blog, slug=slug)
-    except Post.DoesNotExist:
+    # Find by post slug
+    post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, slug=slug)[0]
+
+    if not post:
         # Find by post alias
-        try:
-            post = Post.objects.annotate(upvote_count=Count('upvote')).get(blog=blog, alias=slug)
+        post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, alias=slug)[0]
+        if post:
             return redirect(f"/{post.slug}")
-        except Post.DoesNotExist:
+        else:
             return render(request, '404.html', {'blog': blog}, status=404)
 
     # Check if upvoted
