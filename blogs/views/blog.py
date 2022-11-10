@@ -130,15 +130,15 @@ def posts(request):
 
 @csrf_exempt
 def post(request, slug):
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
-
     # Workaround to prevent H18 errors on post requests
     if request.POST:
         body = str(request.body)
         print(blog)
         print(body)
+
+    blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
 
     # Check for a custom blogreel path and render the blog page
     if slug == blog.blog_path:
