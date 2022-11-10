@@ -134,6 +134,10 @@ def post(request, slug):
     if not blog:
         return not_found(request)
 
+    # Workaround to prevent H18 errors on post requests
+    if request.POST:
+        body = str(request.body)
+
     # Check for a custom blogreel path and render the blog page
     if slug == blog.blog_path:
         return posts(request)
