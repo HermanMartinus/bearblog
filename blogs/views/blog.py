@@ -137,6 +137,8 @@ def post(request, slug):
     # Workaround to prevent H18 errors on post requests
     if request.POST:
         body = str(request.body)
+        print(blog)
+        print(body)
 
     # Check for a custom blogreel path and render the blog page
     if slug == blog.blog_path:
