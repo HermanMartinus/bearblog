@@ -130,11 +130,6 @@ def posts(request):
 
 @csrf_exempt
 def post(request, slug):
-    # Workaround to prevent H18 errors on post requests
-    if request.POST:
-        body = str(request.body)
-        print(body)
-
     blog = resolve_address(request)
     if not blog:
         return not_found(request)
