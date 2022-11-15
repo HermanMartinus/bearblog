@@ -19,6 +19,14 @@
     </p>
     <p>
         <a href="?export=true" download>Download all blog information</a>
+    </p>
+    {% if blog.upgraded %}
+    <p>
+        Cancel subscription on <a href="https://app.lemonsqueezy.com/my-orders" target="_blank">Lemon Squeezy</a>
+        <br>
+        <small>select the active subscription, and click "Cancel Subscription"</small>
+    </p>
+    {% endif %}
     <p>
         <a href="{% url 'user_delete' %}">Delete account</a>
     </p>

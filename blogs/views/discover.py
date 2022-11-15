@@ -93,7 +93,7 @@ def discover(request):
 def feed(request):
     fg = FeedGenerator()
     fg.id("bearblog")
-    fg.author({"name": "Bear Blog", "email": "hi@bearblog.dev"})
+    fg.author({"name": "Bear Blog", "email": "feed@bearblog.dev"})
 
     newest = request.GET.get("newest")
     if newest:
