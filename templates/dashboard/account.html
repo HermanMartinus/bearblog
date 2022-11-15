@@ -20,15 +20,13 @@
     <p>
         <a href="?export=true" download>Download all blog information</a>
     </p>
-    {% if blog.upgraded %}
-    <p>
-        <a href="https://app.lemonsqueezy.com/my-orders" target="_blank">Cancel subscription</a>
-        <br>
-        <small>select the active subscription, and click "Cancel Subscription"</small>
-    </p>
-    {% endif %}
+
     <p>
         <a href="{% url 'user_delete' %}">Delete account</a>
+        {% if blog.upgraded %}
+        <br>
+        <small class="help-text">Ensure your subscription is cancelled on LemonSqueezy (receipt in your email) before deleting your account.</small>
+        {% endif %}
     </p>
     <p>
         If you have any requests or want to log a bug, check out the
