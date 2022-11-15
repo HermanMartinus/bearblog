@@ -16,6 +16,8 @@ import re
 import pygal
 from pygal.style import LightColorizedStyle
 import djqscsv
+import random
+import string
 
 from blogs.forms import AnalyticsForm, PostTemplateForm
 from blogs.helpers import check_connection, sanitise_int, unmark
@@ -291,6 +293,8 @@ def parse_raw_post(raw_content, post):
         post.title = "New post"
     if not post.slug:
         post.slug = slugify(post.title)
+        if not post.slug or post.slug == "":
+            post.slug = ''.join(random.SystemRandom().choice(string.ascii_letters) for _ in range(10))
     if not post.published_date:
         post.published_date = timezone.now()
 
