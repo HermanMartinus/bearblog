@@ -37,7 +37,7 @@ def resolve_address(request):
         return None
     elif any(site.domain in http_host for site in sites):
         # Subdomained blog
-        return get_object_or_404(Blog, subdomain=tldextract.extract(http_host).subdomain, blocked=False)
+        return get_object_or_404(Blog, subdomain__iexact=tldextract.extract(http_host).subdomain, blocked=False)
     else:
         # Custom domain blog
         return get_blog_with_domain(http_host)
@@ -51,9 +51,9 @@ def get_blog_with_domain(domain):
     except Blog.DoesNotExist:
         # Handle www subdomain if necessary
         if 'www.' in domain:
-            return get_object_or_404(Blog, domain=domain.replace('www.', ''), blocked=False)
+            return get_object_or_404(Blog, domain__iexact=domain.replace('www.', ''), blocked=False)
         else:
-            return get_object_or_404(Blog, domain=f'www.{domain}', blocked=False)
+            return get_object_or_404(Blog, domain__iexact=f'www.{domain}', blocked=False)
 
 
 @csrf_exempt
@@ -140,12 +140,12 @@ def post(request, slug):
 
     try:
         # Find by post slug
-        post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, slug=slug)[0]
+        post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, slug__iexact=slug)[0]
 
     except IndexError:
         # Find by post alias
         try:
-            post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, alias=slug)[0]
+            post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, alias__iexact=slug)[0]
             return redirect(f"/{post.slug}")
         except IndexError:
             return render(request, '404.html', {'blog': blog}, status=404)
