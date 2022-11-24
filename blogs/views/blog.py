@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_posts, sanitise_int, unmark
+from blogs.helpers import get_posts, sanitise_int, send_async_mail, unmark
 
 from ipaddr import client_ip
 from taggit.models import Tag
@@ -228,14 +228,22 @@ def lemon_webhook(request):
 
     data = json.loads(request.body, strict=False)
 
-    try:
-        subdomain = str(data['meta']['custom_data']['blog'])
-        blog = get_object_or_404(Blog, subdomain=subdomain)
-        print('Found subdomain, upgrading blog...')
-    except KeyError:
-        email = str(data['data']['attributes']['user_email'])
-        blog = Blog.objects.get(user__email=email)
-        print('Found email address, upgrading blog...')
+    if request.META['HTTP_X_EVENT_NAME'] == 'subscription_cancelled':
+        send_async_mail(
+            "A subscription has been cancelled",
+            data['meta'],
+            'Bear Blog <no_reply@bearblog.dev>',
+            [settings.ADMINS[0]]
+        )
+    else:
+        try:
+            subdomain = str(data['meta']['custom_data']['blog'])
+            blog = get_object_or_404(Blog, subdomain=subdomain)
+            print('Found subdomain, upgrading blog...')
+        except KeyError:
+            email = str(data['data']['attributes']['user_email'])
+            blog = Blog.objects.get(user__email=email)
+            print('Found email address, upgrading blog...')
 
     blog.reviewed = True
     blog.upgraded = True
