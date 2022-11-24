@@ -54,8 +54,8 @@
 	document.getElementById("file").addEventListener("change", upload)
 
 	function upload() {
-	    if(document.getElementById("file").files[0].size > 2000000){
-	        alert(`File over the 2mb limit. Use https://tinypng.com to minimise it.`)
+	    if(document.getElementById("file").files[0].size > 10000000){
+	        alert(`File over the 10mb limit. Use https://tinypng.com to minimise it.`)
 	        return
 	    }
 
