@@ -25,7 +25,11 @@
         <a href="{% url 'user_delete' %}">Delete account</a>
         {% if blog.upgraded %}
         <br>
-        <small class="help-text">Ensure your subscription is cancelled on LemonSqueezy (receipt in your email) before deleting your account.</small>
+        <small class="help-text">
+            Ensure your subscription is cancelled on
+            <a href="https://app.lemonsqueezy.com/my-orders/" target="_blank">LemonSqueezy</a>
+            (receipt in your email) before deleting your account.
+        </small>
         {% endif %}
     </p>
     <p>
