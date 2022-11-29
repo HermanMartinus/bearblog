@@ -27,9 +27,19 @@
             Upgrade $4 per month <small style="font-size: 10px; color: grey;">(thats $48 per year)</small>
         </b>
     </p>
+
+    {% if country_name %}
+    <p style="border: 1px dashed; text-align: center; font-size: small">
+        Hey, it looks like you're from {{ country_name }} {{ country_emoji }}<br>
+        We support <b>Purchasing Power Parity</b> to make Bear more affordable to everyone.<br>
+        Use the promo code <b>{{ promo_code }}</b> to get a <b>{{ discount }}% discount</b> when you upgrade.
+    </p>
+    {% endif %}
+
     <p>
         <button onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][blog]={{blog.subdomain}}')">Upgrade</button>
     </p>
+
     <small>
         <details>
             <summary>Need convincing?</summary>
@@ -44,11 +54,11 @@
                 Bear integrates all of these services. You don't even have to buy themes separately. 
                 <br>
                 <br>
-                Even when compared to other blogging platforms such as Ghost <a href="https://ghost.org/pricing/" target="_blank">($9/mo)</a> and Weebly <a href="https://www.weebly.com/za/pricing" target="_blank">($12/mo without ads)</a>, Bear comes in as being faster and more affordable.
+                When compared to other blogging platforms such as Ghost <a href="https://ghost.org/pricing/" target="_blank">($9/mo)</a> and Weebly <a href="https://www.weebly.com/za/pricing" target="_blank">($12/mo without ads)</a>, Bear comes in as being faster and more affordable.
                 You could choose Wordpress <a href="https://wordpress.com/pricing/" target="_blank">($4/mo)</a>, but who in their right mind wants to use Wordpress?
                 <br>
                 <br>
-                Most importantly, you'll be supporting the small, fast internet, and a blogging platform built to last forever.
+                Most importantly, you'll be supporting the small, fast internet, and a blogging platform <a href="https://herman.bearblog.dev/building-software-to-last-forever" target="_blank">built to last forever</a>.
             </p>
         </details>
     </small>

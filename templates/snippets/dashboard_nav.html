@@ -12,8 +12,9 @@
 <a href="/accounts/logout/">Sign out</a>
 
 {% if not blog.upgraded %}
-<br>
+{% comment %} Announcement {% endcomment %}
+{% comment %} <br>
 <p style="border: 1px dashed; text-align: center">
 <small>I'm running a <b>Black Friday special</b> right now!<br>Use the code <b>BLACKFRIDAY</b> to get <b>30% off</b> when upgrading!</small>
-</p>
+</p> {% endcomment %}
 {% endif %}
