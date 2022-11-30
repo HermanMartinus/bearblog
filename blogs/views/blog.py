@@ -245,12 +245,14 @@ def lemon_webhook(request):
             blog = Blog.objects.get(user__email=email)
             print('Found email address, upgrading blog...')
 
-    blog.reviewed = True
-    blog.upgraded = True
-    blog.upgraded_date = timezone.now()
-    blog.save()
-
-    return HttpResponse(f'Upgraded {blog}')
+    if blog:
+        blog.reviewed = True
+        blog.upgraded = True
+        blog.upgraded_date = timezone.now()
+        blog.save()
+        return HttpResponse(f'Upgraded {blog}')
+    else:
+        return Http404('Blog not found')
 
 
 def not_found(request, *args, **kwargs):
