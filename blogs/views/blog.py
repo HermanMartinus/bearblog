@@ -234,6 +234,7 @@ def lemon_webhook(request):
             "A subscription has been cancelled",
             str(data['meta'])
         )
+        return HttpResponse(f'Cancellation email sent')
     else:
         try:
             subdomain = str(data['meta']['custom_data']['blog'])

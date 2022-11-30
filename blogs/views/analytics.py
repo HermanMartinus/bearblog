@@ -1,3 +1,4 @@
+import json
 import threading
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
@@ -87,7 +88,10 @@ class HitThread(threading.Thread):
 
             ip_hash = hashlib.md5(f"{client_ip(self.request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
             response = requests.request("GET", f'https://geolocation-db.com/json/{client_ip(self.request)}')
-            location = response.json()
+            try:
+                location = response.json()
+            except json.JSONDecodeError:
+                print('Issue with location response')
             country = ''
             device = ''
             browser = ''
