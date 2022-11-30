@@ -240,7 +240,13 @@ def domain_edit(request):
 def upgrade(request):
     blog = get_object_or_404(Blog, user=request.user)
     response = requests.request("GET", f'https://geolocation-db.com/json/{client_ip(request)}')
-    location = response.json()
+
+    location = ''
+    try:
+        location = response.json()
+    except json.JSONDecodeError:
+        print('Issue with location response')
+
     country_name = ''
     country_emoji = ''
     promo_code = ''
