@@ -225,7 +225,7 @@ def lemon_webhook(request):
     digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode('utf-8'), msg=request.body, digestmod=hashlib.sha256).hexdigest()
 
     if request.META.get('HTTP_X_SIGNATURE') != digest:
-        return Http404('Blog not found')
+        raise Http404('Blog not found')
 
     data = json.loads(request.body, strict=False)
 
@@ -251,7 +251,7 @@ def lemon_webhook(request):
         blog.save()
         return HttpResponse(f'Upgraded {blog}')
     else:
-        return Http404('Blog not found')
+        raise Http404('Blog not found')
 
 
 def not_found(request, *args, **kwargs):
