@@ -6,9 +6,10 @@ from django.contrib.sites.models import Site
 from django.db.models import Count
 from django.utils import timezone
 from django.conf import settings
+from django.core.mail import mail_admins
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_posts, sanitise_int, send_async_mail, unmark
+from blogs.helpers import get_posts, sanitise_int, unmark
 
 from ipaddr import client_ip
 from taggit.models import Tag
@@ -223,17 +224,15 @@ def public_analytics(request):
 def lemon_webhook(request):
     digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode('utf-8'), msg=request.body, digestmod=hashlib.sha256).hexdigest()
 
-    if request.META['HTTP_X_SIGNATURE'] != digest:
+    if request.META.get('HTTP_X_SIGNATURE') != digest:
         return Http404('Blog not found')
 
     data = json.loads(request.body, strict=False)
 
-    if request.META['HTTP_X_EVENT_NAME'] == 'subscription_cancelled':
-        send_async_mail(
+    if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_cancelled':
+        mail_admins(
             "A subscription has been cancelled",
-            data['meta'],
-            'Bear Blog <no_reply@bearblog.dev>',
-            [settings.ADMINS[0]]
+            data['meta']
         )
     else:
         try:
