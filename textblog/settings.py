@@ -19,10 +19,16 @@ DEFAULT_LOGGING['handlers']['console']['filters'] = []
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'django.security.DisallowedHost': {
-        'handlers': ['mail_admins'],
-        'level': 'CRITICAL',
-        'propagate': False,
+    'handlers': {
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
+    'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
     },
 }
 
