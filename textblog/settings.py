@@ -23,6 +23,10 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
         },
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
     },
     'root': {
         'handlers': ['console'],
