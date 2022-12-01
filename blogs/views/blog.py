@@ -25,8 +25,6 @@ from blogs.views.studio import render_analytics
 
 def resolve_address(request):
     http_host = request.META['HTTP_HOST']
-    if 'bearblog' in http_host and '_' in http_host:
-        raise Http404('Blog not found')
 
     if http_host == 'bear-blog.herokuapp.com':
         http_host = request.META.get('HTTP_X_FORWARDED_HOST', None)
