@@ -24,7 +24,7 @@ LOGGING = {
             'class': 'logging.StreamHandler',
         },
         'null': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.NullHandler',
         },
     },
