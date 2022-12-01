@@ -33,5 +33,8 @@
 {% endblock %}
 
 {% block footer %}
+{% if blog.upgraded and blog.footer_content %}
+{{ blog.footer_content | markdown | safe  }}
+{% endif %}
 Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
 {% endblock %}
