@@ -230,7 +230,7 @@ def lemon_webhook(request):
     if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_cancelled':
         mail_admins(
             "A subscription has been cancelled",
-            str(data['meta'])
+            str(data)
         )
         return HttpResponse(f'Cancellation email sent')
     else:
