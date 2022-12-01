@@ -26,10 +26,7 @@ from blogs.views.studio import render_analytics
 def resolve_address(request):
     http_host = request.META['HTTP_HOST']
     if http_host == 'bear-blog.herokuapp.com':
-        try:
-            http_host = request.META['HTTP_X_FORWARDED_HOST']
-        except KeyError:
-            print('Bad proxy request')
+        http_host = request.META.get('HTTP_X_FORWARDED_HOST', None)
 
     sites = Site.objects.all()
 

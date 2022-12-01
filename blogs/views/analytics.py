@@ -82,7 +82,7 @@ class HitThread(threading.Thread):
     def run(self):
         try:
             user_agent = httpagentparser.detect(self.request.META.get('HTTP_USER_AGENT', None))
-            if user_agent['bot']:
+            if user_agent.get('bot', False):
                 print('Bot traffic')
                 return
 
@@ -96,21 +96,12 @@ class HitThread(threading.Thread):
             device = ''
             browser = ''
 
-            try:
-                if location['country_name'] and location['country_name'] != 'Not found':
-                    country = location['country_name']
-            except KeyError:
-                print('Country not found')
+            if location.get('country_name', 'Not found') != 'Not found':
+                country = location['country_name']
 
-            try:
-                device = user_agent['platform']['name']
-            except KeyError:
-                print('Platform not found')
+            device = user_agent.get('platform', '').get('name', '')
 
-            try:
-                browser = user_agent['browser']['name']
-            except KeyError:
-                print('Platform not found')
+            browser = user_agent.get('browser', '').get('name', '')
 
             referrer = self.request.GET.get('ref', None)
             if referrer:
