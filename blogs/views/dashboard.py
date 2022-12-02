@@ -252,7 +252,7 @@ def upgrade(request):
     promo_code = ''
     discount = ''
 
-    if location.get('country_name', 'Not found') != 'Not found':
+    if location and location.get('country_name', 'Not found') != 'Not found':
         country_name = location.get('country_name')
         country_emoji = lookup(f'REGIONAL INDICATOR SYMBOL LETTER {location.get("country_code")[0]}') + lookup(f'REGIONAL INDICATOR SYMBOL LETTER {location.get("country_code")[1]}')
 
