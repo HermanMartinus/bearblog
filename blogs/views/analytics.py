@@ -1,5 +1,3 @@
-import os
-from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -16,10 +14,9 @@ from urllib.parse import urlparse
 import httpagentparser
 import pygal
 import hashlib
-import json
 import threading
-import requests
-import geoip2.database
+import geoip2
+from django.contrib.gis.geoip2 import GeoIP2
 
 
 @login_required
@@ -116,16 +113,15 @@ class HitThread(threading.Thread):
 
 def get_user_location(request):
     try:
-        # Load the GeoIP2 database
-        database = os.path.join(os.path.join(settings.GEOIP_ROOT, 'GeoLite2-Country.mmdb'))
-        reader = geoip2.database.Reader(database)
+        g = GeoIP2()
 
         # Get the user's IP address
+        # user_ip = '45.222.31.178'
         user_ip = request.META.get('REMOTE_ADDR')
 
         # Look up the user's location using their IP address
-        response = reader.country(user_ip)
+        country = g.country(user_ip).get('country_name', '')
 
-        return response.country.names.get('en', '')
+        return country
     except geoip2.errors.AddressNotFoundError:
         return ''
