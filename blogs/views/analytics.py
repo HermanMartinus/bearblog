@@ -1,12 +1,10 @@
-import json
-import threading
+import os
+from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db import IntegrityError
 from datetime import timedelta
-
-import requests
 
 from blogs.models import Blog, Hit, Post
 from blogs.helpers import daterange
@@ -18,6 +16,10 @@ from urllib.parse import urlparse
 import httpagentparser
 import pygal
 import hashlib
+import json
+import threading
+import requests
+import geoip2.database
 
 
 @login_required
@@ -69,7 +71,6 @@ def analytics(request):
 
 def post_hit(request, pk):
     HitThread(request, pk).start()
-
     return HttpResponse("Logged")
 
 
@@ -87,26 +88,17 @@ class HitThread(threading.Thread):
                 return
 
             ip_hash = hashlib.md5(f"{client_ip(self.request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
-            response = requests.request("GET", f'https://geolocation-db.com/json/{client_ip(self.request)}')
-            try:
-                location = response.json()
-            except json.JSONDecodeError:
-                print('Issue with location response')
-            country = ''
-            device = ''
-            browser = ''
 
-            if location.get('country_name', 'Not found') != 'Not found':
-                country = location['country_name']
-
+            country = get_user_location(self.request)
             device = user_agent.get('platform', '').get('name', '')
-
             browser = user_agent.get('browser', '').get('name', '')
 
-            referrer = self.request.GET.get('ref', None)
+            referrer = self.request.GET.get('ref', '')
             if referrer:
                 referrer = urlparse(referrer)
                 referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
+
+            print(country, device, browser, referrer)
 
             Hit.objects.get_or_create(
                 post_id=self.pk,
@@ -120,3 +112,20 @@ class HitThread(threading.Thread):
             print('Duplicate hit')
         except IntegrityError:
             print('Post does not exist')
+
+
+def get_user_location(request):
+    try:
+        # Load the GeoIP2 database
+        database = os.path.join(os.path.join(settings.GEOIP_ROOT, 'GeoLite2-Country.mmdb'))
+        reader = geoip2.database.Reader(database)
+
+        # Get the user's IP address
+        user_ip = request.META.get('REMOTE_ADDR')
+
+        # Look up the user's location using their IP address
+        response = reader.country(user_ip)
+
+        return response.country.names.get('en', '')
+    except geoip2.errors.AddressNotFoundError:
+        return ''
