@@ -86,7 +86,7 @@ class HitThread(threading.Thread):
 
             ip_hash = hashlib.md5(f"{client_ip(self.request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
 
-            country = get_user_location(self.request)
+            country = get_user_location(client_ip(self.request))
             device = user_agent.get('platform', '').get('name', '')
             browser = user_agent.get('browser', '').get('name', '')
 
@@ -94,8 +94,6 @@ class HitThread(threading.Thread):
             if referrer:
                 referrer = urlparse(referrer)
                 referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
-
-            print(country, device, browser, referrer)
 
             Hit.objects.get_or_create(
                 post_id=self.pk,
@@ -111,17 +109,15 @@ class HitThread(threading.Thread):
             print('Post does not exist')
 
 
-def get_user_location(request):
+def get_user_location(user_ip):
     try:
         g = GeoIP2()
 
-        # Get the user's IP address
         # user_ip = '45.222.31.178'
-        user_ip = request.META.get('REMOTE_ADDR')
 
         # Look up the user's location using their IP address
         country = g.country(user_ip).get('country_name', '')
-
+        print(user_ip, country)
         return country
     except geoip2.errors.AddressNotFoundError:
         return ''
