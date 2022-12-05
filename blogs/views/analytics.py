@@ -110,14 +110,13 @@ class HitThread(threading.Thread):
 
 
 def get_user_location(user_ip):
+    # user_ip = '45.222.31.178'
     try:
         g = GeoIP2()
 
-        # user_ip = '45.222.31.178'
-
         # Look up the user's location using their IP address
         country = g.country(user_ip).get('country_name', '')
-        print(user_ip, country)
+
         return country
     except geoip2.errors.AddressNotFoundError:
         return ''
