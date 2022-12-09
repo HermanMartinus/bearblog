@@ -18,7 +18,7 @@ import djqscsv
 import requests
 
 from blogs.forms import AccountForm, BlogForm, DomainForm, NavForm, PostForm, StyleForm
-from blogs.helpers import sanitise_int
+from blogs.helpers import get_user_location, sanitise_int
 from blogs.models import Blog, Post, Stylesheet, Upvote
 
 
@@ -239,34 +239,28 @@ def domain_edit(request):
 @login_required
 def upgrade(request):
     blog = get_object_or_404(Blog, user=request.user)
-    response = requests.request("GET", f'https://geolocation-db.com/json/{client_ip(request)}')
 
-    location = ''
-    try:
-        location = response.json()
-    except json.JSONDecodeError:
-        print('Issue with location response')
-
+    country = get_user_location(client_ip(request))
     country_name = ''
     country_emoji = ''
     promo_code = ''
-    discount = ''
+    discount = 0
 
-    if location and location.get('country_name', 'Not found') != 'Not found':
-        country_name = location.get('country_name')
-        country_emoji = lookup(f'REGIONAL INDICATOR SYMBOL LETTER {location.get("country_code")[0]}') + lookup(f'REGIONAL INDICATOR SYMBOL LETTER {location.get("country_code")[1]}')
+    if (country):
+        country_name = country.get('country_name', {})
+        country_emoji = lookup(f'REGIONAL INDICATOR SYMBOL LETTER {country.get("country_code")[0]}') + lookup(f'REGIONAL INDICATOR SYMBOL LETTER {country.get("country_code")[1]}')
 
         tier_2 = ['AD', 'AG', 'AW', 'BE', 'BS', 'BZ', 'CG', 'CN', 'CW', 'CY', 'DE', 'DM', 'EE', 'ES', 'FR', 'GR', 'HK', 'IT', 'KI', 'KN', 'KR', 'LC', 'MO', 'MT', 'NR', 'PG', 'PT', 'PW', 'QA', 'SB', 'SG', 'SI', 'SK', 'SM', 'SX', 'TO', 'UY', 'WS', 'ZW']
         tier_3 = ['AE', 'AL', 'AR', 'AS', 'BA', 'BG', 'BH', 'BN', 'BR', 'BW', 'CD', 'CF', 'CI', 'CL', 'CM', 'CR', 'CV', 'CZ', 'DJ', 'DO', 'EC', 'FJ', 'GA', 'GD', 'GN', 'GQ', 'GT', 'HN', 'HR', 'HT', 'HU', 'IQ', 'JM', 'JO', 'KM', 'KW', 'LR', 'LS', 'LT', 'LV', 'MA', 'ME', 'MV', 'MX', 'NA', 'NE', 'OM', 'PA', 'PE', 'PL', 'PS', 'RO', 'RS', 'SA', 'SC', 'SN', 'ST', 'SV', 'SZ', 'TD', 'TG', 'TM', 'TT', 'VC', 'YE', 'ZA']
         tier_4 = ['AF', 'AM', 'AO', 'AZ', 'BD', 'BF', 'BI', 'BJ', 'BO', 'BT', 'BY', 'CO', 'DZ', 'EG', 'ER', 'ET', 'GE', 'GH', 'GM', 'GW', 'GY', 'ID', 'IN', 'KE', 'KG', 'KH', 'KZ', 'LA', 'LB', 'LK', 'LY', 'MD', 'MG', 'MK', 'ML', 'MM', 'MN', 'MR', 'MU', 'MW', 'MY', 'MZ', 'NG', 'NI', 'NP', 'PH', 'PK', 'PY', 'RU', 'RW', 'SL', 'SO', 'SR', 'TH', 'TJ', 'TL', 'TN', 'TR', 'TZ', 'UA', 'UG', 'UZ', 'VN', 'ZM']
 
-        if location.get("country_code") in tier_2:
+        if country.get("country_code") in tier_2:
             promo_code = 'PADDINGTON'
             discount = 15
-        if location.get("country_code") in tier_3:
+        if country.get("country_code") in tier_3:
             promo_code = 'YOGI'
             discount = 30
-        if location.get("country_code") in tier_4:
+        if country.get("country_code") in tier_4:
             promo_code = 'BALOO'
             discount = 50
 
@@ -277,6 +271,7 @@ def upgrade(request):
         "discount": discount,
         "promo_code": promo_code
     })
+
 
 
 @login_required

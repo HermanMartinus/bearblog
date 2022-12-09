@@ -4,17 +4,14 @@ from bs4 import BeautifulSoup
 from django.contrib.sites.models import Site
 from requests.exceptions import ConnectionError
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
-from django.shortcuts import get_object_or_404
-from django.utils import timezone
 import mistune
 import requests
-import hashlib
 from django.http import Http404
 import subprocess
 from django.conf import settings
 from _datetime import timedelta
-
-from blogs.models import Blog
+import geoip2
+from django.contrib.gis.geoip2 import GeoIP2
 
 
 def root(subdomain=''):
@@ -92,6 +89,17 @@ def check_connection(blog):
             return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities"/>' in response.text)
         except ConnectionError:
             return False
+
+
+def get_user_location(user_ip):
+    # user_ip = '45.222.31.178'
+    try:
+        g = GeoIP2()
+        country = g.country(user_ip)
+
+        return country
+    except geoip2.errors.AddressNotFoundError:
+        return {}
 
 
 def unmark(markdown):

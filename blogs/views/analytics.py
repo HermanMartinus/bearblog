@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from datetime import timedelta
 
 from blogs.models import Blog, Hit, Post
-from blogs.helpers import daterange
+from blogs.helpers import daterange, get_user_location
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
 
@@ -15,8 +15,6 @@ import httpagentparser
 import pygal
 import hashlib
 import threading
-import geoip2
-from django.contrib.gis.geoip2 import GeoIP2
 
 
 @login_required
@@ -86,7 +84,7 @@ class HitThread(threading.Thread):
 
             ip_hash = hashlib.md5(f"{client_ip(self.request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
 
-            country = get_user_location(client_ip(self.request))
+            country = get_user_location(client_ip(self.request)).get('country_name', '')
             device = user_agent.get('platform', '').get('name', '')
             browser = user_agent.get('browser', '').get('name', '')
 
@@ -107,16 +105,3 @@ class HitThread(threading.Thread):
             print('Duplicate hit')
         except IntegrityError:
             print('Post does not exist')
-
-
-def get_user_location(user_ip):
-    # user_ip = '45.222.31.178'
-    try:
-        g = GeoIP2()
-
-        # Look up the user's location using their IP address
-        country = g.country(user_ip).get('country_name', '')
-
-        return country
-    except geoip2.errors.AddressNotFoundError:
-        return ''
