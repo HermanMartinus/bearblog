@@ -227,7 +227,7 @@ def lemon_webhook(request):
 
     data = json.loads(request.body, strict=False)
 
-    if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_cancelled':
+    if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_cancelled' or request.META.get('HTTP_X_EVENT_NAME') == 'subscription_expired':
         mail_admins(
             "A subscription has been cancelled",
             str(data.get('data').get('attributes'))
