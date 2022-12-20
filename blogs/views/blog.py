@@ -261,6 +261,7 @@ def sitemap(request):
     blog = resolve_address(request)
     if not blog:
         return not_found(request)
+    posts = []
     try:
         posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
     except AttributeError:
