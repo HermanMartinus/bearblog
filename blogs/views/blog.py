@@ -164,6 +164,9 @@ def post(request, slug):
     if post.canonical_url and post.canonical_url.startswith('https://'):
         canonical_url = post.canonical_url
 
+    if post.publish is False and not request.GET.get('preview', False):
+        return not_found(request)
+
     return render(
         request,
         'post.html',
@@ -264,6 +267,7 @@ def sitemap(request):
         posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
     except AttributeError:
         posts = []
+
     return render(request, 'sitemap.xml', {'blog': blog, 'posts': posts}, content_type='text/xml')
 
 
