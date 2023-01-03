@@ -12,7 +12,6 @@ Django==3.1.14
 django-allauth==0.41.0
 django-debug-toolbar==3.2.4
 django-ip==1.0.2
-django-pg-utils==0.1.5
 django-pygmentify==0.3.7
 django-queryset-csv==1.1.0
 django-six==1.0.4
@@ -29,7 +28,6 @@ Markdown==2.6.11
 mistune==2.0.4
 oauthlib==3.1.0
 Paperboy==1.0.1
-psycopg2==2.8.5
 pygal==3.0.0
 python-dateutil==2.8.1
 python-http-client==3.2.7
