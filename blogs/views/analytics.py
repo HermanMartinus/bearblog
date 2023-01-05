@@ -85,8 +85,8 @@ class HitThread(threading.Thread):
             ip_hash = hashlib.md5(f"{client_ip(self.request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
 
             country = get_user_location(client_ip(self.request)).get('country_name', '')
-            device = user_agent.get('platform', None).get('name', '')
-            browser = user_agent.get('browser', None).get('name', '')
+            device = user_agent.get('platform', {}).get('name', '')
+            browser = user_agent.get('browser', {}).get('name', '')
 
             referrer = self.request.GET.get('ref', '')
             if referrer:
