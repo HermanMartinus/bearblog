@@ -27,25 +27,25 @@ if not DEBUG:
         send_default_pii=True
     )
 
-# ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
+    # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
-# DEFAULT_LOGGING['handlers']['console']['filters'] = []
+    DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'null': {
-#             'class': 'logging.NullHandler',
-#         },
-#     },
-#     'loggers': {
-#         'django.security.DisallowedHost': {
-#             'handlers': ['null'],
-#             'propagate': False,
-#         },
-#     },
-# }
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'null': {
+                'class': 'logging.NullHandler',
+            },
+        },
+        'loggers': {
+            'django.security.DisallowedHost': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
+        },
+    }
 
 
 # Host & proxy

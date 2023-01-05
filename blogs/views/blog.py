@@ -6,7 +6,6 @@ from django.contrib.sites.models import Site
 from django.db.models import Count
 from django.utils import timezone
 from django.conf import settings
-from django.core.mail import mail_admins
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_posts, sanitise_int, unmark
@@ -17,7 +16,6 @@ import hashlib
 import json
 import tldextract
 import hashlib
-import base64
 import hmac
 
 from blogs.views.studio import render_analytics
@@ -231,10 +229,11 @@ def lemon_webhook(request):
     data = json.loads(request.body, strict=False)
 
     if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_cancelled' or request.META.get('HTTP_X_EVENT_NAME') == 'subscription_expired':
-        mail_admins(
-            "A subscription has been cancelled",
-            str(data.get('data').get('attributes'))
-        )
+        # TODO: set up auto-cancellation
+        # mail_admins(
+        #     "A subscription has been cancelled",
+        #     str(data.get('data').get('attributes'))
+        # )
         return HttpResponse(f'Cancellation email sent')
     else:
         try:
