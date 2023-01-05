@@ -27,23 +27,26 @@ if not DEBUG:
         send_default_pii=True
     )
 
-DEFAULT_LOGGING['handlers']['console']['filters'] = []
+# ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'null': {
-            'class': 'logging.NullHandler',
-        },
-    },
-    'loggers': {
-        'django.security.DisallowedHost': {
-            'handlers': ['null'],
-            'propagate': False,
-        },
-    },
-}
+# DEFAULT_LOGGING['handlers']['console']['filters'] = []
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'null': {
+#             'class': 'logging.NullHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django.security.DisallowedHost': {
+#             'handlers': ['null'],
+#             'propagate': False,
+#         },
+#     },
+# }
+
 
 # Host & proxy
 ALLOWED_HOSTS = ['*']
@@ -51,8 +54,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
 INTERNAL_IPS = ['127.0.0.1']
-
-ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 # Application definition
 SITE_ID = 1
