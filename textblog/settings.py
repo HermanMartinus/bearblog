@@ -18,17 +18,6 @@ DEBUG = (os.environ.get('DEBUG') == 'True')
 
 # Logging settings
 if not DEBUG:
-    sentry_sdk.init(
-        dsn="https://959b65fe3d4c43f59dd43c7453d6d2d4@o4504450583035904.ingest.sentry.io/4504450585919488",
-        integrations=[
-            DjangoIntegration(),
-        ],
-        traces_sample_rate=0.1,
-        send_default_pii=True
-    )
-
-    # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
-
     DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
     LOGGING = {
@@ -47,6 +36,16 @@ if not DEBUG:
         },
     }
 
+    sentry_sdk.init(
+        dsn="https://959b65fe3d4c43f59dd43c7453d6d2d4@o4504450583035904.ingest.sentry.io/4504450585919488",
+        integrations=[
+            DjangoIntegration(),
+        ],
+        traces_sample_rate=0.1,
+        send_default_pii=True
+    )
+
+    # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 # Host & proxy
 ALLOWED_HOSTS = ['*']
