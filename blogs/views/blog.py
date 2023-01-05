@@ -25,7 +25,7 @@ def resolve_address(request):
     http_host = request.META['HTTP_HOST']
 
     if http_host == 'bear-blog.herokuapp.com':
-        http_host = request.META.get('HTTP_X_FORWARDED_HOST', None)
+        http_host = request.META.get('HTTP_X_FORWARDED_HOST', 'bear-blog.herokuapp.com')
 
     sites = Site.objects.all()
 
