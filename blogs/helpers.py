@@ -89,6 +89,8 @@ def check_connection(blog):
             return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities"/>' in response.text)
         except ConnectionError:
             return False
+        except SystemExit:
+            return False
 
 
 def get_user_location(user_ip):
