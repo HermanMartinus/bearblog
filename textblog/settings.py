@@ -2,6 +2,8 @@ import os
 import dj_database_url
 from django.utils.log import DEFAULT_LOGGING
 from pathlib import Path
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,6 +15,17 @@ LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.environ.get('DEBUG') == 'True')
+
+# Logging settings
+if not DEBUG:
+    sentry_sdk.init(
+        dsn="https://959b65fe3d4c43f59dd43c7453d6d2d4@o4504450583035904.ingest.sentry.io/4504450585919488",
+        integrations=[
+            DjangoIntegration(),
+        ],
+        traces_sample_rate=0.1,
+        send_default_pii=True
+    )
 
 DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
@@ -32,6 +45,7 @@ LOGGING = {
     },
 }
 
+# Host & proxy
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
