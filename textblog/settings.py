@@ -1,3 +1,4 @@
+import logging
 import os
 import dj_database_url
 from django.utils.log import DEFAULT_LOGGING
@@ -34,6 +35,16 @@ if not DEBUG:
                 'propagate': False,
             },
         },
+    }
+    logging.getLogger('django.security.DisallowedHost').addHandler(logging.NullHandler())
+    SENTRY_LOGGING = {
+        'loggers': {
+            'django.security.DisallowedHost': {
+                'level': 'ERROR',
+                'handlers': ['console'],
+                'propagate': False,
+            }
+        }
     }
 
     sentry_sdk.init(
