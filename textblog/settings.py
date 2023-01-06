@@ -36,14 +36,20 @@ if not DEBUG:
             },
         },
     }
-    logging.getLogger('django.security.DisallowedHost').addHandler(logging.NullHandler())
+
     SENTRY_LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'null': {
+                'class': 'logging.NullHandler',
+            },
+        },
         'loggers': {
             'django.security.DisallowedHost': {
-                'level': 'ERROR',
-                'handlers': ['console'],
+                'handlers': ['null'],
                 'propagate': False,
-            }
+            },
         }
     }
 
