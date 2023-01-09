@@ -19,6 +19,14 @@ DEBUG = (os.environ.get('DEBUG') == 'True')
 
 # Logging settings
 if not DEBUG:
+    def before_send(event, hint):
+        """Don't log django.DisallowedHost errors in Sentry."""
+        if 'log_record' in hint:
+            if hint['log_record'].name == 'django.security.DisallowedHost':
+                return None
+
+        return event
+
     DEFAULT_LOGGING['handlers']['console']['filters'] = []
 
     LOGGING = {
@@ -44,7 +52,7 @@ if not DEBUG:
         ],
         traces_sample_rate=0.1,
         send_default_pii=True,
-        logging=LOGGING
+        before_send=before_send
     )
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
