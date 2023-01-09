@@ -37,29 +37,14 @@ if not DEBUG:
         },
     }
 
-    SENTRY_LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'null': {
-                'class': 'logging.NullHandler',
-            },
-        },
-        'loggers': {
-            'django.security.DisallowedHost': {
-                'handlers': ['null'],
-                'propagate': False,
-            },
-        }
-    }
-
     sentry_sdk.init(
         dsn="https://959b65fe3d4c43f59dd43c7453d6d2d4@o4504450583035904.ingest.sentry.io/4504450585919488",
         integrations=[
             DjangoIntegration(),
         ],
         traces_sample_rate=0.1,
-        send_default_pii=True
+        send_default_pii=True,
+        logging=LOGGING
     )
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
