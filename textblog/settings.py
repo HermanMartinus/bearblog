@@ -13,6 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET')
 HEROKU_BEARER_TOKEN = os.getenv('HEROKU_BEARER_TOKEN')
 LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
+SENTRY_DSN = os.getenv('SENTRY_DSN')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.environ.get('DEBUG') == 'True')
@@ -46,7 +47,7 @@ if not DEBUG:
     }
 
     sentry_sdk.init(
-        dsn="https://959b65fe3d4c43f59dd43c7453d6d2d4@o4504450583035904.ingest.sentry.io/4504450585919488",
+        dsn=SENTRY_DSN,
         integrations=[
             DjangoIntegration(),
         ],
