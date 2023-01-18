@@ -273,7 +273,6 @@ def upgrade(request):
     })
 
 
-
 @login_required
 def account(request):
     blog = get_object_or_404(Blog, user=request.user)
