@@ -74,7 +74,8 @@ def markdown(content):
         'onedrive.live.com',
         'docs.google.com',
         'bandcamp.com',
-        'embed.music.apple.com'
+        'embed.music.apple.com',
+        'drive.google.com'
         ]
     cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
 
