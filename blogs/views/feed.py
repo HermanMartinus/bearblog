@@ -22,11 +22,15 @@ def feed(request):
     fg.subtitle(blog.meta_description or unmark(blog.content) or blog.title)
     fg.link(href=f"{blog.useful_domain()}/", rel='alternate')
 
+    name = blog.subdomain
+    if blog.user.first_name and blog.user.last_name:
+        name = f"{blog.user.first_name} {blog.user.last_name}"
+
     for post in all_posts:
         fe = fg.add_entry()
         fe.id(f"{blog.useful_domain()}/{post.slug}/")
         fe.title(post.title)
-        fe.author({'name': blog.subdomain, 'email': 'hidden'})
+        fe.author({'name': name, 'email': 'hidden'})
         fe.link(href=f"{blog.useful_domain()}/{post.slug}/")
         fe.content(markdown(post.content), type="html")
         fe.published(post.published_date)
