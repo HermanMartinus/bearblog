@@ -16,12 +16,12 @@
 <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
   {% csrf_token %}
   {{ form.as_p }}
-  <small><input type="checkbox" required />
-    I agree to the terms and conditions (no
+  <label><input type="checkbox" required />
+    <small>I agree to the terms and conditions (no
     <a target="_blank" href="https://docs.bearblog.dev/terms-of-service#1-your-bearblog-dev-account">domain squatting</a>
     or
     <a target="_blank" href="https://docs.bearblog.dev/terms-of-service#1-1-backlinks-and-spam">backlink spam</a>)
-  </small>
+  </small></label>
   <br>
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
