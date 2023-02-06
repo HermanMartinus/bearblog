@@ -101,13 +101,13 @@ def confirm_subscription(request):
     if not blog:
         return not_found(request)
 
-    email = request.GET.get("email", "")
+    email = request.GET.get("email", "").replace(' ', '+')
     token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()
     if token == request.GET.get("token", ""):
         Subscriber.objects.get_or_create(blog=blog, email_address=email)
 
         return HttpResponse(f'''
-            <p style='text-align: center; padding-top: 30%'>
+            <p style='text-align: center; padding-top: 10%'>
                 Your subscription to
                 <a href="{blog.useful_domain()}">{blog.title}</a>
                 has been confirmed. ＼ʕ •ᴥ•ʔ／
