@@ -101,14 +101,19 @@ def review_flow(request):
         if (
             blog.content == "Hello World!"
             and blog.post_count == 0
-            and not blog.custom_styles
         ):
 
             # Delete empty blogs 14 days old
             if blog.created_date < grace_period:
                 blog.delete()
         else:
-            delay_period = timezone.now() - timedelta(days=2)
+            delay_period = timezone.now() - timedelta(days=1)
+
+            # Filtering Discord about me pages
+            strings_to_check = ['ooc', 'infp', 'she/her', 'he/him', 'they/them', 'masc terms', 'fem terms', 'dni']
+            if any(string in blog.content.replace('.', ' ') for string in strings_to_check):
+                blog.reviewed = True
+                blog.save()
             if blog.created_date < delay_period:
                 unreviewed_blogs.append(blog)
 
