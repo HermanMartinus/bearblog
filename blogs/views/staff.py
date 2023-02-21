@@ -110,8 +110,8 @@ def review_flow(request):
             delay_period = timezone.now() - timedelta(days=1)
 
             # Filtering Discord about me pages
-            strings_to_check = ['ooc', 'infp', 'she/her', 'he/him', 'they/them', 'masc terms', 'fem terms', 'dni']
-            if any(string in blog.content.replace('.', ' ') for string in strings_to_check):
+            strings_to_check = ['ooc', 'infp', 'she/her', 'he/him', 'they/them', 'masc terms', 'fem terms', 'dni', 'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces']
+            if any(string.lower() in blog.content.replace('.', ' ').lower() for string in strings_to_check):
                 blog.reviewed = True
                 blog.save()
             if blog.created_date < delay_period:
