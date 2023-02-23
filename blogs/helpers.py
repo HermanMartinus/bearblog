@@ -85,7 +85,7 @@ def check_connection(blog):
         return
     else:
         try:
-            response = requests.request("GET", blog.useful_domain(), allow_redirects=False)
+            response = requests.request("GET", blog.useful_domain(), allow_redirects=False, timeout=10)
             return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities"/>' in response.text)
         except ConnectionError:
             return False
