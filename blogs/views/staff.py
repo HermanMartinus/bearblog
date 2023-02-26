@@ -120,6 +120,7 @@ def review_flow(request):
                 'masc terms',
                 'fem terms',
                 'pronouns',
+                'prns',
                 'dni',
                 'Aries',
                 'Taurus',
