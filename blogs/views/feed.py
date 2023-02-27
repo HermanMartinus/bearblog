@@ -32,7 +32,7 @@ def feed(request):
         fe.title(post.title)
         fe.author({'name': name, 'email': 'hidden'})
         fe.link(href=f"{blog.useful_domain()}/{post.slug}/")
-        fe.content(markdown(post.content), type="html")
+        fe.content(markdown(post.content.replace('{{ email-signup }}', '')), type="html")
         fe.published(post.published_date)
         fe.updated(post.published_date)
 

@@ -138,7 +138,7 @@ def feed(request):
         fe.title(post.title)
         fe.author({"name": post.blog.subdomain, "email": "hidden"})
         fe.link(href=f"{post.blog.useful_domain()}/{post.slug}/")
-        fe.content(clean_text(mistune.html(post.content)), type="html")
+        fe.content(clean_text(mistune.html(post.content.replace("{{ email-signup }}", ''))), type="html")
         fe.published(post.published_date)
         fe.updated(post.published_date)
 
