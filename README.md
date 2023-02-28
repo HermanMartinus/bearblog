@@ -4,7 +4,7 @@
 ## Free, no-nonsense, super-fast blogging
 ### No javascript, no stylesheets, no trackers. Just your words.
 
-**Please log all bugs as [GitHub issues](https://github.com/HermanMartinus/bearblog/issues) and all feature requests on the [suggestions board](https://bearb.nolt.io).
+Please log all bugs as [GitHub issues](https://github.com/HermanMartinus/bearblog/issues) and all feature requests on the [suggestions board](https://bearb.nolt.io).
 
 ## Markdown
 All the post content is written in [markdown](https://herman.bearblog.dev/markdown-cheatsheet/).
