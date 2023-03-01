@@ -227,15 +227,10 @@ def lemon_webhook(request):
         raise Http404('Blog not found')
 
     data = json.loads(request.body, strict=False)
-
-    if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_cancelled' or request.META.get('HTTP_X_EVENT_NAME') == 'subscription_expired':
-        # TODO: set up auto-cancellation
-        # mail_admins(
-        #     "A subscription has been cancelled",
-        #     str(data.get('data').get('attributes'))
-        # )
-        return HttpResponse(f'Cancellation email sent')
-    else:
+    
+    # Blog upgrade
+    if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_created':
+        blog = None
         try:
             subdomain = str(data['meta']['custom_data']['blog'])
             blog = get_object_or_404(Blog, subdomain=subdomain)
@@ -245,14 +240,30 @@ def lemon_webhook(request):
             blog = Blog.objects.get(user__email=email)
             print('Found email address, upgrading blog...')
 
-    if blog:
-        blog.reviewed = True
-        blog.upgraded = True
-        blog.upgraded_date = timezone.now()
-        blog.save()
-        return HttpResponse(f'Upgraded {blog}')
-    else:
-        raise Http404('Blog not found')
+        if blog:
+            blog.reviewed = True
+            blog.upgraded = True
+            blog.upgraded_date = timezone.now()
+            blog.order_id = data['data']['id']
+            blog.save()
+            return HttpResponse(f'Upgraded {blog}')
+    
+    # Blog downgrade
+    if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_expired':
+        blog = None
+        try:
+            blog = get_object_or_404(Blog, order_id=data['data']['id'])
+            print('Found subscription ID, downgrading blog...')
+            if blog:
+                blog.upgraded = False
+                blog.upgraded_date = None
+                blog.order_id = None
+                blog.save()
+                return HttpResponse(f'Downgraded {blog}')
+        except KeyError:
+            print('Could not find subscription ID')
+
+    raise Http404('Blog not found or something')
 
 
 def not_found(request, *args, **kwargs):
