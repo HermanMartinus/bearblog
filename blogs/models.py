@@ -26,7 +26,7 @@ class Blog(models.Model):
     reviewed = models.BooleanField(default=False)
     upgraded = models.BooleanField(default=False)
     upgraded_date = models.DateTimeField(blank=True, null=True)
-    order_id = models.CharField(max_length=200, blank=True)
+    order_id = models.CharField(max_length=200, blank=True, null=True)
     blocked = models.BooleanField(default=False)
 
     custom_styles = models.TextField(blank=True)
