@@ -227,9 +227,9 @@ def lemon_webhook(request):
         raise Http404('Blog not found')
 
     data = json.loads(request.body, strict=False)
-    
+
     # Blog upgrade
-    if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_created':
+    if request.META.get('HTTP_X_EVENT_NAME') != 'subscription_expired':
         blog = None
         try:
             subdomain = str(data['meta']['custom_data']['blog'])
@@ -244,16 +244,16 @@ def lemon_webhook(request):
             blog.reviewed = True
             blog.upgraded = True
             blog.upgraded_date = timezone.now()
-            blog.order_id = data['data']['id']
+            blog.order_id = data['data']['attributes']['order_id']
             blog.save()
             return HttpResponse(f'Upgraded {blog}')
-    
+
     # Blog downgrade
-    if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_expired':
+    else:
         blog = None
         try:
-            blog = get_object_or_404(Blog, order_id=data['data']['id'])
-            print('Found subscription ID, downgrading blog...')
+            blog = get_object_or_404(Blog, order_id=data['data']['attributes']['order_id'])
+            print('Found order_id, downgrading blog...')
             if blog:
                 blog.upgraded = False
                 blog.upgraded_date = None
@@ -261,7 +261,7 @@ def lemon_webhook(request):
                 blog.save()
                 return HttpResponse(f'Downgraded {blog}')
         except KeyError:
-            print('Could not find subscription ID')
+            print('Could not find order_id')
 
     raise Http404('Blog not found or something')
 
