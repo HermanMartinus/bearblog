@@ -273,7 +273,7 @@ def add_order_id(request):
         if blog.upgraded:
             blog.order_id = request.POST.get("order_id")
             blog.save()
-            return HttpResponse(f"Added order_id to {blog}")
+            return HttpResponse(f"Added order_id {blog.order_id} to {blog}")
         else:
             return HttpResponse(f"{blog} is not upgraded")
 
