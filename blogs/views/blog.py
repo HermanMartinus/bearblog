@@ -266,6 +266,16 @@ def lemon_webhook(request):
     raise Http404('Blog not found or something')
 
 
+@csrf_exempt
+def add_order_id(request):
+    if request.POST.get("email", False) and request.POST.get("order_id", False):
+        blog = get_object_or_404(Blog, email__iexact=request.POST.get("email"))
+        if blog.upgraded:
+            blog.order_id = request.POST.get("order_id")
+            blog.save()
+            print(f"Added order_id to {blog}")
+
+
 def not_found(request, *args, **kwargs):
     return render(request, '404.html', status=404)
 
