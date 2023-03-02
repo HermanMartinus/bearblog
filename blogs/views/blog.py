@@ -268,7 +268,7 @@ def lemon_webhook(request):
 
 @csrf_exempt
 def add_order_id(request):
-    if request.POST.get("email", False) and request.POST.get("order_id", False):
+    if request.GET.get("email", False) and request.GET.get("order_id", False):
         blog = get_object_or_404(Blog, email__iexact=request.POST.get("email"))
         if blog.upgraded:
             blog.order_id = request.POST.get("order_id")
