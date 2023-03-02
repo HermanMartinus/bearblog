@@ -268,15 +268,23 @@ def lemon_webhook(request):
 
 @csrf_exempt
 def add_order_id(request):
-    if request.GET.get("email", False) and request.GET.get("order_id", False):
-        blog = get_object_or_404(Blog, user__email__iexact=request.POST.get("email"))
-        if blog.upgraded:
-            blog.order_id = request.POST.get("order_id")
-            blog.save()
-            return HttpResponse(f"Added order_id {blog.order_id} to {blog}")
+    email = request.GET.get("email", '')
+    order_id = request.GET.get("order_id", '')
+    if email and order_id:
+        blogs = Blog.objects.filter(user__email__iexact=email)
+        if blogs.count() > 0:
+            blog = blogs[0]
+            print(f"Found {blog} with email {email}")
+            if blog.upgraded:
+                blog.order_id = request.POST.get("order_id")
+                blog.save()
+                return HttpResponse(f"Added order_id {blog.order_id} to {blog}")
+            else:
+                return HttpResponse(f"{blog} is not upgraded")
         else:
-            return HttpResponse(f"{blog} is not upgraded")
-    return HttpResponse(f"Missing email ({request.POST.get('email', False)}) or order_id ({request.POST.get('order_id', False)})")
+            return HttpResponse(f'Could not find a matching blog for {email}')
+    else:
+        return HttpResponse(f"Missing email ({email}) or order_id ({order_id})")
 
 
 def not_found(request, *args, **kwargs):
