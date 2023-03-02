@@ -276,6 +276,7 @@ def add_order_id(request):
             return HttpResponse(f"Added order_id {blog.order_id} to {blog}")
         else:
             return HttpResponse(f"{blog} is not upgraded")
+    return HttpResponse(f"Missing email ({request.POST.get('email', False)}) or order_id ({request.POST.get('order_id', False)})")
 
 
 def not_found(request, *args, **kwargs):
