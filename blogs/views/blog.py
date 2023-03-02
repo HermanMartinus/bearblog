@@ -270,13 +270,14 @@ def lemon_webhook(request):
 def add_order_id(request):
     email = request.GET.get("email", '')
     order_id = request.GET.get("order_id", '')
+    print(email, order_id)
     if email and order_id:
         blogs = Blog.objects.filter(user__email__iexact=email)
         if blogs.count() > 0:
             blog = blogs[0]
             print(f"Found {blog} with email {email}")
             if blog.upgraded:
-                blog.order_id = request.POST.get("order_id")
+                blog.order_id = order_id
                 blog.save()
                 return HttpResponse(f"Added order_id {blog.order_id} to {blog}")
             else:
