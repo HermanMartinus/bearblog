@@ -231,7 +231,6 @@ def lemon_webhook(request):
     # Blog upgrade
     if 'order_created' in request.META.get('HTTP_X_EVENT_NAME', ''):
         blog = None
-        print(str(data['meta']['custom_data']['blog']))
         try:
             subdomain = str(data['meta']['custom_data']['blog'])
             blog = get_object_or_404(Blog, subdomain=subdomain)
@@ -250,7 +249,7 @@ def lemon_webhook(request):
             return HttpResponse(f'Upgraded {blog}')
 
     # Blog downgrade
-    elif request.META.get('HTTP_X_EVENT_NAME', '') == 'subscription_expired':
+    elif 'subscription_expired' in request.META.get('HTTP_X_EVENT_NAME', ''):
         blog = None
         try:
             blog = get_object_or_404(Blog, order_id=data['data']['attributes']['order_id'])
@@ -264,7 +263,7 @@ def lemon_webhook(request):
         except KeyError:
             print('Could not find order_id')
 
-    raise Http404('Blog not found or something')
+    return HttpResponse('Valid webhook call with no action taken')
 
 
 def not_found(request, *args, **kwargs):
