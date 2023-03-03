@@ -235,11 +235,11 @@ def lemon_webhook(request):
         try:
             subdomain = str(data['meta']['custom_data']['blog'])
             blog = get_object_or_404(Blog, subdomain=subdomain)
-            print('Found subdomain, upgrading blog...')
+            print(f'Found subdomain {subdomain}, upgrading blog...')
         except KeyError:
             email = str(data['data']['attributes']['user_email'])
             blog = Blog.objects.get(user__email=email)
-            print('Found email address, upgrading blog...')
+            print(f'Found email address {email}, upgrading blog...')
 
         if blog:
             blog.reviewed = True
