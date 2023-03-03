@@ -227,7 +227,7 @@ def lemon_webhook(request):
         raise Http404('Blog not found')
 
     data = json.loads(request.body, strict=False)
-
+    print(request.META.get('HTTP_X_EVENT_NAME', ''))
     # Blog upgrade
     if request.META.get('HTTP_X_EVENT_NAME', '') == 'order_created':
         blog = None
