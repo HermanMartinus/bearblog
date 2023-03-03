@@ -229,7 +229,7 @@ def lemon_webhook(request):
     data = json.loads(request.body, strict=False)
 
     # Blog upgrade
-    if request.META.get('HTTP_X_EVENT_NAME') != 'subscription_expired':
+    if request.META.get('HTTP_X_EVENT_NAME', '') == 'order_created':
         blog = None
         try:
             subdomain = str(data['meta']['custom_data']['blog'])
@@ -244,12 +244,12 @@ def lemon_webhook(request):
             blog.reviewed = True
             blog.upgraded = True
             blog.upgraded_date = timezone.now()
-            blog.order_id = data['data']['attributes']['order_id']
+            blog.order_id = data['data']['id']
             blog.save()
             return HttpResponse(f'Upgraded {blog}')
 
     # Blog downgrade
-    else:
+    elif request.META.get('HTTP_X_EVENT_NAME', '') == 'subscription_expired':
         blog = None
         try:
             blog = get_object_or_404(Blog, order_id=data['data']['attributes']['order_id'])
@@ -264,28 +264,6 @@ def lemon_webhook(request):
             print('Could not find order_id')
 
     raise Http404('Blog not found or something')
-
-
-@csrf_exempt
-def add_order_id(request):
-    email = request.GET.get("email", '')
-    order_id = request.GET.get("order_id", '')
-    print(email, order_id)
-    if email and order_id:
-        blogs = Blog.objects.filter(user__email__iexact=email)
-        if blogs.count() > 0:
-            blog = blogs[0]
-            print(f"Found {blog} with email {email}")
-            if blog.upgraded:
-                blog.order_id = order_id
-                blog.save()
-                return HttpResponse(f"Added order_id {blog.order_id} to {blog}")
-            else:
-                return HttpResponse(f"{blog} is not upgraded")
-        else:
-            return HttpResponse(f'Could not find a matching blog for {email}')
-    else:
-        return HttpResponse(f"Missing email ({email}) or order_id ({order_id})")
 
 
 def not_found(request, *args, **kwargs):
