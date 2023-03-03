@@ -39,7 +39,6 @@ urlpatterns = [
     path('discover/feed/', discover.feed, name='discover_feed'),
 
     path('lemon-webhook/', blog.lemon_webhook, name='lemon_webhook'),
-    path('add-order-id/', blog.add_order_id, name='add_order_id'),
 
     path('ping/', blog.ping, name='ping'),
     path('blog/', blog.posts, name='posts'),
