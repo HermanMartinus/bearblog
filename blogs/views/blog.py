@@ -229,8 +229,9 @@ def lemon_webhook(request):
     data = json.loads(request.body, strict=False)
     print(request.META.get('HTTP_X_EVENT_NAME', ''))
     # Blog upgrade
-    if request.META.get('HTTP_X_EVENT_NAME', '') == 'order_created':
+    if 'order_created' in request.META.get('HTTP_X_EVENT_NAME', ''):
         blog = None
+        print('New order yo!')
         try:
             subdomain = str(data['meta']['custom_data']['blog'])
             blog = get_object_or_404(Blog, subdomain=subdomain)
