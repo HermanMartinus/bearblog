@@ -75,8 +75,10 @@ def markdown(content):
         'docs.google.com',
         'bandcamp.com',
         'embed.music.apple.com',
-        'drive.google.com'
-        ]
+        'drive.google.com',
+        'share.transistor.fm',
+        'share.descript.com/'
+    ]
     cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
 
     try:
