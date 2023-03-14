@@ -77,7 +77,7 @@ def markdown(content):
         'embed.music.apple.com',
         'drive.google.com',
         'share.transistor.fm',
-        'share.descript.com/'
+        'share.descript.com'
     ]
     cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
 
