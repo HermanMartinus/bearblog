@@ -106,8 +106,8 @@ def search(request):
                 make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
-            .order_by('-upvote_count')
-            .select_related("blog")
+            .order_by('-upvote_count', "-published_date")
+            .select_related("blog")[0:50]
         )
 
     return render(request, "search.html", {
