@@ -1,7 +1,7 @@
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import timezone
 from django.contrib.sites.models import Site
 
@@ -79,15 +79,42 @@ def discover(request):
         )
 
     return render(request, "discover.html", {
-            "site": Site.objects.get_current(),
-            "posts": posts,
-            "previous_page": page - 1,
-            "next_page": page + 1,
-            "posts_from": posts_from,
-            "gravity": gravity,
-            "newest": newest,
-        },
-    )
+        "site": Site.objects.get_current(),
+        "posts": posts,
+        "previous_page": page - 1,
+        "next_page": page + 1,
+        "posts_from": posts_from,
+        "gravity": gravity,
+        "newest": newest,
+    })
+
+
+def search(request):
+    search_string = request.GET.get('query', "")
+    posts = None
+
+    if search_string:
+        posts = (
+            Post.objects.annotate(
+                upvote_count=Count("upvote"),
+            ).filter(
+                Q(content__icontains=search_string) | Q(title__icontains=search_string),
+                publish=True,
+                hidden=False,
+                blog__reviewed=True,
+                blog__blocked=False,
+                make_discoverable=True,
+                published_date__lte=timezone.now(),
+            )
+            .order_by('-upvote_count')
+            .select_related("blog")
+        )
+
+    return render(request, "search.html", {
+        "site": Site.objects.get_current(),
+        "posts": posts,
+        "search_string": search_string,
+    })
 
 
 def feed(request):

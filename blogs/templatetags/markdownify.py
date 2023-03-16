@@ -87,3 +87,9 @@ def markdown(content):
         cleaned_markup = ""
 
     return cleaned_markup
+
+
+@register.filter
+def unmark(content):
+    markup = mistune.html(content)
+    return html_parser(markup, "lxml").text.strip()[:400] + '...'
