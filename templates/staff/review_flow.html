@@ -19,10 +19,10 @@
 {% endblock %}
 
 {% block nav %}
-<div style="position:fixed; bottom: 0px; background-color: wheat; padding: 20px 10px 10px">
+<div style="position:fixed; bottom: 0px; left:0px; background-color: wheat; padding: 20px 10px 10px; font-size: 14px;">
     <form method="post" action="approve/{{ blog.pk }}"> 
         {% csrf_token %}
-        <textarea name="message" style="width:600px; height: 200px">
+        <textarea name="message" style="max-width: 600px; height: 135px; width: 100%;">
 Hey, I've just reviewed your blog. It looks good and has been approved.
 
 <br><br>
