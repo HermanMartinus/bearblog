@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}{% if newest %}Most recent{% else %}Trending{% endif %} | Bear Blog{% endblock %}
+
 {% block seo %}
 <meta name="robots" content="nofollow">
 {% include 'snippets/seo_tags.html' with site_name='ʕ•ᴥ•ʔ Bear Blog' type="website" title='Discovery feed' url='https://bearblog.dev/discover' description='Discover articles and blogs on Bear' image="https://i.imgur.com/b499n4R.png" %}

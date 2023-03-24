@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load markdownify %}
 
+{% block title %}Search | Bear Blog{% endblock %}
+
 {% block seo %}
 <meta name="robots" content="nofollow">
 {% include 'snippets/seo_tags.html' with site_name='ʕ•ᴥ•ʔ Bear Blog' type="website" title='Search Results' url='https://bearblog.dev/search' description='Search results on Bear Blog' image="https://i.imgur.com/b499n4R.png" %}
