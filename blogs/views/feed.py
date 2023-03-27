@@ -14,6 +14,7 @@ def feed(request):
         return not_found(request)
 
     all_posts = blog.post_set.filter(publish=True, is_page=False, published_date__lte=timezone.now()).order_by('-published_date')[:10]
+    all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain())

@@ -142,6 +142,7 @@ def feed(request):
             .order_by("-published_date")
             .select_related("blog")[0:posts_per_page]
         )
+        all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
     else:
         fg.title("Bear Blog Trending Posts")
         fg.subtitle("Trending posts on Bear Blog")
@@ -158,6 +159,7 @@ def feed(request):
             .order_by("-score", "-published_date")
             .select_related("blog")[0:posts_per_page]
         )
+        all_posts = sorted(list(all_posts), key=lambda post: post.score)
 
     for post in all_posts:
         fe = fg.add_entry()
