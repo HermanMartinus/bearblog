@@ -1,12 +1,51 @@
+from html import escape
 from django import template
+from django.template.loader import render_to_string
+
 import mistune
-import html
-from bs4 import BeautifulSoup as html_parser
-from lxml.html.clean import Cleaner
 import lxml
+from bs4 import BeautifulSoup as HtmlParser
+from lxml.html.clean import Cleaner, defs
 from slugify import slugify
 
 register = template.Library()
+
+SAFE_ATTRS = list(defs.safe_attrs) + ['style', 'controls', 'allowfullscreen', 'autoplay', 'loop']
+
+HOST_WHITELIST = [
+    'www.youtube.com',
+    'www.slideshare.net',
+    'player.vimeo.com',
+    'w.soundcloud.com',
+    'www.google.com',
+    'codepen.io',
+    'stackblitz.com',
+    'onedrive.live.com',
+    'docs.google.com',
+    'bandcamp.com',
+    'embed.music.apple.com',
+    'drive.google.com',
+    'share.transistor.fm',
+    'share.descript.com'
+]
+
+TYPOGRAPHIC_REPLACEMENTS = [
+    ('(c)', '©'),
+    ('(C)', '©'),
+    ('(r)', '®'),
+    ('(R)', '®'),
+    ('(tm)', '™'),
+    ('(TM)', '™'),
+    ('(p)', '℗'),
+    ('(P)', '℗'),
+    ('+-', '±')
+]
+
+
+def typographic_replacements(text):
+    for old, new in TYPOGRAPHIC_REPLACEMENTS:
+        text = text.replace(old, new)
+    return text
 
 
 @register.filter
@@ -15,72 +54,38 @@ def markdown(content):
         return ''
 
     markup = mistune.html(content)
+    soup = HtmlParser(markup, 'html.parser')
 
-    soup = html_parser(markup, 'html.parser')
     heading_tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+    for tag in heading_tags:
+        tag.attrs['id'] = slugify(tag.text)
 
-    # Give headings IDs so they can be linked to
-    for each_tag in heading_tags:
-        each_tag.attrs['id'] = slugify(each_tag.text)
+    for anchor in soup.find_all('a', href=True):
+        if 'tab:' in anchor.attrs['href']:
+            anchor.attrs['href'] = anchor.attrs['href'].replace('tab:', '')
+            anchor.attrs['target'] = '_blank'
 
-    # Create new-tab links
-    for each_anchor in soup.find_all('a', href=True):
-        if 'tab:' in each_anchor.attrs['href']:
-            each_anchor.attrs['href'] = each_anchor.attrs['href'].replace('tab:', '')
-            each_anchor.attrs['target'] = '_blank'
-
-    # Add pre to codeblocks and order correctly
-    for match in soup.findAll('code'):
-        if match.parent.name == 'pre':
-            if match.has_attr('class'):
-                match.parent.attrs['class'] = match['class'][0].replace('language-', '')
-            match.replaceWithChildren()
+    for code_block in soup.findAll('code'):
+        if code_block.parent.name == 'pre':
+            if code_block.has_attr('class'):
+                code_block.parent.attrs['class'] = code_block['class'][0].replace('language-', '')
+            code_block.replaceWithChildren()
         else:
-            if len(match.contents) > 0:
+            if len(code_block.contents) > 0:
                 new_tag = soup.new_tag("code")
-                new_tag.append(html.escape(str(match.contents[0])))
-                match.replace_with(new_tag)
+                new_tag.append(escape(str(code_block.contents[0])))
+                code_block.replace_with(new_tag)
 
-    # TODO this only works if it's the last child in the dom branch
-    for match in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'span', 'b', 'i', 'strong', 'em']):
-        if match.string and '<code>' not in str(match):
-            # Typographic replacement of special characters
-            match.string.replace_with(match.string.replace(
-                '(c)', '©').replace(
-                    '(C)', '©').replace(
-                        '(r)', '®').replace(
-                            '(R)', '®').replace(
-                                '(tm)', '™').replace(
-                                    '(TM)', '™').replace(
-                                        '(p)', '℗').replace(
-                                            '(P)', '℗').replace(
-                                                '+-', '±'))
+    tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'span', 'b', 'i', 'strong', 'em'])
+    for tag in tags:
+        if tag.string and '<code>' not in str(tag):
+            tag.string.replace_with(typographic_replacements(tag.string))
+            tag.string.replace_with(
+                tag.string.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html')))
 
-            # Add email subscription form inline
-            match.string.replace_with(
-                match.string.replace('{{ email-signup }}', template.loader.render_to_string('snippets/email_subscribe_form.html')))
-
-    safe_attrs = list(lxml.html.clean.defs.safe_attrs) + ['style', 'controls', 'allowfullscreen', 'autoplay', 'loop']
-    lxml.html.clean.defs.safe_attrs = safe_attrs
-    lxml.html.clean.Cleaner.safe_attrs = lxml.html.clean.defs.safe_attrs
-    host_whitelist = [
-        'www.youtube.com',
-        'www.slideshare.net',
-        'player.vimeo.com',
-        'w.soundcloud.com',
-        'www.google.com',
-        'codepen.io',
-        'stackblitz.com',
-        'onedrive.live.com',
-        'docs.google.com',
-        'bandcamp.com',
-        'embed.music.apple.com',
-        'drive.google.com',
-        'share.transistor.fm',
-        'share.descript.com'
-    ]
-    cleaner = Cleaner(host_whitelist=host_whitelist, safe_attrs=safe_attrs)
-
+    defs.safe_attrs = SAFE_ATTRS
+    Cleaner.safe_attrs = defs.safe_attrs
+    cleaner = Cleaner(host_whitelist=HOST_WHITELIST, safe_attrs=SAFE_ATTRS)
     try:
         cleaned_markup = cleaner.clean_html(str(soup))
     except lxml.etree.ParserError:
@@ -92,4 +97,4 @@ def markdown(content):
 @register.filter
 def unmark(content):
     markup = mistune.html(content)
-    return html_parser(markup, "lxml").text.strip()[:400] + '...'
+    return HtmlParser(markup, "lxml").text.strip()[:400] + '...'
