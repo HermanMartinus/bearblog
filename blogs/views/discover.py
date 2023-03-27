@@ -155,7 +155,7 @@ def feed(request):
                 make_discoverable=True,
                 published_date__lte=timezone.now()
             )
-            .order_by("-score", "-published_date")
+            .order_by("-score", "published_date")
             .select_related("blog")[0:posts_per_page]
         )
 
