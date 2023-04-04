@@ -27,7 +27,8 @@ HOST_WHITELIST = [
     'drive.google.com',
     'share.transistor.fm',
     'share.descript.com',
-    'mrkennedy.ca'
+    'mrkennedy.ca',
+    'open.spotify.com'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
