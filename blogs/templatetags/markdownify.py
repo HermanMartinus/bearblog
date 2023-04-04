@@ -14,6 +14,7 @@ SAFE_ATTRS = list(defs.safe_attrs) + ['style', 'controls', 'allowfullscreen', 'a
 
 HOST_WHITELIST = [
     'www.youtube.com',
+    'www.youtube-nocookie.com',
     'www.slideshare.net',
     'player.vimeo.com',
     'w.soundcloud.com',
