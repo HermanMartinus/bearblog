@@ -130,7 +130,7 @@ def parse_raw_homepage(raw_content, blog):
                         validator('http://' + value)
                         blog.domain = value
                     except ValidationError:
-                        raise ValueError('This is an invalid custom_domain')   
+                        raise ValueError('This is an invalid custom_domain')
                 else:
                     raise ValueError("This domain is already taken")
             else:
@@ -149,7 +149,8 @@ def parse_raw_homepage(raw_content, blog):
         elif name == 'nav':
             blog.nav = value
         elif name == 'custom_meta_tag':
-            if re.search(r'<meta (.*?)/>', value) and "url" not in value and "javascript" not in value and "script" not in value:
+            pattern = r'<meta\s+(?:[^>]*(?!\b(?:javascript|scripts|url)\b)[^>]*)*>'
+            if re.search(pattern, value, re.IGNORECASE):
                 blog.meta_tag = value
             else:
                 raise ValueError("Invalid custom_meta_tag")
@@ -415,11 +416,11 @@ def render_analytics(request, blog, public=False):
         if referrer_filter:
             posts = Post.objects.annotate(
                 hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date, hit__referrer=referrer_filter))
-                ).prefetch_related('hit_set', 'upvote_set').filter(
-                    blog=blog,
-                    pk=post_filter,
-                    publish=True,
-                ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+            ).prefetch_related('hit_set', 'upvote_set').filter(
+                blog=blog,
+                pk=post_filter,
+                publish=True,
+            ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
             hits = Hit.objects.filter(
                 post__blog=blog,
                 post__id=post_filter,
@@ -428,11 +429,11 @@ def render_analytics(request, blog, public=False):
         else:
             posts = Post.objects.annotate(
                 hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
-                ).prefetch_related('hit_set', 'upvote_set').filter(
-                    blog=blog,
-                    pk=post_filter,
-                    publish=True,
-                ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+            ).prefetch_related('hit_set', 'upvote_set').filter(
+                blog=blog,
+                pk=post_filter,
+                publish=True,
+            ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
             hits = Hit.objects.filter(
                 post__blog=blog,
                 post__id=post_filter,
@@ -441,10 +442,10 @@ def render_analytics(request, blog, public=False):
         if referrer_filter:
             posts = Post.objects.annotate(
                 hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date, hit__referrer=referrer_filter))
-                ).prefetch_related('hit_set', 'upvote_set').filter(
-                    blog=blog,
-                    publish=True,
-                ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+            ).prefetch_related('hit_set', 'upvote_set').filter(
+                blog=blog,
+                publish=True,
+            ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
 
             hits = Hit.objects.filter(
                 post__blog=blog,
@@ -453,10 +454,10 @@ def render_analytics(request, blog, public=False):
         else:
             posts = Post.objects.annotate(
                 hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
-                ).prefetch_related('hit_set', 'upvote_set').filter(
-                    blog=blog,
-                    publish=True,
-                ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+            ).prefetch_related('hit_set', 'upvote_set').filter(
+                blog=blog,
+                publish=True,
+            ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
             hits = Hit.objects.filter(
                 post__blog=blog,
                 created_date__gt=start_date).order_by('created_date')
