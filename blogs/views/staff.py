@@ -216,7 +216,6 @@ def review_stack(request):
         grace_period = timezone.now() - timedelta(days=14)
         if (
             blog.content == "Hello World!"
-            and blog.post_count == 0
         ):
 
             # Delete empty blogs 14 days old
