@@ -6,6 +6,7 @@ from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from blogs.helpers import send_async_mail
 from django.db.models.functions import TruncDate
+from django.http import JsonResponse
 
 from blogs.models import Blog
 
@@ -77,15 +78,15 @@ def dashboard(request):
     upgrade_chart = chart.render_data_uri()
 
     return render(
-            request,
-            'staff/dashboard.html',
-            {
-                'blogs': blogs,
-                'signup_chart': signup_chart,
-                'upgrade_chart': upgrade_chart,
-                'start_date': start_date,
-                'end_date': end_date
-            }
+        request,
+        'staff/dashboard.html',
+        {
+            'blogs': blogs,
+            'signup_chart': signup_chart,
+            'upgrade_chart': upgrade_chart,
+            'start_date': start_date,
+            'end_date': end_date
+        }
     )
 
 
@@ -190,3 +191,43 @@ def delete(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.delete()
     return redirect('review_flow')
+
+
+def extract_blog_info(blog):
+    posts_info = []
+    for post in blog.post_set.all():
+        posts_info.append({'title': post.title, 'content': post.content})
+
+    return {
+        'title': blog.title,
+        'content': blog.content,
+        'url': blog.useful_domain(),
+        'posts': posts_info
+    }
+
+
+def review_stack(request):
+    blogs = Blog.objects.filter(reviewed=False, blocked=False).annotate(
+        post_count=Count("post"),
+    ).prefetch_related("post_set").order_by('created_date')
+
+    unreviewed_blogs = []
+    for blog in blogs:
+        grace_period = timezone.now() - timedelta(days=14)
+        if (
+            blog.content == "Hello World!"
+            and blog.post_count == 0
+        ):
+
+            # Delete empty blogs 14 days old
+            if blog.created_date < grace_period:
+                blog.delete()
+        else:
+            delay_period = timezone.now() - timedelta(days=1)
+            if blog.created_date < delay_period:
+                unreviewed_blogs.append(blog)
+
+    # Extract relevant information from unreviewed_blogs
+    unreviewed_blogs_info = [extract_blog_info(blog) for blog in unreviewed_blogs]
+
+    return JsonResponse(unreviewed_blogs_info, safe=False)
