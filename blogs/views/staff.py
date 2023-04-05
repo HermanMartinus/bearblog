@@ -217,10 +217,10 @@ def review_stack(request):
         if (
             blog.content == "Hello World!"
         ):
-
+            print('Empty')
             # Delete empty blogs 14 days old
-            if blog.created_date < grace_period:
-                blog.delete()
+            # if blog.created_date < grace_period:
+            #     blog.delete()
         else:
             delay_period = timezone.now() - timedelta(days=1)
             if blog.created_date < delay_period:
