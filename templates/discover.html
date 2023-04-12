@@ -26,7 +26,11 @@
         {% endif %}
         <a href="/search/">Search</a>
     </nav>
-
+    {% if not blog.reviewed and newest %}
+    <p>
+        <small><i><a target="_blank" href="https://docs.bearblog.dev/review-process/">Not seeing your post?</a></i></small>
+    </p>
+    {% endif %}
     <ul class="discover-posts">
         {% for post in posts %}
         <li>
