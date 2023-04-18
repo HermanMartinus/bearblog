@@ -24,6 +24,9 @@ class Blog(models.Model):
     blog_path = models.CharField(max_length=200, default="blog")
 
     reviewed = models.BooleanField(default=False)
+    to_review = models.BooleanField(default=False)
+    reviewer_note = models.TextField(blank=True)
+
     upgraded = models.BooleanField(default=False)
     upgraded_date = models.DateTimeField(blank=True, null=True)
     order_id = models.CharField(max_length=200, blank=True, null=True)

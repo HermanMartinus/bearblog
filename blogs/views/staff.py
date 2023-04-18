@@ -108,38 +108,7 @@ def review_flow(request):
             if blog.created_date < grace_period:
                 blog.delete()
         else:
-            delay_period = timezone.now() - timedelta(days=1)
-
-            # Filtering Discord about me pages
-            strings_to_check = [
-                'ooc',
-                'doll',
-                'infp',
-                'she/her',
-                'he/him',
-                'they/them',
-                'masc terms',
-                'fem terms',
-                'pronouns',
-                'prns',
-                'dni',
-                'Aries',
-                'Taurus',
-                'Gemini',
-                'Cancer',
-                'Leo',
-                'Virgo',
-                'Libra',
-                'Scorpio',
-                'Sagittarius',
-                'Capricorn',
-                'Aquarius',
-                'Pisces'
-            ]
-            if any(string.lower() in blog.content.replace('.', ' ').lower() for string in strings_to_check):
-                blog.reviewed = True
-                blog.save()
-            if blog.created_date < delay_period:
+            if blog.to_review:
                 unreviewed_blogs.append(blog)
 
     if unreviewed_blogs:

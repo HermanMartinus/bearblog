@@ -6,24 +6,17 @@
 
 {% block content %}
 
-{% if blog.older_than_one_day %}
-{% if not blog.upgraded %}
+{% if not blog.upgraded or not blog.older_than_one_day %}
 <p style="border: 1px dashed; text-align:center; padding: 5px">
-    <i>
-        <a href="/dashboard/upgrade/">Upgrade</a> to get more neat features and support the Tiny Internet!
-    </i>
-</p>
-{% endif %}
-{% else %}
-<p style="border: 1px dashed; text-align:center; padding: 5px">
-    <b>Welcome to your Bear Blog dashboard</b>.
-    <br>
-    Here's a <a href="https://docs.bearblog.dev/quick-start/" target="_blank">short video guide</a> to get you started.
-    <br>
+    {% if not blog.older_than_one_day %}
+        <b>Welcome to your Bear Blog dashboard</b>.
+        <br>
+        Check out this <a href="https://docs.bearblog.dev/quick-start/" target="_blank">short video guide</a> to get started.
+        <br>
+    {% endif %}
     {% if not blog.upgraded %}
-    <i>
-        <a href="/dashboard/upgrade/">Upgrade</a> to get more neat features and support the Tiny Internet!
-    </i>
+    
+    <i><a href="/dashboard/upgrade/">Upgrade</a> for additional features and to support the Tiny Internet!</i>
     {% endif %}
 </p>
 {% endif %}

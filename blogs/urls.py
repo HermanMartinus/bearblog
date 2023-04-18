@@ -21,6 +21,7 @@ urlpatterns = [
     path('dashboard/email-list/', emailer.email_list, name='email_list'),
     path('dashboard/analytics/', analytics.analytics, name='analytics'),
     path('dashboard/upgrade/', dashboard.upgrade, name='upgrade'),
+    path('dashboard/opt-in-review/', dashboard.opt_in_review, name='opt_in_review'),
 
     path('dashboard/upload-image/', dashboard.upload_image, name='upload_image'),
 

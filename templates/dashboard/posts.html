@@ -6,6 +6,17 @@
 
 {% block content %}
 <content>
+    {% if not blog.reviewed and not blog.to_review and blog.older_than_one_day %}
+    <p style="border: 1px dashed; text-align:center; padding: 5px">
+        <i>
+            Want to show up on the
+            <a href="https://bearblog.dev/discover/" target="_blank">Discovery feed</a>?
+            <a href="/dashboard/upgrade/">Upgrade</a> or
+            <a href="/dashboard/opt-in-review/">opt-in</a> for a review.
+        </i>
+    </p>
+    {% endif %}
+
     <h1>Posts</h1>
     <a href="/{% if blog.old_editor %}dashboard{% else %}studio{% endif %}/posts/new">
         <button>
