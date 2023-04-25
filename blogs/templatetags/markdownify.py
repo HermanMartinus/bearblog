@@ -52,7 +52,7 @@ def typographic_replacements(text):
 
 
 @register.filter
-def markdown(content):
+def markdown(content, upgraded=False):
     if not content:
         return ''
 
@@ -86,11 +86,21 @@ def markdown(content):
             tag.string.replace_with(
                 tag.string.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html')))
 
+    processed_markup = str(soup)
+
+    if not upgraded:
+        processed_markup = clean(processed_markup)
+
+    return processed_markup
+
+
+@register.filter
+def clean(markup):
     defs.safe_attrs = SAFE_ATTRS
     Cleaner.safe_attrs = defs.safe_attrs
     cleaner = Cleaner(host_whitelist=HOST_WHITELIST, safe_attrs=SAFE_ATTRS)
     try:
-        cleaned_markup = cleaner.clean_html(str(soup))
+        cleaned_markup = cleaner.clean_html(markup)
     except lxml.etree.ParserError:
         cleaned_markup = ""
 

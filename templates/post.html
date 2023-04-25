@@ -69,7 +69,7 @@
 
 <content>
 {% pygmentify %}
-    {{ content | markdown | safe }}
+    {{ content | markdown:blog.upgraded | safe }}
 {% endpygmentify %}
 </content>
 {% if canonical_url != full_path %}

@@ -66,7 +66,7 @@ USE_X_FORWARDED_HOST = True
 INTERNAL_IPS = ['127.0.0.1']
 
 # Application definition
-SITE_ID = 1
+SITE_ID = 3
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -105,7 +105,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'textblog.urls'
 TEMPLATES = [
-  {
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.normpath(os.path.join(BASE_DIR, 'templates')),

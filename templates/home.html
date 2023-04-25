@@ -45,7 +45,7 @@
 {% if blog.content %}
 <content>
 {% pygmentify %}
-    {{ blog.content | markdown | safe }}
+    {{ blog.content | markdown:blog.upgraded | safe }}
 {% endpygmentify %}
 </content>
 {% else %}
