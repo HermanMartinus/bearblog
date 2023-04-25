@@ -20,6 +20,10 @@
 
 <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
 
+{% if blog.upgraded %}
+{{ blog.header_directive | safe }}
+{% endif %}
+
 {% include 'snippets/seo_tags.html' with site_name=blog.title title=blog.title type="website" url=blog.useful_domain description=meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
 <link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}
@@ -78,5 +82,10 @@
 {% endblock %}
 
 {% block footer %}
-Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+{% if blog.upgraded and blog.footer_directive %}
+{{ blog.footer_directive | markdown:True | safe }}
+{% endif %}
+<span>
+    Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+</span>
 {% endblock %}

@@ -168,6 +168,23 @@ def parse_raw_homepage(raw_content, blog):
 
 
 @login_required
+def directive_edit(request):
+    blog = get_object_or_404(Blog, user=request.user)
+
+    header = request.POST.get("header", "")
+    footer = request.POST.get("footer", "")
+    print(header, footer)
+    if header or footer:
+        blog.header_directive = header
+        blog.footer_directive = footer
+        blog.save()
+
+    return render(request, 'studio/directive_edit.html', {
+        'blog': blog,
+    })
+
+
+@login_required
 def post(request, pk=None):
     blog = get_object_or_404(Blog, user=request.user)
 

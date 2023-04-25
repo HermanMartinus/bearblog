@@ -22,6 +22,8 @@ class Blog(models.Model):
     lang = models.CharField(max_length=10, default='en', blank=True)
     meta_tag = models.CharField(max_length=500, blank=True)
     blog_path = models.CharField(max_length=200, default="blog")
+    header_directive = models.TextField(blank=True)
+    footer_directive = models.TextField(blank=True)
 
     reviewed = models.BooleanField(default=False)
     to_review = models.BooleanField(default=False)
