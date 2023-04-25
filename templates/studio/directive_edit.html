@@ -9,6 +9,9 @@ Directives | Bear Blog
 {% if blog.upgraded %}
 <main>
     <h1>Directives (beta)</h1>
+    <p class="helptext">
+        Extend your Bear blog by adding custom code to the &lt;head&gt; and &lt;footer&gt; tags. This feature is still under development. Please report any issues.
+    </p>
     <form method="POST" class="post-form full-width">
         {% csrf_token %}
         <p style="line-height: 0">
@@ -17,12 +20,12 @@ Directives | Bear Blog
             <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}');">View</button>
         </p>
         <p>
-            <label>Head content:</label>
+            <label>Head directive:</label>
             <br>
             <textarea name="header" style="height: 150px;">{{ blog.header_directive }}</textarea>
         </p>
         <p>
-            <label>Footer content:</label>
+            <label>Footer directive:</label>
             <br>
             <textarea name="footer" style="height: 150px;">{{ blog.footer_directive }}</textarea>
             <span class="helptext">Markdown/HTML</span>
