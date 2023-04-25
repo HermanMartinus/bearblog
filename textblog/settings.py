@@ -66,7 +66,7 @@ USE_X_FORWARDED_HOST = True
 INTERNAL_IPS = ['127.0.0.1']
 
 # Application definition
-SITE_ID = 3
+SITE_ID = 1
 
 INSTALLED_APPS = [
     'django.contrib.admin',
