@@ -56,7 +56,8 @@ def markdown(content, upgraded=False):
     if not content:
         return ''
 
-    markup = mistune.html(content)
+    markdown_parser = mistune.create_markdown(plugins=['task_lists', 'abbr'])
+    markup = markdown_parser(content)
     soup = HtmlParser(markup, 'html.parser')
 
     heading_tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
