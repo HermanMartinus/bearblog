@@ -36,6 +36,7 @@ urlpatterns = [
     path('studio/posts/<pk>/', studio.post, name="post_edit"),
     path('studio/preview/', studio.preview, name="preview"),
     path('studio/analytics/', studio.analytics, name="analytics"),
+    path('studio/ai-styles/', studio.ai_styles, name="ai_styles"),
 
     path('discover/', discover.discover, name='discover'),
     path('discover/feed/', discover.feed, name='discover_feed'),

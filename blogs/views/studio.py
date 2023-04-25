@@ -18,9 +18,10 @@ from pygal.style import LightColorizedStyle
 import djqscsv
 import random
 import string
+import json
 
 from blogs.forms import AnalyticsForm, PostTemplateForm
-from blogs.helpers import check_connection, sanitise_int, unmark
+from blogs.helpers import check_connection, query_gpt, sanitise_int, unmark
 from blogs.models import Blog, Hit, Post
 
 
@@ -540,3 +541,21 @@ def distinct_count(hits, parameter):
 
     distinct_list = [x for x in distinct_list if x[parameter]]
     return sorted(distinct_list, key=lambda item: item['number'], reverse=True)
+
+
+@login_required
+def ai_styles(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    instruction = request.POST.get("instruction", "")
+    if instruction:
+        prompt = "You will edit the CSS according to the instructions. Respond only with valid CSS."
+        prompt += f"\nInstruction: {instruction}"
+        prompt += f"\nCSS: {blog.custom_styles}"
+        print(instruction)
+        response = query_gpt(prompt)
+        print(response)
+
+        # Update the content of blog.custom_styles
+        blog.custom_styles = response
+        blog.save()
+    return render(request, 'studio/ai_styles.html', {"blog": blog})

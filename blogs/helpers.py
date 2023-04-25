@@ -12,6 +12,7 @@ from django.conf import settings
 from _datetime import timedelta
 import geoip2
 from django.contrib.gis.geoip2 import GeoIP2
+import openai
 
 
 def root(subdomain=''):
@@ -121,7 +122,7 @@ def valid_xml_char_ordinal(c):
         codepoint in (0x9, 0xA, 0xD) or
         0xE000 <= codepoint <= 0xFFFD or
         0x10000 <= codepoint <= 0x10FFFF
-        )
+    )
 
 
 def daterange(start_date, end_date):
@@ -163,3 +164,20 @@ def send_async_mail(subject, html_message, from_email, recipient_list):
     else:
         print('Sent email to ', recipient_list)
         EmailThread(subject, html_message, from_email, recipient_list).start()
+
+
+def query_gpt(instruction):
+    openai.api_key = settings.OPENAI_KEY
+    system_prompt = {"role": "system", "content": "You are a CSS bot"}
+    user_data = []
+    user_data.append({"role": "user", "content": instruction})
+
+    response = openai.ChatCompletion.create(model="gpt-4",
+                                            messages=[system_prompt] +
+                                            user_data,
+                                            temperature=0.6)
+
+    # Extract the chatbot's response
+    chatbot_response = response.choices[0].message['content'].strip()
+
+    return chatbot_response

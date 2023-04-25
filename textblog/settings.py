@@ -14,6 +14,7 @@ SECRET_KEY = os.getenv('SECRET')
 HEROKU_BEARER_TOKEN = os.getenv('HEROKU_BEARER_TOKEN')
 LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
 SENTRY_DSN = os.getenv('SENTRY_DSN')
+OPENAI_KEY = os.getenv('OPENAI_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.environ.get('DEBUG') == 'True')
@@ -62,11 +63,12 @@ if not DEBUG:
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
+X_FRAME_OPTIONS = "allow"
 
 INTERNAL_IPS = ['127.0.0.1']
 
 # Application definition
-SITE_ID = 1
+SITE_ID = 3
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -105,7 +107,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'textblog.urls'
 TEMPLATES = [
-  {
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.normpath(os.path.join(BASE_DIR, 'templates')),
