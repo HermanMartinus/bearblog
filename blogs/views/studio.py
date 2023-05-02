@@ -449,7 +449,8 @@ def render_analytics(request, blog, public=False):
     ).prefetch_related('hit_set', 'upvote_set').filter(
         blog=blog,
         publish=True,
-    ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+    ).filter(Q(pk=post_filter) if post_filter else Q()
+             ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
 
     hits = base_hits.order_by('created_date')
     start_date = hits.first().created_date.date() if hits.exists() else start_date
