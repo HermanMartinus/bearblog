@@ -18,10 +18,11 @@ from pygal.style import LightColorizedStyle
 import djqscsv
 import random
 import string
+from ipaddr import client_ip
 
 from blogs.forms import AnalyticsForm, PostTemplateForm
 from blogs.helpers import check_connection, sanitise_int, unmark
-from blogs.models import Blog, Hit, Post
+from blogs.models import Blog, Hit, Post, Upvote
 
 
 @login_required
@@ -203,8 +204,11 @@ def post(request, pk=None):
     raw_content = request.POST.get("raw_content", "")
 
     if raw_content:
+        is_new = False
+
         if post is None:
             post = Post(blog=blog)
+            is_new = True
 
         try:
             tags = parse_raw_post(raw_content, post)
@@ -215,6 +219,11 @@ def post(request, pk=None):
             post.last_modified = timezone.now()
 
             post.save()
+
+            if is_new:
+                # Self-upvote
+                upvote = Upvote(post=post, ip_address=client_ip(request))
+                upvote.save()
 
             # Add tags after saved
             post.tags.clear()
