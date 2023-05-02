@@ -36,7 +36,6 @@
 		document.body.appendChild(previewForm)
 	
 		previewButton.onclick = event => {
-			console.log("Opening preveiw")
 			window.open('about:blank','print_popup','width=1000,height=800');
 			contentField.value = textarea.value
 			previewForm.submit()
