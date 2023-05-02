@@ -78,7 +78,7 @@
                         <a href="?days={{ days_filter }}&referrer={{ referrer.referrer }}{% if post_filter %}&post={{ post_filter }}{% endif %}">{{ referrer.referrer }}</a>
                         <a href="{{ referrer.referrer }}" target="_blank">↪</a>
                     </span>
-                    <span>{{ referrer.number|intcomma }}</span>
+                    <span>{{ referrer.count|intcomma }}</span>
                 </li>
                 {% endfor %}
             </ul>
@@ -92,7 +92,7 @@
                 {% for device in devices %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ device.device }}
-                    <span>{{ device.number|intcomma }}</span>
+                    <span>{{ device.count|intcomma }}</span>
                 </li>
                 {% endfor %}
             </ul>
@@ -103,7 +103,7 @@
                 {% for browser in browsers %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ browser.browser }}
-                    <span>{{ browser.number|intcomma }}</span>
+                    <span>{{ browser.count|intcomma }}</span>
                 </li>
                 {% endfor %}
             </ul>
@@ -114,7 +114,7 @@
                 {% for country in countries %}
                 <li style="display:flex;justify-content:space-between;padding:5px 0;">
                     {{ country.country }}
-                    <span>{{ country.number|intcomma }}</span>
+                    <span>{{ country.count|intcomma }}</span>
                 </li>
                 {% endfor %}
             </ul>

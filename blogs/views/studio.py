@@ -458,10 +458,10 @@ def render_analytics(request, blog, public=False):
     unique_visitors = hits.values('ip_address').distinct().count()
     on_site = hits.filter(created_date__gt=timezone.now()-timedelta(minutes=4)).count()
 
-    referrers = hits.values('referrer').annotate(count=Count('referrer')).order_by('-count')
-    devices = hits.values('device').annotate(count=Count('device')).order_by('-count')
-    browsers = hits.values('browser').annotate(count=Count('browser')).order_by('-count')
-    countries = hits.values('country').annotate(count=Count('country')).order_by('-count')
+    referrers = hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
+    devices = hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
+    browsers = hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
+    countries = hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
 
     # Build chart data
 
