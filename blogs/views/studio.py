@@ -1,6 +1,7 @@
+from django.db.models.functions import TruncDate
+from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
-from django.db.models.functions import TruncDate
 from django.db import DataError, IntegrityError
 from django.forms import ValidationError
 from django.http import Http404
@@ -434,91 +435,52 @@ def render_analytics(request, blog, public=False):
     post_filter = request.GET.get('post', False)
     referrer_filter = request.GET.get('referrer', False)
     days_filter = int(request.GET.get('days', 7))
-    delta = timedelta(days=1)
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 
+    base_hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date)
     if post_filter:
-        if referrer_filter:
-            posts = Post.objects.annotate(
-                hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date, hit__referrer=referrer_filter))
-            ).prefetch_related('hit_set', 'upvote_set').filter(
-                blog=blog,
-                pk=post_filter,
-                publish=True,
-            ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
-            hits = Hit.objects.filter(
-                post__blog=blog,
-                post__id=post_filter,
-                referrer=referrer_filter,
-                created_date__gt=start_date).order_by('created_date')
-        else:
-            posts = Post.objects.annotate(
-                hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
-            ).prefetch_related('hit_set', 'upvote_set').filter(
-                blog=blog,
-                pk=post_filter,
-                publish=True,
-            ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
-            hits = Hit.objects.filter(
-                post__blog=blog,
-                post__id=post_filter,
-                created_date__gt=start_date).order_by('created_date')
-    else:
-        if referrer_filter:
-            posts = Post.objects.annotate(
-                hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date, hit__referrer=referrer_filter))
-            ).prefetch_related('hit_set', 'upvote_set').filter(
-                blog=blog,
-                publish=True,
-            ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+        base_hits = base_hits.filter(post__id=post_filter)
+    if referrer_filter:
+        base_hits = base_hits.filter(referrer=referrer_filter)
 
-            hits = Hit.objects.filter(
-                post__blog=blog,
-                referrer=referrer_filter,
-                created_date__gt=start_date).order_by('created_date')
-        else:
-            posts = Post.objects.annotate(
-                hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date))
-            ).prefetch_related('hit_set', 'upvote_set').filter(
-                blog=blog,
-                publish=True,
-            ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
-            hits = Hit.objects.filter(
-                post__blog=blog,
-                created_date__gt=start_date).order_by('created_date')
+    posts = Post.objects.annotate(
+        hit_count=Count('hit', filter=Q(hit__in=base_hits))
+    ).prefetch_related('hit_set', 'upvote_set').filter(
+        blog=blog,
+        publish=True,
+    ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
 
-    if hits.count() > 0:
-        start_date = hits[0].created_date.date()
+    hits = base_hits.order_by('created_date')
+    start_date = hits.first().created_date.date() if hits.exists() else start_date
 
     unique_reads = hits.count()
-    unique_visitors = hits.values('ip_address').distinct().order_by().count()
-
+    unique_visitors = hits.values('ip_address').distinct().count()
     on_site = hits.filter(created_date__gt=timezone.now()-timedelta(minutes=4)).count()
 
-    referrers = distinct_count(hits, 'referrer')
-    devices = distinct_count(hits, 'device')
-    browsers = distinct_count(hits, 'browser')
-    countries = distinct_count(hits, 'country')
+    referrers = hits.values('referrer').annotate(count=Count('referrer')).order_by('-count')
+    devices = hits.values('device').annotate(count=Count('device')).order_by('-count')
+    browsers = hits.values('browser').annotate(count=Count('browser')).order_by('-count')
+    countries = hits.values('country').annotate(count=Count('country')).order_by('-count')
+
+    # Build chart data
+
+    hit_dict = hits.annotate(
+        date=TruncDate('created_date')
+    ).values('date').annotate(
+        c=Count('date')
+    ).order_by('date')
 
     chart_data = []
-    date_iterator = start_date
+    date_range = [start_date + timedelta(days=x) for x in range((end_date - start_date).days + 1)]
+    hit_date_count = {hit['date']: hit['c'] for hit in hit_dict}
 
-    hits_count = hits.annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
+    for date in date_range:
+        date_str = date.strftime('%Y-%m-%d')
+        count = hit_date_count.get(date, 0)
+        chart_data.append({'date': date_str, 'hits': count})
 
-    # create dates dict with zero hits
-    hit_dict = {}
-    while date_iterator <= end_date:
-        hit_dict[date_iterator.strftime("%Y-%m-%d")] = 0
-        date_iterator += delta
-
-    # populate dict with hits count
-    for hit in hits_count:
-        hit_dict[hit['date'].strftime("%Y-%m-%d")] = hit['c']
-
-    # generate chart
-    for date, count in hit_dict.items():
-        chart_data.append({'date': date, 'hits': count})
+    # Render chart
 
     chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
     chart.force_uri_protocol = 'http'
