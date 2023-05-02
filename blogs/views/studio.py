@@ -173,8 +173,8 @@ def directive_edit(request):
 
     header = request.POST.get("header", "")
     footer = request.POST.get("footer", "")
-    print(header, footer)
-    if header or footer:
+
+    if request.method == "POST":
         blog.header_directive = header
         blog.footer_directive = footer
         blog.save()
