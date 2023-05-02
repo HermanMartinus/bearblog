@@ -437,7 +437,7 @@ def render_analytics(request, blog, public=False):
                 blog=blog,
                 pk=post_filter,
                 publish=True,
-            ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+            ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
             hits = Hit.objects.filter(
                 post__blog=blog,
                 post__id=post_filter,
@@ -450,7 +450,7 @@ def render_analytics(request, blog, public=False):
                 blog=blog,
                 pk=post_filter,
                 publish=True,
-            ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+            ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
             hits = Hit.objects.filter(
                 post__blog=blog,
                 post__id=post_filter,
@@ -462,7 +462,7 @@ def render_analytics(request, blog, public=False):
             ).prefetch_related('hit_set', 'upvote_set').filter(
                 blog=blog,
                 publish=True,
-            ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+            ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
 
             hits = Hit.objects.filter(
                 post__blog=blog,
@@ -474,7 +474,7 @@ def render_analytics(request, blog, public=False):
             ).prefetch_related('hit_set', 'upvote_set').filter(
                 blog=blog,
                 publish=True,
-            ).values('pk', 'title', 'hit_count', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+            ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
             hits = Hit.objects.filter(
                 post__blog=blog,
                 created_date__gt=start_date).order_by('created_date')
