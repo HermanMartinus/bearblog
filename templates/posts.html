@@ -11,10 +11,6 @@
 
 {% block canonical %}<link rel="canonical" href="{{ root }}/blog/" />{% endblock %}
 
-{% block imports %}
-{% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
-{% endblock %}
-
 {% block seo %}
 {% if not blog.reviewed %}
 <meta name="robots" content="noindex">
@@ -23,12 +19,17 @@
 
 <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
 
+{% include 'snippets/seo_tags.html' with site_name=blog.title title="Blog" type="website" url=root description=blog.meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
+<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
+{% endblock %}
+
+{% block imports %}
+
 {% if blog.upgraded %}
 {{ blog.header_directive | safe }}
 {% endif %}
 
-{% include 'snippets/seo_tags.html' with site_name=blog.title title="Blog" type="website" url=root description=blog.meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
-<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
+{% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
 {% endblock %}
 
 {% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}

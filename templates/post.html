@@ -20,16 +20,17 @@
 
 <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
 
-{% if blog.upgraded %}
-{{ blog.header_directive | safe }}
-{% endif %}
-
 {% include 'snippets/seo_tags.html' with site_name=blog.title title=post.title type="article" url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
 {% endblock %}
 
 {% block hitcount %}{% if blog.analytics_active and not preview %}url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}"){% endif %}{% endblock %}
 
 {% block imports %}
+
+{% if blog.upgraded %}
+{{ blog.header_directive | safe }}
+{% endif %}
+
 {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
 {% if post.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}
 {% endblock %}

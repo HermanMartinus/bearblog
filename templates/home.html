@@ -20,15 +20,16 @@
 
 <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
 
-{% if blog.upgraded %}
-{{ blog.header_directive | safe }}
-{% endif %}
-
 {% include 'snippets/seo_tags.html' with site_name=blog.title title=blog.title type="website" url=blog.useful_domain description=meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
 <link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
 {% endblock %}
 
 {% block imports %}
+
+{% if blog.upgraded %}
+{{ blog.header_directive | safe }}
+{% endif %}
+
 {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
 {% if blog.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}
 {% endblock %}
