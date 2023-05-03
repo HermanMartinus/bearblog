@@ -2,7 +2,7 @@ import threading
 import bleach
 from bs4 import BeautifulSoup
 from django.contrib.sites.models import Site
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, ReadTimeout
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 import mistune
 import requests
@@ -89,6 +89,8 @@ def check_connection(blog):
             return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities"/>' in response.text)
         except ConnectionError:
             return False
+        except ReadTimeout:
+            return False
         except SystemExit:
             return False
 
@@ -121,7 +123,7 @@ def valid_xml_char_ordinal(c):
         codepoint in (0x9, 0xA, 0xD) or
         0xE000 <= codepoint <= 0xFFFD or
         0x10000 <= codepoint <= 0x10FFFF
-        )
+    )
 
 
 def daterange(start_date, end_date):
