@@ -75,6 +75,10 @@ class Blog(models.Model):
             return f'{self.subdomain}.{Site.objects.get_current().domain}'
 
     @property
+    def is_empty(self):
+        return self.content == "Hello World!" and self.post_set.count() == 0
+
+    @property
     def dynamic_domain(self):
         if self.domain:
             return f'//{self.domain}'

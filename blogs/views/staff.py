@@ -20,7 +20,11 @@ def dashboard(request):
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 
-    blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).values('created_date', 'upgraded_date').order_by('created_date')
+    blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).order_by('created_date')
+
+    for blog in blogs:
+        if blog.is_empty:
+            blogs.exclude(pk=blog.pk)
 
     to_review = Blog.objects.filter(to_review=True).count()
 
@@ -111,11 +115,7 @@ def review_flow(request):
     unreviewed_blogs = []
     for blog in blogs:
         grace_period = timezone.now() - timedelta(days=14)
-        if (
-            blog.content == "Hello World!"
-            and blog.post_count == 0
-        ):
-
+        if (blog.is_empty):
             # Delete empty blogs 14 days old
             if blog.created_date < grace_period:
                 blog.delete()
