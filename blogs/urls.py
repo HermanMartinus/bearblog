@@ -5,12 +5,11 @@ from .views import blog, dashboard, studio, feed, discover, analytics, emailer, 
 
 urlpatterns = [
     path('', blog.home, name='home'),
-    path('review/', staff.review_flow, name='review_flow'),
-    path('review/approve/<pk>', staff.approve, name='review_approve'),
-    path('review/block/<pk>', staff.block, name='review_block'),
-    path('review/delete/<pk>', staff.delete, name='review_delete'),
+    path('staff/review/', staff.review_flow, name='review_flow'),
+    path('staff/review/approve/<pk>', staff.approve, name='review_approve'),
+    path('staff/review/block/<pk>', staff.block, name='review_block'),
+    path('staff/review/delete/<pk>', staff.delete, name='review_delete'),
     path('staff/dashboard/', staff.dashboard, name='staff_dashboard'),
-    path('staff/review_stack', staff.review_stack, name='review_stack'),
 
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('dashboard/', dashboard.dashboard, name='dashboard'),

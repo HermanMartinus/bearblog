@@ -22,6 +22,7 @@ def dashboard(request):
 
     blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).values('created_date', 'upgraded_date').order_by('created_date')
 
+    to_review = Blog.objects.filter(to_review=True).count()
     # SIGNUPS
     date_iterator = start_date
     blogs_count = blogs.annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
@@ -85,7 +86,8 @@ def dashboard(request):
             'signup_chart': signup_chart,
             'upgrade_chart': upgrade_chart,
             'start_date': start_date,
-            'end_date': end_date
+            'end_date': end_date,
+            'to_review': to_review
         }
     )
 
@@ -133,6 +135,7 @@ def review_flow(request):
 def approve(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.reviewed = True
+    blog.to_review = False
     blog.save()
 
     message = request.POST.get("message", "")
@@ -173,29 +176,3 @@ def extract_blog_info(blog):
         'url': blog.useful_domain(),
         'posts': posts_info
     }
-
-
-def review_stack(request):
-    blogs = Blog.objects.filter(reviewed=False, blocked=False).annotate(
-        post_count=Count("post"),
-    ).prefetch_related("post_set").order_by('created_date')
-
-    unreviewed_blogs = []
-    for blog in blogs:
-        grace_period = timezone.now() - timedelta(days=14)
-        if (
-            blog.content == "Hello World!"
-        ):
-            print('Empty')
-            # Delete empty blogs 14 days old
-            # if blog.created_date < grace_period:
-            #     blog.delete()
-        else:
-            delay_period = timezone.now() - timedelta(days=1)
-            if blog.created_date < delay_period:
-                unreviewed_blogs.append(blog)
-
-    # Extract relevant information from unreviewed_blogs
-    unreviewed_blogs_info = [extract_blog_info(blog) for blog in unreviewed_blogs]
-
-    return JsonResponse(unreviewed_blogs_info, safe=False)
