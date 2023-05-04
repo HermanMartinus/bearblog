@@ -23,21 +23,22 @@ def dashboard(request):
     blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).values('created_date', 'upgraded_date').order_by('created_date')
 
     to_review = Blog.objects.filter(to_review=True).count()
-    # SIGNUPS
+
+    # Signups
     date_iterator = start_date
     blogs_count = blogs.annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
 
-    # create dates dict with zero signups
+    # Create dates dict with zero signups
     blog_dict = {}
     while date_iterator <= end_date:
         blog_dict[date_iterator.strftime("%Y-%m-%d")] = 0
         date_iterator += timedelta(days=1)
 
-    # populate dict with signup count
+    # Populate dict with signup count
     for signup in blogs_count:
         blog_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
 
-    # generate chart
+    # Generate chart
     chart_data = []
     for date, count in blog_dict.items():
         chart_data.append({'date': date, 'signups': count})
@@ -50,22 +51,24 @@ def dashboard(request):
     chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
     signup_chart = chart.render_data_uri()
 
-    # UPGRADES
+    total_signups = sum([x['signups'] for x in chart_data])
+
+    # Upgrades
     date_iterator = start_date
     upgrades_count = blogs.annotate(date=TruncDate('upgraded_date')).values('date').annotate(c=Count('date')).order_by()
 
-    # create dates dict with zero upgrades
+    # Create dates dict with zero upgrades
     blog_dict = {}
     while date_iterator <= end_date:
         blog_dict[date_iterator.strftime("%Y-%m-%d")] = 0
         date_iterator += timedelta(days=1)
 
-    # populate dict with signup count
+    # Populate dict with signup count
     for signup in upgrades_count:
         if signup['date']:
             blog_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
 
-    # generate chart
+    # Generate chart
     chart_data = []
     for date, count in blog_dict.items():
         chart_data.append({'date': date, 'upgrades': count})
@@ -77,12 +80,19 @@ def dashboard(request):
     chart.add('Upgrades', mark_list)
     chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
     upgrade_chart = chart.render_data_uri()
+    total_upgrades = sum([x['upgrades'] for x in chart_data])
+
+    # Conversion rate
+    conversion_rate = total_upgrades / total_signups if total_signups > 0 else 0
 
     return render(
         request,
         'staff/dashboard.html',
         {
             'blogs': blogs,
+            'total_signups': total_signups,
+            'total_upgrades': total_upgrades,
+            'conversion_rate': conversion_rate,
             'signup_chart': signup_chart,
             'upgrade_chart': upgrade_chart,
             'start_date': start_date,
