@@ -88,6 +88,7 @@ def dashboard(request):
 
     # Conversion rate
     conversion_rate = total_upgrades / total_signups if total_signups > 0 else 0
+    formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
 
     return render(
         request,
@@ -96,7 +97,7 @@ def dashboard(request):
             'blogs': blogs,
             'total_signups': total_signups,
             'total_upgrades': total_upgrades,
-            'conversion_rate': conversion_rate,
+            'conversion_rate': formatted_conversion_rate,
             'signup_chart': signup_chart,
             'upgrade_chart': upgrade_chart,
             'start_date': start_date,
