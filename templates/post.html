@@ -102,7 +102,9 @@
 
 {% block footer %}
 {% if blog.upgraded and blog.footer_directive %}
+<span id="footer-directive">
 {{ blog.footer_directive | markdown:True | safe }}
+</span>
 {% endif %}
 <span>
     Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
