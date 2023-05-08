@@ -400,7 +400,7 @@ ___
 
 This is a [link](http://www.example.com) and this one opens in a [new tab](tab:https://www.example.com).
 
-![Image](https://i.imgur.com/3jxqrKP.jpeg)'''}
+![Image](https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556746-0.jpeg)'''}
         if blog.post_template:
             form = PostTemplateForm(instance=blog)
         else:
