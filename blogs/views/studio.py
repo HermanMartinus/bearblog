@@ -231,7 +231,7 @@ def create_or_update_post(request, blog, pk, preview=False):
                         except ValueError:
                             error_messages.append('Bad date format. Use YYYY-MM-DD')
                 elif name == 'tags':
-                    tags = value
+                    tags = [tag.strip() for tag in value.split(',')]
                 elif name == 'make_discoverable':
                     if type(value) is bool:
                         post.make_discoverable = value
@@ -285,7 +285,7 @@ def create_or_update_post(request, blog, pk, preview=False):
                 # Add tags after saved
                 post.tags.clear()
                 if tags:
-                    for tag in tags.split(','):
+                    for tag in tags:
                         if tag.strip() != '':
                             post.tags.add(tag.strip())
 
