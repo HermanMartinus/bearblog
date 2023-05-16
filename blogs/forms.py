@@ -235,12 +235,6 @@ class PostForm(forms.ModelForm):
 
 
 class AccountForm(forms.ModelForm):
-    old_editor = forms.BooleanField(
-        label="Use the old editor",
-        required=False,
-        help_text="<br>Note: the old editor does not support real-time previews"
-    )
-
     analytics_active = forms.BooleanField(
         label="Collect analytics",
         required=False,
@@ -255,7 +249,7 @@ class AccountForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('old_editor', 'analytics_active', 'fathom_site_id', 'blog_path')
+        fields = ('analytics_active', 'fathom_site_id', 'blog_path')
 
 
 class AnalyticsForm(forms.ModelForm):

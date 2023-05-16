@@ -89,62 +89,6 @@ def posts_edit(request):
     })
 
 
-@login_required
-def post_new(request):
-    blog = get_object_or_404(Blog, user=request.user)
-
-    if request.method == "POST":
-        form = PostForm(request.user, request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.blog = blog
-            if not post.published_date:
-                post.published_date = timezone.now()
-            post.save()
-            form.save_m2m()
-
-            upvote = Upvote(post=post, ip_address=client_ip(request))
-            upvote.save()
-            return redirect(f"/dashboard/posts/{post.id}/")
-    else:
-        form = PostForm(request.user)
-    return render(request, 'dashboard/post_edit.html', {
-        'form': form,
-        'blog': blog
-    })
-
-
-@login_required
-def post_edit(request, pk):
-    blog = get_object_or_404(Blog, user=request.user)
-
-    post = get_object_or_404(Post, blog=blog, pk=sanitise_int(pk))
-    published_date_old = post.published_date
-    if request.method == "POST":
-        form = PostForm(request.user, request.POST, instance=post)
-        if form.is_valid():
-            post_new = form.save(commit=False)
-            post_new.blog = blog
-            # This prevents the resetting of time to 00:00 if same day edit
-            if (published_date_old and
-                post_new.published_date and
-                    published_date_old.date() == post_new.published_date.date()):
-                post_new.published_date = published_date_old
-            if not post_new.published_date:
-                post_new.published_date = timezone.now()
-            post_new.save()
-            form.save_m2m()
-    else:
-        form = PostForm(request.user, instance=post)
-
-    return render(request, 'dashboard/post_edit.html', {
-        'form': form,
-        'blog': blog,
-        'post': post,
-        'root': blog.useful_domain(),
-    })
-
-
 def post_delete(request, pk):
     blog = get_object_or_404(Blog, user=request.user)
     post = get_object_or_404(Post, blog=blog, pk=sanitise_int(pk))
