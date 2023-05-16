@@ -1,29 +1,21 @@
-from django.db.models.functions import TruncDate
-from django.db.models import Count
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q
-from django.db import DataError, IntegrityError
+from django.db import DataError
 from django.forms import ValidationError
-from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import URLValidator
 
-from datetime import timedelta
+from ipaddr import client_ip
 from random import randint
 import re
-import pygal
-from pygal.style import LightColorizedStyle
-import djqscsv
 import random
 import string
-from ipaddr import client_ip
 
-from blogs.forms import AnalyticsForm, PostTemplateForm
+from blogs.forms import PostTemplateForm
 from blogs.helpers import check_connection, sanitise_int, unmark
-from blogs.models import Blog, Hit, Post, Upvote
+from blogs.models import Blog, Post, Upvote
 
 
 @login_required

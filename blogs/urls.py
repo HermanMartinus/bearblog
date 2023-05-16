@@ -18,7 +18,6 @@ urlpatterns = [
     path('dashboard/directives/', studio.directive_edit, name="directive_edit"),
     path('dashboard/styles/', dashboard.styles, name='styles'),
     path('dashboard/account/', dashboard.account, name='account'),
-    path('dashboard/domain/', dashboard.domain_edit, name='domain'),
     path('dashboard/email-list/', emailer.email_list, name='email_list'),
 
     path('dashboard/analytics/', analytics.analytics, name='analytics'),

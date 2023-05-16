@@ -134,28 +134,6 @@ def upload_image(request):
 
 
 @login_required
-def domain_edit(request):
-    blog = Blog.objects.get(user=request.user)
-
-    if not blog.upgraded:
-        return redirect('/dashboard/upgrade/')
-
-    if request.method == "POST":
-        form = DomainForm(request.POST, instance=blog)
-        if form.is_valid():
-            blog_info = form.save(commit=False)
-            blog_info.save()
-    else:
-        form = DomainForm(instance=blog)
-
-    return render(request, 'dashboard/domain_edit.html', {
-        'form': form,
-        'blog': blog,
-        'root': blog.useful_domain(),
-    })
-
-
-@login_required
 def upgrade(request):
     blog = get_object_or_404(Blog, user=request.user)
 
