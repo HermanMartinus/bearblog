@@ -4,11 +4,12 @@ from django.utils import timezone
 from django.db import IntegrityError
 from datetime import timedelta
 
+from django.db.models.functions import TruncDate
 from blogs.models import Blog, Hit, Post
 from blogs.helpers import daterange, get_user_location
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
-
+from blogs.forms import AnalyticsForm, PostTemplateForm
 from ipaddr import client_ip
 from urllib.parse import urlparse
 import httpagentparser
@@ -16,13 +17,17 @@ import pygal
 import hashlib
 import threading
 
+import pygal
+from pygal.style import LightColorizedStyle
+import djqscsv
+
 
 @login_required
 def analytics(request):
     blog = get_object_or_404(Blog, user=request.user)
 
     if blog.upgraded:
-        return redirect('/studio/analytics/')
+        return analytics_upgraded(request)
 
     time_threshold = False
     chart_data = []
@@ -32,10 +37,10 @@ def analytics(request):
     time_threshold = timezone.now() - timedelta(days=days)
 
     posts = Post.objects.annotate(
-            hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))).filter(
-                blog=blog,
-                publish=True,
-                ).order_by('-hit_count', '-published_date')
+        hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))).filter(
+        blog=blog,
+        publish=True,
+    ).order_by('-hit_count', '-published_date')
 
     hits = Hit.objects.filter(post__blog=blog, created_date__gt=time_threshold)
 
@@ -61,6 +66,115 @@ def analytics(request):
         'posts': posts,
         'blog': blog,
         'chart': chart_render
+    })
+
+
+@login_required
+def analytics_upgraded(request):
+    blog = get_object_or_404(Blog, user=request.user)
+
+    if not blog.upgraded:
+        return redirect('/dashboard/analytics/')
+
+    if request.GET.get('share', False):
+        if request.GET.get('share') == 'public':
+            blog.public_analytics = True
+        else:
+            blog.public_analytics = False
+        blog.save()
+
+    if request.GET.get('export', False):
+        hits = Hit.objects.filter(post__blog=blog).order_by('created_date')
+        return djqscsv.render_to_csv_response(hits)
+    return render_analytics(request, blog)
+
+
+def render_analytics(request, blog, public=False):
+    post_filter = request.GET.get('post', False)
+    referrer_filter = request.GET.get('referrer', False)
+    days_filter = int(request.GET.get('days', 7))
+    start_date = (timezone.now() - timedelta(days=days_filter)).date()
+    end_date = timezone.now().date()
+
+    base_hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date)
+    if post_filter:
+        base_hits = base_hits.filter(post__id=post_filter)
+    if referrer_filter:
+        base_hits = base_hits.filter(referrer=referrer_filter)
+
+    posts = Post.objects.annotate(
+        hit_count=Count('hit', filter=Q(hit__in=base_hits))
+    ).prefetch_related('hit_set', 'upvote_set').filter(
+        blog=blog,
+        publish=True,
+    ).filter(Q(pk=post_filter) if post_filter else Q()
+             ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+
+    hits = base_hits.order_by('created_date')
+    start_date = hits.first().created_date.date() if hits.exists() else start_date
+
+    unique_reads = hits.count()
+    unique_visitors = hits.values('ip_address').distinct().count()
+    on_site = hits.filter(created_date__gt=timezone.now()-timedelta(minutes=4)).count()
+
+    referrers = hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
+    devices = hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
+    browsers = hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
+    countries = hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
+
+    # Build chart data
+
+    hit_dict = hits.annotate(
+        date=TruncDate('created_date')
+    ).values('date').annotate(
+        c=Count('date')
+    ).order_by('date')
+
+    chart_data = []
+    date_range = [start_date + timedelta(days=x) for x in range((end_date - start_date).days + 1)]
+    hit_date_count = {hit['date']: hit['c'] for hit in hit_dict}
+
+    for date in date_range:
+        date_str = date.strftime('%Y-%m-%d')
+        count = hit_date_count.get(date, 0)
+        chart_data.append({'date': date_str, 'hits': count})
+
+    # Render chart
+
+    chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
+    chart.force_uri_protocol = 'http'
+    mark_list = [x['hits'] for x in chart_data]
+    [x['date'] for x in chart_data]
+    chart.add('Reads', mark_list)
+    chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
+    chart_render = chart.render_data_uri()
+
+    if request.method == "POST":
+        form = AnalyticsForm(request.POST, instance=blog)
+        if form.is_valid():
+            blog_info = form.save(commit=False)
+            blog_info.save()
+    else:
+        form = AnalyticsForm(instance=blog)
+
+    return render(request, 'studio/analytics.html', {
+        'public': public,
+        'blog': blog,
+        'posts': posts,
+        'start_date': start_date,
+        'end_date': end_date,
+        'unique_reads': unique_reads,
+        'unique_visitors': unique_visitors,
+        'on_site': on_site,
+        'chart': chart_render,
+        'referrers': referrers,
+        'devices': devices,
+        'browsers': browsers,
+        'countries': countries,
+        'days_filter': days_filter,
+        'post_filter': post_filter,
+        'referrer_filter': referrer_filter,
+        'form': form
     })
 
 

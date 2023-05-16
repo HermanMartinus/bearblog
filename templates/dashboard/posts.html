@@ -7,7 +7,7 @@
 {% block content %}
 <content>
     {% if not blog.reviewed and not blog.to_review and blog.older_than_one_day %}
-    <p style="border: 1px dashed; text-align:center; padding: 5px">
+    <p style="background-color: #fff1f1; text-align:center; padding: 5px">
         <i>
             Want to show up on the
             <a href="https://bearblog.dev/discover/" target="_blank">Discovery feed</a>?
@@ -18,12 +18,12 @@
     {% endif %}
 
     <h1>Posts</h1>
-    <a href="/{% if blog.old_editor %}dashboard{% else %}studio{% endif %}/posts/new">
+    <a href="/dashboard/posts/new">
         <button>
         New post
         </button>
     </a>
-    <a style="float:right;" href="/studio/post-template">
+    <a style="float:right;" href="/dashboard/post-template">
         <button>Edit template</button>
     </a>
     <ul class="post-list">
@@ -36,7 +36,7 @@
                     </time>
                 </i>
             </span>
-            <a href="/{% if blog.old_editor %}dashboard{% else %}studio{% endif %}/posts/{{ post.pk }}">
+            <a href="/dashboard/posts/{{ post.pk }}">
                 {% if post.is_page %}
                     [Page]
                 {% endif %}

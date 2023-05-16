@@ -19,7 +19,7 @@
 		const previewForm = document.createElement('form')
 		previewForm.target = "print_popup"
 		previewForm.method = "POST"
-		previewForm.action = "/studio/preview/?type={% if post %}post{% else %}homepage{% endif %}"
+		previewForm.action = "/dashboard/preview/?type={% if post %}post{% else %}homepage{% endif %}"
 
 		const headerContent = document.createElement("input");
 		headerContent.type = "hidden"

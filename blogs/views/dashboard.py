@@ -23,31 +23,6 @@ from blogs.models import Blog, Post, Stylesheet, Upvote
 
 
 @login_required
-def dashboard(request):
-    try:
-        blog = Blog.objects.get(user=request.user)
-        if not blog.old_editor:
-            return redirect("/studio/")
-
-        if request.method == "POST":
-            form = BlogForm(request.POST, instance=blog)
-            if form.is_valid():
-                blog_info = form.save(commit=False)
-                blog_info.save()
-        else:
-            form = BlogForm(instance=blog)
-
-    except Blog.DoesNotExist:
-        return redirect("/studio/")
-
-    return render(request, 'dashboard/dashboard.html', {
-        'form': form,
-        'blog': blog,
-        'root': blog.useful_domain()
-    })
-
-
-@login_required
 def nav(request):
     blog = get_object_or_404(Blog, user=request.user)
 

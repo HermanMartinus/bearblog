@@ -18,7 +18,7 @@ import tldextract
 import hashlib
 import hmac
 
-from blogs.views.studio import render_analytics
+from blogs.views.analytics import render_analytics
 
 
 def resolve_address(request):
