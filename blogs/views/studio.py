@@ -61,7 +61,6 @@ def parse_raw_homepage(blog, header_content, body_content):
     raw_header = list(filter(None, header_content.split('\r\n')))
 
     # Clear out data
-    blog.title = ''
     blog.domain = ''
     blog.meta_description = ''
     blog.meta_image = ''
