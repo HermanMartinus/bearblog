@@ -7,7 +7,7 @@
 {% block content %}
 
 {% if not blog.upgraded or not blog.older_than_one_day %}
-<p style="background-color: #fff1f1; text-align:center; padding: 5px">
+<p style="background-color: rgb(0,0,0,0.2); text-align:center; padding: 5px">
     {% if not blog.older_than_one_day %}
         <b>Welcome to your Bear Blog dashboard</b>.
         <br>
@@ -109,7 +109,7 @@ custom_meta_tag: &lt;meta name='bear-id' content='baloo' /&gt;</pre>
     <textarea
         name="body_content"
         style="height: 500px;border-top: 1px solid lightgrey;"
-        placeholder="Homepage content..."
+        placeholder="Write something awesome or leave blank to display your blog list..."
     >{{ blog.content }}</textarea>
 
 </form>
