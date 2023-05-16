@@ -20,6 +20,16 @@ input:not([type="submit"]),
     color: inherit;
     padding: 10px;
     font-size: 16px;
+
+    
+}
+
+@media (prefers-color-scheme: dark) {
+    textarea,
+    input:not([type="submit"]),
+    .editable {
+        background-color: #004052;
+    }
 }
 
 .full-width textarea,
