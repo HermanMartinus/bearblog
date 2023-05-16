@@ -42,9 +42,11 @@
 <style>
 	.CodeMirror {
 		height: unset;
-		border: 1px dashed black;
+    background-color: #eceff4;
+    border: none;
+    outline: none;
     border-top: 0;
-		padding: 2px;
+		padding: 10px;
     min-height: 200px;
 	}
 
@@ -60,14 +62,15 @@
     position: sticky;
     top: 0;
     background-color: #fff;
-    border-bottom: 1px dashed;
     margin-bottom: 0;
     z-index: 10;
+
+    @media (prefers-color-scheme: dark) {
+      background-color: #01242e;
+    }
   }
 
-  @media (prefers-color-scheme: dark) {
-    background-color: #01242e;
-  }
+
 </style>
 <script>
   var codemirror = CodeMirror.fromTextArea(document.querySelector('textarea'), {mode: "css"})

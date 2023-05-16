@@ -41,71 +41,41 @@ def studio(request):
             subdomain=slugify(subdomain).replace('_', '-'))
         blog.save()
 
-    error_message = ""
-    info_message = ""
-    raw_content = request.POST.get('raw_content', '')
-    if raw_content:
-        try:
-            parse_raw_homepage(raw_content, blog)
-            blog.last_modified = timezone.now()
-            blog.save()
-        except IntegrityError:
-            error_message = "This bear_domain is already taken"
-        except IndexError:
-            error_message = "One of the header options is invalid"
-        except ValueError as error:
-            error_message = error
-        except DataError as error:
-            error_message = error
+    error_messages = []
+    header_content = request.POST.get('header_content', '')
+    body_content = request.POST.get('body_content', '')
 
-    if blog.domain and not check_connection(blog):
-        info_message = f'''
-        The DNS records for <b>{blog.domain}</b> have not been set up.
-        <h4>Set the following DNS record</h4>
-        <table>
-            <tr>
-                <th>Type</th>
-                <th>Name</th>
-                <th>Content</th>
-                <th>TTL</th>
-            </tr>
-            <tr>
-                <td>CNAME</td>
-                <td><small>{blog.blank_domain()}</small></td>
-                <td><small>domain-proxy.bearblog.dev</small></td>
-                <td>3600</td>
-            </tr>
-        </table>
-        <p>
-            <small>
-                <b>If you're using Cloudflare turn off the proxy (the little orange cloud).</b>
-                <br>
-                It may take some time for the DNS records to propagate.
-                <br>
-                <a href="https://docs.bearblog.dev/custom-domains/" target="_blank">Having issues?</a>
-            </small>
-        </p>
-        '''
+    if header_content:
+        try:
+            error_messages.extend(parse_raw_homepage(blog, header_content, body_content))
+        except IndexError:
+            error_messages.append("One of the header options is invalid")
+        except ValueError as error:
+            error_messages.append(error)
+        except DataError as error:
+            error_messages.append(error)
+
+    info_message = blog.domain and not check_connection(blog)
 
     return render(request, 'studio/studio.html', {
         'blog': blog,
-        'error_message': error_message,
-        'raw_content': raw_content,
+        'error_messages': error_messages,
+        'header_content': header_content,
         'info_message': info_message
     })
 
 
-def parse_raw_homepage(raw_content, blog):
-    raw_header = list(filter(None, raw_content.split('___')[0].split('\r\n')))
+def parse_raw_homepage(blog, header_content, body_content):
+    raw_header = list(filter(None, header_content.split('\r\n')))
 
     # Clear out data
     blog.title = ''
-    blog.subdomain = ''
     blog.domain = ''
     blog.meta_description = ''
     blog.meta_image = ''
     blog.meta_tag = ''
 
+    error_messages = []
     # Parse and populate header data
     for item in raw_header:
         item = item.split(':', 1)
@@ -121,9 +91,12 @@ def parse_raw_homepage(raw_content, blog):
         elif name == 'bear_domain':
             subdomain = slugify(value.split('.')[0]).replace('_', '-')
             if not subdomain:
-                raise ValueError("Please provide a valid bear_domain")
+                error_messages.append("{value} is not a valid bear_domain")
             else:
-                blog.subdomain = subdomain
+                if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).count():
+                    blog.subdomain = subdomain
+                else:
+                    error_messages.append(f"{value} has already been taken")
         elif name == "custom_domain":
             if blog.upgraded:
                 if Blog.objects.filter(domain=value).exclude(pk=blog.pk).count() == 0:
@@ -132,32 +105,31 @@ def parse_raw_homepage(raw_content, blog):
                         validator('http://' + value)
                         blog.domain = value
                     except ValidationError:
-                        raise ValueError('This is an invalid custom_domain')
+                        error_messages.append(f'{value} is an invalid custom_domain')
+                        print("error")
                 else:
-                    raise ValueError("This domain is already taken")
+                    error_messages.append(f"{value} is already registered with another blog")
             else:
-                raise ValueError("Upgrade your blog to add a custom domain")
+                error_messages.append("Upgrade your blog to add a custom domain")
         elif name == 'favicon':
             if len(value) < 20:
                 blog.favicon = value
             else:
-                raise ValueError("Favicon is too long")
+                error_messages.append("Favicon is too long")
         elif name == 'meta_description':
             blog.meta_description = value
         elif name == 'meta_image':
             blog.meta_image = value
         elif name == 'lang':
             blog.lang = value
-        elif name == 'nav':
-            blog.nav = value
         elif name == 'custom_meta_tag':
             pattern = r'<meta\s+(?:[^>]*(?!\b(?:javascript|scripts|url)\b)[^>]*)*>'
             if re.search(pattern, value, re.IGNORECASE):
                 blog.meta_tag = value
             else:
-                raise ValueError("Invalid custom_meta_tag")
+                error_messages.append("Invalid custom_meta_tag")
         else:
-            raise ValueError(f"Unrecognised value: {name}")
+            error_messages.append(f"{name} is an unrecognised header option")
 
     if not blog.title:
         blog.title = "My blog"
@@ -166,7 +138,10 @@ def parse_raw_homepage(raw_content, blog):
     if not blog.favicon:
         blog.favicon = "🐻"
 
-    blog.content = raw_content[raw_content.index('___') + 3:].strip()
+    blog.content = body_content
+    blog.last_modified = timezone.now()
+    blog.save()
+    return error_messages
 
 
 @login_required
@@ -190,6 +165,18 @@ def directive_edit(request):
 def post(request, pk=None):
     blog = get_object_or_404(Blog, user=request.user)
 
+    post_data = create_or_update_post(request, blog, pk)
+
+    return render(request, 'studio/post_edit.html', {
+        'blog': blog,
+        'root': blog.useful_domain(),
+        'tags': post_data['tags'],
+        'post': post_data['post'],
+        'error_messages': post_data['error_messages']
+    })
+
+
+def create_or_update_post(request, blog, pk, preview=False):
     if pk is None:
         post = None
         tags = []
@@ -201,10 +188,12 @@ def post(request, pk=None):
             post = None
             tags = []
 
-    error_message = ""
-    raw_content = request.POST.get("raw_content", "")
+    error_messages = []
+    header_content = request.POST.get("header_content", "")
+    body_content = request.POST.get("body_content", "")
 
-    if raw_content:
+    if header_content:
+        header_content = list(filter(None, header_content.split('\r\n')))
         is_new = False
 
         if post is None:
@@ -212,123 +201,111 @@ def post(request, pk=None):
             is_new = True
 
         try:
-            tags = parse_raw_post(raw_content, post)
+            # Clear out data
+            # post.slug = ''
+            post.alias = ''
+            post.class_name = ''
+            post.canonical_url = ''
+            post.meta_description = ''
+            post.meta_image = ''
+            post.is_page = False
+            post.make_discoverable = True
+            post.lang = ''
+            tags = []
+
+            # Parse and populate header data
+            for item in header_content:
+                item = item.split(':', 1)
+                name = item[0].strip()
+                value = item[1].strip()
+                if str(value).lower() == 'true':
+                    value = True
+                if str(value).lower() == 'false':
+                    value = False
+
+                if name == 'title':
+                    post.title = value
+                elif name == 'link':
+                    post.slug = slugify(value)
+                elif name == 'alias':
+                    post.alias = value
+                elif name == 'published_date':
+                    # Check if previously posted 'now'
+                    value = value.replace('/', '-')
+                    if not str(post.published_date).startswith(value):
+                        try:
+                            post.published_date = timezone.datetime.fromisoformat(value)
+                        except ValueError:
+                            error_messages.append('Bad date format. Use YYYY-MM-DD')
+                elif name == 'tags':
+                    tags = value
+                elif name == 'make_discoverable':
+                    if type(value) is bool:
+                        post.make_discoverable = value
+                    else:
+                        error_messages.append('make_discoverable needs to be "true" or "false"')
+                elif name == 'is_page':
+                    if type(value) is bool:
+                        post.is_page = value
+                    else:
+                        error_messages.append('is_page needs to be "true" or "false"')
+                elif name == 'class_name':
+                    post.class_name = slugify(value)
+                elif name == 'canonical_url':
+                    post.canonical_url = value
+                elif name == 'lang':
+                    post.lang = value
+                elif name == 'meta_description':
+                    post.meta_description = value
+                elif name == 'meta_image':
+                    post.meta_image = value
+                else:
+                    error_messages.append(f"{name} is an unrecognised header option")
+
+            if not post.title:
+                post.title = "New post"
+            if not post.slug:
+                post.slug = slugify(post.title)
+                if not post.slug or post.slug == "":
+                    post.slug = ''.join(random.SystemRandom().choice(string.ascii_letters) for _ in range(10))
+            if not post.published_date:
+                post.published_date = timezone.now()
+
+            post.content = body_content
+
             if Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk).count() > 0:
                 post.slug = post.slug + '-' + str(randint(0, 9))
 
             post.publish = request.POST.get("publish", False) == "true"
             post.last_modified = timezone.now()
 
-            post.save()
+            if preview:
+                return post
+            else:
+                post.save()
 
-            if is_new:
-                # Self-upvote
-                upvote = Upvote(post=post, ip_address=client_ip(request))
-                upvote.save()
+                if is_new:
+                    # Self-upvote
+                    upvote = Upvote(post=post, ip_address=client_ip(request))
+                    upvote.save()
 
-            # Add tags after saved
-            post.tags.clear()
-            if tags:
-                for tag in tags.split(','):
-                    if tag.strip() != '':
-                        post.tags.add(tag.strip())
+                # Add tags after saved
+                post.tags.clear()
+                if tags:
+                    for tag in tags.split(','):
+                        if tag.strip() != '':
+                            post.tags.add(tag.strip())
 
-            return redirect(f"/studio/posts/{post.id}/")
         except ValidationError:
-            error_message = "One of the header options is invalid"
+            error_messages.append("One of the header options is invalid")
         except IndexError:
-            error_message = "One of the header options is invalid"
+            error_messages.append("One of the header options is invalid")
         except ValueError as error:
-            error_message = error
+            error_messages.append(error)
         except DataError as error:
-            error_message = error
+            error_messages.append(error)
 
-    return render(request, 'studio/post_edit.html', {
-        'blog': blog,
-        'root': blog.useful_domain(),
-        'tags': tags,
-        'post': post,
-        'error_message': error_message,
-        'raw_content': raw_content
-    })
-
-
-def parse_raw_post(raw_content, post):
-    raw_header = list(filter(None, raw_content.split('___')[0].split('\r\n')))
-
-    # Clear out data
-    post.slug = ''
-    post.alias = ''
-    post.class_name = ''
-    post.canonical_url = ''
-    post.meta_description = ''
-    post.meta_image = ''
-    post.is_page = False
-    post.make_discoverable = True
-    post.lang = ''
-    tags = []
-
-    # Parse and populate header data
-    for item in raw_header:
-        item = item.split(':', 1)
-        name = item[0].strip()
-        value = item[1].strip()
-        if str(value).lower() == 'true':
-            value = True
-        if str(value).lower() == 'false':
-            value = False
-
-        if name == 'title':
-            post.title = value
-        elif name == 'link':
-            post.slug = slugify(value)
-        elif name == 'alias':
-            post.alias = value
-        elif name == 'published_date':
-            # Check if previously posted 'now'
-            value = value.replace('/', '-')
-            if not str(post.published_date).startswith(value):
-                try:
-                    post.published_date = timezone.datetime.fromisoformat(value)
-                except ValueError:
-                    raise ValueError('Bad date format. Use YYYY-MM-DD')
-        elif name == 'tags':
-            tags = value
-        elif name == 'make_discoverable':
-            if type(value) is bool:
-                post.make_discoverable = value
-            else:
-                raise ValueError('make_discoverable needs to be "true" or "false"')
-        elif name == 'is_page':
-            if type(value) is bool:
-                post.is_page = value
-            else:
-                raise ValueError('is_page needs to be "true" or "false"')
-        elif name == 'class_name':
-            post.class_name = slugify(value)
-        elif name == 'canonical_url':
-            post.canonical_url = value
-        elif name == 'lang':
-            post.lang = value
-        elif name == 'meta_description':
-            post.meta_description = value
-        elif name == 'meta_image':
-            post.meta_image = value
-        else:
-            raise ValueError(f"Unrecognised value: {name}")
-
-    if not post.title:
-        post.title = "New post"
-    if not post.slug:
-        post.slug = slugify(post.title)
-        if not post.slug or post.slug == "":
-            post.slug = ''.join(random.SystemRandom().choice(string.ascii_letters) for _ in range(10))
-    if not post.published_date:
-        post.published_date = timezone.now()
-
-    post.content = raw_content[raw_content.index('___') + 3:].strip()
-
-    return tags
+    return {'post': post, 'tags': tags, 'error_messages': error_messages}
 
 
 @csrf_exempt
@@ -336,29 +313,14 @@ def parse_raw_post(raw_content, post):
 def preview(request):
     blog = get_object_or_404(Blog, user=request.user)
 
-    error_message = ""
-    raw_content = request.POST.get("raw_content", "")
-    post = Post(blog=blog)
+    post = create_or_update_post(request, blog, None, True)
 
-    if raw_content:
-        try:
-            parse_raw_post(raw_content, post)
-        except ValidationError:
-            error_message = "One of the header options is invalid"
-        except IndexError:
-            error_message = "One of the header options is invalid"
-        except ValueError as error:
-            error_message = error
-
-        root = blog.useful_domain()
-        meta_description = post.meta_description or unmark(post.content)
-        full_path = f'{root}/{post.slug}/'
-        canonical_url = full_path
-        if post.canonical_url and post.canonical_url.startswith('https://'):
-            canonical_url = post.canonical_url
-    else:
-        raise Http404()
-
+    root = blog.useful_domain()
+    meta_description = post.meta_description or unmark(post.content)
+    full_path = f'{root}/{post.slug}/'
+    canonical_url = full_path
+    if post.canonical_url and post.canonical_url.startswith('https://'):
+        canonical_url = post.canonical_url
     return render(
         request,
         'post.html',
@@ -372,7 +334,6 @@ def preview(request):
             'meta_description': meta_description,
             'meta_image': post.meta_image or blog.meta_image,
             'preview': True,
-            'error_message': error_message
         }
     )
 
@@ -387,24 +348,7 @@ def post_template(request):
             blog_info = form.save(commit=False)
             blog_info.save()
     else:
-        initial = {'post_template': '''title: Post title
-___
-
-# Big header
-## Medium header
-### Small header
-
-**bold**
-*italics*
-~~strikethrough~~
-
-This is a [link](http://www.example.com) and this one opens in a [new tab](tab:https://www.example.com).
-
-![Image](https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556746-0.jpeg)'''}
-        if blog.post_template:
-            form = PostTemplateForm(instance=blog)
-        else:
-            form = PostTemplateForm(instance=blog, initial=initial)
+        form = PostTemplateForm(instance=blog)
 
     return render(request, 'studio/post_template_edit.html', {
         'blog': blog,

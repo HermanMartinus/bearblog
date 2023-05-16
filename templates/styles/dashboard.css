@@ -12,42 +12,25 @@
 }
 
 textarea,
-input:not([type="submit"]) {
-    background-color: inherit;
+input:not([type="submit"]),
+.editable {
+    background-color: #eceff4;
+    border: none;
+    outline: none;
     color: inherit;
-    border: 1px dashed;
-    padding: 5px;
+    padding: 10px;
     font-size: 16px;
 }
 
 .full-width textarea,
 .full-width input:not([type="submit"], [type="checkbox"], [type="radio"]) {
-    width: calc(100% - 15px);
+    width: calc(100% - 20px);
 }
 
 textarea:required,
 input:required:not([type="submit"]){
-    border: 1px solid;
+    border-left: 1px solid #f99f9f;
 }
-
-textarea.full-screen {
-    position: fixed;
-    background-color: white;
-    top: -2px;
-    bottom: -2px;
-    left: 0;
-    width: calc(100vw - 30px);
-    max-width: 720px;
-    border: 10px solid;
-    border-width: 10px calc(50vw - 370px);
-}
-
-@media only screen and (max-width: 750px) {
-    textarea.full-screen {
-        border-width: 10px;
-    }
-}
-
 
 input[type='checkbox'], input[type='radio'] {
     height: 15px;
@@ -96,7 +79,7 @@ ul.post-list li {
     display: flex;
     align-items: baseline;
     padding: 10px 0;
-    border-bottom: 1px dashed;
+    border-bottom: 1px solid #eceff4;
 }
 
 ul.post-list li span {

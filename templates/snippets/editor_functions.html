@@ -1,21 +1,13 @@
 <input type="file" id="file" hidden multiple accept="image/*" />
-{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/markdown/markdown.min.js"></script>
-<style>
-	.CodeMirror {
-		height: unset;
-		border: 1px dashed black;
-		padding: 10px;
-	}
-</style> {% endcomment %}
+
 <script>
+	const form = document.querySelector('form')
+    form.addEventListener('submit', function() {
+        var header_content = document.getElementById('header_content').innerText;
+        document.getElementById('hidden_header_content').value = header_content;
+    });
+
 	var textarea = document.querySelector('textarea')
-	{% comment %} var codemirror = CodeMirror.fromTextArea(textarea, {
-		mode: "markdown",
-		lineWrapping: true,
-		spellcheck: true
-	})  {% endcomment %}
 	textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
 
 	textarea.addEventListener("scroll", function(event) {
@@ -29,15 +21,22 @@
 		previewForm.method = "POST"
 		previewForm.action = "/studio/preview/?type={% if post %}post{% else %}homepage{% endif %}"
 
-		const contentField = document.createElement("input");
-		contentField.type = "hidden"
-		contentField.name = "raw_content"
-		previewForm.appendChild(contentField)
+		const headerContent = document.createElement("input");
+		headerContent.type = "hidden"
+		headerContent.name = "header_content"
+		previewForm.appendChild(headerContent)
+		document.body.appendChild(previewForm)
+
+		const bodyContent = document.createElement("input");
+		bodyContent.type = "hidden"
+		bodyContent.name = "body_content"
+		previewForm.appendChild(bodyContent)
 		document.body.appendChild(previewForm)
 	
 		previewButton.onclick = event => {
 			window.open('about:blank','print_popup','width=1000,height=800');
-			contentField.value = textarea.value
+			headerContent.value = document.querySelector('#header_content').innerText
+			bodyContent.value = document.querySelector('#body_content').value
 			previewForm.submit()
 		}
 	}

@@ -9,95 +9,102 @@ New post | Bear Blog
 {% endblock %}
 
 {% block content %}
-<content>
-    {% comment %} <h1>
-        {% if post %}
-        Edit post
-        {% else %}
-        New post
-        {% endif %}
-    </h1> {% endcomment %}
-    {% if error_message %}
-    <p style="color:lightsalmon">
-        {{ error_message }}
-    </p>
-    {% endif %}
-    <form method="POST" class="post-form full-width">
-        <p style="line-height: 0">
-            <button onclick="event.preventDefault(); sessionStorage.clear(); window.location = '/dashboard/posts/'">&#8592; Back</button>
-            <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
-            
-            {% if post %}
-                <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}/{{ post.slug }}{% if not post.publish %}?preview=true{% endif %}');">
-                    View{% if not post.publish %} draft{% endif %}
-                </button>
-                <button
-                    style="color: red; float: right;"
-                    onclick="event.preventDefault();if(confirm('Are you sure?')){window.location = '/dashboard/posts/{{ post.pk }}/delete/';}"
-                >
-                    Delete
-                </button>
-            {% endif %}
-            <button type="submit" {% if post.publish %}style="color: lightsalmon;"{% endif %} onclick="document.getElementById('publish').value = false;">
-                {% if post.publish %}
-                Unpublish
-                {% else %}
-                Save as draft
-                {% endif %}
-            </button>
-        </p>
 
-        {% include '../snippets/post_header_options.html' %}
+{% if error_messages %}
+<p style="color:lightsalmon">
+    {% for error_message in error_messages %}
+        {{ error_message }}<br>
+    {% endfor %}
+</p>
+{% endif %}
+
+<form method="POST" class="post-form full-width">
+    <p style="line-height: 0">
+        <button onclick="event.preventDefault(); sessionStorage.clear(); window.location = '/dashboard/posts/'">&#8592; Back</button>
+        <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
         
-        {% csrf_token %}
-        <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden />
-        <textarea
-            name="raw_content"
-            style="width: calc(100% - 12px); height: 500px"
-            rows="10" 
-        >{% if error_message and raw_content  %}{{ raw_content }}{% elif post %}
-title: {{ post.title }}
-link: {{ post.slug }}{% if post.alias %}
-alias: {{ post.alias }}{% endif %}
-published_date: {{ post.published_date|date:"Y-m-d" }}{% if post.canonical_url %}
-canonical_url: {{ post.canonical_url }}{% endif %}{% if post.meta_description %}
-meta_description: {{ post.meta_description }}{% endif %}{% if post.meta_image %}
-meta_image: {{ post.meta_image }}{% endif %}{% if post.lang %}
-lang: {{ post.lang }}{% endif %}{% if tags %}
-tags: {% for tag in tags %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if post.is_page %}
-is_page: {{ post.is_page|lower }}{% endif %}{% if post.class_name %}
-class_name: {{ post.class_name }}{% endif %}{% if not post.make_discoverable %}
-make_discoverable: {{ post.make_discoverable|lower }}{% endif %}
-___
+        {% if post %}
+            <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}/{{ post.slug }}{% if not post.publish %}?preview=true{% endif %}');">
+                View{% if not post.publish %} draft{% endif %}
+            </button>
+            <button
+                style="color: red; float: right;"
+                onclick="event.preventDefault();if(confirm('Are you sure?')){window.location = '/dashboard/posts/{{ post.pk }}/delete/';}"
+            >
+                Delete
+            </button>
+        {% endif %}
+        <button type="submit" {% if post.publish %}style="color: lightsalmon;"{% endif %} onclick="document.getElementById('publish').value = false;">
+            {% if post.publish %}
+            Unpublish
+            {% else %}
+            Save as draft
+            {% endif %}
+        </button>
+    </p>
 
-{{ post.content }}
-{% elif blog.post_template %}{{ blog.post_template }}{% else %}
-title: Post title
-___
+    <details style="font-size: 12px; margin-bottom: 10px;">
+        <summary>
+            Available header options
+        </summary>
+        <pre style="">
+title: I like Bears
+link: i-like-bears
+alias: 2012/01/02/cool-post.html
+canonical_url: https://example.com/i-like-bears
+published_date: 2022-12-30
+is_page: false
+meta_description: Bears are pretty cool, according to science.
+meta_image: https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556746-0.jpeg
+lang: en
+tags: bears, writing, thoughts
+make_discoverable: true</pre>
+        <a href="https://docs.bearblog.dev/home-page" target="_blank">
+            More info
+        </a>
+    </details>
+    
+    {% csrf_token %}
+    <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden />
+    <div
+        id="header_content"
+        class="editable"
+        contenteditable="true"
+        style="margin-bottom:-1px; border-bottom: 1px solid lightgrey;"
+    >
+        <b>title:</b> {{ post.title }}<br>
+        {% if post %}
+        <b>link:</b> {{ post.slug }}{% if post.alias %}<br>
+        <b>alias:</b> {{ post.alias }}{% endif %}<br>
+        <b>published_date:</b> {{ post.published_date|date:"Y-m-d" }}{% if post.canonical_url %}<br>
+        <b>canonical_url:</b> {{ post.canonical_url }}{% endif %}{% if post.meta_description %}<br>
+        <b>meta_description:</b> {{ post.meta_description }}{% endif %}{% if post.meta_image %}<br>
+        <b>meta_image:</b> {{ post.meta_image }}{% endif %}{% if post.lang %}<br>
+        <b>lang:</b> {{ post.lang }}{% endif %}{% if tags %}<br>
+        <b>tags:</b> {% for tag in tags %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if post.is_page %}<br>
+        <b>is_page:</b> {{ post.is_page|lower }}{% endif %}{% if post.class_name %}<br>
+        <b>class_name:</b> {{ post.class_name }}{% endif %}{% if not post.make_discoverable %}<br>
+        <b>make_discoverable:</b> {{ post.make_discoverable|lower }}<br>{% endif %}{% endif %}
+    </div>
 
-# Big header
-## Medium header
-### Small header
+    <input type="hidden" id="hidden_header_content" name="header_content">
 
-**bold**
-*italics*
-~~strikethrough~~
+    <textarea
+        name="body_content"
+        id="body_content"
+        style="height: 500px;border-top: 1px solid lightgrey;"
+    >{% if post %}{{ post.content }}{% else %}{{ blog.post_template }}{% endif %}</textarea>
 
-This is a [link](http://www.example.com) and this one opens in a [new tab](tab:https://www.example.com).
-
-![Image](https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556746-0.jpegg){% endif %}</textarea>
-
-        <span class="helptext">
-            <span>
-                Learn <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>markdown syntax</a>
-            </span>
-            <span style="float:right">
-                <a id='upload-image'>Insert image</a> |
-                <a id="preview">Preview</a>
-            </span>
+    <span class="helptext">
+        <span>
+            Learn <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>markdown syntax</a>
         </span>
-    </form>
-</content>
+        <span style="float:right">
+            <a id='upload-image'>Insert image</a> |
+            <a id="preview">Preview</a>
+        </span>
+    </span>
+</form>
 
 {% include '../snippets/editor_functions.html' with blog=blog post=post%}
 {% endblock %}

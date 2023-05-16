@@ -23,15 +23,41 @@
 
 <h1>Home</h1>
 
-{% if error_message %}
+{% if error_messages %}
 <p style="color:lightsalmon">
-    {{ error_message }}
+    {% for error_message in error_messages %}
+        {{ error_message }}<br>
+    {% endfor %}
 </p>
 {% endif %}
 
 {% if info_message %}
 <p style="color: black">
-    {{ info_message | safe }}
+    The DNS records for <b>{{ blog.domain }}</b> have not been set up.
+    <h4>Set the following DNS record</h4>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Content</th>
+            <th>TTL</th>
+        </tr>
+        <tr>
+            <td>CNAME</td>
+            <td><small>{{ blog.blank_domain }}</small></td>
+            <td><small>domain-proxy.bearblog.dev</small></td>
+            <td>3600</td>
+        </tr>
+    </table>
+    <p>
+        <small>
+            <b>If you're using Cloudflare turn off the proxy (the little orange cloud).</b>
+            <br>
+            It may take some time for the DNS records to propagate.
+            <br>
+            <a href="https://docs.bearblog.dev/custom-domains/" target="_blank">Having issues?</a>
+        </small>
+    </p>
 </p>
 {% endif  %}
 
@@ -45,9 +71,6 @@
     <details style="font-size: 12px; margin-bottom: 10px;">
         <summary>
             Available header options
-            <a href="https://docs.bearblog.dev/home-page" target="_blank" style="text-decoration:none">
-                &#9432;
-            </a>
         </summary>
         <pre style="">
 title: Baloo's blog
@@ -57,28 +80,39 @@ favicon: 🐻
 meta_description: Look for the bear necessities
 meta_image: https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556746-0.jpeg
 lang: en
-custom_meta_tag: &lt;meta name='bear-id' content='baloo' /&gt;
-___</pre>
+custom_meta_tag: &lt;meta name='bear-id' content='baloo' /&gt;</pre>
+        <a href="https://docs.bearblog.dev/home-page" target="_blank" style="text-decoration:none">
+            More info
+        </a>
     </details>
     
     {% csrf_token %}
-    <textarea
-        name="raw_content"
-        style="width: calc(100% - 13px); height: 500px"
-        rows="10"
-    >{% if error_message and raw_content  %}{{ raw_content }}{% else %}
-title: {{ blog.title }}
-bear_domain: {{ blog.blank_bear_domain }}{% if blog.domain %}
-custom_domain: {{ blog.domain }}{% endif %}
-favicon: {{ blog.favicon }}{% if blog.meta_description %}
-meta_description: {{ blog.meta_description }}{% endif %}{% if blog.meta_image %}
-meta_image: {{ blog.meta_image }}{% endif %}{% if blog.lang != 'en' %}
-lang: {{ blog.lang }}{% endif %}{% if blog.meta_tag and blog.meta_tag != "<meta name='' property='' content='' />" %}
-custom_meta_tag: {{ blog.meta_tag }}{% endif %}
-___
 
-{{ blog.content }}{% endif %}</textarea>
+    <div
+        id="header_content"
+        class="editable"
+        contenteditable="true"
+        style="margin-bottom:-1px; border-bottom: 1px solid lightgrey;"
+    >
+        <b>title:</b> {{ blog.title }}<br>
+        <b>bear_domain:</b> {{ blog.blank_bear_domain }}{% if blog.domain %}<br>
+        <b>custom_domain:</b> {{ blog.domain }}{% endif %}<br>
+        <b>favicon:</b> {{ blog.favicon }}{% if blog.meta_description %}<br>
+        <b>meta_description:</b> {{ blog.meta_description }}{% endif %}{% if blog.meta_image %}<br>
+        <b>meta_image:</b> {{ blog.meta_image }}{% endif %}{% if blog.lang != 'en' %}<br>
+        <b>lang:</b> {{ blog.lang }}{% endif %}{% if blog.meta_tag and blog.meta_tag != "<meta name='' property='' content='' />" %}<br>
+        <b>custom_meta_tag:</b> {{ blog.meta_tag }}{% endif %}
+    </div>
+
+    <input type="hidden" id="hidden_header_content" name="header_content">
+
+    <textarea
+        name="body_content"
+        style="height: 500px;border-top: 1px solid lightgrey;"
+    >{{ blog.content }}</textarea>
+
 </form>
+
 <span class="helptext">
     Learn <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>markdown syntax</a>
     {% if blog.upgraded %}
