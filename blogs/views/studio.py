@@ -66,6 +66,7 @@ def parse_raw_homepage(blog, header_content, body_content):
     blog.meta_description = ''
     blog.meta_image = ''
     blog.meta_tag = ''
+    blog.lang = 'en'
 
     error_messages = []
     # Parse and populate header data

@@ -7,6 +7,13 @@
         document.getElementById('hidden_header_content').value = header_content;
     });
 
+	document.addEventListener('keydown', function(event) {
+		if ((event.ctrlKey || event.metaKey) && event.keyCode === 83) {
+			event.preventDefault();
+			return false;
+		}
+	});
+
 	var textarea = document.querySelector('textarea')
 	textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
 
