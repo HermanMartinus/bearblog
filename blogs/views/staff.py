@@ -26,7 +26,7 @@ def dashboard(request):
         if blog.is_empty:
             blogs.exclude(pk=blog.pk)
 
-    to_review = Blog.objects.filter(to_review=True).count()
+    to_review = Blog.objects.filter(to_review=True, reviewed=False, blocked=False).count()
 
     # Signups
     date_iterator = start_date
