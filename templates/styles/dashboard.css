@@ -11,6 +11,22 @@
     font-weight: 400;
 }
 
+.upgrade .bear::before {
+    content: "ᕦʕ.•ᴥ•ʔᕤ";
+    font-weight: 400;
+}
+
+.upgrade:hover .bear::before {
+    content: "ᕙʕ.ಠᴥಠʔᕗ";
+    font-weight: 400;
+}
+
+header nav {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+}
+
 textarea,
 input:not([type="submit"]),
 .editable {

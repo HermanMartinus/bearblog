@@ -1,19 +1,23 @@
-<a href="/dashboard/">Home</a>
-{% if blog %}
-<a href="/dashboard/nav/">Nav</a>
-<a href="/dashboard/posts/">Posts</a>
-<a href="/dashboard/styles/">Styling</a>
-{% if blog.analytics_active %}
-<a href="/dashboard/analytics/">Analytics</a>
-{% endif %}
-<a href="/dashboard/email-list/">Emails</a>
-<a href="/dashboard/account/">Account</a>
-{% endif %}
+<span>
+    <a href="/dashboard/">Home</a>
+    {% if blog %}
+    <a href="/dashboard/nav/">Nav</a>
+    <a href="/dashboard/posts/">Posts</a>
+    <a href="/dashboard/styles/">Themes</a>
+    {% if blog.analytics_active %}
+    <a href="/dashboard/analytics/">Analytics</a>
+    {% endif %}
+    <a href="/dashboard/email-list/">Emails</a>
+    {% endif %}
+    {% if not blog.upgraded %}
+    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear"></span></a>
+    {% endif %}
+</span>
 
-{% if not blog.upgraded %}
-<a href="{% url 'upgrade' %}" style="color:salmon;">Upgrade ᕦʕ•ᴥ• ʔᕤ</a>
-{% endif %}
-<a href="/accounts/logout/">Sign out</a>
+<span>
+    <a href="/dashboard/account/">Account</a>
+    <a href="/accounts/logout/">Sign out</a>
+</span>
 
 {% if not blog.upgraded %}
 {% comment %} Announcement {% endcomment %}
