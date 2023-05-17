@@ -21,11 +21,13 @@
   </div>
 
   <form method="POST" class="post-form full-width">
-    <p class="sticky-tools">
-      <button type="submit" class="save btn btn-default">Publish</button>
-      <button onclick="event.preventDefault();window.open('{{ blog.dynamic_domain }}');">
-        View
-      </button>
+    <p class="helptext sticky" style="bottom:unset; top:-1px;z-index:20;">
+      <span>
+        <button type="submit" class="save btn btn-default">Publish</button>
+        <button onclick="event.preventDefault();window.open('{{ blog.dynamic_domain }}');">
+          View
+        </button>
+      </span>
     </p>
     {% csrf_token %} {{ form.as_p }}
 
@@ -57,19 +59,6 @@
   p:nth-child(3) > label {
     display: none;
   }
-
-  .sticky-tools {
-    position: sticky;
-    top: 0;
-    background-color: #fff;
-    margin-bottom: 0;
-    z-index: 10;
-
-    @media (prefers-color-scheme: dark) {
-      background-color: #01242e;
-    }
-  }
-
 
 </style>
 <script>

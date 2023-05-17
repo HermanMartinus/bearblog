@@ -16,12 +16,12 @@ input:not([type="submit"]),
 .editable {
     background-color: #eceff4;
     border: none;
+    font-family: serif;
+    line-height: 2;
     outline: none;
     color: inherit;
     padding: 10px;
-    font-size: 16px;
-
-    
+    font-size: 18px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -62,9 +62,26 @@ button#toggle-full-screen {
 }
 
 .helptext {
+    display: flex;
+    justify-content: space-between;
     color: #777;
     font-size: small;
 }
+
+.helptext.sticky {
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    padding: 3px 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .helptext.sticky {
+        background-color: var(--background-color);
+    }
+}
+
+
 
 .errorlist {
     color: #eba613;

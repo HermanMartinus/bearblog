@@ -108,18 +108,20 @@ custom_meta_tag: &lt;meta name='bear-id' content='baloo' /&gt;</pre>
 
     <textarea
         name="body_content"
-        style="height: 500px;border-top: 1px solid lightgrey;"
+        style="min-height: 500px;border-top: 1px solid lightgrey;"
         placeholder="Write something awesome or leave blank to display your blog list..."
     >{{ blog.content }}</textarea>
 
 </form>
 
-<span class="helptext">
-    Learn <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>markdown syntax</a>
-    {% if blog.upgraded %}
-    | <a href="/dashboard/directives/" target="_blank">Directives</a>
-    {% endif %}
-    <span style="float:right">
+<span class="helptext sticky">
+    <span>
+        <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown syntax</a>
+        {% if blog.upgraded %}
+        | <a href="/dashboard/directives/" target="_blank">Directives</a>
+        {% endif %}
+    </span>
+    <span>
         <a id='upload-image'>Insert image</a>
     </span>
 </span>

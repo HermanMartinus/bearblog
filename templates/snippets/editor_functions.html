@@ -33,6 +33,16 @@
     });
 
 	var textarea = document.querySelector('textarea')
+
+	textarea.addEventListener('input', autoResize, false);
+
+	function autoResize() {
+		this.style.height = 'auto';
+		this.style.height = this.scrollHeight + 'px';
+	}
+	autoResize.call(textarea);
+
+
 	textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
 
 	textarea.addEventListener("scroll", function(event) {

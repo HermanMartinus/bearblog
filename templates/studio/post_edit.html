@@ -92,15 +92,15 @@ make_discoverable: true</pre>
     <textarea
         name="body_content"
         id="body_content"
-        style="height: 500px;border-top: 1px solid lightgrey;"
+        style="min-height: 500px;border-top: 1px solid lightgrey;"
         placeholder="Write something awesome..."
     >{% if post %}{{ post.content }}{% else %}{{ blog.post_template }}{% endif %}</textarea>
 
-    <span class="helptext">
+    <span class="helptext sticky">
         <span>
-            Learn <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>markdown syntax</a>
+            <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown syntax</a>
         </span>
-        <span style="float:right">
+        <span>
             <a id='upload-image'>Insert image</a> |
             <a id="preview">Preview</a>
         </span>
