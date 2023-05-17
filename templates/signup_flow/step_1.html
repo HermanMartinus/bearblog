@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Create something awesome{% endblock %}
+
+{% block content %}
+<h1>Create something awesome</h1>
+
+{% if error_messages %}
+<p style="color:lightsalmon">
+    {% for error_message in error_messages %}
+        {{ error_message }}<br>
+    {% endfor %}
+</p>
+{% endif %}
+
+<form method="POST" class="full-width">
+    {% csrf_token %}
+    <input
+        type="text"
+        required
+        name="title"
+        placeholder="An awesome title for your blog..."
+        value="{{ title }}"
+    />
+    <p style="display: flex;align-items:end">
+        <input
+            type="text"
+            required
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            name="subdomain"
+            placeholder="Preferred subdomain..."
+            value="{{ subdomain }}"
+            style="max-width:200px; margin-right: 10px;"
+        />
+        <span class="helptext">.bearblog.dev</span>
+    </p>
+
+    <p>
+        <textarea name="content" required placeholder="Write something awesome...">{{ content }}</textarea>
+    </p>
+    
+    <button type="submit">Create &raquo;</button>
+</form>
+
+<script>
+document.querySelector('form input[name=title]').select();
+</script>
+
+{% endblock %}

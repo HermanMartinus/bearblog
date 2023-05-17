@@ -6,21 +6,6 @@
 
 {% block content %}
 
-{% if not blog.upgraded or not blog.older_than_one_day %}
-<p style="background-color: rgb(0,0,0,0.2); text-align:center; padding: 5px">
-    {% if not blog.older_than_one_day %}
-        <b>Welcome to your Bear Blog dashboard</b>.
-        <br>
-        Check out this <a href="https://docs.bearblog.dev/quick-start/" target="_blank">short video guide</a> to get started.
-        <br>
-    {% endif %}
-    {% if not blog.upgraded %}
-    
-    <i><a href="/dashboard/upgrade/">Upgrade</a> for additional features and to support the Tiny Internet!</i>
-    {% endif %}
-</p>
-{% endif %}
-
 <h1>Home</h1>
 
 {% if error_messages %}

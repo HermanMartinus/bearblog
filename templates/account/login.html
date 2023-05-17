@@ -31,8 +31,8 @@ of your existing third party accounts. Or, <a href="{{ signup_url }}">create a B
 {% else %}
 <p>
   <small>
-  {% blocktrans %}No account?
-  <a href="{{ signup_url }}">Create an account</a>{% endblocktrans %}
+  No account?
+  <a href="{% url 'signup_flow' %}">Create an account</a>
   </small>
 </p>
 {% endif %}

@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import blog, dashboard, studio, feed, discover, analytics, emailer, staff
+from .views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow
 
 urlpatterns = [
     path('', blog.home, name='home'),
@@ -12,6 +12,7 @@ urlpatterns = [
     path('staff/dashboard/', staff.dashboard, name='staff_dashboard'),
 
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
+    path('signup/', signup_flow.signup, name="signup_flow"),
 
     path('dashboard/', studio.studio, name="dashboard"),
     path('dashboard/nav/', dashboard.nav, name='nav'),

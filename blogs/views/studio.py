@@ -14,7 +14,7 @@ import random
 import string
 
 from blogs.forms import PostTemplateForm
-from blogs.helpers import check_connection, sanitise_int, unmark
+from blogs.helpers import check_connection, sanitise_int
 from blogs.models import Blog, Post, Upvote
 
 

@@ -1,4 +1,4 @@
-<a href="/dashboard/">Dashboard</a>
+<a href="/dashboard/">Home</a>
 {% if blog %}
 <a href="/dashboard/nav/">Nav</a>
 <a href="/dashboard/posts/">Posts</a>
@@ -8,6 +8,10 @@
 {% endif %}
 <a href="/dashboard/email-list/">Emails</a>
 <a href="/dashboard/account/">Account</a>
+{% endif %}
+
+{% if not blog.upgraded %}
+<a href="{% url 'upgrade' %}" style="color:salmon;">Upgrade ᕦʕ•ᴥ• ʔᕤ</a>
 {% endif %}
 <a href="/accounts/logout/">Sign out</a>
 
