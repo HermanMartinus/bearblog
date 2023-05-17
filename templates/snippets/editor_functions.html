@@ -32,7 +32,7 @@
         }
     });
 
-	var textarea = document.querySelector('textarea')
+	const textarea = document.querySelector('textarea')
 
 	textarea.addEventListener('input', autoResize, false);
 
@@ -42,11 +42,9 @@
 	}
 	autoResize.call(textarea);
 
-
-	textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
-
-	textarea.addEventListener("scroll", function(event) {
-		sessionStorage.setItem('textareaY', textarea.scrollTop)
+	window.scrollTo(0, sessionStorage.getItem('scrollY'))
+	window.addEventListener("scroll", function(event) {
+		sessionStorage.setItem('scrollY', window.scrollY)
 	})
 
 	const previewButton = document.querySelector('#preview')

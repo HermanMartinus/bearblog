@@ -62,7 +62,7 @@
 {% endif  %}
 
 <form method="POST" class="post-form full-width">
-    <p style="line-height: 0">
+    <p class="sticky-controls">
         <button type="submit">Publish</button>
         {% if blog %}
         <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}')">View</button>

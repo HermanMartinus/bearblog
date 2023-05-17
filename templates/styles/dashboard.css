@@ -61,6 +61,14 @@ button#toggle-full-screen {
     float: right;
 }
 
+.sticky-controls {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    line-height: 0;
+    z-index: 10;
+}
+
 .helptext {
     display: flex;
     justify-content: space-between;
@@ -76,7 +84,8 @@ button#toggle-full-screen {
 }
 
 @media (prefers-color-scheme: dark) {
-    .helptext.sticky {
+    .helptext.sticky,
+    .sticky-controls {
         background-color: var(--background-color);
     }
 }

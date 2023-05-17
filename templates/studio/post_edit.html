@@ -19,7 +19,7 @@ New post | Bear Blog
 {% endif %}
 
 <form method="POST" class="post-form full-width">
-    <p style="line-height: 0">
+    <p class="sticky-controls">
         <button onclick="event.preventDefault(); sessionStorage.clear(); window.location = '/dashboard/posts/'">&#8592; Back</button>
         <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
         
