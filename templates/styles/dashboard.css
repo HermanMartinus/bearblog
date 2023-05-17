@@ -27,6 +27,10 @@ header nav {
     justify-content: space-between;
 }
 
+header nav a:last-child {
+    margin-right: 0;
+}
+
 textarea,
 input:not([type="submit"]),
 .editable {
