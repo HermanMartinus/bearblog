@@ -34,7 +34,7 @@
 
 	const textarea = document.querySelector('textarea')
 
-	textarea.addEventListener('input', autoResize, false);
+	{% comment %} textarea.addEventListener('input', autoResize, false);
 
 	function autoResize() {
 		this.style.height = 'auto';
@@ -45,7 +45,7 @@
 	window.scrollTo(0, sessionStorage.getItem('scrollY'))
 	window.addEventListener("scroll", function(event) {
 		sessionStorage.setItem('scrollY', window.scrollY)
-	})
+	}) {% endcomment %}
 
 	const previewButton = document.querySelector('#preview')
 	if (previewButton) {
