@@ -72,8 +72,8 @@ make_discoverable: true</pre>
         contenteditable="true"
         style="margin-bottom:-1px; border-bottom: 1px solid lightgrey;"
     >
-        <b>title:</b> {{ post.title }}<br>
         {% if post %}
+        <b>title:</b> {{ post.title }}<br>
         <b>link:</b> {{ post.slug }}{% if post.alias %}<br>
         <b>alias:</b> {{ post.alias }}{% endif %}<br>
         <b>published_date:</b> {{ post.published_date|date:"Y-m-d" }}{% if post.canonical_url %}<br>
@@ -84,7 +84,8 @@ make_discoverable: true</pre>
         <b>tags:</b> {% for tag in tags %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if post.is_page %}<br>
         <b>is_page:</b> {{ post.is_page|lower }}{% endif %}{% if post.class_name %}<br>
         <b>class_name:</b> {{ post.class_name }}{% endif %}{% if not post.make_discoverable %}<br>
-        <b>make_discoverable:</b> {{ post.make_discoverable|lower }}<br>{% endif %}{% endif %}
+        <b>make_discoverable:</b> {{ post.make_discoverable|lower }}<br>{% endif %}{% elif template_header %}
+        <b>{{ template_header|linebreaksbr }}</b>{% else %}<b>title:</b> <br>{% endif %}
     </div>
 
     <input type="hidden" id="hidden_header_content" name="header_content">
@@ -94,7 +95,7 @@ make_discoverable: true</pre>
         id="body_content"
         style="min-height: 500px;border-top: 1px solid lightgrey;"
         placeholder="Write something awesome..."
-    >{% if post %}{{ post.content }}{% else %}{{ blog.post_template }}{% endif %}</textarea>
+    >{% if post %}{{ post.content }}{% else %}{{ template_body }}{% endif %}</textarea>
 
     <span class="helptext sticky">
         <span>

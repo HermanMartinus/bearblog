@@ -285,12 +285,21 @@ def post(request, pk=None):
         except DataError as error:
             error_messages.append(error)
 
+    template_header = ""
+    template_body = ""
+    if blog.post_template:
+        template_parts = blog.post_template.split("___", 1)
+        if len(template_parts) == 2:
+            template_header, template_body = template_parts
+
     return render(request, 'studio/post_edit.html', {
         'blog': blog,
         'root': blog.useful_domain(),
         'tags': tags,
         'post': post,
-        'error_messages': error_messages
+        'error_messages': error_messages,
+        'template_header': template_header,
+        'template_body': template_body
     })
 
 
