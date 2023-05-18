@@ -39,6 +39,24 @@ Staff Dashboard  ʕง•ᴥ•ʔง
         <span>{{ start_date|date:"j F Y" }}</span>
         <span>{{ end_date|date:"j F Y" }}</span> 
     </span>
+
+    <h2>Empty blogs</h2>
+    <ul>
+        {% for blog in empty_blogs %}
+        <li>
+            <b>{{ blog.title }} </b>{{ blog.bear_domain }}
+            <br>
+            <i>
+                {{ blog.user.email }}
+            </i>
+            <br>
+            {{ blog.content }}
+            <br>
+            <button onclick="window.location.href='{% url 'delete_empty' pk=blog.pk %}'">Delete</button>
+            <br>
+        </li>
+        {% endfor %}
+    </ul>
 </main>
 {% endblock %}
 

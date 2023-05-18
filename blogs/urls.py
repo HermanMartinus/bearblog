@@ -10,6 +10,7 @@ urlpatterns = [
     path('staff/review/block/<pk>', staff.block, name='review_block'),
     path('staff/review/delete/<pk>', staff.delete, name='review_delete'),
     path('staff/dashboard/', staff.dashboard, name='staff_dashboard'),
+    path('staff/dashboard/delete/<pk>', staff.delete_empty, name='delete_empty'),
 
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('signup/', signup_flow.signup, name="signup_flow"),

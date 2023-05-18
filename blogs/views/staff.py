@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from blogs.helpers import send_async_mail
-from django.db.models.functions import TruncDate
+from django.db.models.functions import TruncDate, Length
 from django.http import JsonResponse
 
 from blogs.models import Blog
@@ -90,6 +90,11 @@ def dashboard(request):
     conversion_rate = total_upgrades / total_signups if total_signups > 0 else 0
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
 
+    # Empty blogs
+    one_week_ago = timezone.now() - timedelta(weeks=1)
+    empty_blogs = Blog.objects.annotate(num_posts=Count('post')).annotate(content_length=Length('content')).filter(
+        last_modified__lte=one_week_ago, num_posts=0, content_length__lt=20, upgraded=False).order_by('-created_date')[:100]
+
     return render(
         request,
         'staff/dashboard.html',
@@ -102,7 +107,8 @@ def dashboard(request):
             'upgrade_chart': upgrade_chart,
             'start_date': start_date,
             'end_date': end_date,
-            'to_review': to_review
+            'to_review': to_review,
+            'empty_blogs': empty_blogs
         }
     )
 
@@ -174,6 +180,13 @@ def delete(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.delete()
     return redirect('review_flow')
+
+
+@staff_member_required
+def delete_empty(request, pk):
+    blog = get_object_or_404(Blog, pk=pk)
+    blog.delete()
+    return redirect('staff_dashboard')
 
 
 def extract_blog_info(blog):
