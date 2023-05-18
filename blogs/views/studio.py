@@ -303,144 +303,82 @@ def post(request, pk=None):
     })
 
 
-def create_or_update_post(request, blog, pk, preview=False):
-    if pk is None:
-        post = None
-        tags = []
-    else:
-        try:
-            post = Post.objects.get(blog=blog, pk=sanitise_int(pk))
-            tags = post.tags.all()
-        except Post.DoesNotExist:
-            post = None
-            tags = []
-
-    error_messages = []
-    header_content = request.POST.get("header_content", "")
-    body_content = request.POST.get("body_content", "")
-
-    if header_content:
-        header_content = list(filter(None, header_content.split('\r\n')))
-        is_new = False
-
-        if post is None:
-            post = Post(blog=blog)
-            is_new = True
-
-        try:
-            # Clear out data
-            # post.slug = ''
-            post.alias = ''
-            post.class_name = ''
-            post.canonical_url = ''
-            post.meta_description = ''
-            post.meta_image = ''
-            post.is_page = False
-            post.make_discoverable = True
-            post.lang = ''
-            tags = []
-
-            # Parse and populate header data
-            for item in header_content:
-                item = item.split(':', 1)
-                name = item[0].strip()
-                value = item[1].strip()
-                if str(value).lower() == 'true':
-                    value = True
-                if str(value).lower() == 'false':
-                    value = False
-
-                if name == 'title':
-                    post.title = value
-                elif name == 'link':
-                    post.slug = slugify(value)
-                elif name == 'alias':
-                    post.alias = value
-                elif name == 'published_date':
-                    # Check if previously posted 'now'
-                    value = value.replace('/', '-')
-                    if not str(post.published_date).startswith(value):
-                        try:
-                            post.published_date = timezone.datetime.fromisoformat(value)
-                        except ValueError:
-                            error_messages.append('Bad date format. Use YYYY-MM-DD')
-                elif name == 'tags':
-                    tags = [tag.strip() for tag in value.split(',')]
-                elif name == 'make_discoverable':
-                    if type(value) is bool:
-                        post.make_discoverable = value
-                    else:
-                        error_messages.append('make_discoverable needs to be "true" or "false"')
-                elif name == 'is_page':
-                    if type(value) is bool:
-                        post.is_page = value
-                    else:
-                        error_messages.append('is_page needs to be "true" or "false"')
-                elif name == 'class_name':
-                    post.class_name = slugify(value)
-                elif name == 'canonical_url':
-                    post.canonical_url = value
-                elif name == 'lang':
-                    post.lang = value
-                elif name == 'meta_description':
-                    post.meta_description = value
-                elif name == 'meta_image':
-                    post.meta_image = value
-                else:
-                    error_messages.append(f"{name} is an unrecognised header option")
-
-            if not post.title:
-                post.title = "New post"
-            if not post.slug:
-                post.slug = slugify(post.title)
-                if not post.slug or post.slug == "":
-                    post.slug = ''.join(random.SystemRandom().choice(string.ascii_letters) for _ in range(10))
-            if not post.published_date:
-                post.published_date = timezone.now()
-
-            post.content = body_content
-
-            if Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk).count() > 0:
-                post.slug = post.slug + '-' + str(randint(0, 9))
-
-            post.publish = request.POST.get("publish", False) == "true"
-            post.last_modified = timezone.now()
-
-            if preview:
-                return post
-            else:
-                post.save()
-
-                if is_new:
-                    # Self-upvote
-                    upvote = Upvote(post=post, ip_address=client_ip(request))
-                    upvote.save()
-
-                # Add tags after saved
-                post.tags.clear()
-                if tags:
-                    for tag in tags:
-                        if tag.strip() != '':
-                            post.tags.add(tag.strip())
-
-        except ValidationError:
-            error_messages.append("One of the header options is invalid")
-        except IndexError:
-            error_messages.append("One of the header options is invalid")
-        except ValueError as error:
-            error_messages.append(error)
-        except DataError as error:
-            error_messages.append(error)
-
-    return {'post': post, 'tags': tags, 'error_messages': error_messages}
-
-
 @csrf_exempt
 @login_required
 def preview(request):
     blog = get_object_or_404(Blog, user=request.user)
 
-    post = create_or_update_post(request, blog, None, True)
+    post = Post(blog=blog)
+
+    header_content = request.POST.get("header_content", "")
+    body_content = request.POST.get("body_content", "")
+
+    if header_content:
+        header_content = list(filter(None, header_content.split('\r\n')))
+
+        if post is None:
+            post = Post(blog=blog)
+
+        # Clear out data
+        # post.slug = ''
+        post.alias = ''
+        post.class_name = ''
+        post.canonical_url = ''
+        post.meta_description = ''
+        post.meta_image = ''
+        post.is_page = False
+        post.make_discoverable = True
+        post.lang = ''
+
+        # Parse and populate header data
+        for item in header_content:
+            item = item.split(':', 1)
+            name = item[0].strip()
+            value = item[1].strip()
+            if str(value).lower() == 'true':
+                value = True
+            if str(value).lower() == 'false':
+                value = False
+
+            if name == 'title':
+                post.title = value
+            elif name == 'link':
+                post.slug = slugify(value)
+            elif name == 'alias':
+                post.alias = value
+            elif name == 'published_date':
+                # Check if previously posted 'now'
+                value = value.replace('/', '-')
+                if not str(post.published_date).startswith(value):
+                    post.published_date = timezone.datetime.fromisoformat(value)
+            elif name == 'make_discoverable':
+                post.make_discoverable = value
+            elif name == 'is_page':
+                post.is_page = value
+            elif name == 'class_name':
+                post.class_name = slugify(value)
+            elif name == 'canonical_url':
+                post.canonical_url = value
+            elif name == 'lang':
+                post.lang = value
+            elif name == 'meta_description':
+                post.meta_description = value
+            elif name == 'meta_image':
+                post.meta_image = value
+
+        if not post.title:
+            post.title = "New post"
+        if not post.slug:
+            post.slug = slugify(post.title)
+            if not post.slug or post.slug == "":
+                post.slug = ''.join(random.SystemRandom().choice(string.ascii_letters) for _ in range(10))
+        if not post.published_date:
+            post.published_date = timezone.now()
+
+        post.content = body_content
+
+        if Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk).count() > 0:
+            post.slug = post.slug + '-' + str(randint(0, 9))
 
     root = blog.useful_domain()
     full_path = f'{root}/{post.slug}/'

@@ -21,7 +21,6 @@ def signup(request):
     content = request.POST.get('content', '')
     email = request.POST.get('email', '')
     password = request.POST.get('password', '')
-    print(subdomain)
 
     # Check password valid
     if password and len(password) < 6:
@@ -45,8 +44,7 @@ def signup(request):
         user = User.objects.create_user(username=email, email=email, password=password)
         user.backend = 'django.contrib.auth.backends.ModelBackend'
 
-        blog = Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user, to_review=True)
-        blog.save()
+        Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
 
         # Log in the user
         login(request, user)

@@ -14,11 +14,10 @@
     {% if  user.is_authenticated %}
     <a href="/dashboard/">Dashboard</a>
     {% else %}
-    {% comment %} <a href="{% url 'signup_flow' %}">Sign up</a> {% endcomment %}
-    <a href="/accounts/signup/">Sign up</a>
+    <a href="{% url 'signup_flow' %}">Sign up</a>
+    {% comment %} <a href="/accounts/signup/">Sign up</a> {% endcomment %}
     <a href="/accounts/login/">Log in</a>
     {% endif %}
-    {% comment %} <a>Details</a> {% endcomment %}
     <a href="/discover/">Discover</a>
 </nav>
 <p>
