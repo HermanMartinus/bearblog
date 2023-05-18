@@ -53,6 +53,8 @@ Staff Dashboard  ʕง•ᴥ•ʔง
         <li>
             <b>{{ blog.title }} </b>{{ blog.bear_domain }}
             <br>
+            <small>Created date: {{ blog.created_date }}</small>
+            <br>
             <small>Last modified: {{ blog.last_modified }}</small>
             <br>
             <i>
@@ -64,7 +66,7 @@ Staff Dashboard  ʕง•ᴥ•ʔง
         </li>
         {% endfor %}
     </ul>
-    <button onclick="window.location = '?delete_empty=True'">Delete empty</button>
+    <button onclick="if (confirm('Are you sure?')) {window.location = '{% url 'delete_empty' %}'}">Delete empty</button>
 </main>
 {% endblock %}
 

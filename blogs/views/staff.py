@@ -90,13 +90,7 @@ def dashboard(request):
     conversion_rate = total_upgrades / total_signups if total_signups > 0 else 0
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
 
-    # Empty blogs
-    one_week_ago = timezone.now() - timedelta(weeks=2)
-    empty_blogs = Blog.objects.annotate(num_posts=Count('post')).annotate(content_length=Length('content')).filter(
-        last_modified__lte=one_week_ago, num_posts=0, content_length__lt=20, upgraded=False).order_by('-created_date')[:100]
-
-    if request.GET.get('delete_empty', False):
-        print('Deleting 100 blogs')
+    empty_blogs = get_empty_blogs()
 
     return render(
         request,
@@ -116,6 +110,26 @@ def dashboard(request):
     )
 
 
+def get_empty_blogs():
+    # Empty blogs
+    # Not used in the last 2 weeks
+    # Most recent 100
+    timeperiod = timezone.now() - timedelta(weeks=2)
+    empty_blogs = Blog.objects.annotate(num_posts=Count('post')).annotate(content_length=Length('content')).filter(
+        last_modified__lte=timeperiod, num_posts=0, content_length__lt=20, upgraded=False)[:100]
+
+    return empty_blogs
+
+
+@staff_member_required
+def delete_empty(request):
+    for blog in get_empty_blogs():
+        print(f'Deleting {blog}')
+        blog.user.delete()
+
+    return redirect('staff_dashboard')
+
+
 @staff_member_required
 def review_flow(request):
     blogs = Blog.objects.filter(reviewed=False, blocked=False).annotate(
@@ -124,14 +138,8 @@ def review_flow(request):
 
     unreviewed_blogs = []
     for blog in blogs:
-        grace_period = timezone.now() - timedelta(days=14)
-        if (blog.is_empty):
-            # Delete empty blogs 14 days old
-            if blog.created_date < grace_period:
-                blog.delete()
-        else:
-            if blog.to_review:
-                unreviewed_blogs.append(blog)
+        if blog.to_review:
+            unreviewed_blogs.append(blog)
 
     if unreviewed_blogs:
         blog = unreviewed_blogs[0]
@@ -181,7 +189,7 @@ def block(request, pk):
 @staff_member_required
 def delete(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
-    blog.delete()
+    blog.user.delete()
     return redirect('review_flow')
 
 
