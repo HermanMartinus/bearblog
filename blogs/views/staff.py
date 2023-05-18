@@ -156,7 +156,7 @@ def review_flow(request):
                 'still_to_go': len(unreviewed_blogs)
             })
     else:
-        return HttpResponse("No blogs left to review! \ʕ•ᴥ•ʔ/")
+        return redirect('staff_dashboard')
 
 
 @staff_member_required
