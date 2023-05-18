@@ -91,9 +91,12 @@ def dashboard(request):
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
 
     # Empty blogs
-    one_week_ago = timezone.now() - timedelta(weeks=1)
+    one_week_ago = timezone.now() - timedelta(weeks=2)
     empty_blogs = Blog.objects.annotate(num_posts=Count('post')).annotate(content_length=Length('content')).filter(
         last_modified__lte=one_week_ago, num_posts=0, content_length__lt=20, upgraded=False).order_by('-created_date')[:100]
+
+    if request.GET.get('delete_empty', False):
+        print('Deleting 100 blogs')
 
     return render(
         request,
@@ -180,13 +183,6 @@ def delete(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.delete()
     return redirect('review_flow')
-
-
-@staff_member_required
-def delete_empty(request, pk):
-    blog = get_object_or_404(Blog, pk=pk)
-    blog.delete()
-    return redirect('staff_dashboard')
 
 
 def extract_blog_info(blog):

@@ -76,7 +76,7 @@ class Blog(models.Model):
 
     @property
     def is_empty(self):
-        return self.content == "Hello World!" and self.post_set.count() == 0
+        return not self.upgraded and len(self.content) < 20 and self.post_set.count() == 0
 
     @property
     def dynamic_domain(self):
