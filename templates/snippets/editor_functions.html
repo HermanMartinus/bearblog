@@ -135,7 +135,9 @@
 	{% else %}
 	document.querySelector('#upload-image').onclick = event => {
 	    event.preventDefault()
-	    window.open('/dashboard/upgrade/')
+		if (confirm("You've discovered a Pro feature ʕ•ᴥ•ʔﾉ♡\n\nUpgrade to unlock it and support the Tiny Internet!")) {
+	    	window.open('/dashboard/upgrade/')
+		}
 	}
 	{% endif %}
 </script>
