@@ -36,7 +36,6 @@ input:not([type="submit"]),
 .editable {
     background-color: #eceff4;
     border: none;
-    font-family: serif;
     line-height: 1.7;
     outline: none;
     color: inherit;
