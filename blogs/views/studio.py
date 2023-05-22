@@ -261,17 +261,17 @@ def post(request, pk=None):
             else:
                 post.save()
 
+                # Add tags after saved
+                post.tags.clear()
+                if tags:
+                    for tag in tags:
+                        if tag.strip() != '':
+                            post.tags.add(tag.strip())
+
                 if is_new:
                     # Self-upvote
                     upvote = Upvote(post=post, ip_address=client_ip(request))
                     upvote.save()
-
-                    # Add tags after saved
-                    post.tags.clear()
-                    if tags:
-                        for tag in tags:
-                            if tag.strip() != '':
-                                post.tags.add(tag.strip())
 
                     # Redirect to the new post detail view
                     return redirect('post_edit', pk=post.pk)
