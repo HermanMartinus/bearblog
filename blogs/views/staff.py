@@ -23,9 +23,9 @@ def dashboard(request):
     blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).order_by('created_date')
 
     # Exclude empty blogs
-    for blog in blogs:
-        if blog.is_empty:
-            blogs.exclude(pk=blog.pk)
+    # for blog in blogs:
+    #     if blog.is_empty:
+    #         blogs.exclude(pk=blog.pk)
 
     to_review = Blog.objects.filter(to_review=True, reviewed=False, blocked=False).count()
 
