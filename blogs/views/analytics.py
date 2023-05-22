@@ -97,16 +97,14 @@ def render_analytics(request, blog, public=False):
     end_date = timezone.now().date()
 
     base_hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date)
-    # base_upvotes = Upvote.objects.filter(post__blog=blog, created_date__gt=start_date)
+
     if post_filter:
         base_hits = base_hits.filter(post__id=post_filter)
-        # base_upvotes = base_upvotes.filter(post__id=post_filter)
     if referrer_filter:
         base_hits = base_hits.filter(referrer=referrer_filter)
 
     posts = Post.objects.annotate(
         hit_count=Count('hit', filter=Q(hit__in=base_hits)),
-        # upvote_count=Count('upvote', filter=Q(upvote__in=base_upvotes))
     ).prefetch_related('hit_set', 'upvote_set').filter(
         blog=blog,
         publish=True,

@@ -272,6 +272,7 @@ def post(request, pk=None):
                     # Self-upvote
                     upvote = Upvote(post=post, ip_address=client_ip(request))
                     upvote.save()
+                    post.update_score()
 
                     # Redirect to the new post detail view
                     return redirect('post_edit', pk=post.pk)
