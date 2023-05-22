@@ -46,7 +46,7 @@
                     <br>
                     <small>Published {{ post.published_date|timesince }} ago</small>
                     -
-                    <small><b>{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</b></small>
+                    <small><b>{{ post.upvotes }} toast{{ post.upvotes|pluralize }}</b></small>
                     {% if request.user.is_staff %}
                         <details>
                             <summary></summary>

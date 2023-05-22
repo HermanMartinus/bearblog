@@ -48,9 +48,7 @@ def discover(request):
     if newest:
         # New
         posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-            ).filter(
+            Post.objects.filter(
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
@@ -64,9 +62,7 @@ def discover(request):
     else:
         # Trending
         posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-            ).filter(
+            Post.objects.filter(
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
@@ -95,9 +91,7 @@ def search(request):
 
     if search_string:
         posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-            ).filter(
+            Post.objects.filter(
                 Q(content__icontains=search_string) | Q(title__icontains=search_string),
                 publish=True,
                 hidden=False,
@@ -106,7 +100,7 @@ def search(request):
                 make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
-            .order_by('-upvote_count', "-published_date")
+            .order_by('-upvotes', "-published_date")
             .select_related("blog")[0:50]
         )
 
@@ -128,10 +122,7 @@ def feed(request):
         fg.subtitle("Most recent posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/?newest=True", rel="alternate")
         all_posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-            )
-            .filter(
+            Post.objects.annotate.filter(
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,

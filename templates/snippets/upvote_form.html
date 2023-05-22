@@ -9,7 +9,7 @@
         <button>▵ Toast this post</button>
         {% endif %}
     </form>
-    - <small class="upvote-count">{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</small>
+    - <small class="upvote-count">{{ post.upvotes }} toast{{ post.upvotes|pluralize }}</small>
 </small>
 <script>
     document.querySelector('#upvote-form').addEventListener('submit', (e) => {

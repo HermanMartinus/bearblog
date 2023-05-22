@@ -3,7 +3,7 @@ from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
-from django.db.models import Count
+from django.db.models import Q
 from django.utils import timezone
 from django.conf import settings
 
@@ -137,12 +137,12 @@ def post(request, slug):
 
     try:
         # Find by post slug
-        post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, slug__iexact=slug)[0]
+        post = Post.objects.filter(blog=blog, slug__iexact=slug)[0]
 
     except IndexError:
         # Find by post alias
         try:
-            post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, alias__iexact=slug)[0]
+            post = Post.objects.filter(blog=blog, alias__iexact=slug)[0]
             return redirect(f"/{post.slug}")
         except IndexError:
             return render(request, '404.html', {'blog': blog}, status=404)
@@ -150,10 +150,7 @@ def post(request, slug):
     # Check if upvoted
     ip_address = client_ip(request)
     ip_hash = hashlib.md5(f"{ip_address}-{timezone.now().year}".encode('utf-8')).hexdigest()
-    upvoted = False
-    for upvote in post.upvote_set.all():
-        if upvote.ip_address == ip_hash or upvote.ip_address == ip_address:
-            upvoted = True
+    upvoted = post.upvote_set.filter(Q(ip_address=ip_hash) | Q(ip_address=ip_address)).exists()
 
     root = blog.useful_domain()
     meta_description = post.meta_description or unmark(post.content)

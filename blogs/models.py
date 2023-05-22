@@ -133,7 +133,7 @@ class Post(models.Model):
                 score = (log_of_upvotes) + ((seconds - 1577811600) / (14 * 86400))
                 self.score = score
 
-                self.save()
+        self.save()
         return
 
 
