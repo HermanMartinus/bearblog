@@ -1,12 +1,14 @@
-from html import escape
 from django import template
 from django.template.loader import render_to_string
+from django.utils import dateformat
 
-import mistune
-import lxml
+from html import escape
 from bs4 import BeautifulSoup as HtmlParser
 from lxml.html.clean import Cleaner, defs
 from slugify import slugify
+
+import mistune
+import lxml
 
 register = template.Library()
 
@@ -111,3 +113,10 @@ def clean(markup):
 def unmark(content):
     markup = mistune.html(content)
     return HtmlParser(markup, "lxml").text.strip()[:400] + '...'
+
+
+@register.simple_tag
+def format_date(date, format_string):
+    if not format_string:
+        format_string = 'd M, Y'
+    return dateformat.format(date, format_string)

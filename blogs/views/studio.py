@@ -66,6 +66,7 @@ def parse_raw_homepage(blog, header_content, body_content):
     blog.meta_image = ''
     blog.meta_tag = ''
     blog.lang = 'en'
+    blog.date_format = ''
 
     error_messages = []
     # Parse and populate header data
@@ -120,6 +121,8 @@ def parse_raw_homepage(blog, header_content, body_content):
                 blog.meta_tag = value
             else:
                 error_messages.append("Invalid custom_meta_tag")
+        elif name == 'date_format':
+            blog.date_format = value
         else:
             error_messages.append(f"{name} is an unrecognised header option")
 

@@ -1,4 +1,4 @@
-from django.utils import timezone
+from django.utils import timezone, dateformat
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -40,6 +40,8 @@ class Blog(models.Model):
         choices=((True, 'Overwrite default styles'), (False, 'Extend default styles')),
         verbose_name='')
     favicon = models.CharField(max_length=10, default="🐼")
+
+    date_format = models.CharField(max_length=32, blank=True)
 
     analytics_active = models.BooleanField(default=True)
     fathom_site_id = models.CharField(max_length=8, blank=True)

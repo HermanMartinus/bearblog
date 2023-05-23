@@ -52,7 +52,7 @@
             <span>
                 <i>
                     <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
-                        {{ post.published_date|date:'d M, Y' }}
+                        {% format_date post.published_date blog.date_format %}
                     </time>
                 </i>
             </span>
