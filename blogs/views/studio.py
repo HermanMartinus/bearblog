@@ -3,6 +3,7 @@ from django.db import DataError
 from django.forms import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render, redirect
+from django.http import HttpResponseBadRequest
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import URLValidator
@@ -316,73 +317,81 @@ def preview(request):
 
     header_content = request.POST.get("header_content", "")
     body_content = request.POST.get("body_content", "")
+    try:
+        if header_content:
+            header_content = list(filter(None, header_content.split('\r\n')))
 
-    if header_content:
-        header_content = list(filter(None, header_content.split('\r\n')))
+            if post is None:
+                post = Post(blog=blog)
 
-        if post is None:
-            post = Post(blog=blog)
+            # Clear out data
+            # post.slug = ''
+            post.alias = ''
+            post.class_name = ''
+            post.canonical_url = ''
+            post.meta_description = ''
+            post.meta_image = ''
+            post.is_page = False
+            post.make_discoverable = True
+            post.lang = ''
 
-        # Clear out data
-        # post.slug = ''
-        post.alias = ''
-        post.class_name = ''
-        post.canonical_url = ''
-        post.meta_description = ''
-        post.meta_image = ''
-        post.is_page = False
-        post.make_discoverable = True
-        post.lang = ''
+            # Parse and populate header data
+            for item in header_content:
+                item = item.split(':', 1)
+                name = item[0].strip()
+                value = item[1].strip()
+                if str(value).lower() == 'true':
+                    value = True
+                if str(value).lower() == 'false':
+                    value = False
 
-        # Parse and populate header data
-        for item in header_content:
-            item = item.split(':', 1)
-            name = item[0].strip()
-            value = item[1].strip()
-            if str(value).lower() == 'true':
-                value = True
-            if str(value).lower() == 'false':
-                value = False
+                if name == 'title':
+                    post.title = value
+                elif name == 'link':
+                    post.slug = slugify(value)
+                elif name == 'alias':
+                    post.alias = value
+                elif name == 'published_date':
+                    # Check if previously posted 'now'
+                    value = value.replace('/', '-')
+                    if not str(post.published_date).startswith(value):
+                        post.published_date = timezone.datetime.fromisoformat(value)
+                elif name == 'make_discoverable':
+                    post.make_discoverable = value
+                elif name == 'is_page':
+                    post.is_page = value
+                elif name == 'class_name':
+                    post.class_name = slugify(value)
+                elif name == 'canonical_url':
+                    post.canonical_url = value
+                elif name == 'lang':
+                    post.lang = value
+                elif name == 'meta_description':
+                    post.meta_description = value
+                elif name == 'meta_image':
+                    post.meta_image = value
 
-            if name == 'title':
-                post.title = value
-            elif name == 'link':
-                post.slug = slugify(value)
-            elif name == 'alias':
-                post.alias = value
-            elif name == 'published_date':
-                # Check if previously posted 'now'
-                value = value.replace('/', '-')
-                if not str(post.published_date).startswith(value):
-                    post.published_date = timezone.datetime.fromisoformat(value)
-            elif name == 'make_discoverable':
-                post.make_discoverable = value
-            elif name == 'is_page':
-                post.is_page = value
-            elif name == 'class_name':
-                post.class_name = slugify(value)
-            elif name == 'canonical_url':
-                post.canonical_url = value
-            elif name == 'lang':
-                post.lang = value
-            elif name == 'meta_description':
-                post.meta_description = value
-            elif name == 'meta_image':
-                post.meta_image = value
+            if not post.title:
+                post.title = "New post"
+            if not post.slug:
+                post.slug = slugify(post.title)
+                if not post.slug or post.slug == "":
+                    post.slug = ''.join(random.SystemRandom().choice(string.ascii_letters) for _ in range(10))
+            if not post.published_date:
+                post.published_date = timezone.now()
 
-        if not post.title:
-            post.title = "New post"
-        if not post.slug:
-            post.slug = slugify(post.title)
-            if not post.slug or post.slug == "":
-                post.slug = ''.join(random.SystemRandom().choice(string.ascii_letters) for _ in range(10))
-        if not post.published_date:
-            post.published_date = timezone.now()
+            post.content = body_content
 
-        post.content = body_content
-
-        if Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk).count() > 0:
-            post.slug = post.slug + '-' + str(randint(0, 9))
+            if Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk).count() > 0:
+                post.slug = post.slug + '-' + str(randint(0, 9))
+    except ValidationError:
+        return HttpResponseBadRequest("One of the header options is invalid")
+    except IndexError:
+        return HttpResponseBadRequest("One of the header options is invalid")
+    except ValueError as error:
+        return HttpResponseBadRequest(error)
+    except DataError as error:
+        return HttpResponseBadRequest(error)
 
     root = blog.useful_domain()
     full_path = f'{root}/{post.slug}/'
