@@ -122,7 +122,7 @@ def feed(request):
         fg.subtitle("Most recent posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/?newest=True", rel="alternate")
         all_posts = (
-            Post.objects.annotate.filter(
+            Post.objects.filter(
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
