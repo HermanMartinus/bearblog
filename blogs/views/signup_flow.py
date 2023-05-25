@@ -41,10 +41,14 @@ def signup(request):
         print('Create new blog!')
 
         User = get_user_model()
-        user = User.objects.create_user(username=email, email=email, password=password)
+        user = User.objects.filter(email=email).first()
+        if not user:
+            user = User.objects.create_user(username=email, email=email, password=password)
+
         user.backend = 'django.contrib.auth.backends.ModelBackend'
 
-        Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
+        if not Blog.objects.filter(user=user).exists():
+            Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
 
         # Log in the user
         login(request, user)
