@@ -5,13 +5,12 @@
         {% csrf_token %}
         {% if upvoted %}
         <button
+            class="upvoted"
             disabled=true
-            style="padding:0; margin:0; border:0;background-color:inherit;color: salmon;"
             title="Toasted"
         >
         {% else %}
         <button
-            style="padding:0; margin:0; border:0;background-color:inherit;color: inherit;"
             title="Toast this post"
         >
         {% endif %}
@@ -19,13 +18,30 @@
                 <polyline points="17 11 12 6 7 11"></polyline>
                 <polyline points="17 18 12 13 7 18"></polyline>
             </svg>
-            <br>
             <small class="upvote-count">{{ post.upvotes }}</small>
         </button>
         
     </form>
     
 </small>
+<style>
+#upvote-form button {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background-color: inherit;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#upvote-form button.upvoted {
+    color: salmon;
+}
+.upvote-count {
+    margin-top: -3px;
+}
+</style>
 <script>
     document.querySelector('#upvote-form').addEventListener('submit', (e) => {
         e.preventDefault();
