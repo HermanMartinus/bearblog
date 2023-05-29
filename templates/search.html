@@ -39,9 +39,10 @@
                     <span>(<a href="{{ post.blog.dynamic_domain }}">{{ post.blog.useful_domain }}</a>)</span>
                     <br>
                     <small>Published {{ post.published_date|timesince }} ago</small>
-                    -
-                    <small><b>{{ post.upvotes }} toast{{ post.upvotes|pluralize }}</b></small>
-                    <br>
+                    <small>
+                        <svg style="height:16px;margin: 0 -8px -4px 0;" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>
+                        {{ post.upvotes }}
+                    </small>
                     <p>
                         {{ post.content|unmark }}
                     </p>

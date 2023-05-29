@@ -4,12 +4,27 @@
         <input hidden name="title" style="display:none"/>
         {% csrf_token %}
         {% if upvoted %}
-        <button disabled=true>▵ Toasted</button>
+        <button
+            disabled=true
+            style="padding:0; margin:0; border:0;background-color:inherit;color: salmon;"
+            title="Toasted"
+        >
         {% else %}
-        <button>▵ Toast this post</button>
+        <button
+            style="padding:0; margin:0; border:0;background-color:inherit;color: inherit;"
+            title="Toast this post"
+        >
         {% endif %}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
+                <polyline points="17 11 12 6 7 11"></polyline>
+                <polyline points="17 18 12 13 7 18"></polyline>
+            </svg>
+            <br>
+            <small class="upvote-count">{{ post.upvotes }}</small>
+        </button>
+        
     </form>
-    - <small class="upvote-count">{{ post.upvotes }} toast{{ post.upvotes|pluralize }}</small>
+    
 </small>
 <script>
     document.querySelector('#upvote-form').addEventListener('submit', (e) => {
@@ -21,8 +36,8 @@
         });
         const button = form.querySelector('button')
         button.disabled = true
-        button.innerText = "▵ Toasted"
+        button.style.color = "salmon"
         const upvoteCount = document.querySelector('.upvote-count')
-        upvoteCount.innerHTML = `${(parseInt(upvoteCount.innerHTML.split(" ")[0]) + 1)} toasts`
+        upvoteCount.innerHTML = `${(parseInt(upvoteCount.innerHTML.split(" ")[0]) + 1)}`
     });
 </script>
