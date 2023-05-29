@@ -5,12 +5,13 @@
         {% csrf_token %}
         {% if upvoted %}
         <button
-            class="upvoted"
+            class="upvote-button upvoted"
             disabled=true
             title="Toasted"
         >
         {% else %}
         <button
+            class="upvote-button"
             title="Toast this post"
         >
         {% endif %}
@@ -25,7 +26,7 @@
     
 </small>
 <style>
-#upvote-form button {
+.upvote-button {
     padding: 0;
     margin: 0;
     border: 0;
@@ -35,7 +36,7 @@
     flex-direction: column;
     align-items: center;
 }
-#upvote-form button.upvoted {
+.upvote-button {
     color: salmon;
 }
 .upvote-count {
