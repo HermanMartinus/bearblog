@@ -3,17 +3,23 @@
 <script>
 	const form = document.querySelector('form')
     form.addEventListener('submit', function() {
-        var header_content = document.getElementById('header_content').innerText;
-        document.getElementById('hidden_header_content').value = header_content;
+        addHeaderContentToFormAndSubmit()
     });
+
+	const addHeaderContentToFormAndSubmit = () => {
+		const header_content = document.getElementById('header_content').innerText;
+        document.getElementById('hidden_header_content').value = header_content;
+		form.submit()
+	}
 
 	document.addEventListener('keydown', function(event) {
 		if ((event.ctrlKey || event.metaKey) && event.keyCode === 83) {
 			event.preventDefault();
-			return false;
+			addHeaderContentToFormAndSubmit()
 		}
 	});
 
+	// Handle pasting of HTML into header content
 	document.getElementById('header_content').addEventListener('paste', function(e) {
         e.preventDefault();
 
@@ -32,6 +38,7 @@
         }
     });
 
+	// Handle saving scroll position
 	const textarea = document.querySelector('textarea')
 
 	textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
@@ -109,9 +116,6 @@
 	    var eventSource = xhr.upload || xhr
 
 	    eventSource.addEventListener("progress", function(e){
-	        var current = e.loaded || e.position
-	        var total = e.total || e.totalSize
-	        var percent = parseInt((current/total)*100, 10)
 	        uploadButton.innerText = "Uploading..."
 	    });
 	    xhr.open("POST", target, true)
