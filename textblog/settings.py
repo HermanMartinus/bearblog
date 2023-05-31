@@ -3,8 +3,6 @@ import os
 import dj_database_url
 from django.utils.log import DEFAULT_LOGGING
 from pathlib import Path
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +19,7 @@ DEBUG = (os.environ.get('DEBUG') == 'True')
 # Logging settings
 if not DEBUG:
     def before_send(event, hint):
-        """Don't log django.DisallowedHost errors in Sentry."""
+        """Don't log django.DisallowedHost errors."""
         if 'log_record' in hint:
             if hint['log_record'].name == 'django.security.DisallowedHost':
                 return None
@@ -35,7 +33,7 @@ if not DEBUG:
         'disable_existing_loggers': False,
         'handlers': {
             'slack': {
-                'class': 'profpi.logger.SlackExceptionHandler',
+                'class': 'textblog.logger.SlackExceptionHandler',
                 'level': 'ERROR',
             },
         },
