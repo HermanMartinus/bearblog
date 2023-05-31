@@ -1,10 +1,11 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow
+from .views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, logger
 
 urlpatterns = [
     path('', blog.home, name='home'),
+    path('logger-test/', logger.logger_test),
     path('staff/review/', staff.review_flow, name='review_flow'),
     path('staff/review/approve/<pk>', staff.approve, name='review_approve'),
     path('staff/review/block/<pk>', staff.block, name='review_block'),

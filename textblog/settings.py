@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET')
 HEROKU_BEARER_TOKEN = os.getenv('HEROKU_BEARER_TOKEN')
 LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
-SENTRY_DSN = os.getenv('SENTRY_DSN')
+SLACK_WEBHOOK = os.getenv('SLACK_WEBHOOK')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.environ.get('DEBUG') == 'True')
@@ -34,27 +34,22 @@ if not DEBUG:
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
-            'null': {
-                'class': 'logging.NullHandler',
+            'slack': {
+                'class': 'profpi.logger.SlackExceptionHandler',
+                'level': 'ERROR',
             },
         },
         'loggers': {
             'django.security.DisallowedHost': {
-                'handlers': ['null'],
+                'handlers': ['slack'],
                 'propagate': False,
             },
         },
+        'root': {
+            'handlers': ['slack'],
+            'level': 'ERROR',
+        },
     }
-
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        integrations=[
-            DjangoIntegration(),
-        ],
-        traces_sample_rate=0.1,
-        send_default_pii=True,
-        before_send=before_send
-    )
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
@@ -149,8 +144,9 @@ DATABASES = {
     }
 }
 
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(db_from_env)
+if os.getenv('DATABASE_URL'):
+    db_from_env = dj_database_url.config(conn_max_age=600)
+    DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
