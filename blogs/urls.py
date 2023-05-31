@@ -1,7 +1,8 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, logger
+from .views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow
+from textblog import logger
 
 urlpatterns = [
     path('', blog.home, name='home'),
