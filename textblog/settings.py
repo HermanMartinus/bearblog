@@ -4,7 +4,8 @@ import dj_database_url
 from django.utils.log import DEFAULT_LOGGING
 from pathlib import Path
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+PROJECT_NAME = "🐼 BEARBLOG 🐼"
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
