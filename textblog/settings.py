@@ -41,6 +41,7 @@ if not DEBUG:
         'loggers': {
             'django.security.DisallowedHost': {
                 'handlers': ['slack'],
+                'level': 'CRITICAL',
                 'propagate': False,
             },
         },
