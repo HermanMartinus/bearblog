@@ -189,7 +189,7 @@ def block(request, pk):
 @staff_member_required
 def delete(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
-    blog.user.delete()
+    blog.delete()
     return redirect('review_flow')
 
 
