@@ -125,7 +125,7 @@ def get_empty_blogs():
 def delete_empty(request):
     for blog in get_empty_blogs():
         print(f'Deleting {blog}')
-        blog.user.delete()
+        blog.delete()
 
     return redirect('staff_dashboard')
 
