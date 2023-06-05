@@ -118,7 +118,7 @@ button#toggle-full-screen {
     display: none;
 }
 
-#date-range:target,{
+#date-range:target{
     display: block;
 }
 
