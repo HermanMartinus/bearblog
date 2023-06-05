@@ -41,7 +41,7 @@ of your existing third party accounts. Or, <a href="{{ signup_url }}">create a B
   {% csrf_token %}
   {{ form.as_p }}
   {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
   {% endif %}
   <button class="primaryAction" type="submit">{% trans "Sign In" %} &raquo;</button>
   <p>

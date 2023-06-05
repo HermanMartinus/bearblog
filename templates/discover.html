@@ -53,15 +53,15 @@
                         <details>
                             <summary></summary>
                             <form method="POST" style="display:inline">
-                                <input hidden name="hide-post" value="{{ post.pk }}" />
+                                <input hidden name="hide-post" value="{{ post.pk }}">
                                 <button onclick="event.preventDefault();if(confirm('Hide this post?')){event.target.parentElement.submit()}">Hide post</button>
                             </form>
                             <form method="POST" style="display:inline">
-                                <input hidden name="block-blog" value="{{ post.pk }}" />
+                                <input hidden name="block-blog" value="{{ post.pk }}">
                                 <button onclick="event.preventDefault();if(confirm('Block this blog?')){event.target.parentElement.submit()}">Block blog</button>
                             </form>
                             <form method="POST" style="display:inline">
-                                <input hidden name="boost-post" value="{{ post.pk }}" />
+                                <input hidden name="boost-post" value="{{ post.pk }}">
                                 <button onclick="event.preventDefault();if(confirm('Boost this post?')){event.target.parentElement.submit()}">Boost post</button>
                             </form>
                         </details>

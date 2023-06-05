@@ -68,7 +68,7 @@ body:hover {
 
 <p>
     <i>
-        <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
+        <time datetime="{{ post.published_date|date:'Y-m-d' }}">
             {% format_date post.published_date blog.date_format %}
         </time>
     </i>

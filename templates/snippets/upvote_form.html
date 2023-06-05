@@ -1,7 +1,8 @@
-<small>
-    <form id="upvote-form" action="/upvote/{{ post.pk }}/" method="post" style="display: inline">
-        <input hidden name="pk" value="{{ post.pk }}" style="display:none"/>
-        <input hidden name="title" style="display:none"/>
+
+<form id="upvote-form" action="/upvote/{{ post.pk }}/" method="post" style="display: inline">
+    <small>
+        <input hidden name="pk" value="{{ post.pk }}" style="display:none">
+        <input hidden name="title" style="display:none">
         {% csrf_token %}
         {% if upvoted %}
         <button
@@ -21,10 +22,9 @@
             </svg>
             <small class="upvote-count">{{ post.upvotes }}</small>
         </button>
-        
-    </form>
-    
-</small>
+    </small>        
+</form>
+
 <style>
 .upvote-button {
     padding: 0;

@@ -34,7 +34,7 @@ Herman
 P.S. If you're stuck check out this quick-start video: https://docs.bearblog.dev/quick-start/
         </textarea>
         <br>
-        <input type="submit" value="Approve" /> |
+        <input type="submit" value="Approve"> |
         <small>
             <a href="approve/{{ blog.pk }}?no-email=True">Approve (no email)</a>|
             <a href="block/{{ blog.pk }}">Block</a>|
@@ -64,7 +64,7 @@ P.S. If you're stuck check out this quick-start video: https://docs.bearblog.dev
     <li>
         #{{ forloop.counter }}
         <i>
-            <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
+            <time datetime="{{ post.published_date|date:'Y-m-d' }}">
                 - {{ post.published_date|date:'d M, Y' }}
             </time>
         </i>
