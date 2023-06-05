@@ -32,6 +32,22 @@
 
 {% block custom_styles %}
 {% include 'snippets/styles.html' with blog=blog %}
+.upvote-button {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background-color: inherit;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.upvote-button.upvoted {
+    color: salmon;
+}
+.upvote-count {
+    margin-top: -3px;
+}
 {% if blog.analytics_active and not preview %}
 body:hover {
     border-image: url("/hit/{{ post.pk }}/{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
