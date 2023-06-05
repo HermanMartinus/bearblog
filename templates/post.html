@@ -10,20 +10,15 @@
 
 {% block title %}{{ post.title }} | {{ blog.title }}{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ canonical_url }}" />{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ canonical_url }}">{% endblock %}
 
 {% block seo %}
-{% if not blog.reviewed %}
-<meta name="robots" content="noindex">
-<meta name="robots" content="nofollow">
-{% endif %}
+{% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
-<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
+<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
 
 {% include 'snippets/seo_tags.html' with site_name=blog.title title=post.title type="article" url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
 {% endblock %}
-
-{% block hitcount %}{% if blog.analytics_active and not preview %}url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}"){% endif %}{% endblock %}
 
 {% block imports %}
 
@@ -35,7 +30,15 @@
 {% if post.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}
 {% endblock %}
 
-{% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
+{% block custom_styles %}
+{% include 'snippets/styles.html' with blog=blog %}
+{% if blog.analytics_active and not preview %}
+body:hover {
+    border-image: url("/hit/{{ post.pk }}/{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
+    border-width: 0;
+}
+{% endif %}
+{% endblock %}
 
 {% block heading %}{{ blog.title }}{% endblock %}
 

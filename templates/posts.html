@@ -9,18 +9,15 @@
 
 {% block title %}Blog | {{ blog.title }}{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ root }}/blog/" />{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ root }}/blog/">{% endblock %}
 
 {% block seo %}
-{% if not blog.reviewed %}
-<meta name="robots" content="noindex">
-<meta name="robots" content="nofollow">
-{% endif %}
+{% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
-<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
+<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
 
 {% include 'snippets/seo_tags.html' with site_name=blog.title title="Blog" type="website" url=root description=blog.meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
-<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
+<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss">
 {% endblock %}
 
 {% block imports %}

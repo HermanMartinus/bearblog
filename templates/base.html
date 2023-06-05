@@ -4,23 +4,18 @@
 <head>
   {% block referrer %}
   {% endblock %}
-  {% if request.META.HTTP_HOST == "hmartinus.com" %}
-  <meta name="robots" content="noindex">
-  <meta name="robots" content="nofollow">
-  {% endif %}
-  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" >
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
   
   <title>{% block title %}Bear Blog{% endblock %}</title>
   {% block canonical %}{% endblock %}
   {% block seo %}{% endblock %}
   {% block imports %}{% endblock %}
   
-  <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>{% block favicon %}🐼{% endblock %}</text></svg>">
+  <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E{% block favicon %}🐼{% endblock %}%3C/text%3E%3C/svg%3E">
 
   <style>
-      {% comment %} @import url('https://fonts.googleapis.com/css2?family=Spectral:wght@300;400&display=swap'); {% endcomment %}
       {% autoescape off %}
       {% block custom_styles %}
         {% include 'styles/blog/default.css' %}
@@ -55,12 +50,6 @@
     {% block footer %}
     {% include 'snippets/dashboard_footer.html' %}
     {% endblock %}
-    <style>
-      body:hover {
-        border-image: {% block hitcount %}{% endblock %};
-        border-width: 0;
-      }
-    </style>
   </footer>
 </body>
 </html>
