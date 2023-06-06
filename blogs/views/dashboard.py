@@ -89,6 +89,7 @@ def posts_edit(request):
     })
 
 
+@login_required
 def post_delete(request, pk):
     blog = get_object_or_404(Blog, user=request.user)
     post = get_object_or_404(Post, blog=blog, pk=sanitise_int(pk))
@@ -174,6 +175,7 @@ def upgrade(request):
     })
 
 
+@login_required
 def opt_in_review(request):
     blog = get_object_or_404(Blog, user=request.user)
 
