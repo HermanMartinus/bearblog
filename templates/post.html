@@ -105,11 +105,13 @@ body:hover {
 {% endif %}
 
 {% if not preview %}
+    {% if post.tags %}
     <p class="tags">
     {% for tag in post.tags.all %}
         <a href="/blog/?q={{tag}}">#{{ tag }}</a>
     {% endfor %}
     </p>
+    {% endif %}
 
     {% if post.make_discoverable %}
     {% include 'snippets/upvote_form.html' with post=post upvoted=upvoted %}
