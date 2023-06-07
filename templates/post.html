@@ -105,7 +105,7 @@ body:hover {
 {% endif %}
 
 {% if not preview %}
-    {% if post.tags %}
+    {% if post.tags.count > 0 %}
     <p class="tags">
     {% for tag in post.tags.all %}
         <a href="/blog/?q={{tag}}">#{{ tag }}</a>
