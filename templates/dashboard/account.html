@@ -5,37 +5,35 @@
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<content>
-    <h1>Account</h1>
-    <form method="POST" class="post-form full-width">{% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Save</button>
-    </form>
-    <p>
-        <a href="/accounts/email/">Update email address</a>
-    </p>
-    <p>
-        <a href="/accounts/password/change/">Change password</a>
-    </p>
-    <p>
-        <a href="?export=true" download>Download all blog information</a>
-    </p>
+<h1>Account</h1>
+<form method="POST" class="post-form full-width">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="save btn btn-default">Save</button>
+</form>
+<p>
+    <a href="/accounts/email/">Update email address</a>
+</p>
+<p>
+    <a href="/accounts/password/change/">Change password</a>
+</p>
+<p>
+    <a href="?export=true" download>Download all blog information</a>
+</p>
 
-    <p>
-        <a href="{% url 'user_delete' %}">Delete account</a>
-        {% if blog.upgraded %}
-        <br>
-        <small class="help-text">
-            Ensure your subscription is cancelled on
-            <a href="https://app.lemonsqueezy.com/my-orders/" target="_blank">LemonSqueezy</a>
-            before deleting your account.
-        </small>
-        {% endif %}
-    </p>
-    <p>
-        If you have any requests use the
-        <a href="https://bear.nolt.io" target="_blank">suggestions board</a>
-        or if you've found a bug pop me an <a href="mailto:herman@bearblog.dev">email</a>.
-    </p>
-</content>
+<p>
+    <a href="{% url 'user_delete' %}">Delete account</a>
+    {% if blog.upgraded %}
+    <br>
+    <small class="help-text">
+        Ensure your subscription is cancelled on
+        <a href="https://app.lemonsqueezy.com/my-orders/" target="_blank">LemonSqueezy</a>
+        before deleting your account.
+    </small>
+    {% endif %}
+</p>
+<p>
+    If you have any requests use the
+    <a href="https://bear.nolt.io" target="_blank">suggestions board</a>
+    or if you've found a bug pop me an <a href="mailto:herman@bearblog.dev">email</a>.
+</p>
 {% endblock %}

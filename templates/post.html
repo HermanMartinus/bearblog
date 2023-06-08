@@ -90,12 +90,9 @@ body:hover {
     </i>
 </p>
 {% endif %}
-
-<content>
 {% pygmentify %}
     {{ content | markdown:blog.upgraded | safe }}
 {% endpygmentify %}
-</content>
 {% if canonical_url != full_path %}
 <p>
     <small>

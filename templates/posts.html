@@ -36,41 +36,40 @@
 {% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
 
 {% block content %}
-<content>
-    {% if query %}
-    <h3 style="margin-bottom:0">Filtering for "{{ query }}"</h3>
-    <small>
-    <a href="/blog/">Remove filter</a>
-    </small>
-    {% endif %}
-    <ul class="blog-posts">
-        {% for post in posts %}
-        <li>
-            <span>
-                <i>
-                    <time datetime="{{ post.published_date|date:'Y-m-d' }}">
-                        {% format_date post.published_date blog.date_format %}
-                    </time>
-                </i>
-            </span>
-            <a href="/{{ post.slug }}/">{{ post.title }}</a>
-        </li>
-        {% empty %}
-        <li>
-            No posts yet
-        </li>
+
+{% if query %}
+<h3 style="margin-bottom:0">Filtering for "{{ query }}"</h3>
+<small>
+<a href="/blog/">Remove filter</a>
+</small>
+{% endif %}
+<ul class="blog-posts">
+    {% for post in posts %}
+    <li>
+        <span>
+            <i>
+                <time datetime="{{ post.published_date|date:'Y-m-d' }}">
+                    {% format_date post.published_date blog.date_format %}
+                </time>
+            </i>
+        </span>
+        <a href="/{{ post.slug }}/">{{ post.title }}</a>
+    </li>
+    {% empty %}
+    <li>
+        No posts yet
+    </li>
+    {% endfor %}
+</ul>
+{% if not query %}
+<small>
+    <div class="tags">
+        {% for tag in tags %}
+            <a href="/blog/?q={{ tag }}">#{{ tag }}</a>
         {% endfor %}
-    </ul>
-    {% if not query %}
-    <small>
-        <div class="tags">
-            {% for tag in tags %}
-                <a href="/blog/?q={{ tag }}">#{{ tag }}</a>
-            {% endfor %}
-        </div>
-    </small>
-    {% endif %}
-</content>
+    </div>
+</small>
+{% endif %}
 
 {% endblock %}
 

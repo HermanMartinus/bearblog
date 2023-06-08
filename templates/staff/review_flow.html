@@ -54,10 +54,10 @@ P.S. If you're stuck check out this quick-start video: https://docs.bearblog.dev
 <br>
 <a href="mailto:{{ blog.user.email }}">{{ blog.user.email }}</a>
 <p><b>Created {{ blog.created_date | timesince }} ago</b></p>
-<content>
-    <nav>{{ blog.nav | markdown | safe }}</nav>
-    {{ content | markdown | safe }}
-</content>
+
+<nav>{{ blog.nav | markdown | safe }}</nav>
+{{ content | markdown | safe }}
+
 
 <ul style="padding-bottom: 300px">
     {% for post in posts %}

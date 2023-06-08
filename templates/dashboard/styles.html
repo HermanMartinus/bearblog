@@ -5,37 +5,34 @@
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<content>
-  <h1>Themes</h1>
-  <div
-    style="display: grid;grid-template-columns: 145px 200px 145px 200px;grid-gap: 0 27px;overflow-x: scroll;padding-bottom: 20px;"
-  >
-    {% for style in stylesheets %}
-    {{ style.title }}
+<h1>Themes</h1>
+<div
+  style="display: grid;grid-template-columns: 145px 200px 145px 200px;grid-gap: 0 27px;overflow-x: scroll;padding-bottom: 20px;"
+>
+  {% for style in stylesheets %}
+  {{ style.title }}
+  <span>
+    <button onclick="preview('{{ style.identifier }}')">Preview</button>
+    <button onclick="setStyle('{{ style.identifier }}')">Apply theme</button> 
+  </span>
+  {% endfor %}
+</div>
+
+<form method="POST" class="post-form full-width">
+  <p class="sticky-controls">
     <span>
-      <button onclick="preview('{{ style.identifier }}')">Preview</button>
-      <button onclick="setStyle('{{ style.identifier }}')">Apply theme</button> 
+      <button type="submit" class="save btn btn-default">Publish</button>
+      <button onclick="event.preventDefault();window.open('{{ blog.dynamic_domain }}');">
+        View
+      </button>
     </span>
-    {% endfor %}
-  </div>
+  </p>
+  {% csrf_token %} {{ form.as_p }}
 
-  <form method="POST" class="post-form full-width">
-    <p class="sticky-controls">
-      <span>
-        <button type="submit" class="save btn btn-default">Publish</button>
-        <button onclick="event.preventDefault();window.open('{{ blog.dynamic_domain }}');">
-          View
-        </button>
-      </span>
-    </p>
-    {% csrf_token %} {{ form.as_p }}
-
-      <span class="helptext">
-        <b>If extending styling, ensure your styling caters to existing dark mode styles.</b>
-      </span>
-  </form>
-
-</content>
+    <span class="helptext">
+      <b>If extending styling, ensure your styling caters to existing dark mode styles.</b>
+    </span>
+</form>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">

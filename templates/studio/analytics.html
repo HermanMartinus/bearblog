@@ -10,149 +10,147 @@
 {% endblock %}
 
 {% block content %}
-<content>
-    <h1>Analytics{% if public %} for {{ blog.title }}{% endif %}</h1>
-    <p>
-        <b>Reading now:</b> {{ on_site|intcomma }}
-    </p>
-    <span style="float:right; padding: 5px 0">
-        <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last week</button>
-        <button onclick="window.location = '?days=30{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last month</button>
-        <button onclick="window.location = '?days=60{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 3 months</button>
-        <button onclick="window.location = '?days=180{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 6 months</button>
-        <button onclick="window.location = '?days=365{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last year</button>
-        <button onclick="window.location = '?days=99999{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">All time</button>
-    </span>
-    <embed type="image/svg+xml" src= {{ chart|safe }} />
-    <span class="helptext" style="display: flex; justify-content:space-between;">
-        <span>{{ start_date|date:"j F Y" }}</span>
-        <span>{{ end_date|date:"j F Y" }}</span> 
-    </span>
+<h1>Analytics{% if public %} for {{ blog.title }}{% endif %}</h1>
+<p>
+    <b>Reading now:</b> {{ on_site|intcomma }}
+</p>
+<span style="float:right; padding: 5px 0">
+    <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last week</button>
+    <button onclick="window.location = '?days=30{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last month</button>
+    <button onclick="window.location = '?days=60{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 3 months</button>
+    <button onclick="window.location = '?days=180{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 6 months</button>
+    <button onclick="window.location = '?days=365{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last year</button>
+    <button onclick="window.location = '?days=99999{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">All time</button>
+</span>
+<embed type="image/svg+xml" src= {{ chart|safe }} />
+<span class="helptext" style="display: flex; justify-content:space-between;">
+    <span>{{ start_date|date:"j F Y" }}</span>
+    <span>{{ end_date|date:"j F Y" }}</span> 
+</span>
 
-    <p>
-    {% if post_filter %}
-        <small>Post: <b>{{ posts.first.title }}</b></small>
-        <a href="?days={{days_filter}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}"><button>Remove filter</button></a>
-        <br>
-    {% endif %}
-    {% if referrer_filter %}
-        <small>Referrer: <b>{{ referrer_filter }}</b></small>
-        <a href="?days={{days_filter}}{% if post_filter %}&post={{post_filter}}{% endif %}"><button>Remove filter</button></a>
-    {% endif %}
-    </p>
+<p>
+{% if post_filter %}
+    <small>Post: <b>{{ posts.first.title }}</b></small>
+    <a href="?days={{days_filter}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}"><button>Remove filter</button></a>
+    <br>
+{% endif %}
+{% if referrer_filter %}
+    <small>Referrer: <b>{{ referrer_filter }}</b></small>
+    <a href="?days={{days_filter}}{% if post_filter %}&post={{post_filter}}{% endif %}"><button>Remove filter</button></a>
+{% endif %}
+</p>
 
-    <p>
-        <b>Visitors:</b> {{ unique_visitors|intcomma }}
-        <br>
-        <b>Reads:</b> {{ unique_reads|intcomma }}
-    </p>
+<p>
+    <b>Visitors:</b> {{ unique_visitors|intcomma }}
+    <br>
+    <b>Reads:</b> {{ unique_reads|intcomma }}
+</p>
 
-    <div style="display:flex;flex-flow:row wrap;justify-content:space-between; font-size: 12px;">
-        <div style="width: 340px">
-            <h3>Pages</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: auto;">
-                {% for post in posts %}
-                <li style="display:flex;justify-content:space-between;padding:5px 0;">
-                    <span>
-                        {% if post.hit_count > 0 %}
-                        <a href="?days={{days_filter}}&post={{post.pk}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">
-                            {{post.title}}
-                        </a>
-                        {% else %}
+<div style="display:flex;flex-flow:row wrap;justify-content:space-between; font-size: 12px;">
+    <div style="width: 340px">
+        <h3>Pages</h3>
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto;">
+            {% for post in posts %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                <span>
+                    {% if post.hit_count > 0 %}
+                    <a href="?days={{days_filter}}&post={{post.pk}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">
                         {{post.title}}
-                        {% endif %}
-                        <small>(▵{{ post.upvotes }})</small>
-                        <a href="{{ blog.dynamic_domain }}/{{ post.slug }}" target="_blank">↪</a>
-                    </span>
-                    <span>{{post.hit_count|intcomma}}</span>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div style="width: 340px">
-            <h3>Referrers</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: auto;word-break:break-all;">
-                {% for referrer in referrers %}
-                <li style="display:flex;justify-content:space-between;padding:5px 0;">
-                    <span>
-                        <a href="?days={{ days_filter }}&referrer={{ referrer.referrer }}{% if post_filter %}&post={{ post_filter }}{% endif %}">{{ referrer.referrer }}</a>
-                        <a href="{{ referrer.referrer }}" target="_blank">↪</a>
-                    </span>
-                    <span>{{ referrer.count|intcomma }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
+                    </a>
+                    {% else %}
+                    {{post.title}}
+                    {% endif %}
+                    <small>(▵{{ post.upvotes }})</small>
+                    <a href="{{ blog.dynamic_domain }}/{{ post.slug }}" target="_blank">↪</a>
+                </span>
+                <span>{{post.hit_count|intcomma}}</span>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
+    <div style="width: 340px">
+        <h3>Referrers</h3>
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto;word-break:break-all;">
+            {% for referrer in referrers %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                <span>
+                    <a href="?days={{ days_filter }}&referrer={{ referrer.referrer }}{% if post_filter %}&post={{ post_filter }}{% endif %}">{{ referrer.referrer }}</a>
+                    <a href="{{ referrer.referrer }}" target="_blank">↪</a>
+                </span>
+                <span>{{ referrer.count|intcomma }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
-    <div style="padding-top:20px;display:flex; flex-flow: row wrap;justify-content:space-between; font-size: 12px;">
-        <div style="width:220px">
-            <h3>Devices</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: auto">
-                {% for device in devices %}
-                <li style="display:flex;justify-content:space-between;padding:5px 0;">
-                    {{ device.device }}
-                    <span>{{ device.count|intcomma }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div style="width:220px">
-            <h3>Browsers</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: auto">
-                {% for browser in browsers %}
-                <li style="display:flex;justify-content:space-between;padding:5px 0;">
-                    {{ browser.browser }}
-                    <span>{{ browser.count|intcomma }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div style="width:220px">
-            <h3>Countries</h3>
-            <ul style="padding: 0;max-height: 300px;overflow-y: auto">
-                {% for country in countries %}
-                <li style="display:flex;justify-content:space-between;padding:5px 0;">
-                    {{ country.country }}
-                    <span>{{ country.count|intcomma }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
+<div style="padding-top:20px;display:flex; flex-flow: row wrap;justify-content:space-between; font-size: 12px;">
+    <div style="width:220px">
+        <h3>Devices</h3>
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto">
+            {% for device in devices %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                {{ device.device }}
+                <span>{{ device.count|intcomma }}</span>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
-    {% if not public %}
-    <hr>
-    <small>
-        <details>
-            <summary>Analytics settings</summary>
-        
-            <p>
-                {% if blog.public_analytics %}
-                Public analytics available at 
-                <a href="{{blog.dynamic_domain}}/public-analytics/" target="_blank">{{ blog.useful_domain }}/public-analytics/</a>
-                <br>
-                <button onclick="window.location = '?share=private'">Make analytics private</button>
-                {% else %}
-                <button onclick="window.location = '?share=public'">Make analytics public</button>
-                {% endif %}
-                <button onclick="window.open('?export=True')">Export all</button>
-            </p>
-            <hr>
-            <p>
-                <b>Need more in-depth analytics with minute-by-minute logs, time-on-site, and granular referrers?</b>
-                <br>
-                <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a> is a great, privacy respecting analytics tool.
-                <br>
-                Sign up with the above link to get $10 off.
-                <form method="POST" class="post-form">{% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="save btn btn-default">Save</button>
-                </form>    
-            </p>
-        </details>
-    </small>
-    {% endif %}
-</content>
+    <div style="width:220px">
+        <h3>Browsers</h3>
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto">
+            {% for browser in browsers %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                {{ browser.browser }}
+                <span>{{ browser.count|intcomma }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div style="width:220px">
+        <h3>Countries</h3>
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto">
+            {% for country in countries %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                {{ country.country }}
+                <span>{{ country.count|intcomma }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% if not public %}
+<hr>
+<small>
+    <details>
+        <summary>Analytics settings</summary>
+    
+        <p>
+            {% if blog.public_analytics %}
+            Public analytics available at 
+            <a href="{{blog.dynamic_domain}}/public-analytics/" target="_blank">{{ blog.useful_domain }}/public-analytics/</a>
+            <br>
+            <button onclick="window.location = '?share=private'">Make analytics private</button>
+            {% else %}
+            <button onclick="window.location = '?share=public'">Make analytics public</button>
+            {% endif %}
+            <button onclick="window.open('?export=True')">Export all</button>
+        </p>
+        <hr>
+        <p>
+            <b>Need more in-depth analytics with minute-by-minute logs, time-on-site, and granular referrers?</b>
+            <br>
+            <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a> is a great, privacy respecting analytics tool.
+            <br>
+            Sign up with the above link to get $10 off.
+            <form method="POST" class="post-form">{% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="save btn btn-default">Save</button>
+            </form>    
+        </p>
+    </details>
+</small>
+{% endif %}
 {% endblock %}
 
 

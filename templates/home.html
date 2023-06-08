@@ -45,11 +45,9 @@
 {% endif %}
 
 {% if blog.content %}
-<content>
 {% pygmentify %}
     {{ blog.content | markdown:blog.upgraded | safe }}
 {% endpygmentify %}
-</content>
 {% else %}
 <ul class="blog-posts">
     {% for post in posts %}
