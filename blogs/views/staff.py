@@ -112,9 +112,9 @@ def dashboard(request):
 
 def get_empty_blogs():
     # Empty blogs
-    # Not used in the last 2 weeks
+    # Not used in the last 5 weeks
     # Most recent 100
-    timeperiod = timezone.now() - timedelta(weeks=2)
+    timeperiod = timezone.now() - timedelta(weeks=5)
     empty_blogs = Blog.objects.annotate(num_posts=Count('post')).annotate(content_length=Length('content')).filter(
         last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=20, upgraded=False, custom_styles="").order_by('-created_date')[:100]
 
