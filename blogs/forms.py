@@ -266,7 +266,7 @@ class AnalyticsForm(forms.ModelForm):
 
 class PostTemplateForm(forms.ModelForm):
     post_template = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 20, 'cols': 40, 'placeholder': "title: \nmeta_desciption: \n___\nHello world!"}),
+        widget=forms.Textarea(attrs={'rows': 20, 'cols': 40, 'placeholder': "title: \nmeta_description: \n___\nHello world!"}),
         required=False,
         label='',
         help_text="This will pre-populate on all new posts. Separate header and body content with ___."
