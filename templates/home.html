@@ -38,7 +38,7 @@
 {% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
 
 {% block content %}
-{% if request.user == blog.user %}
+{% if request.user == blog.user and not preview %}
 <a href="/dashboard/" target="_blank" style="position: fixed;right: 0;top: 0;padding: 10px;color: lightgrey;text-decoration: none;font-size: 20px;">✎</a>
 {% endif %}
 

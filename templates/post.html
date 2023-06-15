@@ -70,7 +70,7 @@ body:hover {
     </small>
 </p>
 {% else %}
-{% if request.user == blog.user %}
+{% if request.user == blog.user and not preview %}
 <a href="/dashboard/posts/{{ post.pk }}/" target="_blank" style="position: fixed;right: 0;top: 0;padding: 10px;color: lightgrey;text-decoration: none;font-size: 20px;">✎</a>
 {% endif %}
 {% endif %}
