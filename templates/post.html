@@ -71,9 +71,7 @@ body:hover {
 </p>
 {% else %}
 {% if request.user == blog.user %}
-<h3 style="position:relative;height:0;margin:0">
-   <a href="/dashboard/posts/{{ post.pk }}/" target="_blank" style="position:absolute;right:0;color:lightgrey;text-decoration:none;">✎</a>
-</h3>
+<a href="/dashboard/posts/{{ post.pk }}/" target="_blank" style="position: fixed;right: 0;top: 0;padding: 10px;color: lightgrey;text-decoration: none;font-size: 20px;">✎</a>
 {% endif %}
 {% endif %}
 
