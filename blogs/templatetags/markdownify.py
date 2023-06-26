@@ -117,6 +117,8 @@ def unmark(content):
 
 @register.simple_tag
 def format_date(date, format_string):
+    if date is None:
+        return ''
     if not format_string:
         format_string = 'd M, Y'
     return dateformat.format(date, format_string)
