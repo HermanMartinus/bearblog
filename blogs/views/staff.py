@@ -116,7 +116,7 @@ def get_empty_blogs():
     # Most recent 100
     timeperiod = timezone.now() - timedelta(weeks=5)
     empty_blogs = Blog.objects.annotate(num_posts=Count('post')).annotate(content_length=Length('content')).filter(
-        last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=20, upgraded=False, custom_styles="").order_by('-created_date')[:100]
+        last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=50, upgraded=False, custom_styles="").order_by('-created_date')[:100]
 
     return empty_blogs
 
