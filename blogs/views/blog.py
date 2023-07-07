@@ -135,16 +135,14 @@ def post(request, slug):
     if slug == blog.blog_path:
         return posts(request)
 
-    try:
-        # Find by post slug
-        post = Post.objects.filter(blog=blog, slug__iexact=slug)[0]
-
-    except IndexError:
+    # Find by post slug
+    post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
+    if not post:
         # Find by post alias
-        try:
-            post = Post.objects.filter(blog=blog, alias__iexact=slug)[0]
+        post = Post.objects.filter(blog=blog, alias__iexact=slug).first()
+        if post:
             return redirect(f"/{post.slug}")
-        except IndexError:
+        else:
             return render(request, '404.html', {'blog': blog}, status=404)
 
     # Check if upvoted
@@ -184,8 +182,10 @@ def post_alias(request, resource):
     if not blog:
         return not_found(request)
 
-    post = get_object_or_404(Post, blog=blog, alias=resource)
-    return redirect(f"/{post.slug}")
+    post = Post.objects.filter(blog=blog, alias=resource).first()
+    if post:
+        return redirect(f"/{post.slug}")
+    return render(request, '404.html', {'blog': blog}, status=404)
 
 
 @csrf_exempt
