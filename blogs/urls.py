@@ -59,7 +59,7 @@ urlpatterns = [
     path('hit/<pk>/', analytics.post_hit, name='post_hit'),
     path("feed/", feed.feed, name="post_feed"),
     path('<slug>/', blog.post, name='post'),
-    path('<slug>/meta_image.png', blog.generate_meta_image, name='generate_meta_image'),
+    path('<slug>/meta_image.png/', blog.generate_meta_image, name='generate_meta_image'),
     path('<path:resource>/', blog.post_alias, name='post_alias'),
     path('404/', TemplateView.as_view(template_name="404.html", content_type="text/html"))
 ]
