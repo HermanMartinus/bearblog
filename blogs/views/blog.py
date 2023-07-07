@@ -198,14 +198,14 @@ def generate_meta_image(request, slug):
 
     post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
 
-    img = Image.new('RGB', (1200, 630), color="#01242e")
+    img = Image.new('RGB', (250, 250), color="#01242e")
     d = ImageDraw.Draw(img)
 
-    font_title = ImageFont.truetype("/usr/share/fonts/Verdana.ttf", size=50)
-    font_date = ImageFont.truetype("/usr/share/fonts/Verdana.ttf", size=30)
-    font_description = ImageFont.truetype("/usr/share/fonts/Verdana.ttf", size=35)
+    font_title = ImageFont.load_default()
+    font_date = ImageFont.load_default()
+    font_description = ImageFont.load_default()
 
-    description = post.meta_description or unmark(post.content)
+    description = post.meta_description or post.content
     if len(description) > 180:
         description = description[0:180].strip() + '...'
 
@@ -215,7 +215,7 @@ def generate_meta_image(request, slug):
     current_line = ''
 
     for word in words:
-        if len(current_line) + len(word) <= 56:
+        if len(current_line) + len(word) <= 35:
             current_line += ' ' + word if current_line else word
         else:
             lines.append(current_line.strip())
@@ -226,13 +226,14 @@ def generate_meta_image(request, slug):
 
     description = '\n'.join(lines)
 
-    title = post.title
-    if len(title) > 42:
-        title = title[0:40].strip() + '...'
+    title = f"# {post.title}"
+    if len(title) > 35:
+        title = f"{title[0:35].strip()}..."
     # Draw text
-    d.text((60, 80), title, fill=(255, 255, 255), font=font_title)
-    d.text((60, 220), format_date(post.published_date, blog.date_format), fill=(255, 255, 255), font=font_date)
-    d.text((60, 340), description, fill=(255, 255, 255), font=font_description)
+    d.text((10, 10), title, fill=(255, 255, 255), font=font_title)
+    d.text((10, 40), f"*{format_date(post.published_date, blog.date_format)}*", fill=(255, 255, 255), font=font_date)
+    d.text((10, 60), description, fill=(255, 255, 255), font=font_description)
+    d.text((10, 230), blog.useful_domain(), fill=(255, 255, 255), font=font_description)
 
     img_io = BytesIO()
     img.save(img_io, 'PNG', quality=100)
