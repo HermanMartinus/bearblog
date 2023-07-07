@@ -198,7 +198,7 @@ def generate_meta_image(request, slug):
 
     post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
 
-    img = Image.new('RGB', (250, 250), color="#01242e")
+    img = Image.new('RGB', (250, 130), color="#01242e")
     d = ImageDraw.Draw(img)
 
     font_title = ImageFont.load_default()
@@ -233,7 +233,7 @@ def generate_meta_image(request, slug):
     d.text((10, 10), title, fill=(255, 255, 255), font=font_title)
     d.text((10, 40), f"*{format_date(post.published_date, blog.date_format)}*", fill=(255, 255, 255), font=font_date)
     d.text((10, 60), description, fill=(255, 255, 255), font=font_description)
-    d.text((10, 230), blog.useful_domain(), fill=(255, 255, 255), font=font_description)
+    d.text((10, 110), blog.useful_domain(), fill=(255, 255, 255), font=font_description)
 
     img_io = BytesIO()
     img.save(img_io, 'PNG', quality=100)
