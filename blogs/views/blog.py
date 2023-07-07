@@ -1,3 +1,6 @@
+from PIL import Image, ImageDraw, ImageFont
+from io import BytesIO
+from django.http import FileResponse
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect
@@ -9,6 +12,8 @@ from django.conf import settings
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_posts, sanitise_int, unmark
+from blogs.templatetags.markdownify import format_date
+from blogs.views.analytics import render_analytics
 
 from ipaddr import client_ip
 from taggit.models import Tag
@@ -17,8 +22,6 @@ import json
 import tldextract
 import hashlib
 import hmac
-
-from blogs.views.analytics import render_analytics
 
 
 def resolve_address(request):
@@ -186,6 +189,56 @@ def post_alias(request, resource):
     if post:
         return redirect(f"/{post.slug}")
     return render(request, '404.html', {'blog': blog}, status=404)
+
+
+def generate_meta_image(request, slug):
+    blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+
+    post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
+
+    img = Image.new('RGB', (1200, 630), color="#01242e")
+    d = ImageDraw.Draw(img)
+
+    font_title = ImageFont.truetype("/usr/share/fonts/Verdana.ttf", size=50)
+    font_date = ImageFont.truetype("/usr/share/fonts/Verdana.ttf", size=30)
+    font_description = ImageFont.truetype("/usr/share/fonts/Verdana.ttf", size=35)
+
+    description = post.meta_description or unmark(post.content)
+    if len(description) > 180:
+        description = description[0:180].strip() + '...'
+
+    # Insert line breaks after a space without breaking a word
+    words = description.split(' ')
+    lines = []
+    current_line = ''
+
+    for word in words:
+        if len(current_line) + len(word) <= 56:
+            current_line += ' ' + word if current_line else word
+        else:
+            lines.append(current_line.strip())
+            current_line = word
+
+    if current_line:
+        lines.append(current_line.strip())
+
+    description = '\n'.join(lines)
+
+    title = post.title
+    if len(title) > 42:
+        title = title[0:40].strip() + '...'
+    # Draw text
+    d.text((60, 80), title, fill=(255, 255, 255), font=font_title)
+    d.text((60, 220), format_date(post.published_date, blog.date_format), fill=(255, 255, 255), font=font_date)
+    d.text((60, 340), description, fill=(255, 255, 255), font=font_description)
+
+    img_io = BytesIO()
+    img.save(img_io, 'PNG', quality=100)
+    img_io.seek(0)
+
+    return FileResponse(img_io, filename='meta.png', content_type='image/png')
 
 
 @csrf_exempt

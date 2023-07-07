@@ -30,6 +30,7 @@ Markdown==2.6.11
 mistune==2.0.4
 oauthlib==3.1.0
 Paperboy==1.0.1
+pillow==10.0.0
 psycopg2==2.8.5
 pygal==3.0.0
 python-dateutil==2.8.1
