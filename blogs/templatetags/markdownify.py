@@ -91,20 +91,19 @@ def markdown(content, upgraded=False):
             tag.string.replace_with(
                 tag.string.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html')))
 
+            # Replace content between $$ with MathML
+            latex_exp = re.compile(r"\$\$([\s\S]*?)\$\$")
+
+            def replace_with_mathml(match):
+                latex_content = match.group(1)
+                mathml_output = latex2mathml.converter.convert(latex_content)
+                return mathml_output
+            tag.string.replace_with(latex_exp.sub(replace_with_mathml, tag.string))
+
     processed_markup = str(soup)
 
     if not upgraded:
         processed_markup = clean(processed_markup)
-
-    # Replace content between $$ with MathML
-    latex_exp = re.compile(r"\$\$([\s\S]*?)\$\$")
-
-    def replace_with_mathml(match):
-        latex_content = match.group(1)
-        mathml_output = latex2mathml.converter.convert(latex_content)
-        return mathml_output
-
-    processed_markup = latex_exp.sub(replace_with_mathml, processed_markup)
 
     return processed_markup
 
