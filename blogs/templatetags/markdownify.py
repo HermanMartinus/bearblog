@@ -84,7 +84,7 @@ def markdown(content, upgraded=False):
                 new_tag.append(escape(str(code_block.contents[0])))
                 code_block.replace_with(new_tag)
 
-    tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'span', 'b', 'i', 'strong', 'em'])
+    tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'span', 'b', 'i', 'strong', 'em', 'ul', 'li'])
     for tag in tags:
         if tag.string and '<code>' not in str(tag):
             tag.string.replace_with(typographic_replacements(tag.string))
