@@ -92,13 +92,8 @@ def markdown(content, upgraded=False):
                 tag.string.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html')))
 
             # Replace content between $$ with MathML
-            latex_exp = re.compile(r"\$\$([\s\S]*?)\$\$")
-
-            def replace_with_mathml(match):
-                latex_content = match.group(1)
-                mathml_output = latex2mathml.converter.convert(latex_content)
-                return mathml_output
-            tag.string.replace_with(latex_exp.sub(replace_with_mathml, tag.string))
+            rendered_text = render_latex(tag.string)
+            tag.string.replace_with(rendered_text)
 
     processed_markup = str(soup)
 
@@ -106,6 +101,26 @@ def markdown(content, upgraded=False):
         processed_markup = clean(processed_markup)
 
     return processed_markup
+
+
+def render_latex(markup):
+    # Replace content between $$ with MathML
+    latex_exp_block = re.compile(r"\$\$\n([\s\S]*?)\n\$\$")
+    latex_exp_inline = re.compile(r"\$\$([^\n]*?)\$\$")
+
+    def replace_with_mathml(match):
+        latex_content = match.group(1)
+        mathml_output = latex2mathml.converter.convert(latex_content)
+        return mathml_output
+
+    def replace_with_mathml_block(match):
+        latex_content = match.group(1)
+        mathml_output = latex2mathml.converter.convert(latex_content).replace('display="inline"', 'display="block"')
+        return mathml_output
+
+    rendered_markup = latex_exp_block.sub(replace_with_mathml_block, markup)
+    rendered_markup = latex_exp_inline.sub(replace_with_mathml, rendered_markup)
+    return rendered_markup
 
 
 @register.filter
