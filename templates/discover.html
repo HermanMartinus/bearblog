@@ -64,6 +64,10 @@
                             <input hidden name="boost-post" value="{{ post.pk }}">
                             <button onclick="event.preventDefault();if(confirm('Boost this post?')){event.target.parentElement.submit()}">Boost post</button>
                         </form>
+
+                        <button onclick="window.open('https://news.ycombinator.com/submitlink?u={{ post.blog.useful_domain }}/{{ post.slug }}&t={{ post.title }}')">
+                            Post to Hacker News
+                        </button>
                     </details>
                 {% endif %}
             </small>
