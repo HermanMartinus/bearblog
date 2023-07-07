@@ -24,6 +24,7 @@ geoip2==4.6.0
 gunicorn==20.0.4
 httpagentparser==1.9.2
 idna==2.9
+latex2mathml==3.76.0
 lxml==4.9.1
 Markdown==2.6.11
 mistune==2.0.4

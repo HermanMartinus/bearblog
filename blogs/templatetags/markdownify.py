@@ -9,6 +9,8 @@ from slugify import slugify
 
 import mistune
 import lxml
+import latex2mathml.converter
+import re
 
 register = template.Library()
 
@@ -59,6 +61,7 @@ def markdown(content, upgraded=False):
         return ''
 
     markup = mistune.html(content)
+
     soup = HtmlParser(markup, 'html.parser')
 
     heading_tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
@@ -92,6 +95,16 @@ def markdown(content, upgraded=False):
 
     if not upgraded:
         processed_markup = clean(processed_markup)
+
+    # Replace content between $$ with MathML
+    latex_exp = re.compile(r"\$\$([\s\S]*?)\$\$")
+
+    def replace_with_mathml(match):
+        latex_content = match.group(1)
+        mathml_output = latex2mathml.converter.convert(latex_content)
+        return mathml_output
+
+    processed_markup = latex_exp.sub(replace_with_mathml, processed_markup)
 
     return processed_markup
 
