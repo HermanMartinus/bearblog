@@ -7,10 +7,10 @@
 {% block content %}
 <h1>Themes</h1>
 <div
-  style="display: grid;grid-template-columns: 145px 200px 145px 200px;grid-gap: 27px;overflow-x: scroll;padding-bottom: 20px;"
+  style="display: grid;grid-template-columns: 150px 150px 150px 150px 150px 150px 150px;grid-gap: 27px;overflow-x: scroll;padding-bottom: 20px;"
 >
   {% for style in stylesheets %}
-  <div style="width:100%; background-color: #eceff4; padding: 3px;">
+  <div style="width:100%; background-color: #eceff4; padding: 3px; text-align: center;">
     <img src="{{ style.image }}" height=100>
     <br>
     <b>{{ style.title }}</b>
