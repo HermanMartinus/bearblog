@@ -6,5 +6,11 @@
     "python.linting.pylintArgs": ["--ignore E501", "--load-plugins", "pylint_django", "--max-line-length=120"],
     "python.formatting.autopep8Args": ["--max-line-length=150"],
     "python.linting.pycodestyleEnabled": true,
-    "python.linting.pycodestyleArgs": ["--max-line-length=150"],
+    "python.linting.pycodestyleArgs": [
+        "--max-line-length=150"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none",
 }

@@ -173,6 +173,7 @@ class Stylesheet(models.Model):
     identifier = models.SlugField(max_length=100, unique=True)
     css = models.TextField(blank=True)
     external = models.BooleanField(default=False)
+    image = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.title

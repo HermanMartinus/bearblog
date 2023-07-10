@@ -10,11 +10,16 @@
   style="display: grid;grid-template-columns: 145px 200px 145px 200px;grid-gap: 0 27px;overflow-x: scroll;padding-bottom: 20px;"
 >
   {% for style in stylesheets %}
-  {{ style.title }}
-  <span>
-    <button onclick="preview('{{ style.identifier }}')">Preview</button>
-    <button onclick="setStyle('{{ style.identifier }}')">Apply theme</button> 
-  </span>
+  <div style="width:100%">
+    <img src="{{ style.image }}" height=100>
+    <br>
+    <b>{{ style.title }}</b>
+    <br>
+    <span>
+      <button onclick="preview('{{ style.identifier }}')">Preview</button>
+      <button onclick="setStyle('{{ style.identifier }}')">Apply theme</button> 
+    </span>
+  </div>
   {% endfor %}
 </div>
 
