@@ -229,6 +229,7 @@ def generate_meta_image(request, slug):
     title = f"# {post.title}"
     if len(title) > 35:
         title = f"{title[0:35].strip()}..."
+
     # Draw text
     d.text((10, 10), title, fill=(255, 255, 255), font=font_title)
     d.text((10, 40), f"*{format_date(post.published_date, blog.date_format)}*", fill=(255, 255, 255), font=font_date)
