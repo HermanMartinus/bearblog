@@ -72,7 +72,7 @@ def styles(request):
     return render(request, 'dashboard/styles.html', {
         'blog': blog,
         'form': form,
-        'stylesheets': Stylesheet.objects.all()
+        'stylesheets': Stylesheet.objects.all().order_by('-pk')
     })
 
 
