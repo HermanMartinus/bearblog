@@ -123,7 +123,7 @@
 	    xhr.onload = function() {
 	        if (this.status === 200) {
 	            JSON.parse(this.responseText).forEach(image => {
-						const blogTitle = "{{ blog.title|safe }}"
+						const blogTitle = "{{ blog.title|escapejs }}"
 						const toInsert = `\n![${blogTitle}](${image})\n`
 						if (position == 0) {
 							textarea.value += toInsert
