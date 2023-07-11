@@ -105,17 +105,15 @@ class NavForm(forms.ModelForm):
 
 class StyleForm(forms.ModelForm):
     custom_styles = forms.CharField(
-        label="Styles",
+        label="Edit theme CSS",
         widget=forms.Textarea(),
-        required=False
+        required=False,
+        help_text="Ensure styling caters to existing dark mode CSS."
     )
 
     class Meta:
         model = Blog
-        widgets = {
-            'overwrite_styles': forms.RadioSelect
-        }
-        fields = ('custom_styles', 'overwrite_styles')
+        fields = ('custom_styles', )
 
 
 class DomainForm(forms.ModelForm):

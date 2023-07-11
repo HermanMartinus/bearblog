@@ -35,10 +35,6 @@
     </span>
   </p>
   {% csrf_token %} {{ form.as_p }}
-
-    <span class="helptext">
-      <b>If extending styling, ensure your styling caters to existing dark mode styles.</b>
-    </span>
 </form>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
@@ -54,15 +50,6 @@
 		padding: 10px;
     min-height: 200px;
 	}
-
-  p:nth-child(3) {
-    margin-top: 0;
-  }
-
-  p:nth-child(3) > label {
-    display: none;
-  }
-
 </style>
 <script>
   var codemirror = CodeMirror.fromTextArea(document.querySelector('textarea'), {mode: "css"})

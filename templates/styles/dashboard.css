@@ -31,6 +31,10 @@ header nav a:last-child {
     margin-right: 0;
 }
 
+label {
+    font-weight: bold;
+}
+
 textarea,
 input:not([type="submit"]),
 .editable {
