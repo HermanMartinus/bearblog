@@ -140,12 +140,11 @@ def review_flow(request):
 
     unreviewed_blogs = []
     for blog in blogs:
-        # if blog.to_review:
-        unreviewed_blogs.append(blog)
+        if blog.to_review:
+            unreviewed_blogs.append(blog)
 
     if unreviewed_blogs:
         blog = unreviewed_blogs[0]
-        spam = check_for_spam(blog)
         all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
         return render(
@@ -157,7 +156,6 @@ def review_flow(request):
                 'posts': all_posts,
                 'root': blog.useful_domain(),
                 'still_to_go': len(unreviewed_blogs),
-                'spam': spam
             })
     else:
         return redirect('staff_dashboard')
