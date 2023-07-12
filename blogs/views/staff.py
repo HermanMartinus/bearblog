@@ -1,17 +1,19 @@
-from datetime import timedelta
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
-from blogs.helpers import send_async_mail
 from django.db.models.functions import TruncDate, Length
 from django.http import JsonResponse
 
+from blogs.helpers import send_async_mail
 from blogs.models import Blog
 
+from datetime import timedelta
 import pygal
 from pygal.style import LightColorizedStyle
+import openai
+import os
 
 
 @staff_member_required
@@ -138,11 +140,12 @@ def review_flow(request):
 
     unreviewed_blogs = []
     for blog in blogs:
-        if blog.to_review:
-            unreviewed_blogs.append(blog)
+        # if blog.to_review:
+        unreviewed_blogs.append(blog)
 
     if unreviewed_blogs:
         blog = unreviewed_blogs[0]
+        spam = check_for_spam(blog)
         all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
 
         return render(
@@ -153,10 +156,51 @@ def review_flow(request):
                 'content': blog.content or "~nothing here~",
                 'posts': all_posts,
                 'root': blog.useful_domain(),
-                'still_to_go': len(unreviewed_blogs)
+                'still_to_go': len(unreviewed_blogs),
+                'spam': spam
             })
     else:
         return redirect('staff_dashboard')
+
+
+def check_for_spam(blog):
+    openai.api_key = os.environ['OPENAI_KEY']
+
+    # define system prompt
+    system_prompt = {
+        'role': 'system',
+        'content': f'''
+        You are a spam account detection AI.
+        You view the content of the blog as well as the associated email address and metadata
+        and determine whether it should be allowed on the platform.
+        No advertising. The blogging platform is reserved for personal blogs.
+        No hateful or malicious behaviour.
+        Religion is not necessarily an indicator of spam.
+        Return the words "approve" or "block" followed by a very short explanation.
+        '''
+    }
+
+    # define user prompt
+    user_prompt = {
+        'role': 'user',
+        'content': f'Blog to review\n\nTitle: {blog.title}\nEmail address: {blog.user.email}\nDescription: {blog.meta_description}\nContent: {blog.content}\nPosts: {blog.post_set.all()}'
+    }
+
+    print([system_prompt, user_prompt])
+    # initiate chat with system and user prompts
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[system_prompt, user_prompt]
+    )
+
+    # Extract the chatbot's response
+    chatbot_response = response['choices'][0]['message']['content'].strip()
+    print(chatbot_response)
+    # Determine if the blog should be blocked or approved
+    if "approve" in chatbot_response.lower():
+        return False
+    else:
+        return True
 
 
 @staff_member_required
