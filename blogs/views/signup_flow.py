@@ -38,8 +38,6 @@ def signup(request):
         email = ''
 
     if title and subdomain and content and email and password:
-        print('Create new blog!')
-
         User = get_user_model()
         user = User.objects.filter(email=email).first()
         if not user:
@@ -48,7 +46,11 @@ def signup(request):
         user.backend = 'django.contrib.auth.backends.ModelBackend'
 
         if not Blog.objects.filter(user=user).exists():
-            Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
+            blog = Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
+
+            if 'cleardex.io' in user.email:
+                blog.blocked = True
+                blog.save()
 
         # Log in the user
         login(request, user)
