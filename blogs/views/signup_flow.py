@@ -22,6 +22,9 @@ def signup(request):
     email = request.POST.get('email', '')
     password = request.POST.get('password', '')
 
+    if 'cleardex.io' in email:
+        raise Http404()
+
     # Check password valid
     if password and len(password) < 6:
         error_messages.append('Password is too short')
@@ -46,11 +49,7 @@ def signup(request):
         user.backend = 'django.contrib.auth.backends.ModelBackend'
 
         if not Blog.objects.filter(user=user).exists():
-            blog = Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
-
-            if 'cleardex.io' in user.email:
-                blog.blocked = True
-                blog.save()
+            Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
 
         # Log in the user
         login(request, user)
