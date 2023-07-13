@@ -161,46 +161,6 @@ def review_flow(request):
         return redirect('staff_dashboard')
 
 
-def check_for_spam(blog):
-    openai.api_key = os.environ['OPENAI_KEY']
-
-    # define system prompt
-    system_prompt = {
-        'role': 'system',
-        'content': f'''
-        You are a spam account detection AI.
-        You view the content of the blog as well as the associated email address and metadata
-        and determine whether it should be allowed on the platform.
-        No advertising. The blogging platform is reserved for personal blogs.
-        No hateful or malicious behaviour.
-        Religion is not necessarily an indicator of spam.
-        Return the words "approve" or "block" followed by a very short explanation.
-        '''
-    }
-
-    # define user prompt
-    user_prompt = {
-        'role': 'user',
-        'content': f'Blog to review\n\nTitle: {blog.title}\nEmail address: {blog.user.email}\nDescription: {blog.meta_description}\nContent: {blog.content}\nPosts: {blog.post_set.all()}'
-    }
-
-    print([system_prompt, user_prompt])
-    # initiate chat with system and user prompts
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[system_prompt, user_prompt]
-    )
-
-    # Extract the chatbot's response
-    chatbot_response = response['choices'][0]['message']['content'].strip()
-    print(chatbot_response)
-    # Determine if the blog should be blocked or approved
-    if "approve" in chatbot_response.lower():
-        return False
-    else:
-        return True
-
-
 @staff_member_required
 def approve(request, pk):
     blog = get_object_or_404(Blog, pk=pk)

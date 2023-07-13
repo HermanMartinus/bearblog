@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Create something awesome{% endblock %}
+{% block title %}Create your blog{% endblock %}
+
+{% block seo %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 
 {% block content %}
-<h1>Create something awesome</h1>
+<h1>Create your blog</h1>
 
 {% if error_messages %}
 <p style="color:lightsalmon">
