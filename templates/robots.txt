@@ -1,5 +1,6 @@
 User-Agent: *
 Sitemap: {{ blog.useful_domain }}/sitemap.xml
+Disallow: /signup/
 Disallow: /accounts/
 Disallow: /dashboard/
 Disallow: /mothership/
