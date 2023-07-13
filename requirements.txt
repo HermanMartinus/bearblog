@@ -34,6 +34,7 @@ Paperboy==1.0.1
 pillow==10.0.0
 psycopg2==2.8.5
 pygal==3.0.0
+python-akismet==0.4.3
 python-dateutil==2.8.1
 python-http-client==3.2.7
 python-slugify==4.0.1

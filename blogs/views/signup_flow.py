@@ -1,15 +1,20 @@
 
+import os
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model, login
+from django.core.validators import validate_email
 
 from blogs.models import Blog
+
+from akismet import Akismet
 
 
 def signup(request):
 
-    if request.POST.get('date') or request.POST.get('name'):
+    # Simple honeypot pre-db check
+    if honeypot_check(request):
         raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
     if request.user.is_authenticated:
@@ -21,9 +26,6 @@ def signup(request):
     content = request.POST.get('content', '')
     email = request.POST.get('email', '')
     password = request.POST.get('password', '')
-
-    if 'cleardex.io' in email:
-        raise Http404()
 
     # Check password valid
     if password and len(password) < 6:
@@ -40,7 +42,11 @@ def signup(request):
         error_messages.append('There is already a blog with this email address')
         email = ''
 
+    # If all fields are present do spam check and create account
     if title and subdomain and content and email and password:
+        if spam_check(title, subdomain, content, email, request.META['REMOTE_ADDR'], request.META['HTTP_USER_AGENT']):
+            raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
+
         User = get_user_model()
         user = User.objects.filter(email=email).first()
         if not user:
@@ -72,3 +78,40 @@ def signup(request):
         'subdomain': subdomain,
         'content': content
     })
+
+
+def honeypot_check(request):
+    if request.POST.get('date'):
+        return True
+    if request.POST.get('name'):
+        return True
+    if request.POST.get('email', '') in ['cleardex.io']:
+        return True
+
+    title = request.POST.get('title', '').lower()
+    spam_keywords = ['court records', 'labbia', 'insurance', 'seo', 'gamble', 'crypto', 'marketing']
+
+    for keyword in spam_keywords:
+        if keyword in title:
+            return True
+
+    return False
+
+
+def spam_check(title, subdomain, content, email, user_ip, user_agent):
+    # Initialize Akismet with your API key and blog URL
+    akismet_api = Akismet(os.getenv('AKISMET_KEY'), 'https://bearblog.dev')
+
+    print('Checking')
+    is_spam = akismet_api.check(
+        user_ip=user_ip,
+        user_agent=user_agent,
+        comment_author=title,
+        comment_author_email=email,
+        comment_content=content,
+        comment_type='signup',
+    )
+
+    if is_spam > 0:
+        return True
+    return False
