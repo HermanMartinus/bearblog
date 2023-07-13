@@ -85,7 +85,7 @@ def honeypot_check(request):
         return True
     if request.POST.get('name'):
         return True
-    if request.POST.get('email', '') in ['cleardex.io']:
+    if request.POST.get('email', '').endswith('@cleardex.io'):
         return True
 
     title = request.POST.get('title', '').lower()
