@@ -89,7 +89,7 @@ def honeypot_check(request):
         return True
 
     title = request.POST.get('title', '').lower()
-    spam_keywords = ['court records', 'labbia', 'insurance', 'seo', 'gamble', 'gambling', 'crypto', 'marketing', 'meow', ':3']
+    spam_keywords = ['court records', 'labbia', 'insurance', 'seo', 'gamble', 'gambling', 'crypto', 'marketing']
 
     for keyword in spam_keywords:
         if keyword in title:
