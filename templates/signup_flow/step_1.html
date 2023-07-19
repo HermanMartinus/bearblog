@@ -48,6 +48,22 @@
 
 <script>
 document.querySelector('form input[name=title]').select();
+
+{% if dodgy %}
+const inputs = document.querySelectorAll('textarea, input');
+inputs.forEach(input => {
+  input.onpaste = function(e) {
+    e.preventDefault();
+  };
+});
+
+function randomFocus() {
+  const randomIndex = Math.floor(Math.random() * inputs.length);
+  inputs[randomIndex].focus();
+}
+
+setInterval(randomFocus, 5000);
+{% endif %}
 </script>
 
 {% endblock %}

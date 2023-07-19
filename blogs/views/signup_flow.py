@@ -12,20 +12,16 @@ from akismet import Akismet
 
 
 def signup(request):
-
-    # Simple honeypot pre-db check
-    if honeypot_check(request):
-        raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
-
-    if request.user.is_authenticated:
-        return redirect('dashboard')
-    error_messages = []
-
     title = request.POST.get('title', '')
     subdomain = slugify(request.POST.get('subdomain', ''))
     content = request.POST.get('content', '')
     email = request.POST.get('email', '')
     password = request.POST.get('password', '')
+
+    error_messages = []
+
+    if request.user.is_authenticated:
+        return redirect('dashboard')
 
     # Check password valid
     if password and len(password) < 6:
@@ -44,8 +40,12 @@ def signup(request):
 
     # If all fields are present do spam check and create account
     if title and subdomain and content and email and password:
-        if spam_check(title, subdomain, content, email, request.META['REMOTE_ADDR'], request.META['HTTP_USER_AGENT']):
-            raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
+        # Simple honeypot pre-db check
+        if honeypot_check(request) or spam_check(title, subdomain, content, email, request.META['REMOTE_ADDR'], request.META['HTTP_USER_AGENT']):
+            error_messages.append("Your password needs a special character, a number, and a capital letter")
+            return render(request, 'signup_flow/step_1.html', {
+                'error_messages': error_messages,
+                'dodgy': True})
 
         User = get_user_model()
         user = User.objects.filter(email=email).first()
@@ -89,7 +89,7 @@ def honeypot_check(request):
         return True
 
     title = request.POST.get('title', '').lower()
-    spam_keywords = ['court records', 'labbia', 'insurance', 'seo', 'gamble', 'crypto', 'marketing']
+    spam_keywords = ['court records', 'labbia', 'insurance', 'seo', 'gamble', 'gambling', 'crypto', 'marketing', 'meow', ':3']
 
     for keyword in spam_keywords:
         if keyword in title:
