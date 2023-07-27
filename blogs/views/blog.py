@@ -74,7 +74,7 @@ def home(request):
     if not blog:
         return render(request, 'landing.html')
 
-    all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+    all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
 
     meta_description = blog.meta_description or unmark(blog.content)
 
