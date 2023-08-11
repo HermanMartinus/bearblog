@@ -232,7 +232,7 @@ def generate_meta_image(request, slug):
 
     # Draw text
     d.text((10, 10), title, fill=(255, 255, 255), font=font_title)
-    d.text((10, 40), f"*{format_date(post.published_date, blog.date_format)}*", fill=(255, 255, 255), font=font_date)
+    d.text((10, 40), f"*{format_date(post.published_date, blog.date_format, blog.lang)}*", fill=(255, 255, 255), font=font_date)
     d.text((10, 60), description, fill=(255, 255, 255), font=font_description)
     d.text((10, 160), blog.useful_domain(), fill=(255, 255, 255), font=font_description)
 

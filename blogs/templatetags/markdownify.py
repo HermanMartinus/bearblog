@@ -1,6 +1,7 @@
 from django import template
 from django.template.loader import render_to_string
-from django.utils import dateformat
+from django.utils import dateformat, translation
+from django.utils.dateformat import format as date_format
 
 from html import escape
 from bs4 import BeautifulSoup as HtmlParser
@@ -143,9 +144,16 @@ def unmark(content):
 
 
 @register.simple_tag
-def format_date(date, format_string):
+def format_date(date, format_string, lang=None):
     if date is None:
         return ''
     if not format_string:
         format_string = 'd M, Y'
+
+    if lang:
+        current_lang = translation.get_language()
+        translation.activate(lang)
+        formatted_date = date_format(date, format_string)
+        translation.activate(current_lang)
+        return formatted_date
     return dateformat.format(date, format_string)
