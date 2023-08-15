@@ -36,18 +36,6 @@ def sanitise_int(input, length=10):
         raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
 
-def sanitise_text(text):
-    htmlCodes = (
-        ('&', '&amp;'),
-        ('<', '&lt;'),
-        ('>', '&gt;'),
-        ('"', '&quot;'),
-        ("'", '&#39;'),)
-    for c, html_code in htmlCodes:
-        cleaned_text = text.replace(html_code, c)
-    return cleaned_text
-
-
 def is_protected(subdomain):
     protected_subdomains = [
         'login',
