@@ -8,3 +8,6 @@ Disallow: /studio/
 Disallow: /public-analytics/
 Disallow: /subscribe/
 Disallow: /confirm-subscription/
+
+User-agent: GPTBot
+Disallow: /
