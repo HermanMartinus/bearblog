@@ -42,7 +42,7 @@ def signup(request):
     # If all fields are present do spam check and create account
     if title and subdomain and content and email and password:
         # Simple honeypot pre-db check
-        if honeypot_check(request) or spam_check(title, subdomain, content, email, request.META['REMOTE_ADDR'], request.META['HTTP_USER_AGENT']):
+        if honeypot_check(request) or spam_check(title, content, email, request.META['REMOTE_ADDR'], request.META['HTTP_USER_AGENT']):
             error_messages.append(random_error_message())
             return render(request, 'signup_flow/step_1.html', {
                 'error_messages': error_messages,
@@ -99,7 +99,7 @@ def honeypot_check(request):
     return False
 
 
-def spam_check(title, subdomain, content, email, user_ip, user_agent):
+def spam_check(title, content, email, user_ip, user_agent):
     akismet_api = Akismet(os.getenv('AKISMET_KEY'), 'https://bearblog.dev')
 
     is_spam = akismet_api.check(
