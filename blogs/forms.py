@@ -234,9 +234,8 @@ class PostForm(forms.ModelForm):
 
 class AccountForm(forms.ModelForm):
     analytics_active = forms.BooleanField(
-        label="Collect analytics",
-        required=False,
-        help_text="<br>Disable the collection of analytics"
+        label="Collect blog analytics",
+        required=False
     )
 
     fathom_site_id = forms.CharField(
