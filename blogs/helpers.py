@@ -163,6 +163,7 @@ def random_error_message():
         'Something went wrong. Please try restarting your computer.',
         'Your password needs a special character, a number, and a capital letter.',
         'Ensure content is the correct length.',
+        'Bear with us as we fix our software.'
     ]
 
     return random.choice(errors)
