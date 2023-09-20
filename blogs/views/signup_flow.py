@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model, login
 from django.core.validators import validate_email
+from blogs.helpers import random_error_message
 
 from blogs.models import Blog
 
@@ -42,7 +43,7 @@ def signup(request):
     if title and subdomain and content and email and password:
         # Simple honeypot pre-db check
         if honeypot_check(request) or spam_check(title, subdomain, content, email, request.META['REMOTE_ADDR'], request.META['HTTP_USER_AGENT']):
-            error_messages.append("Your password needs a special character, a number, and a capital letter")
+            error_messages.append(random_error_message())
             return render(request, 'signup_flow/step_1.html', {
                 'error_messages': error_messages,
                 'dodgy': True})
@@ -89,7 +90,7 @@ def honeypot_check(request):
         return True
 
     title = request.POST.get('title', '').lower()
-    spam_keywords = ['court records', 'labbia', 'insurance', 'seo', 'gamble', 'gambling', 'crypto', 'marketing']
+    spam_keywords = ['court records', 'labbia', 'insurance', 'seo', 'gamble', 'gambling', 'crypto', 'marketing', 'bangalore']
 
     for keyword in spam_keywords:
         if keyword in title:
@@ -99,10 +100,8 @@ def honeypot_check(request):
 
 
 def spam_check(title, subdomain, content, email, user_ip, user_agent):
-    # Initialize Akismet with your API key and blog URL
     akismet_api = Akismet(os.getenv('AKISMET_KEY'), 'https://bearblog.dev')
 
-    print('Checking')
     is_spam = akismet_api.check(
         user_ip=user_ip,
         user_agent=user_agent,

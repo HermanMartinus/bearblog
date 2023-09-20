@@ -1,3 +1,4 @@
+import random
 import threading
 import bleach
 from bs4 import BeautifulSoup
@@ -153,3 +154,15 @@ def send_async_mail(subject, html_message, from_email, recipient_list):
     else:
         print('Sent email to ', recipient_list)
         EmailThread(subject, html_message, from_email, recipient_list).start()
+
+
+def random_error_message():
+    errors = [
+        'Whoops. Looks like our servers are bearly functioning. Try again later.',
+        'Ensure content contains necessary parameters.',
+        'Something went wrong. Please try restarting your computer.',
+        'Your password needs a special character, a number, and a capital letter.',
+        'Ensure content is the correct length.',
+    ]
+
+    return random.choice(errors)
