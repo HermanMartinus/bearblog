@@ -40,6 +40,7 @@ def sanitise_int(input, length=10):
 def is_protected(subdomain):
     protected_subdomains = [
         'login',
+        'mg',
         'www',
         'api',
         'signup',
