@@ -34,7 +34,8 @@ HOST_WHITELIST = [
     'share.transistor.fm',
     'share.descript.com',
     'mrkennedy.ca',
-    'open.spotify.com'
+    'open.spotify.com',
+    'umap.openstreetmap.fr'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
