@@ -101,7 +101,7 @@ def post_delete(request, pk):
 def upload_image(request):
     blog = get_object_or_404(Blog, user=request.user)
 
-    if request.method == "POST":
+    if request.method == "POST" and blog.upgraded == True:
         file_links = []
         time_string = str(time.time()).split('.')[0]
         count = 0
