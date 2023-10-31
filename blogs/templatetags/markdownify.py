@@ -106,22 +106,21 @@ def markdown(content, upgraded=False):
 
 
 def excluding_pre(markup, func):
-    # Placeholder dict
     placeholders = {}
 
-    # Replace <div class="highlight"> with placeholders
     def placeholder_div(match):
         key = f"PLACEHOLDER_{len(placeholders)}"
         placeholders[key] = match.group(0)
         return key
 
-    markup = re.sub(r'<pre>.*?</pre>', placeholder_div, markup, flags=re.DOTALL)
+    # Improved regex pattern to match <pre>...</pre> accurately
+    markup = re.sub(r'<pre.*?/pre>', placeholder_div, markup, flags=re.DOTALL)
 
     markup = func(markup)
 
-    # Replace placeholders with original content
     for key, value in placeholders.items():
         markup = markup.replace(key, value)
+
     return markup
 
 
