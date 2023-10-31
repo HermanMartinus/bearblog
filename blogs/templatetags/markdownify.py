@@ -4,7 +4,7 @@ from django.utils import dateformat, translation
 from django.utils.dateformat import format as date_format
 
 from html import escape
-from bs4 import BeautifulSoup as HtmlParser
+from bs4 import BeautifulSoup
 from lxml.html.clean import Cleaner, defs
 from slugify import slugify
 
@@ -64,7 +64,7 @@ def markdown(content, upgraded=False):
 
     markup = mistune.html(content)
 
-    soup = HtmlParser(markup, 'html.parser')
+    soup = BeautifulSoup(markup, 'html.parser')
 
     heading_tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
     for tag in heading_tags:
@@ -86,29 +86,49 @@ def markdown(content, upgraded=False):
                 new_tag.append(escape(str(code_block.contents[0])))
                 code_block.replace_with(new_tag)
 
-    tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'span', 'b', 'i', 'strong', 'em', 'ul', 'li'])
-    for tag in tags:
-        if tag.string and '<code>' not in str(tag):
-            tag.string.replace_with(typographic_replacements(tag.string))
-            tag.string.replace_with(
-                tag.string.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html')))
-
-            # Replace content between $$ with MathML
-            rendered_text = render_latex(tag.string)
-            tag.string.replace_with(rendered_text)
-
     processed_markup = str(soup)
 
+    # If not upgraded remove iframes and js
     if not upgraded:
         processed_markup = clean(processed_markup)
+    print(processed_markup)
+
+    # Replace LaTeX between $$ with MathML
+    processed_markup = excluding_pre(processed_markup, render_latex)
+
+    # Add typographic replacements
+    processed_markup = excluding_pre(processed_markup, typographic_replacements)
+
+    # Replace {{ xyz }} elements
+    processed_markup = excluding_pre(processed_markup, element_replacement)
 
     return processed_markup
 
 
+def excluding_pre(markup, func):
+    # Placeholder dict
+    placeholders = {}
+
+    # Replace <div class="highlight"> with placeholders
+    def placeholder_div(match):
+        key = f"PLACEHOLDER_{len(placeholders)}"
+        placeholders[key] = match.group(0)
+        return key
+
+    markup = re.sub(r'<pre>.*?</pre>', placeholder_div, markup, flags=re.DOTALL)
+
+    markup = func(markup)
+
+    # Replace placeholders with original content
+    for key, value in placeholders.items():
+        markup = markup.replace(key, value)
+    return markup
+
+
 def render_latex(markup):
-    # Replace content between $$ with MathML
-    latex_exp_block = re.compile(r"\$\$\n([\s\S]*?)\n\$\$")
-    latex_exp_inline = re.compile(r"\$\$([^\n]*?)\$\$")
+    # Your existing LaTeX replacement code
+    latex_exp_block = re.compile(r'\$\$\n([\s\S]*?)\n\$\$')
+    latex_exp_inline = re.compile(r'\$\$([^\n]*?)\$\$')
 
     def replace_with_mathml(match):
         latex_content = match.group(1)
@@ -120,9 +140,16 @@ def render_latex(markup):
         mathml_output = latex2mathml.converter.convert(latex_content).replace('display="inline"', 'display="block"')
         return mathml_output
 
-    rendered_markup = latex_exp_block.sub(replace_with_mathml_block, markup)
-    rendered_markup = latex_exp_inline.sub(replace_with_mathml, rendered_markup)
-    return rendered_markup
+    markup = latex_exp_block.sub(replace_with_mathml_block, markup)
+    markup = latex_exp_inline.sub(replace_with_mathml, markup)
+
+    return markup
+
+
+def element_replacement(markup):
+    markup = markup.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html'))
+    markup = markup.replace('{{email-signup}}', render_to_string('snippets/email_subscribe_form.html'))
+    return markup
 
 
 @register.filter
@@ -141,7 +168,7 @@ def clean(markup):
 @register.filter
 def unmark(content):
     markup = mistune.html(content)
-    return HtmlParser(markup, "lxml").text.strip()[:400] + '...'
+    return BeautifulSoup(markup, "lxml").text.strip()[:400] + '...'
 
 
 @register.simple_tag
