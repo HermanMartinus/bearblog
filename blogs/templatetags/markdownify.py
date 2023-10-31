@@ -91,7 +91,6 @@ def markdown(content, upgraded=False):
     # If not upgraded remove iframes and js
     if not upgraded:
         processed_markup = clean(processed_markup)
-    print(processed_markup)
 
     # Replace LaTeX between $$ with MathML
     processed_markup = excluding_pre(processed_markup, render_latex)
@@ -137,8 +136,11 @@ def render_latex(markup):
         mathml_output = latex2mathml.converter.convert(latex_content).replace('display="inline"', 'display="block"')
         return mathml_output
 
-    markup = latex_exp_block.sub(replace_with_mathml_block, markup)
-    markup = latex_exp_inline.sub(replace_with_mathml, markup)
+    try:
+        markup = latex_exp_block.sub(replace_with_mathml_block, markup)
+        markup = latex_exp_inline.sub(replace_with_mathml, markup)
+    except Exception as e:
+        print("LaTeX rendering error")
 
     return markup
 
