@@ -113,7 +113,6 @@ def excluding_pre(markup, func):
         placeholders[key] = match.group(0)
         return key
 
-    # Improved regex pattern to match <pre>...</pre> accurately
     markup = re.sub(r'<pre.*?/pre>', placeholder_div, markup, flags=re.DOTALL)
 
     markup = func(markup)
@@ -125,7 +124,6 @@ def excluding_pre(markup, func):
 
 
 def render_latex(markup):
-    # Your existing LaTeX replacement code
     latex_exp_block = re.compile(r'\$\$\n([\s\S]*?)\n\$\$')
     latex_exp_inline = re.compile(r'\$\$([^\n]*?)\$\$')
 
