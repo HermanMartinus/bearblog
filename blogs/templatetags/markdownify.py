@@ -116,8 +116,8 @@ def excluding_pre(markup, func):
 
     markup = func(markup)
 
-    for key, value in placeholders.items():
-        markup = markup.replace(key, value)
+    for key in sorted(placeholders.keys(), reverse=True):
+        markup = markup.replace(key, placeholders[key])
 
     return markup
 
