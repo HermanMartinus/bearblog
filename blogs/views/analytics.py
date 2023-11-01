@@ -7,7 +7,7 @@ from django.db.models.functions import TruncDate
 
 from blogs.forms import AnalyticsForm, PostTemplateForm
 from blogs.models import Blog, Hit, Post, Upvote
-from blogs.helpers import daterange, get_user_location, salt_and_hash
+from blogs.helpers import daterange, get_country, salt_and_hash
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
 
@@ -200,7 +200,7 @@ class HitThread(threading.Thread):
             # Prevent duplicates with ip hash + date
             hash_id = salt_and_hash(self.request)
 
-            country = get_user_location(client_ip(self.request)).get('country_name', '')
+            country = get_country(client_ip(self.request)).get('country_name', '')
             device = user_agent.get('platform', {}).get('name', '')
             browser = user_agent.get('browser', {}).get('name', '')
 

@@ -97,7 +97,7 @@ def salt_and_hash(request, duration='day'):
     return hash_id
 
 
-def get_user_location(user_ip):
+def get_country(user_ip):
     # user_ip = '45.222.31.178'
     try:
         g = GeoIP2()

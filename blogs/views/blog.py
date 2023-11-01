@@ -11,13 +11,11 @@ from django.utils import timezone
 from django.conf import settings
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_posts, sanitise_int, unmark
+from blogs.helpers import get_posts, salt_and_hash, sanitise_int, unmark
 from blogs.templatetags.markdownify import format_date
 from blogs.views.analytics import render_analytics
 
-from ipaddr import client_ip
 from taggit.models import Tag
-import hashlib
 import json
 import tldextract
 import hashlib
@@ -149,9 +147,8 @@ def post(request, slug):
             return render(request, '404.html', {'blog': blog}, status=404)
 
     # Check if upvoted
-    ip_address = client_ip(request)
-    ip_hash = hashlib.md5(f"{ip_address}-{timezone.now().year}".encode('utf-8')).hexdigest()
-    upvoted = post.upvote_set.filter(Q(ip_address=ip_hash) | Q(ip_address=ip_address)).exists()
+    hash_id = salt_and_hash(request, 'year')
+    upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
 
     root = blog.useful_domain()
     meta_description = post.meta_description or unmark(post.content)
@@ -245,16 +242,17 @@ def generate_meta_image(request, slug):
 
 @csrf_exempt
 def upvote(request, pk):
-    ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().year}".encode('utf-8')).hexdigest()
+    hash_id = salt_and_hash(request, 'year')
 
     if pk == request.POST.get("pk", "") and not request.POST.get("title", False):
         pk = sanitise_int(pk, 7)
         post = get_object_or_404(Post, pk=pk)
-        posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_hash)
-        if len(posts_upvote_dupe) == 0:
-            upvote = Upvote(post=post, ip_address=ip_hash)
-            upvote.save()
-            post.update_score()
+
+        upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
+
+        post.update_score()
+
+        if created:
             return HttpResponse(f'Upvoted {post.title}')
         raise Http404('Duplicate upvote')
     raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")

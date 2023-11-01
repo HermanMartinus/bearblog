@@ -17,7 +17,7 @@ import time
 import djqscsv
 
 from blogs.forms import AccountForm, NavForm, StyleForm
-from blogs.helpers import get_user_location, sanitise_int
+from blogs.helpers import get_country, sanitise_int
 from blogs.models import Blog, Post, Stylesheet, Upvote
 
 
@@ -137,7 +137,7 @@ def upload_image(request):
 def upgrade(request):
     blog = get_object_or_404(Blog, user=request.user)
 
-    country = get_user_location(client_ip(request))
+    country = get_country(client_ip(request))
     country_name = ''
     country_emoji = ''
     promo_code = ''
