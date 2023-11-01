@@ -15,7 +15,7 @@ import random
 import string
 
 from blogs.forms import PostTemplateForm
-from blogs.helpers import check_connection, sanitise_int
+from blogs.helpers import check_connection, salt_and_hash, sanitise_int
 from blogs.models import Blog, Post, Upvote
 
 
@@ -274,7 +274,7 @@ def post(request, pk=None):
 
                 if is_new:
                     # Self-upvote
-                    upvote = Upvote(post=post, ip_address=client_ip(request))
+                    upvote = Upvote(post=post, hash_id=salt_and_hash(request, 'year'))
                     upvote.save()
                     post.update_score()
 

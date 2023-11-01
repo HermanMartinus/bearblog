@@ -15,9 +15,8 @@ import os
 import boto3
 import time
 import djqscsv
-import requests
 
-from blogs.forms import AccountForm, BlogForm, DomainForm, NavForm, PostForm, StyleForm
+from blogs.forms import AccountForm, NavForm, StyleForm
 from blogs.helpers import get_user_location, sanitise_int
 from blogs.models import Blog, Post, Stylesheet, Upvote
 
@@ -101,7 +100,7 @@ def post_delete(request, pk):
 def upload_image(request):
     blog = get_object_or_404(Blog, user=request.user)
 
-    if request.method == "POST" and blog.upgraded == True:
+    if request.method == "POST" and blog.upgraded is True:
         file_links = []
         time_string = str(time.time()).split('.')[0]
         count = 0

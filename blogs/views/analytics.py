@@ -3,18 +3,18 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db import IntegrityError
 from datetime import timedelta
-
 from django.db.models.functions import TruncDate
+
+from blogs.forms import AnalyticsForm, PostTemplateForm
 from blogs.models import Blog, Hit, Post, Upvote
-from blogs.helpers import daterange, get_user_location
+from blogs.helpers import daterange, get_user_location, salt_and_hash
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
-from blogs.forms import AnalyticsForm, PostTemplateForm
+
 from ipaddr import client_ip
 from urllib.parse import urlparse
 import httpagentparser
 import pygal
-import hashlib
 import threading
 
 import pygal
@@ -51,7 +51,7 @@ def analytics(request):
         })
 
     unique_reads = posts.aggregate(Sum('hit_count'))
-    unique_visitors = len(hits.values('ip_address').distinct())
+    unique_visitors = len(hits.values('hash_id').distinct())
 
     chart = pygal.Bar(height=300, show_legend=False)
     mark_list = [x['hits'] for x in chart_data]
@@ -115,7 +115,7 @@ def render_analytics(request, blog, public=False):
     start_date = hits.first().created_date.date() if hits.exists() else start_date
 
     unique_reads = hits.count()
-    unique_visitors = hits.values('ip_address').distinct().count()
+    unique_visitors = hits.values('hash_id').distinct().count()
     on_site = hits.filter(created_date__gt=timezone.now()-timedelta(minutes=4)).count()
 
     referrers = hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
@@ -197,7 +197,8 @@ class HitThread(threading.Thread):
                 print('Bot traffic')
                 return
 
-            ip_hash = hashlib.md5(f"{client_ip(self.request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
+            # Prevent duplicates with ip hash + date
+            hash_id = salt_and_hash(self.request)
 
             country = get_user_location(client_ip(self.request)).get('country_name', '')
             device = user_agent.get('platform', {}).get('name', '')
@@ -210,7 +211,7 @@ class HitThread(threading.Thread):
 
             Hit.objects.get_or_create(
                 post_id=self.pk,
-                ip_address=ip_hash,
+                hash_id=hash_id,
                 referrer=referrer,
                 country=country,
                 device=device,

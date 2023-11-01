@@ -1,18 +1,22 @@
+from django.utils import timezone
+from django.contrib.sites.models import Site
+from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
+from django.contrib.gis.geoip2 import GeoIP2
+from django.http import Http404
+from django.conf import settings
+
 import random
 import threading
 import bleach
 from bs4 import BeautifulSoup
-from django.contrib.sites.models import Site
 from requests.exceptions import ConnectionError, ReadTimeout
-from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 import mistune
 import requests
-from django.http import Http404
 import subprocess
-from django.conf import settings
-from _datetime import timedelta
+from datetime import timedelta
 import geoip2
-from django.contrib.gis.geoip2 import GeoIP2
+from ipaddr import client_ip
+import hashlib
 
 
 def root(subdomain=''):
@@ -83,6 +87,14 @@ def check_connection(blog):
             return False
         except SystemExit:
             return False
+
+
+def salt_and_hash(request, duration='day'):
+    if duration == 'year':
+        hash_id = hashlib.md5(f"{client_ip(request)}-{timezone.now().year}".encode('utf-8')).hexdigest()
+    else:
+        hash_id = hashlib.md5(f"{client_ip(request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
+    return hash_id
 
 
 def get_user_location(user_ip):

@@ -30,7 +30,7 @@ def discover(request):
         if request.POST.get("boost-post", False):
             post = Post.objects.get(pk=request.POST.get("boost-post", ''))
             for i in range(0, 5):
-                upvote = Upvote(post=post, ip_address=f"boost-{i}")
+                upvote = Upvote(post=post, hash_id=f"boost-{i}")
                 upvote.save()
             post.update_score()
 

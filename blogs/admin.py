@@ -137,13 +137,7 @@ class HitAdmin(admin.ModelAdmin):
                            id=obj.post.pk,
                            post=escape(obj.post))
 
-    def cleanup(self, request, queryset):
-        queryset.filter(created_date__lt=timezone.now().date()-timedelta(days=7)).delete()
-
-    cleanup.short_description = "Cleanup (remove older than 7 days)"
-
-    actions = ['cleanup']
-    list_display = ('created_date', 'post_link', 'ip_address')
+    list_display = ('created_date', 'post_link', 'hash_id')
     search_fields = ('created_date', 'post__title')
     ordering = ('-created_date',)
 
