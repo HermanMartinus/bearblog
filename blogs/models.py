@@ -177,3 +177,17 @@ class Stylesheet(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# Singleton model to store Bear specific settings
+class PersistentStore(models.Model):
+    last_executed = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(PersistentStore, self).save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
