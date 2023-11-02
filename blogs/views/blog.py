@@ -71,7 +71,7 @@ def ping(request):
 def home(request):
     blog = resolve_address(request)
     if not blog:
-        # daily_task()
+        daily_task()
         return render(request, 'landing.html')
 
     all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')

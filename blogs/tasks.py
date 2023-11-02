@@ -12,13 +12,13 @@ def daily_task():
     persistent_store = PersistentStore.load()
 
     if persistent_store.last_executed < time_24_hours_ago:
+        persistent_store.last_executed = current_time
+        persistent_store.save()
+
         print('Executing daily task')
 
         t = threading.Thread(target=scrub_hash_ids)
         t.start()
-
-        persistent_store.last_executed = current_time
-        persistent_store.save()
 
 
 # Scrub all hash_ids that are over 24 hours old
