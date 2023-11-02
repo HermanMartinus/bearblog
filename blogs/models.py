@@ -191,3 +191,6 @@ class PersistentStore(models.Model):
     def load(cls):
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
+
+    def __str__(self):
+        return self.last_executed.strftime('%d %B %Y, %I:%M %p')
