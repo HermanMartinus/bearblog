@@ -12,6 +12,7 @@ from django.conf import settings
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_posts, salt_and_hash, sanitise_int, unmark
+from blogs.tasks import daily_task
 from blogs.templatetags.markdownify import format_date
 from blogs.views.analytics import render_analytics
 
@@ -70,6 +71,7 @@ def ping(request):
 def home(request):
     blog = resolve_address(request)
     if not blog:
+        daily_task()
         return render(request, 'landing.html')
 
     all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
