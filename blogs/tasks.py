@@ -25,5 +25,5 @@ def daily_task():
 def scrub_hash_ids():
     current_time = timezone.now()
     time_24_hours_ago = current_time - timedelta(hours=24)
-    Hit.objects.filter(post_id="55025", created_date__lt=time_24_hours_ago).exclude(hash_id='scrubbed').update(hash_id='scrubbed')
+    Hit.objects.filter(post_id="52091", created_date__lt=time_24_hours_ago).exclude(hash_id='scrubbed').update(hash_id='scrubbed')
     print('Scrubbed hash_ids')
