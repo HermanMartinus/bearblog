@@ -58,7 +58,7 @@ def typographic_replacements(text):
 
 
 @register.filter
-def markdown(content, upgraded=False):
+def markdown(content, blog=False):
     if not content:
         return ''
 
@@ -89,7 +89,7 @@ def markdown(content, upgraded=False):
     processed_markup = str(soup)
 
     # If not upgraded remove iframes and js
-    if not upgraded:
+    if not blog and not blog.upgraded:
         processed_markup = clean(processed_markup)
 
     # Replace LaTeX between $$ with MathML

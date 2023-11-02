@@ -58,7 +58,7 @@ body:hover {
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
+{% block nav %}{{ blog.nav | markdown:blog | safe }}{% endblock %}
 
 {% block content %}
 {% if preview %}
@@ -89,7 +89,7 @@ body:hover {
 </p>
 {% endif %}
 {% pygmentify %}
-    {{ content | markdown:blog.upgraded | safe }}
+    {{ content | markdown:blog | safe }}
 {% endpygmentify %}
 {% if canonical_url != full_path %}
 <p>
@@ -119,7 +119,7 @@ body:hover {
 {% block footer %}
 {% if blog.upgraded and blog.footer_directive %}
 <span id="footer-directive">
-{{ blog.footer_directive | markdown:True | safe }}
+{{ blog.footer_directive | markdown:blog | safe }}
 </span>
 {% endif %}
 <span>

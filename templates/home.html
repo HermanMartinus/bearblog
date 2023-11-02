@@ -35,7 +35,7 @@
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
+{% block nav %}{{ blog.nav | markdown:blog | safe }}{% endblock %}
 
 {% block content %}
 {% if request.user == blog.user and not preview %}
@@ -44,7 +44,7 @@
 
 {% if blog.content %}
 {% pygmentify %}
-    {{ blog.content | markdown:blog.upgraded | safe }}
+    {{ blog.content | markdown:blog | safe }}
 {% endpygmentify %}
 {% else %}
 <ul class="blog-posts">
@@ -78,7 +78,7 @@
 {% block footer %}
 {% if blog.upgraded and blog.footer_directive %}
 <span id="footer-directive">
-{{ blog.footer_directive | markdown:True | safe }}
+{{ blog.footer_directive | markdown:blog | safe }}
 </span>
 {% endif %}
 <span>

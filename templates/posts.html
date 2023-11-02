@@ -33,7 +33,7 @@
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
+{% block nav %}{{ blog.nav | markdown:blog | safe }}{% endblock %}
 
 {% block content %}
 
@@ -76,7 +76,7 @@
 {% block footer %}
 {% if blog.upgraded and blog.footer_directive %}
 <span id="footer-directive">
-{{ blog.footer_directive | markdown:True | safe }}
+{{ blog.footer_directive | markdown:blog | safe }}
 </span>
 {% endif %}
 <span>
