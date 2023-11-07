@@ -100,7 +100,8 @@ def markdown(content, blog=False):
     processed_markup = excluding_pre(processed_markup, typographic_replacements)
 
     # Replace {{ xyz }} elements
-    processed_markup = excluding_pre(processed_markup, element_replacement, blog)
+    if blog:
+        processed_markup = excluding_pre(processed_markup, element_replacement, blog)
 
     return processed_markup
 
