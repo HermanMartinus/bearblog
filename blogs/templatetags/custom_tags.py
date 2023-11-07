@@ -92,7 +92,7 @@ def markdown(content, blog=False):
     # If not upgraded remove iframes and js
     if not blog or not blog.upgraded:
         processed_markup = clean(processed_markup)
-
+    print(processed_markup)
     # Replace LaTeX between $$ with MathML
     processed_markup = excluding_pre(processed_markup, render_latex)
 
@@ -114,7 +114,7 @@ def excluding_pre(markup, func, blog=None):
         placeholders[key] = match.group(0)
         return key
 
-    markup = re.sub(r'<pre.*?/pre>', placeholder_div, markup, flags=re.DOTALL)
+    markup = re.sub(r'(<pre.*?>.*?</pre>|<code.*?>.*?</code>)', placeholder_div, markup, flags=re.DOTALL)
 
     if blog:
         markup = func(markup, blog)
@@ -153,7 +153,8 @@ def render_latex(markup):
 def apply_filters(posts, tag=None, limit=None, order=None):
     if tag:
         tag = Tag.objects.filter(name=tag).first()
-        posts = posts.filter(tags=tag)
+        if tag:
+            posts = posts.filter(tags=tag)
     if order == 'asc':
         posts = posts.order_by('published_date')
     else:
