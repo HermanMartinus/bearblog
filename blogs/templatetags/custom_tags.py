@@ -92,7 +92,7 @@ def markdown(content, blog=False):
     # If not upgraded remove iframes and js
     if not blog or not blog.upgraded:
         processed_markup = clean(processed_markup)
-    print(processed_markup)
+
     # Replace LaTeX between $$ with MathML
     processed_markup = excluding_pre(processed_markup, render_latex)
 
@@ -155,7 +155,7 @@ def apply_filters(posts, tag=None, limit=None, order=None):
         tag = Tag.objects.filter(name=tag.replace('"', '').strip()).first()
         if tag:
             posts = posts.filter(tags=tag)
-    if 'asc' in order:
+    if order == 'asc':
         posts = posts.order_by('published_date')
     else:
         posts = posts.order_by('-published_date')
