@@ -152,7 +152,7 @@ def render_latex(markup):
 
 def apply_filters(posts, tag=None, limit=None, order=None):
     if tag:
-        tag = Tag.objects.get(name=tag)
+        tag = Tag.objects.filter(name=tag).first()
         posts = posts.filter(tags=tag)
     if order == 'asc':
         posts = posts.order_by('published_date')
