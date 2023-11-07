@@ -5,8 +5,8 @@ from django.db import IntegrityError
 from datetime import timedelta
 from django.db.models.functions import TruncDate
 
-from blogs.forms import AnalyticsForm, PostTemplateForm
-from blogs.models import Blog, Hit, Post, Upvote
+from blogs.forms import AnalyticsForm
+from blogs.models import Blog, Hit, Post
 from blogs.helpers import daterange, get_country, salt_and_hash
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse

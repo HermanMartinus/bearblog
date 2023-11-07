@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.utils import timezone
 from requests import TooManyRedirects
 
-from .models import Blog, Post, Stylesheet, Upvote, Hit, Subscriber
+from .models import Blog, PersistentStore, Post, Stylesheet, Upvote, Hit, Subscriber
 from django.utils.html import escape, format_html
 from blogs.helpers import check_connection, root
 from django.urls import reverse
@@ -145,3 +145,6 @@ class HitAdmin(admin.ModelAdmin):
 @admin.register(Subscriber)
 class SubscriberAdmin(admin.ModelAdmin):
     list_display = ('subscribed_date', 'blog', 'email_address')
+
+
+admin.site.register(PersistentStore)
