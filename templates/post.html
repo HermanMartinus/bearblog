@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load pygmentify_tags %}
-{% load markdownify %}
+{% load custom_tags %}
 
 {% block page_type %}{% if post.is_page %}page{% else %}post{% endif %} {{ post.class_name }}{% endblock %}
 

@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 
 from blogs.helpers import unmark
-from blogs.templatetags.markdownify import markdown
+from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
 
 from feedgen.feed import FeedGenerator

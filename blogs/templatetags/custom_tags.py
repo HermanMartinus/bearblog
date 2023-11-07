@@ -2,6 +2,7 @@ from django import template
 from django.template.loader import render_to_string
 from django.utils import dateformat, translation
 from django.utils.dateformat import format as date_format
+from taggit.models import Tag
 
 from html import escape
 from bs4 import BeautifulSoup
@@ -99,12 +100,12 @@ def markdown(content, blog=False):
     processed_markup = excluding_pre(processed_markup, typographic_replacements)
 
     # Replace {{ xyz }} elements
-    processed_markup = excluding_pre(processed_markup, element_replacement)
+    processed_markup = excluding_pre(processed_markup, element_replacement, blog)
 
     return processed_markup
 
 
-def excluding_pre(markup, func):
+def excluding_pre(markup, func, blog=None):
     placeholders = {}
 
     def placeholder_div(match):
@@ -114,7 +115,10 @@ def excluding_pre(markup, func):
 
     markup = re.sub(r'<pre.*?/pre>', placeholder_div, markup, flags=re.DOTALL)
 
-    markup = func(markup)
+    if blog:
+        markup = func(markup, blog)
+    else:
+        markup = func(markup)
 
     for key in sorted(placeholders.keys(), reverse=True):
         markup = markup.replace(key, placeholders[key])
@@ -145,7 +149,42 @@ def render_latex(markup):
     return markup
 
 
-def element_replacement(markup):
+def apply_filters(posts, tag=None, limit=None, order=None):
+    if tag:
+        tag = Tag.objects.get(name=tag)
+        posts = posts.filter(tags=tag)
+    if order == 'asc':
+        posts = posts.order_by('published_date')
+    else:
+        posts = posts.order_by('-published_date')
+    if limit is not None:
+        try:
+            limit = int(limit)
+            posts = posts[:limit]
+        except ValueError:
+            pass
+    return posts
+
+def element_replacement(markup, blog):
+    pattern = r'\{\{\s*posts' \
+          r'(?:\s*\|\s*tag:\s*(?P<tag>[^\|]+))?' \
+          r'(?:\s*\|\s*limit:\s*(?P<limit>\d+))?' \
+          r'(?:\s*\|\s*order:\s*(?P<order>asc|desc))?' \
+          r'(?:\s*\|\s*description:\s*(?P<description>True))?' \
+          r'\s*\}\}'
+
+
+    def replace_with_filtered_posts(match):
+        tag = match.group('tag')
+        limit = match.group('limit')
+        order = match.group('order')
+        description = match.group('description') == 'True'
+        filtered_posts = apply_filters(blog.post_set.filter(publish=True), tag, limit, order)
+        context = {'blog': blog, 'posts': filtered_posts, 'embed': True, 'show_description': description}
+        return render_to_string('snippets/post_list.html', context)
+    
+    markup = re.sub(pattern, replace_with_filtered_posts, markup)
+
     markup = markup.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html'))
     markup = markup.replace('{{email-signup}}', render_to_string('snippets/email_subscribe_form.html'))
     return markup

@@ -1,0 +1,23 @@
+{% load custom_tags %}
+
+<ul class="{% if embed %}embedded {% endif %}blog-posts">
+    {% for post in posts %}
+    <li>
+        <span>
+            <i>
+                <time datetime="{{ post.published_date|date:'Y-m-d' }}">
+                    {% format_date post.published_date blog.date_format blog.lang %}
+                </time>
+            </i>
+        </span>
+        <a href="/{{ post.slug }}/">{{ post.title }}</a>
+        {% if show_description %}
+        <p>{{ post.meta_description }}</p>
+        {% endif %}
+    </li>
+    {% empty %}
+    <li>
+        No posts yet
+    </li>
+    {% endfor %}
+</ul>

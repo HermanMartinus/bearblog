@@ -6,14 +6,13 @@ from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
-from django.db.models import Q
 from django.utils import timezone
 from django.conf import settings
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_posts, salt_and_hash, sanitise_int, unmark
 from blogs.tasks import daily_task
-from blogs.templatetags.markdownify import format_date
+from blogs.templatetags.custom_tags import format_date
 from blogs.views.analytics import render_analytics
 
 from taggit.models import Tag

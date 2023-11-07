@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load pygmentify_tags %}
-{% load markdownify %}
+{% load custom_tags %}
 
 {% block page_type %}home{% endblock %}
 
@@ -47,24 +47,7 @@
     {{ blog.content | markdown:blog | safe }}
 {% endpygmentify %}
 {% else %}
-<ul class="blog-posts">
-    {% for post in posts %}
-    <li>
-        <span>
-            <i>
-                <time datetime="{{ post.published_date|date:'Y-m-d' }}">
-                    {% format_date post.published_date blog.date_format blog.lang %}
-                </time>
-            </i>
-        </span>
-        <a href="/{{ post.slug }}/">{{ post.title }}</a>
-    </li>
-    {% empty %}
-    <li>
-        No posts yet
-    </li>
-    {% endfor %}
-</ul>
+{% include "snippets/post_list.html" %}
 {% endif %}
 
 {% if posts.empty %}
