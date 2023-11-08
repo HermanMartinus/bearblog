@@ -93,8 +93,10 @@ def posts(request):
         return not_found(request)
 
     tag = request.GET.get('q', '')
+
     if tag:
-        blog_posts = blog.post_set.filter(all_tags__contains=tag, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
+        posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
+        blog_posts = [post for post in posts if tag in post.get_tags]
     else:
         all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         blog_posts = get_posts(all_posts)
