@@ -101,7 +101,7 @@ class Post(models.Model):
     published_date = models.DateTimeField(blank=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     tags = TaggableManager(blank=True)
-    all_tags = models.CharField(max_length=200, default='[]')
+    all_tags = models.TextField(default='[]')
     publish = models.BooleanField(default=True)
     make_discoverable = models.BooleanField(default=True)
     is_page = models.BooleanField(default=False)
