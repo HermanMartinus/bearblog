@@ -81,8 +81,8 @@ New post | Bear Blog
         <b>canonical_url:</b> {{ post.canonical_url }}{% endif %}{% if post.meta_description %}<br>
         <b>meta_description:</b> {{ post.meta_description }}{% endif %}{% if post.meta_image %}<br>
         <b>meta_image:</b> {{ post.meta_image }}{% endif %}{% if post.lang %}<br>
-        <b>lang:</b> {{ post.lang }}{% endif %}{% if tags %}<br>
-        <b>tags:</b> {% for tag in tags %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if post.is_page %}<br>
+        <b>lang:</b> {{ post.lang }}{% endif %}{% if post.get_tags|length > 0 %}<br>
+        <b>tags:</b> {% for tag in post.get_tags %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if post.is_page %}<br>
         <b>is_page:</b> {{ post.is_page|lower }}{% endif %}{% if post.class_name %}<br>
         <b>class_name:</b> {{ post.class_name }}{% endif %}{% if not post.make_discoverable %}<br>
         <b>make_discoverable:</b> {{ post.make_discoverable|lower }}<br>{% endif %}{% elif template_header %}

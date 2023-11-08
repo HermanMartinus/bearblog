@@ -15,7 +15,6 @@ from blogs.tasks import daily_task
 from blogs.templatetags.custom_tags import format_date
 from blogs.views.analytics import render_analytics
 
-from taggit.models import Tag
 import json
 import tldextract
 import hashlib
@@ -93,23 +92,17 @@ def posts(request):
     if not blog:
         return not_found(request)
 
-    query = request.GET.get('q', '')
-    if query:
-        try:
-            tag = Tag.objects.get(name=query)
-            all_posts = blog.post_set.filter(tags=tag, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
-        except Tag.DoesNotExist:
-            all_posts = []
-        blog_posts = all_posts
+    tag = request.GET.get('q', '')
+    if tag:
+        blog_posts = blog.post_set.filter(all_tags__contains=tag, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
     else:
         all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         blog_posts = get_posts(all_posts)
 
-    tags = []
-    for post in all_posts:
-        tags += post.tags.most_common()[:10]
-    tags = list(dict.fromkeys(tags))
-    tags.sort()
+    tags = set()
+    for post in blog_posts:
+        tags.update(post.get_tags)
+    tags = sorted(tags)
 
     meta_description = blog.meta_description or unmark(blog.content)
 
@@ -122,7 +115,7 @@ def posts(request):
             'root': blog.useful_domain(),
             'meta_description':  meta_description,
             'tags': tags,
-            'query': query,
+            'query': tag,
         }
     )
 

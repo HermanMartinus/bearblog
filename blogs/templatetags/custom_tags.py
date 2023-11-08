@@ -152,9 +152,8 @@ def render_latex(markup):
 
 def apply_filters(posts, tag=None, limit=None, order=None):
     if tag:
-        tag = Tag.objects.filter(name=tag.replace('"', '').strip()).first()
-        if tag:
-            posts = posts.filter(tags=tag)
+        tag = tag.replace('"', '').strip()
+        posts = posts.filter(all_tags__contains=tag)
     if order == 'asc':
         posts = posts.order_by('published_date')
     else:

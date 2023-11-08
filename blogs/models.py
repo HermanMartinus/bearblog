@@ -1,3 +1,4 @@
+import json
 from django.utils import timezone, dateformat
 from django.db import models
 from django.contrib.auth.models import User
@@ -100,6 +101,7 @@ class Post(models.Model):
     published_date = models.DateTimeField(blank=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     tags = TaggableManager(blank=True)
+    all_tags = models.CharField(max_length=200, default='[]')
     publish = models.BooleanField(default=True)
     make_discoverable = models.BooleanField(default=True)
     is_page = models.BooleanField(default=False)
@@ -118,11 +120,18 @@ class Post(models.Model):
     def contains_code(self):
         return "```" in self.content
 
+    @property
+    def get_tags(self):
+        return json.loads(self.all_tags)
+
     def __str__(self):
         return self.title
 
     def save(self, *args, **kwargs):
         self.slug = self.slug.lower()
+        if not self.all_tags:
+            self.all_tags = '[]'
+        
         super(Post, self).save(*args, **kwargs)
 
     def update_score(self):

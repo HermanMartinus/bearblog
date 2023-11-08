@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth.decorators import login_required
 from django.db import DataError
 from django.forms import ValidationError
@@ -165,8 +166,6 @@ def post(request, pk=None):
 
     if pk:
         post = Post.objects.filter(blog=blog, pk=sanitise_int(pk)).first()
-        if post:
-            tags = post.tags.all()
 
     error_messages = []
     header_content = request.POST.get("header_content", "")
@@ -192,7 +191,7 @@ def post(request, pk=None):
             post.is_page = False
             post.make_discoverable = True
             post.lang = ''
-            tags = []
+            post.all_tags = '[]'
 
             # Parse and populate header data
             for item in header_content:
@@ -212,7 +211,7 @@ def post(request, pk=None):
                     post.alias = value
                 elif name == 'published_date':
                     # Check if previously posted 'now'
-                    value = value.replace('/', '-')
+                    value = str(value).replace('/', '-')
                     if not str(post.published_date).startswith(value):
                         try:
                             post.published_date = timezone.datetime.fromisoformat(value)
@@ -220,6 +219,7 @@ def post(request, pk=None):
                             error_messages.append('Bad date format. Use YYYY-MM-DD')
                 elif name == 'tags':
                     tags = [tag.strip() for tag in value.split(',')]
+                    post.all_tags = json.dumps(tags)
                 elif name == 'make_discoverable':
                     if type(value) is bool:
                         post.make_discoverable = value
@@ -265,13 +265,6 @@ def post(request, pk=None):
             else:
                 post.save()
 
-                # Add tags after saved
-                post.tags.clear()
-                if tags:
-                    for tag in tags:
-                        if tag.strip() != '':
-                            post.tags.add(tag.strip())
-
                 if is_new:
                     # Self-upvote
                     upvote = Upvote(post=post, hash_id=salt_and_hash(request, 'year'))
@@ -300,7 +293,6 @@ def post(request, pk=None):
     return render(request, 'studio/post_edit.html', {
         'blog': blog,
         'root': blog.useful_domain(),
-        'tags': tags,
         'post': post,
         'error_messages': error_messages,
         'template_header': template_header,
