@@ -8,6 +8,12 @@ New post | Bear Blog
 {% endif %}
 {% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block content %}
 
 {% if error_messages %}

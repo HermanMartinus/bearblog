@@ -5,8 +5,13 @@
 Directives | Bear Blog
 {% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block content %}
-{% if blog.upgraded %}
 <main>
     <h1>Directives</h1>
     <p class="helptext">
@@ -15,7 +20,7 @@ Directives | Bear Blog
     <form method="POST" class="post-form full-width">
         {% csrf_token %}
         <p style="line-height: 0">
-            <button onclick="event.preventDefault(); window.location = '/dashboard/'">&#8592; Back</button>
+            <button onclick="event.preventDefault(); window.location = '/dashboard/settings/'">&#8592; Back</button>
             <button type="submit">Save</button>
             <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}');">View</button>
         </p>
@@ -32,7 +37,4 @@ Directives | Bear Blog
         </p>
     </form>
 </main>
-{% else %}
-Upgrade to add header and footer directives to your Bear blog.
-{% endif %}
 {% endblock %}

@@ -41,6 +41,8 @@ class Blog(models.Model):
         verbose_name='')
     favicon = models.CharField(max_length=10, default="🐼")
 
+    dashboard_styles = models.TextField(blank=True)
+
     date_format = models.CharField(max_length=32, blank=True)
 
     analytics_active = models.BooleanField(default=True)
@@ -48,6 +50,7 @@ class Blog(models.Model):
     public_analytics = models.BooleanField(default=False)
 
     post_template = models.TextField(blank=True)
+    robots_txt = models.TextField(blank=True)
 
     def older_than_one_day(self):
         return (timezone.now() - self.created_date).days > 1

@@ -2,6 +2,12 @@
 
 {% block title %}Dashboard | Bear Blog{% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
@@ -104,9 +110,6 @@
 <span class="helptext sticky">
     <span>
         <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown syntax</a>
-        {% if blog.upgraded %}
-        | <a href="/dashboard/directives/" target="_blank">Directives</a>
-        {% endif %}
     </span>
     <span>
         <a id='upload-image'>Insert image</a>

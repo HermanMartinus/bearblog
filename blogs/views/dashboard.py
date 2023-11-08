@@ -16,7 +16,7 @@ import boto3
 import time
 import djqscsv
 
-from blogs.forms import AccountForm, NavForm, StyleForm
+from blogs.forms import NavForm, StyleForm
 from blogs.helpers import get_country, sanitise_int
 from blogs.models import Blog, Post, Stylesheet, Upvote
 
@@ -195,23 +195,14 @@ def opt_in_review(request):
 
 
 @login_required
-def account(request):
+def settings(request):
     blog = get_object_or_404(Blog, user=request.user)
-
-    if request.method == "POST":
-        form = AccountForm(request.POST, instance=blog)
-        if form.is_valid():
-            blog_info = form.save(commit=False)
-            blog_info.save()
-    else:
-        form = AccountForm(instance=blog)
 
     if request.GET.get("export", ""):
         return djqscsv.render_to_csv_response(blog.post_set)
 
     return render(request, "dashboard/account.html", {
-        "blog": blog,
-        'form': form,
+        "blog": blog
     })
 
 

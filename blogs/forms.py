@@ -36,9 +36,9 @@ class StyleForm(forms.ModelForm):
         fields = ('custom_styles', )
 
 
-class AccountForm(forms.ModelForm):
+class AdvancedSettingsForm(forms.ModelForm):
     analytics_active = forms.BooleanField(
-        label="Collect blog analytics",
+        label="Collect analytics",
         required=False
     )
 
@@ -48,9 +48,23 @@ class AccountForm(forms.ModelForm):
         help_text="<span>More in-depth analytics using <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a>.</span>"
     )
 
+    dashboard_styles = forms.CharField(
+        widget=forms.Textarea(),
+        label="Custom dashboard CSS",
+        required=False,
+        help_text="Change the way your dashboard looks and feels with CSS."
+    )
+
+    robots_txt = forms.CharField(
+        widget=forms.Textarea(),
+        label="robots.txt content",
+        required=False,
+        help_text="This will be appended to the mandatory robots.txt content. View yours at example.bearblog.dev/robots.txt"
+    )
+
     class Meta:
         model = Blog
-        fields = ('analytics_active', 'fathom_site_id', 'blog_path')
+        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'dashboard_styles', 'robots_txt')
 
 
 class AnalyticsForm(forms.ModelForm):
@@ -70,7 +84,7 @@ class PostTemplateForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'rows': 20, 'cols': 40, 'placeholder': "title: \nmeta_description: \n___\nHello world!"}),
         required=False,
         label='',
-        help_text="This will pre-populate on all new posts. Separate header and body content with ___."
+        help_text="This will pre-populate on all new posts. Separate header and body content with ___ (3 underscores)."
     )
 
     class Meta:

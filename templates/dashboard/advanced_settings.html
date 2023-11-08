@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Advanced settings | Bear Blog{% endblock %}
+
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
+
+{% block content %}
+<h1>Advanced settings</h1>
+<form method="POST" class="post-form full-width">{% csrf_token %}
+    <p style="line-height: 0">
+        <button onclick="event.preventDefault(); window.location = '/dashboard/settings/'">&#8592; Back</button>
+        <button type="submit">Save</button>
+        <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}');">View</button>
+    </p>
+    {{ form.as_p }}
+</form>
+{% endblock %}

@@ -9,5 +9,4 @@ Disallow: /public-analytics/
 Disallow: /subscribe/
 Disallow: /confirm-subscription/
 
-User-agent: GPTBot
-Disallow: /
+{% if blog %}{{ blog.robots_txt }}{% endif %}

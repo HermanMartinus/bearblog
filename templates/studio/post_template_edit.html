@@ -2,6 +2,12 @@
 
 {% block title %}Post template | Bear Blog{% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block content %}
 <h1>Post template</h1>
 <form method="POST" class="post-form full-width">

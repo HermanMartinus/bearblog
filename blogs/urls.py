@@ -20,9 +20,10 @@ urlpatterns = [
 
     path('dashboard/', studio.studio, name="dashboard"),
     path('dashboard/nav/', dashboard.nav, name='nav'),
-    path('dashboard/directives/', studio.directive_edit, name="directive_edit"),
     path('dashboard/styles/', dashboard.styles, name='styles'),
-    path('dashboard/account/', dashboard.account, name='account'),
+    path('dashboard/settings/', dashboard.settings, name='settings'),
+    path('dashboard/settings/advanced/', studio.advanced_settings, name='advanced_settings'),
+    path('dashboard/directives/', studio.directive_edit, name="directive_edit"),
     path('dashboard/email-list/', emailer.email_list, name='email_list'),
 
     path('dashboard/analytics/', analytics.analytics, name='analytics'),
@@ -35,7 +36,7 @@ urlpatterns = [
     path('dashboard/posts/new/', studio.post, name="post_new"),
     path('dashboard/posts/<pk>/', studio.post, name="post_edit"),
     path('dashboard/posts/<pk>/delete/', dashboard.post_delete, name='post_delete'),
-    path('dashboard/preview/', studio.preview, name="preview"),
+    path('dashboard/preview/', studio.preview, name="post_preview"),
     path('dashboard/upload-image/', dashboard.upload_image, name='upload_image'),
 
     path('dashboard/post-template/', studio.post_template, name="post_template"),

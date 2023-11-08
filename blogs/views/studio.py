@@ -15,7 +15,7 @@ import re
 import random
 import string
 
-from blogs.forms import PostTemplateForm
+from blogs.forms import AdvancedSettingsForm, PostTemplateForm
 from blogs.helpers import check_connection, is_protected, salt_and_hash, sanitise_int
 from blogs.models import Blog, Post, Upvote
 
@@ -142,23 +142,6 @@ def parse_raw_homepage(blog, header_content, body_content):
     blog.last_modified = timezone.now()
     blog.save()
     return error_messages
-
-
-@login_required
-def directive_edit(request):
-    blog = get_object_or_404(Blog, user=request.user)
-
-    header = request.POST.get("header", "")
-    footer = request.POST.get("footer", "")
-
-    if request.method == "POST":
-        blog.header_directive = header
-        blog.footer_directive = footer
-        blog.save()
-
-    return render(request, 'studio/directive_edit.html', {
-        'blog': blog,
-    })
 
 
 @login_required
@@ -422,5 +405,41 @@ def post_template(request):
         form = PostTemplateForm(instance=blog)
 
     return render(request, 'studio/post_template_edit.html', {
+        'blog': blog,
+        'form': form})
+
+
+@login_required
+def directive_edit(request):
+    blog = get_object_or_404(Blog, user=request.user)
+
+    if not blog.upgraded:
+        return redirect('/dashboard/upgrade/')
+
+    header = request.POST.get("header", "")
+    footer = request.POST.get("footer", "")
+
+    if request.method == "POST":
+        blog.header_directive = header
+        blog.footer_directive = footer
+        blog.save()
+
+    return render(request, 'studio/directive_edit.html', {
+        'blog': blog,
+    })
+
+@login_required
+def advanced_settings(request):
+    blog = get_object_or_404(Blog, user=request.user)
+
+    if request.method == "POST":
+        form = AdvancedSettingsForm(request.POST, instance=blog)
+        if form.is_valid():
+            blog_info = form.save(commit=False)
+            blog_info.save()
+    else:
+        form = AdvancedSettingsForm(instance=blog)
+
+    return render(request, 'dashboard/advanced_settings.html', {
         'blog': blog,
         'form': form})

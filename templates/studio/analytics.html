@@ -3,6 +3,14 @@
 
 {% block title %}Analytics | Bear Blog{% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {% if not public %}
+    {{ blog.dashboard_styles | safe }}
+    {% endif %}
+{% endblock %}
+
 {% block nav %}
 {% if not public %}
 {% include '../snippets/dashboard_nav.html' %}
