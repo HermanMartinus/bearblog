@@ -16,7 +16,7 @@ import random
 import string
 
 from blogs.forms import PostTemplateForm
-from blogs.helpers import check_connection, salt_and_hash, sanitise_int
+from blogs.helpers import check_connection, is_protected, salt_and_hash, sanitise_int
 from blogs.models import Blog, Post, Upvote
 
 
@@ -89,7 +89,10 @@ def parse_raw_homepage(blog, header_content, body_content):
                 error_messages.append("{value} is not a valid bear_domain")
             else:
                 if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).count():
-                    blog.subdomain = subdomain
+                    if not is_protected(subdomain):
+                        blog.subdomain = subdomain
+                    else:
+                        error_messages.append(f"{value} is protected")
                 else:
                     error_messages.append(f"{value} has already been taken")
         elif name == "custom_domain":

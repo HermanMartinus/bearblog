@@ -2,7 +2,6 @@ from django import template
 from django.template.loader import render_to_string
 from django.utils import dateformat, translation
 from django.utils.dateformat import format as date_format
-from taggit.models import Tag
 
 from html import escape
 from bs4 import BeautifulSoup

@@ -48,8 +48,6 @@ class Blog(models.Model):
     fathom_site_id = models.CharField(max_length=8, blank=True)
     public_analytics = models.BooleanField(default=False)
 
-    old_editor = models.BooleanField(default=False)
-
     post_template = models.TextField(blank=True)
 
     def older_than_one_day(self):
@@ -100,7 +98,6 @@ class Post(models.Model):
     alias = models.CharField(max_length=200, blank=True)
     published_date = models.DateTimeField(blank=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
-    tags = TaggableManager(blank=True)
     all_tags = models.TextField(default='[]')
     publish = models.BooleanField(default=True)
     make_discoverable = models.BooleanField(default=True)
