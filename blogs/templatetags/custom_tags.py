@@ -187,6 +187,10 @@ def element_replacement(markup, blog):
 
     markup = markup.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html'))
     markup = markup.replace('{{email-signup}}', render_to_string('snippets/email_subscribe_form.html'))
+    
+    markup = markup.replace('{{ blog_title }}', blog.title)
+    markup = markup.replace('{{ blog_last_modified }}', format_date(blog.last_modified, blog.date_format, blog.lang))
+
     return markup
 
 

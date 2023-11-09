@@ -1,10 +1,12 @@
-import json
-from django.utils import timezone, dateformat
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
+import json
 from math import log
+import random
+import string
 
 
 class Blog(models.Model):
@@ -95,6 +97,7 @@ class Blog(models.Model):
 
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    uid = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)
     alias = models.CharField(max_length=200, blank=True)
@@ -131,6 +134,11 @@ class Post(models.Model):
         if not self.all_tags:
             self.all_tags = '[]'
         
+        # Create unique random identifier
+        if not self.uid:
+            allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
+            self.uid = ''.join(random.choice(allowed_chars) for _ in range(20))
+
         super(Post, self).save(*args, **kwargs)
 
     def update_score(self):

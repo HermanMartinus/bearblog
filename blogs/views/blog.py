@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_posts, salt_and_hash, sanitise_int, unmark
+from blogs.helpers import get_posts, salt_and_hash, unmark
 from blogs.tasks import daily_task
 from blogs.templatetags.custom_tags import format_date
 from blogs.views.analytics import render_analytics
@@ -237,13 +237,12 @@ def generate_meta_image(request, slug):
 
 
 @csrf_exempt
-def upvote(request, pk):
+def upvote(request, uid):
     hash_id = salt_and_hash(request, 'year')
 
-    if pk == request.POST.get("pk", "") and not request.POST.get("title", False):
-        pk = sanitise_int(pk, 7)
-        post = get_object_or_404(Post, pk=pk)
-
+    if uid == request.POST.get("uid", "") and not request.POST.get("title", False):
+        post = get_object_or_404(Post, uid=uid)
+        print("Upvoting", post)
         upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
 
         post.update_score()

@@ -1,7 +1,6 @@
-
-<form id="upvote-form" action="/upvote/{{ post.pk }}/" method="post" style="display: inline">
+<form id="upvote-form" action="/upvote/{{ post.uid }}/" method="post" style="display: inline">
     <small>
-        <input hidden name="pk" value="{{ post.pk }}" style="display:none">
+        <input hidden name="uid" value="{{ post.uid }}" style="display:none">
         <input hidden name="title" style="display:none">
         {% csrf_token %}
         {% if upvoted %}

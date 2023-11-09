@@ -179,15 +179,15 @@ def render_analytics(request, blog, public=False):
     })
 
 
-def post_hit(request, pk):
-    HitThread(request, pk).start()
+def post_hit(request, uid):
+    HitThread(request, uid).start()
     return HttpResponse("Logged")
 
 
 class HitThread(threading.Thread):
-    def __init__(self, request, pk):
+    def __init__(self, request, uid):
         self.request = request
-        self.pk = pk
+        self.uid = uid
         threading.Thread.__init__(self)
 
     def run(self):
@@ -208,14 +208,17 @@ class HitThread(threading.Thread):
             if referrer:
                 referrer = urlparse(referrer)
                 referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
+            
+            post_pk = Post.objects.filter(uid=self.uid).values_list('pk', flat=True).first()
 
-            Hit.objects.get_or_create(
-                post_id=self.pk,
-                hash_id=hash_id,
-                referrer=referrer,
-                country=country,
-                device=device,
-                browser=browser)
+            if post_pk:
+                Hit.objects.get_or_create(
+                    post_id=post_pk,
+                    hash_id=hash_id,
+                    referrer=referrer,
+                    country=country,
+                    device=device,
+                    browser=browser)
 
         except Hit.MultipleObjectsReturned:
             print('Duplicate hit')
