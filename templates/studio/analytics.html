@@ -62,7 +62,7 @@
             <li style="display:flex;justify-content:space-between;padding:5px 0;">
                 <span>
                     {% if post.hit_count > 0 %}
-                    <a href="?days={{days_filter}}&post={{post.pk}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">
+                    <a href="?days={{days_filter}}&post={{post.slug}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">
                         {{post.title}}
                     </a>
                     {% else %}

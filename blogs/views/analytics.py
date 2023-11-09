@@ -99,7 +99,7 @@ def render_analytics(request, blog, public=False):
     base_hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date)
 
     if post_filter:
-        base_hits = base_hits.filter(post__id=post_filter)
+        base_hits = base_hits.filter(post__slug=post_filter)
     if referrer_filter:
         base_hits = base_hits.filter(referrer=referrer_filter)
 
@@ -108,8 +108,8 @@ def render_analytics(request, blog, public=False):
     ).prefetch_related('hit_set', 'upvote_set').filter(
         blog=blog,
         publish=True,
-    ).filter(Q(pk=post_filter) if post_filter else Q()
-             ).values('pk', 'title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+    ).filter(Q(slug=post_filter) if post_filter else Q()
+             ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
 
     hits = base_hits.order_by('created_date')
     start_date = hits.first().created_date.date() if hits.exists() else start_date

@@ -89,9 +89,9 @@ def posts_edit(request):
 
 
 @login_required
-def post_delete(request, pk):
+def post_delete(request, slug):
     blog = get_object_or_404(Blog, user=request.user)
-    post = get_object_or_404(Post, blog=blog, pk=sanitise_int(pk))
+    post = get_object_or_404(Post, blog=blog, slug=slug)
     post.delete()
     return redirect('/dashboard/posts/')
 

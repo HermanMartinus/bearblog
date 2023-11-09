@@ -145,13 +145,13 @@ def parse_raw_homepage(blog, header_content, body_content):
 
 
 @login_required
-def post(request, pk=None):
+def post(request, slug=None):
     blog = get_object_or_404(Blog, user=request.user)
     tags = []
     post = None
 
-    if pk:
-        post = Post.objects.filter(blog=blog, pk=sanitise_int(pk)).first()
+    if slug:
+        post = Post.objects.filter(blog=blog, slug=slug).first()
 
     error_messages = []
     header_content = request.POST.get("header_content", "")
@@ -168,7 +168,7 @@ def post(request, pk=None):
 
         try:
             # Clear out data
-            # post.slug = ''
+            slug = ''
             post.alias = ''
             post.class_name = ''
             post.canonical_url = ''
@@ -192,7 +192,7 @@ def post(request, pk=None):
                 if name == 'title':
                     post.title = value
                 elif name == 'link':
-                    post.slug = slugify(value)
+                    slug = value
                 elif name == 'alias':
                     post.alias = value
                 elif name == 'published_date':
@@ -231,17 +231,16 @@ def post(request, pk=None):
 
             if not post.title:
                 post.title = "New post"
-            if not post.slug:
-                post.slug = slugify(post.title)
-                if not post.slug or post.slug == "":
-                    post.slug = ''.join(random.SystemRandom().choice(string.ascii_letters) for _ in range(10))
+
+            slug = unique_slug(blog, post, slug)
+            if post.slug != slug:
+                post.slug = slug
+                is_new = True
+
             if not post.published_date:
                 post.published_date = timezone.now()
 
             post.content = body_content
-
-            if Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk).count() > 0:
-                post.slug = post.slug + '-' + str(randint(0, 9))
 
             post.publish = request.POST.get("publish", False) == "true"
             post.last_modified = timezone.now()
@@ -258,7 +257,7 @@ def post(request, pk=None):
                     post.update_score()
 
                     # Redirect to the new post detail view
-                    return redirect('post_edit', pk=post.pk)
+                    return redirect('post_edit', slug=post.slug)
 
         except ValidationError:
             error_messages.append("One of the header options is invalid")
@@ -284,6 +283,19 @@ def post(request, pk=None):
         'template_header': template_header,
         'template_body': template_body
     })
+
+
+def unique_slug(blog, post, new_slug):
+    base_slug = slugify(new_slug) or slugify(post.title)
+    slug = base_slug
+    new_stack = "-new"
+
+    while Post.objects.filter(blog=blog, slug=slug).exclude(pk=post.pk).exists():
+        slug = f"{base_slug}{new_stack}"
+        new_stack += "-new"
+
+    return slug
+
 
 
 @csrf_exempt
@@ -325,8 +337,6 @@ def preview(request):
 
                 if name == 'title':
                     post.title = value
-                elif name == 'link':
-                    post.slug = slugify(value)
                 elif name == 'alias':
                     post.alias = value
                 elif name == 'published_date':
@@ -360,8 +370,6 @@ def preview(request):
 
             post.content = body_content
 
-            if Post.objects.filter(blog=blog, slug=post.slug).exclude(pk=post.pk).count() > 0:
-                post.slug = post.slug + '-' + str(randint(0, 9))
     except ValidationError:
         return HttpResponseBadRequest("One of the header options is invalid")
     except IndexError:
