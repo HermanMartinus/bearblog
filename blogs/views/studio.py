@@ -286,12 +286,11 @@ def post(request, slug=None):
 
 
 def unique_slug(blog, post, new_slug):
-    base_slug = slugify(new_slug) or slugify(post.title)
-    slug = base_slug
+    slug = slugify(new_slug) or slugify(post.title) or slugify(str(random.randint(0,9999)))
     new_stack = "-new"
 
     while Post.objects.filter(blog=blog, slug=slug).exclude(pk=post.pk).exists():
-        slug = f"{base_slug}{new_stack}"
+        slug = f"{slug}{new_stack}"
         new_stack += "-new"
 
     return slug
