@@ -61,8 +61,9 @@ def dashboard(request):
 
     # Upgrades
     date_iterator = start_date
-    blogs = Blog.objects.filter(upgraded=True, created_date__gt=start_date).order_by('created_date')
-    upgrades_count = blogs.annotate(date=TruncDate('upgraded_date')).values('date').annotate(c=Count('date')).order_by()
+    upgraded_blogs = Blog.objects.filter(upgraded=True, upgraded_date__gte=start_date).order_by('upgraded_date')
+    upgrades_count = upgraded_blogs.annotate(date=TruncDate('upgraded_date')).values('date').annotate(c=Count('date')).order_by()
+
 
     # Create dates dict with zero upgrades
     blog_dict = {}
