@@ -20,9 +20,25 @@ Staff Dashboard  ʕง•ᴥ•ʔง
 {% block content %}
 <main>
     <p>
+        <h2>All time</h2>
         <ul>
-            <li>Total signups: {{ total_signups }}</li>
-            <li>Total upgrades: {{ total_upgrades }}</li>
+            <li>Signups: {{ total_signups }}</li>
+            <li>Upgrades: {{ total_upgrades }}</li>
+            <li>Conversion rate: {{ total_conversion_rate }}</li>
+        </ul>
+    </p>
+    <p>
+        <h2>Past {{ days_filter }} days</h2>
+        <span>
+            <button onclick="window.location = '?days=7'">Last week</button>
+            <button onclick="window.location = '?days=30'">Last month</button>
+            <button onclick="window.location = '?days=60'">Last 3 months</button>
+            <button onclick="window.location = '?days=180'">Last 6 months</button>
+            <button onclick="window.location = '?days=365'">Last year</button>
+        </span>
+        <ul>
+            <li>Signups: {{ signups }}</li>
+            <li>Upgrades: {{ upgrades }}</li>
             <li>Conversion rate: {{ conversion_rate }}</li>
         </ul>
     </p>

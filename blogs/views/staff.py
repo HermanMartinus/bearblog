@@ -57,8 +57,6 @@ def dashboard(request):
     chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
     signup_chart = chart.render_data_uri()
 
-    total_signups = sum([x['signups'] for x in chart_data])
-
     # Upgrades
     date_iterator = start_date
     upgraded_blogs = Blog.objects.filter(upgraded=True, upgraded_date__gte=start_date).order_by('upgraded_date')
@@ -88,11 +86,21 @@ def dashboard(request):
     chart.add('Upgrades', mark_list)
     chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
     upgrade_chart = chart.render_data_uri()
-    total_upgrades = sum([x['upgrades'] for x in chart_data])
 
-    # Conversion rate
-    conversion_rate = total_upgrades / total_signups if total_signups > 0 else 0
+    # Calculate signups and upgrades for the past month
+    signups = blogs.count()
+    upgrades = Blog.objects.filter(upgraded=True, upgraded_date__gt=start_date).count()
+
+    # Calculate all-time totals
+    total_signups = Blog.objects.count()
+    total_upgrades = Blog.objects.filter(upgraded=True).count()
+
+    # Calculate conversion rates
+    conversion_rate = upgrades / signups if signups > 0 else 0
+    total_conversion_rate = total_upgrades / total_signups if total_signups > 0 else 0
+
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
+    formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
 
     empty_blogs = get_empty_blogs()
 
@@ -101,24 +109,28 @@ def dashboard(request):
         'staff/dashboard.html',
         {
             'blogs': blogs,
+            'signups': signups,
+            'upgrades': upgrades,
             'total_signups': total_signups,
             'total_upgrades': total_upgrades,
             'conversion_rate': formatted_conversion_rate,
+            'total_conversion_rate': formatted_total_conversion_rate,
             'signup_chart': signup_chart,
             'upgrade_chart': upgrade_chart,
             'start_date': start_date,
             'end_date': end_date,
             'to_review': to_review,
-            'empty_blogs': empty_blogs
+            'empty_blogs': empty_blogs,
+            'days_filter': days_filter
         }
     )
 
 
 def get_empty_blogs():
     # Empty blogs
-    # Not used in the last 5 weeks
+    # Not used in the last 7 weeks
     # Most recent 100
-    timeperiod = timezone.now() - timedelta(weeks=5)
+    timeperiod = timezone.now() - timedelta(weeks=7)
     empty_blogs = Blog.objects.annotate(num_posts=Count('post')).annotate(content_length=Length('content')).filter(
         last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=50, upgraded=False, custom_styles="").order_by('-created_date')[:100]
 
