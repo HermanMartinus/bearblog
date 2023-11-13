@@ -36,7 +36,7 @@ def signup(request):
 
     # Check email unique and valid
     if email and Blog.objects.filter(user__email__iexact=email).count():
-        error_messages.append('There is already a blog with this email address')
+        error_messages.append('An account with this email address already exists.')
         email = ''
 
     # If all fields are present do spam check and create account
@@ -50,18 +50,20 @@ def signup(request):
 
         User = get_user_model()
         user = User.objects.filter(email=email).first()
-        if not user:
+        if user:
+            error_messages.append('An account with this email address already exists.')
+        else:
             user = User.objects.create_user(username=email, email=email, password=password)
 
-        user.backend = 'django.contrib.auth.backends.ModelBackend'
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
 
-        if not Blog.objects.filter(user=user).exists():
-            Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
+            if not Blog.objects.filter(user=user).exists():
+                Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
 
-        # Log in the user
-        login(request, user)
+            # Log in the user
+            login(request, user)
 
-        return redirect('dashboard')
+            return redirect('dashboard')
 
     if title and subdomain and content and (not email or not password):
         return render(request, 'signup_flow/step_2.html', {
