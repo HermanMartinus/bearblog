@@ -18,11 +18,9 @@
 {% endblock %}
 
 {% block content %}
-<h1>Analytics{% if public %} for {{ blog.title }}{% endif %}</h1>
+<h1>Analytics{% if public %} for {{ blog.title }}{% endif %} ({{ days_filter }} days)</h1>
 <p>
     <b>Reading now:</b> {{ on_site|intcomma }}
-    <br>
-    <b>Total reads:</b> {{ unique_reads|intcomma }}
 </p>
 <span style="float:right; padding: 5px 0">
     <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last week</button>
@@ -37,6 +35,10 @@
     <span>{{ start_date|date:"j F Y" }}</span>
     <span>{{ end_date|date:"j F Y" }}</span> 
 </span>
+
+<p>
+    <b>Reads:</b> {{ unique_reads|intcomma }}
+</p>
 
 <p>
 {% if post_filter %}
