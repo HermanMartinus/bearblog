@@ -62,7 +62,7 @@ New post | Bear Blog
             meta_description: Look for the bear necessities.<br>
             meta_image: https://example.com/image.jpeg<br>
             lang: en<br>
-            tags: {{ blog.tags|join:", " }}<br>
+            tags: {% if blog.tags %}{{ blog.tags|join:", " }}{% else %}bears, writing, thoughts{% endif %}<br>
             make_discoverable: true
         </p>
         <a href="https://docs.bearblog.dev/home-page" target="_blank">
