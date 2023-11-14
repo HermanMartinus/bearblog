@@ -204,7 +204,7 @@ def post(request, slug=None):
                         except ValueError:
                             error_messages.append('Bad date format. Use YYYY-MM-DD')
                 elif name == 'tags':
-                    tags = [tag.strip() for tag in value.split(',')]
+                    tags = list(set([tag.strip() for tag in value.split(',')]))
                     post.all_tags = json.dumps(tags)
                 elif name == 'make_discoverable':
                     if type(value) is bool:

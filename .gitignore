@@ -110,3 +110,7 @@ venv.bak/
 
 # Sandbox
 blogs/sandbox.py
+
+# Testing tools
+fixture.json
+sync_data.sh

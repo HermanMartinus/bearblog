@@ -1,5 +1,3 @@
-from PIL import Image, ImageDraw, ImageFont
-from io import BytesIO
 from django.http import FileResponse
 from django.http import HttpResponse
 from django.http.response import Http404
@@ -15,6 +13,8 @@ from blogs.tasks import daily_task
 from blogs.templatetags.custom_tags import format_date
 from blogs.views.analytics import render_analytics
 
+from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont
 import json
 import tldextract
 import hashlib
@@ -96,15 +96,10 @@ def posts(request):
 
     if tag:
         posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
-        blog_posts = [post for post in posts if tag in post.get_tags]
+        blog_posts = [post for post in posts if tag in post.tags]
     else:
         all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         blog_posts = get_posts(all_posts)
-
-    tags = set()
-    for post in blog_posts:
-        tags.update(post.get_tags)
-    tags = sorted(tags)
 
     meta_description = blog.meta_description or unmark(blog.content)
 
@@ -116,7 +111,6 @@ def posts(request):
             'posts': blog_posts,
             'root': blog.useful_domain(),
             'meta_description':  meta_description,
-            'tags': tags,
             'query': tag,
         }
     )

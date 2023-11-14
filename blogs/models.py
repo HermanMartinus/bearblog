@@ -90,6 +90,15 @@ class Blog(models.Model):
             return f'//{self.domain}'
         else:
             return f'//{self.subdomain}.{Site.objects.get_current().domain}'
+    
+    @property
+    def tags(self):
+        all_tags = []
+        for post in Post.objects.filter(blog=self):
+            all_tags.extend(json.loads(post.all_tags))
+            all_tags = list(set(all_tags))
+        return sorted(all_tags)
+
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain()})'
@@ -123,8 +132,8 @@ class Post(models.Model):
         return "```" in self.content
 
     @property
-    def get_tags(self):
-        return json.loads(self.all_tags)
+    def tags(self):
+        return sorted(json.loads(self.all_tags))
 
     def __str__(self):
         return self.title
