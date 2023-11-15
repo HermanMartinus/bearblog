@@ -5,6 +5,7 @@ from django.contrib.gis.geoip2 import GeoIP2
 from django.http import Http404
 from django.conf import settings
 
+import os
 import random
 import threading
 import bleach
@@ -90,10 +91,13 @@ def check_connection(blog):
 
 
 def salt_and_hash(request, duration='day'):
+    ip_date_salt_string = f"{client_ip(request)}-{timezone.now().date()}-{os.getenv('SALT')}"
+    
     if duration == 'year':
-        hash_id = hashlib.md5(f"{client_ip(request)}-{timezone.now().year}".encode('utf-8')).hexdigest()
-    else:
-        hash_id = hashlib.md5(f"{client_ip(request)}-{timezone.now().date()}".encode('utf-8')).hexdigest()
+        ip_date_salt_string = f"{client_ip(request)}-{timezone.now().year}-{os.getenv('SALT')}"
+
+    hash_id = hashlib.sha256(ip_date_salt_string.encode('utf-8')).hexdigest()
+
     return hash_id
 
 

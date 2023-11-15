@@ -17,8 +17,8 @@ def daily_task():
 
         print('Executing daily task')
 
-        t = threading.Thread(target=scrub_hash_ids)
-        t.start()
+        # t = threading.Thread(target=scrub_hash_ids)
+        # t.start()
 
 
 # Scrub all hash_ids that are over 24 hours old
