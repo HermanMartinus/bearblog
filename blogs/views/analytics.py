@@ -212,13 +212,15 @@ class HitThread(threading.Thread):
             post_pk = Post.objects.filter(uid=self.uid).values_list('pk', flat=True).first()
 
             if post_pk:
-                Hit.objects.get_or_create(
+                hit, create = Hit.objects.get_or_create(
                     post_id=post_pk,
                     hash_id=hash_id,
                     referrer=referrer,
                     country=country,
                     device=device,
                     browser=browser)
+                if create:
+                    print(hit, 'hit')
 
         except Hit.MultipleObjectsReturned:
             print('Duplicate hit')
