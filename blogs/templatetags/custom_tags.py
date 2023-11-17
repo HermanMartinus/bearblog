@@ -1,4 +1,5 @@
 from django import template
+from django.utils import timezone
 from django.template.loader import render_to_string
 from django.utils import dateformat, translation
 from django.utils.dateformat import format as date_format
@@ -218,8 +219,8 @@ def element_replacement(markup, blog, post=None):
         markup = markup.replace('{{ post_title }}', post.title)
         markup = markup.replace('{{ post_description }}', post.meta_description)
         markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang))
-        if post.last_modified:
-            markup = markup.replace('{{ post_last_modified }}', timesince(post.last_modified))
+        last_modified = post.last_modified or timezone.now()
+        markup = markup.replace('{{ post_last_modified }}', timesince(last_modified))
         markup = markup.replace('{{ post_link }}', f"{blog.useful_domain()}/{post.slug}")
 
     return markup
