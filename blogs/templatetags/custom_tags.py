@@ -2,6 +2,7 @@ from django import template
 from django.template.loader import render_to_string
 from django.utils import dateformat, translation
 from django.utils.dateformat import format as date_format
+from django.utils.timesince import timesince
 
 from html import escape
 from bs4 import BeautifulSoup
@@ -12,6 +13,8 @@ import mistune
 import lxml
 import latex2mathml.converter
 import re
+
+from blogs.models import Post
 
 register = template.Library()
 
@@ -58,7 +61,16 @@ def typographic_replacements(text):
 
 
 @register.filter
-def markdown(content, blog=False):
+def markdown(content, blog_or_post=False):
+    post = None
+    blog= None
+    if blog_or_post:
+        if isinstance(blog_or_post, Post):
+            post = blog_or_post
+            blog = post.blog
+        else:
+            blog = blog_or_post
+        
     if not content:
         return ''
 
@@ -100,12 +112,12 @@ def markdown(content, blog=False):
 
     # Replace {{ xyz }} elements
     if blog:
-        processed_markup = excluding_pre(processed_markup, element_replacement, blog)
+        processed_markup = excluding_pre(processed_markup, element_replacement, blog, post)
 
     return processed_markup
 
 
-def excluding_pre(markup, func, blog=None):
+def excluding_pre(markup, func, blog=None, post=None):
     placeholders = {}
 
     def placeholder_div(match):
@@ -116,7 +128,10 @@ def excluding_pre(markup, func, blog=None):
     markup = re.sub(r'(<pre.*?>.*?</pre>|<code.*?>.*?</code>)', placeholder_div, markup, flags=re.DOTALL)
 
     if blog:
-        markup = func(markup, blog)
+        if post: 
+            markup = func(markup, blog, post)
+        else:
+            markup = func(markup, blog)
     else:
         markup = func(markup)
 
@@ -165,7 +180,7 @@ def apply_filters(posts, tag=None, limit=None, order=None):
             pass
     return posts
 
-def element_replacement(markup, blog):
+def element_replacement(markup, blog, post=None):
     pattern = r'\{\{\s*posts' \
           r'(?:\s*\|\s*tag:\s*(?P<tag>[^\|]+))?' \
           r'(?:\s*\|\s*limit:\s*(?P<limit>\d+))?' \
@@ -185,11 +200,22 @@ def element_replacement(markup, blog):
     
     markup = re.sub(pattern, replace_with_filtered_posts, markup)
 
+
+    translation.activate(blog.lang)
+    if post:
+        translation.activate(post.lang)
+
     markup = markup.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html'))
     markup = markup.replace('{{email-signup}}', render_to_string('snippets/email_subscribe_form.html'))
     
     markup = markup.replace('{{ blog_title }}', blog.title)
-    markup = markup.replace('{{ blog_last_modified }}', format_date(blog.last_modified, blog.date_format, blog.lang))
+    markup = markup.replace('{{ blog_created_date }}', format_date(blog.created_date, blog.date_format, blog.lang))
+    markup = markup.replace('{{ blog_last_modified }}', timesince(blog.last_modified))
+
+    if post:
+        markup = markup.replace('{{ post_title }}', post.title)
+        markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang))
+        markup = markup.replace('{{ post_last_modified }}', timesince(post.last_modified))
 
     return markup
 
