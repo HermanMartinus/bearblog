@@ -211,11 +211,13 @@ def element_replacement(markup, blog, post=None):
     markup = markup.replace('{{ blog_title }}', blog.title)
     markup = markup.replace('{{ blog_created_date }}', format_date(blog.created_date, blog.date_format, blog.lang))
     markup = markup.replace('{{ blog_last_modified }}', timesince(blog.last_modified))
+    markup = markup.replace('{{ blog_link }}', f"{blog.useful_domain()}")
 
     if post:
         markup = markup.replace('{{ post_title }}', post.title)
         markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang))
         markup = markup.replace('{{ post_last_modified }}', timesince(post.last_modified))
+        markup = markup.replace('{{ post_link }}', f"{blog.useful_domain()}/{post.slug}")
 
     return markup
 
