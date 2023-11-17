@@ -218,7 +218,8 @@ def element_replacement(markup, blog, post=None):
         markup = markup.replace('{{ post_title }}', post.title)
         markup = markup.replace('{{ post_description }}', post.meta_description)
         markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang))
-        markup = markup.replace('{{ post_last_modified }}', timesince(post.last_modified))
+        if post.last_modified:
+            markup = markup.replace('{{ post_last_modified }}', timesince(post.last_modified))
         markup = markup.replace('{{ post_link }}', f"{blog.useful_domain()}/{post.slug}")
 
     return markup
