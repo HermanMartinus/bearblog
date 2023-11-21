@@ -20,19 +20,23 @@ def discover(request):
     # admin actions
     if request.user.is_staff:
         if request.POST.get("hide-post", False):
-            post = Post.objects.get(pk=request.POST.get("hide-post", ''))
+            post = Post.objects.get(pk=request.POST.get("hide-post"))
             post.hidden = True
             post.save()
         if request.POST.get("block-blog", False):
-            post = Post.objects.get(pk=request.POST.get("block-blog", ''))
+            post = Post.objects.get(pk=request.POST.get("block-blog"))
             post.blog.blocked = True
             post.blog.save()
         if request.POST.get("boost-post", False):
-            post = Post.objects.get(pk=request.POST.get("boost-post", ''))
+            post = Post.objects.get(pk=request.POST.get("boost-post"))
             for i in range(0, 5):
                 upvote = Upvote(post=post, hash_id=f"boost-{i}")
                 upvote.save()
             post.update_score()
+        if request.POST.get("pin-post", False):
+            post = Post.objects.get(pk=request.POST.get("pin-post"))
+            post.pinned = not post.pinned
+            post.save()
 
     page = 0
     gravity = float(request.GET.get("gravity", 1.2))
@@ -45,34 +49,26 @@ def discover(request):
 
     newest = request.GET.get("newest")
 
+    pinned_posts = Post.objects.filter(pinned=True).order_by('-published_date')
+
+    # Base query excluding pinned posts
+    base_query = Post.objects.filter(
+        publish=True,
+        hidden=False,
+        blog__reviewed=True,
+        blog__blocked=False,
+        make_discoverable=True,
+        published_date__lte=timezone.now()
+    ).exclude(id__in=pinned_posts)
+
     if newest:
-        # New
-        posts = (
-            Post.objects.filter(
-                publish=True,
-                hidden=False,
-                blog__reviewed=True,
-                blog__blocked=False,
-                make_discoverable=True,
-                published_date__lte=timezone.now(),
-            )
-            .order_by("-published_date")
-            .select_related("blog")[posts_from:posts_to]
-        )
+        other_posts = base_query.order_by("-published_date")
     else:
-        # Trending
-        posts = (
-            Post.objects.filter(
-                publish=True,
-                hidden=False,
-                blog__reviewed=True,
-                blog__blocked=False,
-                make_discoverable=True,
-                published_date__lte=timezone.now()
-            )
-            .order_by("-score", "-published_date")
-            .select_related("blog")[posts_from:posts_to]
-        )
+        other_posts = base_query.order_by("-score", "-published_date")
+
+    other_posts = other_posts.select_related("blog")[posts_from:posts_to]
+
+    posts = list(pinned_posts) + list(other_posts)
 
     return render(request, "discover.html", {
         "site": Site.objects.get_current(),
