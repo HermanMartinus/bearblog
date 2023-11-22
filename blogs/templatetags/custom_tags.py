@@ -5,6 +5,10 @@ from django.utils import dateformat, translation
 from django.utils.dateformat import format as date_format
 from django.utils.timesince import timesince
 
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import HtmlFormatter
+
 from html import escape
 from bs4 import BeautifulSoup
 from lxml.html.clean import Cleaner, defs
@@ -88,16 +92,20 @@ def markdown(content, blog_or_post=False):
             anchor.attrs['href'] = anchor.attrs['href'].replace('tab:', '')
             anchor.attrs['target'] = '_blank'
 
-    for code_block in soup.findAll('code'):
-        if code_block.parent.name == 'pre':
-            if code_block.has_attr('class'):
-                code_block.parent.attrs['class'] = code_block['class'][0].replace('language-', '')
-            code_block.replaceWithChildren()
-        else:
-            if len(code_block.contents) > 0:
-                new_tag = soup.new_tag("code")
-                new_tag.append(escape(str(code_block.contents[0])))
-                code_block.replace_with(new_tag)
+    for code_block in soup.find_all('code'):
+        if code_block.parent and code_block.parent.name == 'pre':
+            # Add pygments
+            language = code_block.get('class', [''])[0].split('-')[-1]
+            try:
+                lexer = get_lexer_by_name(language)
+            except ValueError:
+                lexer = get_lexer_by_name('text')
+
+            formatter = HtmlFormatter(style='friendly')
+            highlighted_code = highlight(code_block.get_text(), lexer, formatter)
+
+            new_code = BeautifulSoup(highlighted_code, 'html.parser')
+            code_block.parent.replace_with(new_code)
 
     processed_markup = str(soup)
 
@@ -201,27 +209,29 @@ def element_replacement(markup, blog, post=None):
     
     markup = re.sub(pattern, replace_with_filtered_posts, markup)
 
-
+    current_lang = "en" # translation.get_language()
     translation.activate(blog.lang)
     if post:
         translation.activate(post.lang)
 
     markup = markup.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html'))
     markup = markup.replace('{{email-signup}}', render_to_string('snippets/email_subscribe_form.html'))
-    
-    markup = markup.replace('{{ blog_title }}', blog.title)
-    markup = markup.replace('{{ blog_description }}', blog.meta_description)
+
+    markup = markup.replace('{{ blog_title }}', escape(blog.title))
+    markup = markup.replace('{{ blog_description }}', escape(blog.meta_description))
     markup = markup.replace('{{ blog_created_date }}', format_date(blog.created_date, blog.date_format, blog.lang))
     markup = markup.replace('{{ blog_last_modified }}', timesince(blog.last_modified))
     markup = markup.replace('{{ blog_link }}', f"{blog.useful_domain()}")
 
     if post:
-        markup = markup.replace('{{ post_title }}', post.title)
-        markup = markup.replace('{{ post_description }}', post.meta_description)
+        markup = markup.replace('{{ post_title }}', escape(post.title))
+        markup = markup.replace('{{ post_description }}', escape(post.meta_description))
         markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang))
         last_modified = post.last_modified or timezone.now()
         markup = markup.replace('{{ post_last_modified }}', timesince(last_modified))
         markup = markup.replace('{{ post_link }}', f"{blog.useful_domain()}/{post.slug}")
+
+    translation.activate(current_lang)
 
     return markup
 

@@ -43,9 +43,9 @@
 {% endif %}
 
 {% if blog.content %}
-{% pygmentify %}
-    {{ blog.content | markdown:blog | safe }}
-{% endpygmentify %}
+
+{{ blog.content | markdown:blog | safe }}
+
 {% else %}
 {% include "snippets/post_list.html" %}
 {% endif %}
