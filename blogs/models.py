@@ -97,7 +97,10 @@ class Blog(models.Model):
             all_tags.extend(json.loads(post.all_tags))
             all_tags = list(set(all_tags))
         return sorted(all_tags)
-
+    
+    @property
+    def last_posted(self):
+        return self.post_set.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain})'
@@ -134,10 +137,6 @@ class Post(models.Model):
     @property
     def tags(self):
         return sorted(json.loads(self.all_tags))
-    
-    @property
-    def last_updated(self):
-        return self.post_set.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
     def update_score(self):
         self.upvotes = self.upvote_set.count()
