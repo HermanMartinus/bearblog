@@ -34,8 +34,8 @@ urlpatterns = [
 
     path('dashboard/posts/', dashboard.posts_edit, name='post'),
     path('dashboard/posts/new/', studio.post, name="post_new"),
-    path('dashboard/posts/<slug>/', studio.post, name="post_edit"),
-    path('dashboard/posts/<slug>/delete/', dashboard.post_delete, name='post_delete'),
+    path('dashboard/posts/<uid>/', studio.post, name="post_edit"),
+    path('dashboard/posts/<uid>/delete/', dashboard.post_delete, name='post_delete'),
     path('dashboard/preview/', studio.preview, name="post_preview"),
     path('dashboard/upload-image/', dashboard.upload_image, name='upload_image'),
 
@@ -54,10 +54,10 @@ urlpatterns = [
     path('robots.txt', blog.robots, name='robots'),
     path('public-analytics/', blog.public_analytics, name="public_analytics"),
     path('upvote/<uid>/', blog.upvote, name='upvote'),
+    path('hit/<uid>/', analytics.post_hit, name='post_hit'),
     path('subscribe/', emailer.subscribe, name='subscribe'),
     path('email-subscribe/', emailer.email_subscribe, name='email_subscribe'),
     path('confirm-subscription/', emailer.confirm_subscription, name='confirm_subscription'),
-    path('hit/<uid>/', analytics.post_hit, name='post_hit'),
     path("feed/", feed.feed, name="post_feed"),
     path('<slug>/', blog.post, name='post'),
     path('<slug>/meta_image/', blog.generate_meta_image, name='generate_meta_image'),

@@ -145,13 +145,13 @@ def parse_raw_homepage(blog, header_content, body_content):
 
 
 @login_required
-def post(request, slug=None):
+def post(request, uid=None):
     blog = get_object_or_404(Blog, user=request.user)
     tags = []
     post = None
 
-    if slug:
-        post = Post.objects.filter(blog=blog, slug=slug).first()
+    if uid:
+        post = Post.objects.filter(blog=blog, uid=uid).first()
 
     error_messages = []
     header_content = request.POST.get("header_content", "")
@@ -257,7 +257,7 @@ def post(request, slug=None):
                     post.update_score()
 
                     # Redirect to the new post detail view
-                    return redirect('post_edit', slug=post.slug)
+                    return redirect('post_edit', uid=post.uid)
 
         except ValidationError:
             error_messages.append("One of the header options is invalid")
