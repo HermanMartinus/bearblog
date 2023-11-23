@@ -16,7 +16,7 @@
 
 <form method="POST" class="post-form full-width">{% csrf_token %}
     <button type="submit">Publish</button>
-    <button onclick="event.preventDefault();window.open('{{blog.dynamic_domain}}');">View</button>
+    <button onclick="event.preventDefault();window.open('{{blog.dynamic_useful_domain}}');">View</button>
     {{ form.as_p }}
 </form>
 

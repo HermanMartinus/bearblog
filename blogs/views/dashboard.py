@@ -38,7 +38,7 @@ def nav(request):
     return render(request, 'dashboard/nav.html', {
         'form': form,
         'blog': blog,
-        'root': blog.useful_domain()
+        'root': blog.useful_domain
     })
 
 

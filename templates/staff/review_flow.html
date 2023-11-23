@@ -54,8 +54,8 @@ Herman
 <a href="mailto:{{ blog.user.email }}">{{ blog.user.email }}</a>
 <p><b>Created {{ blog.created_date | timesince }} ago</b></p>
 
-<nav>{{ blog.nav | markdown | safe }}</nav>
-{{ content | markdown | safe }}
+<nav>{{ blog.nav | markdown:blog | safe }}</nav>
+{{ content | markdown:blog | safe }}
 
 
 <ul style="padding-bottom: 300px">
@@ -69,7 +69,7 @@ Herman
         </i>
         <h3><a href="{{ root }}/{{ post.slug }}/" target="_blank">{{ post.title }}</a></h3>
         <p>
-            {{ post.content | markdown | safe }}
+            {{ post.content | markdown:post | safe }}
         </p>
     </li>
     {% endfor %}

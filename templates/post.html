@@ -50,7 +50,7 @@
 }
 {% if blog.analytics_active and not preview %}
 body:hover {
-    border-image: url("/hit/{{ post.uid }}/{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
+    border-image: url("/hit/{{ post.uid }}/{% if blog.blank_useful_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
     border-width: 0;
 }
 {% endif %}

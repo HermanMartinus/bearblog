@@ -69,7 +69,7 @@
                     {{post.title}}
                     {% endif %}
                     <small>(▵{{ post.upvotes }})</small>
-                    <a href="{{ blog.dynamic_domain }}/{{ post.slug }}" target="_blank">↪</a>
+                    <a href="{{ blog.dynamic_useful_domain }}/{{ post.slug }}" target="_blank">↪</a>
                 </span>
                 <span>{{post.hit_count|intcomma}}</span>
             </li>
@@ -136,7 +136,7 @@
         <p>
             {% if blog.public_analytics %}
             Public analytics available at 
-            <a href="{{blog.dynamic_domain}}/public-analytics/" target="_blank">{{ blog.useful_domain }}/public-analytics/</a>
+            <a href="{{blog.dynamic_useful_domain}}/public-analytics/" target="_blank">{{ blog.useful_domain }}/public-analytics/</a>
             <br>
             <button onclick="window.location = '?share=private'">Make analytics private</button>
             {% else %}

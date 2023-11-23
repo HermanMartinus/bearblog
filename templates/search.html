@@ -31,11 +31,11 @@
     {% for post in posts %}
     <li>
         <div>
-            <a href="{{ post.blog.dynamic_domain }}/{{ post.slug }}">
+            <a href="{{ post.blog.dynamic_useful_domain }}/{{ post.slug }}">
                 {{ post.title }}
             </a>
             <small>
-                <span>(<a href="{{ post.blog.dynamic_domain }}">{{ post.blog.useful_domain }}</a>)</span>
+                <span>(<a href="{{ post.blog.dynamic_useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>
                 <br>
                 <small>Published {{ post.published_date|timesince }} ago</small>
                 <small>

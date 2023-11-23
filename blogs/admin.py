@@ -22,7 +22,7 @@ class UserAdmin(admin.ModelAdmin):
         blog = Blog.objects.get(user=obj)
         return format_html(
             "<a href='{url}' target='_blank'>{url}</a>",
-            url={blog.useful_domain()})
+            url={blog.useful_domain})
 
     subdomain_url.short_description = "Subdomain"
 

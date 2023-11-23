@@ -148,7 +148,7 @@ def delete_empty(request):
 
 @staff_member_required
 def review_flow(request):
-    blogs = Blog.objects.filter(reviewed=False, blocked=False).annotate(
+    blogs = Blog.objects.filter(reviewed=False, blocked=False, to_review=True).annotate(
         post_count=Count("post"),
     ).prefetch_related("post_set").order_by('created_date')
 
@@ -168,7 +168,7 @@ def review_flow(request):
                 'blog': blog,
                 'content': blog.content or "~nothing here~",
                 'posts': all_posts,
-                'root': blog.useful_domain(),
+                'root': blog.useful_domain,
                 'still_to_go': len(unreviewed_blogs),
             })
     else:
@@ -217,6 +217,6 @@ def extract_blog_info(blog):
     return {
         'title': blog.title,
         'content': blog.content,
-        'url': blog.useful_domain(),
+        'url': blog.useful_domain,
         'posts': posts_info
     }

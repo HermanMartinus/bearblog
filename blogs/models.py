@@ -54,6 +54,7 @@ class Blog(models.Model):
     post_template = models.TextField(blank=True)
     robots_txt = models.TextField(blank=True)
 
+    @property
     def older_than_one_day(self):
         return (timezone.now() - self.created_date).days > 1
 
@@ -61,35 +62,33 @@ class Blog(models.Model):
     def contains_code(self):
         return "```" in self.content
 
-    def bear_domain(self):
-        return f'https://{self.subdomain}.{Site.objects.get_current().domain}'
-
+    @property
     def blank_bear_domain(self):
         return f'{self.subdomain}.{Site.objects.get_current().domain}'
 
-    def useful_domain(self, protocol='https://'):
-        if self.domain:
-            return f'{protocol}{self.domain}'
-        else:
-            return f'{protocol}{self.subdomain}.{Site.objects.get_current().domain}'
+    @property
+    def bear_domain(self):
+        return f'https://{self.blank_bear_domain}'
 
-    def blank_domain(self):
+    @property
+    def blank_useful_domain(self):
         if self.domain:
             return self.domain
         else:
-            return f'{self.subdomain}.{Site.objects.get_current().domain}'
+            return f'{self.blank_bear_domain}'
 
+    @property
+    def useful_domain(self):
+        return f'https://{self.blank_useful_domain}'
+
+    @property
+    def dynamic_useful_domain(self):
+        return f'//{self.blank_useful_domain}'
+    
     @property
     def is_empty(self):
         content_length = len(self.content) if self.content is not None else 0
         return not self.upgraded and content_length < 20 and self.post_set.count() == 0 and self.custom_styles == ""
-
-    @property
-    def dynamic_domain(self):
-        if self.domain:
-            return f'//{self.domain}'
-        else:
-            return f'//{self.subdomain}.{Site.objects.get_current().domain}'
     
     @property
     def tags(self):
@@ -101,7 +100,7 @@ class Blog(models.Model):
 
 
     def __str__(self):
-        return f'{self.title} ({self.useful_domain()})'
+        return f'{self.title} ({self.useful_domain})'
 
 
 class Post(models.Model):
@@ -135,21 +134,10 @@ class Post(models.Model):
     @property
     def tags(self):
         return sorted(json.loads(self.all_tags))
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        self.slug = self.slug.lower()
-        if not self.all_tags:
-            self.all_tags = '[]'
-        
-        # Create unique random identifier
-        if not self.uid:
-            allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
-            self.uid = ''.join(random.choice(allowed_chars) for _ in range(20))
-
-        super(Post, self).save(*args, **kwargs)
+    
+    @property
+    def last_updated(self):
+        return self.post_set.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
     def update_score(self):
         self.upvotes = self.upvote_set.count()
@@ -164,6 +152,21 @@ class Post(models.Model):
 
         self.save()
         return
+    
+    def save(self, *args, **kwargs):
+        self.slug = self.slug.lower()
+        if not self.all_tags:
+            self.all_tags = '[]'
+        
+        # Create unique random identifier
+        if not self.uid:
+            allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
+            self.uid = ''.join(random.choice(allowed_chars) for _ in range(20))
+
+        super(Post, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
 
 
 class Upvote(models.Model):
@@ -209,14 +212,14 @@ class Stylesheet(models.Model):
 class PersistentStore(models.Model):
     last_executed = models.DateTimeField(default=timezone.now)
 
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super(PersistentStore, self).save(*args, **kwargs)
-
     @classmethod
     def load(cls):
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(PersistentStore, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.last_executed.strftime('%d %B %Y, %I:%M %p')

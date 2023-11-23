@@ -29,7 +29,7 @@ New post | Bear Blog
         <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
         
         {% if post %}
-            <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}/{{ post.slug }}{% if not post.publish %}?preview=true{% endif %}');">
+            <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}/{{ post.slug }}{% if not post.publish %}?preview=true{% endif %}');">
                 View{% if not post.publish %} draft{% endif %}
             </button>
             <button

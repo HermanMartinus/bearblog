@@ -82,7 +82,7 @@ def home(request):
         {
             'blog': blog,
             'posts': get_posts(all_posts),
-            'root': blog.useful_domain(),
+            'root': blog.useful_domain,
             'meta_description': meta_description
         })
 
@@ -109,7 +109,7 @@ def posts(request):
         {
             'blog': blog,
             'posts': blog_posts,
-            'root': blog.useful_domain(),
+            'root': blog.useful_domain,
             'meta_description':  meta_description,
             'query': tag,
         }
@@ -140,7 +140,7 @@ def post(request, slug):
     hash_id = salt_and_hash(request, 'year')
     upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
 
-    root = blog.useful_domain()
+    root = blog.useful_domain
     meta_description = post.meta_description or unmark(post.content)
     full_path = f'{root}/{post.slug}/'
     canonical_url = full_path
@@ -157,7 +157,7 @@ def post(request, slug):
             'blog': blog,
             'content': post.content,
             'post': post,
-            'root': blog.useful_domain(),
+            'root': blog.useful_domain,
             'full_path': full_path,
             'canonical_url': canonical_url,
             'meta_description': meta_description,
@@ -221,7 +221,7 @@ def generate_meta_image(request, slug):
     d.text((10, 10), title, fill=(255, 255, 255), font=font_title)
     d.text((10, 40), f"*{format_date(post.published_date, blog.date_format, blog.lang)}*", fill=(255, 255, 255), font=font_date)
     d.text((10, 60), description, fill=(255, 255, 255), font=font_description)
-    d.text((10, 160), blog.useful_domain(), fill=(255, 255, 255), font=font_description)
+    d.text((10, 160), blog.useful_domain, fill=(255, 255, 255), font=font_description)
 
     img_io = BytesIO()
     img.save(img_io, 'PNG', quality=100)

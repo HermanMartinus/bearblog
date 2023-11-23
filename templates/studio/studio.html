@@ -35,7 +35,7 @@
         </tr>
         <tr>
             <td>CNAME</td>
-            <td><small>{{ blog.blank_domain }}</small></td>
+            <td><small>{{ blog.blank_useful_domain }}</small></td>
             <td><small>domain-proxy.bearblog.dev</small></td>
             <td>3600</td>
         </tr>
@@ -56,7 +56,7 @@
     <p class="sticky-controls">
         <button type="submit">Publish</button>
         {% if blog %}
-        <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_domain }}')">View</button>
+        <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}')">View</button>
         {% endif %}
     </p>
     <details style="font-size: 12px; margin-bottom: 10px;">

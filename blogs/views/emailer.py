@@ -69,7 +69,7 @@ def subscribe(request):
         'subscribe.html',
         {
             'blog': blog,
-            'root': blog.useful_domain(),
+            'root': blog.useful_domain,
         }
     )
 
@@ -109,7 +109,7 @@ def confirm_subscription(request):
         return HttpResponse(f'''
             <p style='text-align: center; padding-top: 10%'>
                 Your subscription to
-                <a href="{blog.useful_domain()}">{blog.title}</a>
+                <a href="{blog.useful_domain}">{blog.title}</a>
                 has been confirmed. ＼ʕ •ᴥ•ʔ／
             </p>
             ''')
@@ -119,10 +119,10 @@ def confirm_subscription(request):
 
 def validate_subscriber_email(email, blog):
     token = hashlib.md5(f'{email} {blog.subdomain} {timezone.now().strftime("%B %Y")}'.encode()).hexdigest()
-    confirmation_link = f'{blog.useful_domain()}/confirm-subscription/?token={token}&email={email}'
+    confirmation_link = f'{blog.useful_domain}/confirm-subscription/?token={token}&email={email}'
 
     html_message = f'''
-        You've decided to subscribe to {blog.title} ({blog.useful_domain()}). That's awesome!
+        You've decided to subscribe to {blog.title} ({blog.useful_domain}). That's awesome!
         <br>
         <br>
         Follow this <a href="{confirmation_link}">link</a> to confirm your subscription.
@@ -131,7 +131,7 @@ def validate_subscriber_email(email, blog):
         Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
     '''
     text_message = f'''
-        You've decided to subscribe to {blog.title} ({blog.useful_domain()}). That's awesome!
+        You've decided to subscribe to {blog.title} ({blog.useful_domain}). That's awesome!
 
         Follow this link to confirm your subscription: {confirmation_link}
 

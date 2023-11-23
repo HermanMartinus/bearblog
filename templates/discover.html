@@ -38,11 +38,11 @@
             #{{ forloop.counter|add:posts_from }}
         </span>
         <div>
-            <a href="{{ post.blog.dynamic_domain }}/{{ post.slug }}">
+            <a href="{{ post.blog.dynamic_useful_domain }}/{{ post.slug }}">
                 {{ post.title }}
             </a>
             <small>
-                <span>(<a href="{{ post.blog.dynamic_domain }}">{{ post.blog.useful_domain }}</a>)</span>
+                <span>(<a href="{{ post.blog.dynamic_useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>
                 <br>
                 {% if post.pinned %}<small style="position: absolute; top:0; right:0;">📍 Pinned</small>{% endif %}
                 <small>Published {{ post.published_date|timesince }} ago</small>
