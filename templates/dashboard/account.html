@@ -27,18 +27,20 @@
     <a href="/accounts/password/change/">Change password</a>
 </p>
 <p>
-    <a href="?export=true" download>Download all blog information</a>
+    <a href="?export=true" download>Export all blog data</a>
 </p>
 
+{% if subscription_link %}
 <p>
+    <a href="{{ subscription_link }}" target="_blank">Manage subscription</a>
+</p>
+{% endif %}
+
+<p>
+    {% if not subscription_cancelled %}
+    <a onclick="alert('Please cancel your subscription before deleting your account.')">Delete account</a>
+    {% else %}
     <a href="{% url 'user_delete' %}">Delete account</a>
-    {% if blog.upgraded %}
-    <br>
-    <small class="help-text">
-        Ensure your subscription is cancelled on
-        <a href="https://app.lemonsqueezy.com/my-orders/" target="_blank">LemonSqueezy</a>
-        before deleting your account.
-    </small>
     {% endif %}
 </p>
 <p>

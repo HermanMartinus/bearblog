@@ -19,6 +19,7 @@ import djqscsv
 from blogs.forms import NavForm, StyleForm
 from blogs.helpers import get_country, sanitise_int
 from blogs.models import Blog, Post, Stylesheet, Upvote
+from blogs.subscriptions import get_subscriptions
 
 
 @login_required
@@ -197,12 +198,26 @@ def opt_in_review(request):
 @login_required
 def settings(request):
     blog = get_object_or_404(Blog, user=request.user)
+    subscription_cancelled = None
+    subscription_link = None
+
+    if blog.order_id:
+        subscription = get_subscriptions(blog.order_id)
+
+        try:
+            if subscription:
+                subscription_cancelled = subscription['data'][0]['attributes']['cancelled']
+                subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal']
+        except KeyError and IndexError:
+            print('No sub found')
 
     if request.GET.get("export", ""):
         return djqscsv.render_to_csv_response(blog.post_set)
 
     return render(request, "dashboard/account.html", {
-        "blog": blog
+        "blog": blog,
+        'subscription_cancelled': subscription_cancelled,
+        'subscription_link': subscription_link
     })
 
 

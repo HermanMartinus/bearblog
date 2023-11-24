@@ -3,19 +3,20 @@ import os
 import dj_database_url
 from django.utils.log import DEFAULT_LOGGING
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 PROJECT_NAME = "🐼 BEARBLOG 🐼"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET')
 HEROKU_BEARER_TOKEN = os.getenv('HEROKU_BEARER_TOKEN')
 LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
 SLACK_WEBHOOK = os.getenv('SLACK_WEBHOOK')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = (os.environ.get('DEBUG') == 'True')
+DEBUG = (os.getenv('DEBUG') == 'True')
 
 # Logging settings
 if not DEBUG:

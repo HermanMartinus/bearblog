@@ -1,7 +1,8 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow
+from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow
+from blogs import subscriptions
 from textblog import logger
 
 urlpatterns = [
@@ -46,7 +47,7 @@ urlpatterns = [
     path('discover/feed/', discover.feed, name='discover_feed'),
     path('search/', discover.search, name='search'),
 
-    path('lemon-webhook/', blog.lemon_webhook, name='lemon_webhook'),
+    path('lemon-webhook/', subscriptions.lemon_webhook, name='lemon_webhook'),
 
     path('ping/', blog.ping, name='ping'),
     path('blog/', blog.posts, name='posts'),

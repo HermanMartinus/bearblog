@@ -15,10 +15,7 @@ from blogs.views.analytics import render_analytics
 
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
-import json
 import tldextract
-import hashlib
-import hmac
 
 
 def resolve_address(request):
@@ -256,53 +253,6 @@ def public_analytics(request):
         return not_found(request)
 
     return render_analytics(request, blog, True)
-
-
-@csrf_exempt
-def lemon_webhook(request):
-    digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode('utf-8'), msg=request.body, digestmod=hashlib.sha256).hexdigest()
-
-    if request.META.get('HTTP_X_SIGNATURE') != digest:
-        raise Http404('Blog not found')
-
-    data = json.loads(request.body, strict=False)
-
-    # Blog upgrade
-    if 'order_created' in request.META.get('HTTP_X_EVENT_NAME', ''):
-        blog = None
-        try:
-            subdomain = str(data['meta']['custom_data']['blog'])
-            blog = get_object_or_404(Blog, subdomain=subdomain)
-            print(f'Found subdomain {subdomain}, upgrading blog...')
-        except KeyError:
-            email = str(data['data']['attributes']['user_email'])
-            blog = Blog.objects.get(user__email=email)
-            print(f'Found email address {email}, upgrading blog...')
-
-        if blog:
-            blog.reviewed = True
-            blog.upgraded = True
-            blog.upgraded_date = timezone.now()
-            blog.order_id = data['data']['id']
-            blog.save()
-            return HttpResponse(f'Upgraded {blog}')
-
-    # Blog downgrade
-    elif 'subscription_expired' in request.META.get('HTTP_X_EVENT_NAME', ''):
-        blog = None
-        try:
-            blog = get_object_or_404(Blog, order_id=data['data']['attributes']['order_id'])
-            print('Found order_id, downgrading blog...')
-            if blog:
-                blog.upgraded = False
-                blog.upgraded_date = None
-                blog.order_id = None
-                blog.save()
-                return HttpResponse(f'Downgraded {blog}')
-        except KeyError:
-            print('Could not find order_id')
-
-    return HttpResponse('Valid webhook call with no action taken')
 
 
 def not_found(request, *args, **kwargs):
