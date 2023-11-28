@@ -1,16 +1,29 @@
-<small>
-    <form id="upvote-form" action="/upvote/{{ post.pk }}/" method="post" style="display: inline">
-        <input hidden name="pk" value="{{ post.pk }}" style="display:none"/>
-        <input hidden name="title" style="display:none"/>
+<form id="upvote-form" action="/upvote/{{ post.uid }}/" method="post" style="display: inline">
+    <small>
+        <input hidden name="uid" value="{{ post.uid }}" style="display:none">
+        <input hidden name="title" style="display:none">
         {% csrf_token %}
         {% if upvoted %}
-        <button disabled=true>▵ Toasted</button>
+        <button
+            class="upvote-button upvoted"
+            disabled=true
+            title="Toasted"
+        >
         {% else %}
-        <button>▵ Toast this post</button>
+        <button
+            class="upvote-button"
+            title="Toast this post"
+        >
         {% endif %}
-    </form>
-    - <small class="upvote-count">{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</small>
-</small>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
+                <polyline points="17 11 12 6 7 11"></polyline>
+                <polyline points="17 18 12 13 7 18"></polyline>
+            </svg>
+            <small class="upvote-count">{{ post.upvotes }}</small>
+        </button>
+    </small>        
+</form>
+
 <script>
     document.querySelector('#upvote-form').addEventListener('submit', (e) => {
         e.preventDefault();
@@ -21,8 +34,8 @@
         });
         const button = form.querySelector('button')
         button.disabled = true
-        button.innerText = "▵ Toasted"
+        button.style.color = "salmon"
         const upvoteCount = document.querySelector('.upvote-count')
-        upvoteCount.innerHTML = `${(parseInt(upvoteCount.innerHTML.split(" ")[0]) + 1)} toasts`
+        upvoteCount.innerHTML = `${(parseInt(upvoteCount.innerHTML.split(" ")[0]) + 1)}`
     });
 </script>

@@ -1,24 +1,21 @@
+from django.http import FileResponse
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
-from django.db.models import Count
 from django.utils import timezone
 from django.conf import settings
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_posts, sanitise_int, unmark
+from blogs.helpers import get_posts, salt_and_hash, unmark
+from blogs.tasks import daily_task
+from blogs.templatetags.custom_tags import format_date
+from blogs.views.analytics import render_analytics
 
-from ipaddr import client_ip
-from taggit.models import Tag
-import hashlib
-import json
+from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont
 import tldextract
-import hashlib
-import hmac
-
-from blogs.views.studio import render_analytics
 
 
 def resolve_address(request):
@@ -69,9 +66,10 @@ def ping(request):
 def home(request):
     blog = resolve_address(request)
     if not blog:
+        daily_task()
         return render(request, 'landing.html')
 
-    all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+    all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
 
     meta_description = blog.meta_description or unmark(blog.content)
 
@@ -81,7 +79,7 @@ def home(request):
         {
             'blog': blog,
             'posts': get_posts(all_posts),
-            'root': blog.useful_domain(),
+            'root': blog.useful_domain,
             'meta_description': meta_description
         })
 
@@ -91,23 +89,14 @@ def posts(request):
     if not blog:
         return not_found(request)
 
-    query = request.GET.get('q', '')
-    if query:
-        try:
-            tag = Tag.objects.get(name=query)
-            all_posts = blog.post_set.filter(tags=tag, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
-        except Tag.DoesNotExist:
-            all_posts = []
-        blog_posts = all_posts
+    tag = request.GET.get('q', '')
+
+    if tag:
+        posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
+        blog_posts = [post for post in posts if tag in post.tags]
     else:
         all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         blog_posts = get_posts(all_posts)
-
-    tags = []
-    for post in all_posts:
-        tags += post.tags.most_common()[:10]
-    tags = list(dict.fromkeys(tags))
-    tags.sort()
 
     meta_description = blog.meta_description or unmark(blog.content)
 
@@ -117,10 +106,9 @@ def posts(request):
         {
             'blog': blog,
             'posts': blog_posts,
-            'root': blog.useful_domain(),
+            'root': blog.useful_domain,
             'meta_description':  meta_description,
-            'tags': tags,
-            'query': query,
+            'query': tag,
         }
     )
 
@@ -135,27 +123,21 @@ def post(request, slug):
     if slug == blog.blog_path:
         return posts(request)
 
-    try:
-        # Find by post slug
-        post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, slug__iexact=slug)[0]
-
-    except IndexError:
+    # Find by post slug
+    post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
+    if not post:
         # Find by post alias
-        try:
-            post = Post.objects.annotate(upvote_count=Count('upvote')).filter(blog=blog, alias__iexact=slug)[0]
+        post = Post.objects.filter(blog=blog, alias__iexact=slug).first()
+        if post:
             return redirect(f"/{post.slug}")
-        except IndexError:
+        else:
             return render(request, '404.html', {'blog': blog}, status=404)
 
     # Check if upvoted
-    ip_address = client_ip(request)
-    ip_hash = hashlib.md5(f"{ip_address}-{timezone.now().year}".encode('utf-8')).hexdigest()
-    upvoted = False
-    for upvote in post.upvote_set.all():
-        if upvote.ip_address == ip_hash or upvote.ip_address == ip_address:
-            upvoted = True
+    hash_id = salt_and_hash(request, 'year')
+    upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
 
-    root = blog.useful_domain()
+    root = blog.useful_domain
     meta_description = post.meta_description or unmark(post.content)
     full_path = f'{root}/{post.slug}/'
     canonical_url = full_path
@@ -172,7 +154,7 @@ def post(request, slug):
             'blog': blog,
             'content': post.content,
             'post': post,
-            'root': blog.useful_domain(),
+            'root': blog.useful_domain,
             'full_path': full_path,
             'canonical_url': canonical_url,
             'meta_description': meta_description,
@@ -187,22 +169,76 @@ def post_alias(request, resource):
     if not blog:
         return not_found(request)
 
-    post = get_object_or_404(Post, blog=blog, alias=resource)
-    return redirect(f"/{post.slug}")
+    post = Post.objects.filter(blog=blog, alias=resource).first()
+    if post:
+        return redirect(f"/{post.slug}")
+    return render(request, '404.html', {'blog': blog}, status=404)
+
+
+def generate_meta_image(request, slug):
+    blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+
+    post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
+
+    img = Image.new('RGB', (250, 180), color="#01242e")
+    d = ImageDraw.Draw(img)
+
+    font_title = ImageFont.load_default()
+    font_date = ImageFont.load_default()
+    font_description = ImageFont.load_default()
+
+    description = post.meta_description or post.content
+    if len(description) > 180:
+        description = description[0:180].strip() + '...'
+
+    # Insert line breaks after a space without breaking a word
+    words = description.split(' ')
+    lines = []
+    current_line = ''
+
+    for word in words:
+        if len(current_line) + len(word) <= 35:
+            current_line += ' ' + word if current_line else word
+        else:
+            lines.append(current_line.strip())
+            current_line = word
+
+    if current_line:
+        lines.append(current_line.strip())
+
+    description = '\n'.join(lines)
+
+    title = f"# {post.title}"
+    if len(title) > 35:
+        title = f"{title[0:35].strip()}..."
+
+    # Draw text
+    d.text((10, 10), title, fill=(255, 255, 255), font=font_title)
+    d.text((10, 40), f"*{format_date(post.published_date, blog.date_format, blog.lang)}*", fill=(255, 255, 255), font=font_date)
+    d.text((10, 60), description, fill=(255, 255, 255), font=font_description)
+    d.text((10, 160), blog.useful_domain, fill=(255, 255, 255), font=font_description)
+
+    img_io = BytesIO()
+    img.save(img_io, 'PNG', quality=100)
+    img_io.seek(0)
+
+    return FileResponse(img_io, filename='meta.png', content_type='image/png')
 
 
 @csrf_exempt
-def upvote(request, pk):
-    ip_hash = hashlib.md5(f"{client_ip(request)}-{timezone.now().year}".encode('utf-8')).hexdigest()
+def upvote(request, uid):
+    hash_id = salt_and_hash(request, 'year')
 
-    if pk == request.POST.get("pk", "") and not request.POST.get("title", False):
-        pk = sanitise_int(pk, 7)
-        post = get_object_or_404(Post, pk=pk)
-        posts_upvote_dupe = post.upvote_set.filter(ip_address=ip_hash)
-        if len(posts_upvote_dupe) == 0:
-            upvote = Upvote(post=post, ip_address=ip_hash)
-            upvote.save()
-            post.update_score()
+    if uid == request.POST.get("uid", "") and not request.POST.get("title", False):
+        post = get_object_or_404(Post, uid=uid)
+        print("Upvoting", post)
+        upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
+
+        post.update_score()
+
+        if created:
             return HttpResponse(f'Upvoted {post.title}')
         raise Http404('Duplicate upvote')
     raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
@@ -217,42 +253,6 @@ def public_analytics(request):
         return not_found(request)
 
     return render_analytics(request, blog, True)
-
-
-@csrf_exempt
-def lemon_webhook(request):
-    digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode('utf-8'), msg=request.body, digestmod=hashlib.sha256).hexdigest()
-
-    if request.META.get('HTTP_X_SIGNATURE') != digest:
-        raise Http404('Blog not found')
-
-    data = json.loads(request.body, strict=False)
-
-    if request.META.get('HTTP_X_EVENT_NAME') == 'subscription_cancelled' or request.META.get('HTTP_X_EVENT_NAME') == 'subscription_expired':
-        # TODO: set up auto-cancellation
-        # mail_admins(
-        #     "A subscription has been cancelled",
-        #     str(data.get('data').get('attributes'))
-        # )
-        return HttpResponse(f'Cancellation email sent')
-    else:
-        try:
-            subdomain = str(data['meta']['custom_data']['blog'])
-            blog = get_object_or_404(Blog, subdomain=subdomain)
-            print('Found subdomain, upgrading blog...')
-        except KeyError:
-            email = str(data['data']['attributes']['user_email'])
-            blog = Blog.objects.get(user__email=email)
-            print('Found email address, upgrading blog...')
-
-    if blog:
-        blog.reviewed = True
-        blog.upgraded = True
-        blog.upgraded_date = timezone.now()
-        blog.save()
-        return HttpResponse(f'Upgraded {blog}')
-    else:
-        raise Http404('Blog not found')
 
 
 def not_found(request, *args, **kwargs):

@@ -1,20 +1,28 @@
-<a href="/dashboard/">Dashboard</a>
-{% if blog %}
-<a href="/dashboard/nav/">Nav</a>
-<a href="/dashboard/posts/">Posts</a>
-<a href="/dashboard/styles/">Styling</a>
-{% if blog.analytics_active %}
-<a href="/dashboard/analytics/">Analytics</a>
-{% endif %}
-<a href="/dashboard/email-list/">Emails</a>
-<a href="/dashboard/account/">Account</a>
-{% endif %}
-<a href="/accounts/logout/">Sign out</a>
+<span>
+    <a href="/dashboard/">Home</a>
+    {% if blog %}
+    <a href="/dashboard/nav/">Nav</a>
+    <a href="/dashboard/posts/">Posts</a>
+    <a href="/dashboard/styles/">Themes</a>
+    {% if blog.analytics_active %}
+    <a href="/dashboard/analytics/">Analytics</a>
+    {% endif %}
+    <a href="/dashboard/email-list/">Emails</a>
+    {% endif %}
+    {% if not blog.upgraded %}
+    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear"></span></a>
+    {% endif %}
+</span>
+
+<span>
+    <a href="/dashboard/settings/">Settings</a>
+    <a href="/accounts/logout/">Sign out</a>
+</span>
 
 {% if not blog.upgraded %}
 {% comment %} Announcement {% endcomment %}
 {% comment %} <br>
-<p style="border: 1px dashed; text-align: center">
+<p style="background-color: rgb(0,0,0,1); text-align: center">
 <small>I'm running a <b>Black Friday special</b> right now!<br>Use the code <b>BLACKFRIDAY</b> to get <b>30% off</b> when upgrading!</small>
 </p> {% endcomment %}
 {% endif %}

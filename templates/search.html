@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+
+{% block title %}Search | Bear Blog{% endblock %}
+
+{% block seo %}
+<meta name="robots" content="nofollow">
+{% include 'snippets/seo_tags.html' with site_name='ʕ•ᴥ•ʔ Bear Blog' type="website" title='Search Results' url='https://bearblog.dev/search' description='Search results on Bear Blog' image="https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556668-0.png" %}
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
+{% block content %}
+<h1>
+    Search
+</h1>
+<nav>
+    <a href="/discover/">Trending</a>
+    <a href="/discover/?newest=true">Most recent</a>
+    <b><a href="/search/">Search</a></b>
+    
+</nav>
+<p>
+    <form method="GET">
+        <input type="text" name="query" placeholder="Search..." value="{{ search_string }}">
+        <input type="submit">
+    </form>
+</p>
+<ul class="discover-posts">
+    {% for post in posts %}
+    <li>
+        <div>
+            <a href="{{ post.blog.dynamic_useful_domain }}/{{ post.slug }}">
+                {{ post.title }}
+            </a>
+            <small>
+                <span>(<a href="{{ post.blog.dynamic_useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>
+                <br>
+                <small>Published {{ post.published_date|timesince }} ago</small>
+                <small>
+                    <svg style="height:16px;margin: 0 -8px -4px 0;" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>
+                    {{ post.upvotes }}
+                </small>
+                <p>
+                    {{ post.content|unmark }}
+                </p>
+            </small>
+        </div>
+
+    </li>
+    {% empty %}
+    <li>
+        ┬┴┬┴┤•ᴥ•ʔ├┬┴┬┴
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block footer %}
+<p>
+    Start your own blog with <a href="/accounts/signup/">ʕ•ᴥ•ʔ Bear</a>
+</p>
+{% endblock %}

@@ -4,16 +4,16 @@
 ## Free, no-nonsense, super-fast blogging
 ### No javascript, no stylesheets, no trackers. Just your words.
 
-**Please log all bugs and feature requests as [issues](https://github.com/HermanMartinus/bearblog/issues).**
+Please log all bugs as [GitHub issues](https://github.com/HermanMartinus/bearblog/issues) and all feature requests on the [suggestions board](https://bear.nolt.io).
 
 ## Markdown
 All the post content is written in [markdown](https://herman.bearblog.dev/markdown-cheatsheet/).
 
 ## Can Bear Blog be self-hosted? 
 Bear Blog has been built as a platform and not as an individual blog generator.
-It is more like Substack than Jekyll. Due to this it isn't possible to individually self-host a Bear Blog.
+It is more like Substack than Hugo. Due to this it isn't possible to individually self-host a Bear Blog.
 
-There is currently a [Bear Blog Hugo theme](https://github.com/janraasch/hugo-bearblog) available built by [Jan Raasch](https://www.janraasch.com/), and a self-hosted version ([Polar Bear Blog](https://github.com/josephspurrier/polarbearblog)) written in Go and hosted on the serverless [Google Cloud Run](https://cloud.google.com/run) architecture by [Joseph Spurrier](https://www.josephspurrier.com).
+There are a few Hugo themes that use Bear's stylesheet which you can find on the Hugo theme repository if you really want to self host something that looks like Bear :)
 
 ## Wiki
 The full documentation for Bear can be found at https://docs.bearblog.dev

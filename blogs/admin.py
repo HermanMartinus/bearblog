@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.utils import timezone
 from requests import TooManyRedirects
 
-from .models import Blog, Post, Stylesheet, Upvote, Hit, Subscriber
+from .models import Blog, PersistentStore, Post, Stylesheet, Upvote, Hit, Subscriber
 from django.utils.html import escape, format_html
 from blogs.helpers import check_connection, root
 from django.urls import reverse
@@ -22,7 +22,7 @@ class UserAdmin(admin.ModelAdmin):
         blog = Blog.objects.get(user=obj)
         return format_html(
             "<a href='{url}' target='_blank'>{url}</a>",
-            url={blog.useful_domain()})
+            url={blog.useful_domain})
 
     subdomain_url.short_description = "Subdomain"
 
@@ -93,7 +93,7 @@ class BlogAdmin(admin.ModelAdmin):
         ('domain', admin.EmptyFieldListFilter),
         ('upgraded', admin.BooleanFieldListFilter),
         ('blocked', admin.BooleanFieldListFilter),
-        )
+    )
 
     def block_blog(self, request, queryset):
         for blog in queryset:
@@ -121,24 +121,9 @@ class BlogAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    def get_queryset(self, request):
-        return Post.objects.annotate(upvote_count=Count('upvote'))
-
-    def upvote_count(self, obj):
-        return obj.upvote_count
-
-    upvote_count.short_description = ('Upvotes')
-
-    def update_score(self, request, queryset):
-        for post in queryset:
-            post.update_score()
-
-    update_score.short_description = "Update post score"
-
-    list_display = ('title', 'blog', 'upvote_count', 'published_date')
+    list_display = ('title', 'blog', 'upvotes', 'published_date')
     search_fields = ('title', 'blog__title')
     ordering = ('-published_date',)
-    actions = ['update_score']
 
 
 admin.site.register(Upvote)
@@ -152,13 +137,7 @@ class HitAdmin(admin.ModelAdmin):
                            id=obj.post.pk,
                            post=escape(obj.post))
 
-    def cleanup(self, request, queryset):
-        queryset.filter(created_date__lt=timezone.now().date()-timedelta(days=7)).delete()
-
-    cleanup.short_description = "Cleanup (remove older than 7 days)"
-
-    actions = ['cleanup']
-    list_display = ('created_date', 'post_link', 'ip_address')
+    list_display = ('created_date', 'post_link', 'hash_id')
     search_fields = ('created_date', 'post__title')
     ordering = ('-created_date',)
 
@@ -166,3 +145,6 @@ class HitAdmin(admin.ModelAdmin):
 @admin.register(Subscriber)
 class SubscriberAdmin(admin.ModelAdmin):
     list_display = ('subscribed_date', 'blog', 'email_address')
+
+
+admin.site.register(PersistentStore)

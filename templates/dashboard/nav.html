@@ -2,16 +2,28 @@
 
 {% block title %}Nav | Bear Blog{% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<content>
-    <h1>Navigation</h1>
-    
-    <form method="POST" class="post-form full-width">{% csrf_token %}
-        <button type="submit">Publish</button>
-        <button onclick="event.preventDefault();window.open('{{blog.dynamic_domain}}');">View</button>
-        {{ form.as_p }}
-    </form>
-</content>
+
+<h1>Navigation</h1>
+
+<form method="POST" class="post-form full-width">{% csrf_token %}
+    <button type="submit">Publish</button>
+    <button onclick="event.preventDefault();window.open('{{blog.dynamic_useful_domain}}');">View</button>
+    {{ form.as_p }}
+</form>
+
+<style>
+textarea {
+    height: 60px;
+}
+</style>
+
 {% endblock %}

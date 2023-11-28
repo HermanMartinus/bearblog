@@ -1,5 +1,5 @@
 :root {
-    --width: 720px;
+    --width: 800px;
     --font-main: Verdana, sans-serif;
     --font-secondary: Verdana, sans-serif;
     --font-scale: 1em;
@@ -68,7 +68,7 @@ button {
     cursor: pointer;
 }
 
-content {
+main {
     line-height: 1.6;
 }
 

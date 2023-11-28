@@ -2,69 +2,76 @@
 
 {% block title %}Upgrade | Bear Blog{% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<content>
-    {% if not blog.upgraded %}
-    <h3>Hey, Herman here  ʕ •ᴥ•ʔゝ</h3>
-    <p>
-        Bear will never sell your data, or display ads.
-        <br>
-        <br>
-        To keep the servers running and the coffee hot,<br>
-        I charge for the most resource-intensive features:
-        <ul>
-            <li>Custom domains</li>
-            <li>Image uploading</li>
-            <li>In-depth analytics</li>
-            <li>Email subscriber lists</li>
-            <li>Beta features</li>
-        </ul>
-    </p>
-    <p>
-        <b>
-            Upgrade $4 per month <small style="font-size: 10px; color: grey;">(thats $48 per year)</small>
-        </b>
-    </p>
+<h1>Upgrade</h1>
 
-    {% if discount %}
-    <p style="border: 1px dashed; text-align: center; font-size: small">
-        Hey, it looks like you're from {{ country_name }} {{ country_emoji }}<br>
-        We support <b>Purchasing Power Parity</b> to make Bear more affordable to everyone.<br>
-        Use the promo code <b>{{ promo_code }}</b> to get a <b>{{ discount }}% discount</b> when you upgrade.
-    </p>
-    {% endif %}
+{% if not blog.upgraded %}
+<h3>Keep the tiny internet awesome!  \ʕ•ᴥ•ʔ/</h2>
+<p>
+    Bear will never sell your data, or display ads.
+    <br>
+    <br>
+    To keep the servers running and the coffee hot,<br>
+    I charge for the most resource-intensive features:
+    <ul>
+        <li>Custom domains</li>
+        <li>Image uploading</li>
+        <li>In-depth analytics</li>
+        <li>Run JS scripts</li>
+        <li>Email subscriber list</li>
+        <li>Add code to head and footer</li>
+    </ul>
+</p>
+<p>
+    <b>
+        Upgrade $5 per month <small style="font-size: 10px; color: grey;">(or $48 per year)</small>
+    </b>
+</p>
 
-    <p>
-        <button onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][blog]={{blog.subdomain}}')">Upgrade</button>
-    </p>
+{% if discount %}
+<p style="background-color: rgb(0,0,0,0.1); text-align: center; font-size: small">
+    Hey, it looks like you're from {{ country_name }} {{ country_emoji }}<br>
+    We support <b>Purchasing Power Parity</b> to make Bear more affordable to everyone.<br>
+    Use the promo code <b>{{ promo_code }}</b> to get a <b>{{ discount }}% discount</b> when you upgrade.
+</p>
+{% endif %}
 
-    <small>
-        <details>
-            <summary>Need convincing?</summary>
-            <p>
-                Bear's relative cost is great when compared to stringing together disparate services.
-                <br>
-                <br>
-                Privacy respecting analytics comes at a premium of <a href="https://usefathom.com/pricing" target="_blank">$14/mo</a>, and hosting and image hosting can cost upwards of <a href="https://www.digitalocean.com/pricing/droplets" target="_blank">$5/mo</a> a piece.
-                Overall a custom built blog can cost upwards of $24/mo.
-                <br>
-                <br>
-                Bear integrates all of these services. You don't even have to buy themes separately. 
-                <br>
-                <br>
-                When compared to other blogging platforms such as Ghost <a href="https://ghost.org/pricing/" target="_blank">($9/mo)</a> and Weebly <a href="https://www.weebly.com/za/pricing" target="_blank">($12/mo without ads)</a>, Bear comes in as being faster and more affordable.
-                You could choose Wordpress <a href="https://wordpress.com/pricing/" target="_blank">($4/mo)</a>, but who in their right mind wants to use Wordpress?
-                <br>
-                <br>
-                Most importantly, you'll be supporting the small, fast internet, and a blogging platform <a href="https://herman.bearblog.dev/building-software-to-last-forever" target="_blank">built to last forever</a>.
-            </p>
-        </details>
-    </small>
-    <h3>Keep the tiny internet awesome!  \ʕ•ᴥ•ʔ/</h2>
-    {% else %}
-    <h3>You've already upgraded your Bear account! \ʕ•ᴥ•ʔ/</h3>
-    {% endif %}
-</content>
+<p>
+    <button onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][blog]={{blog.subdomain}}')">Upgrade</button>
+</p>
+
+<small>
+    <details>
+        <summary>Need convincing?</summary>
+        <p>
+            Bear's relative cost is great when compared to stringing together disparate services.
+            <br>
+            <br>
+            Privacy respecting analytics comes at a premium of <a href="https://usefathom.com/pricing" target="_blank">$14/mo</a>, and hosting and image hosting can cost upwards of <a href="https://www.digitalocean.com/pricing/droplets" target="_blank">$5/mo</a> a piece.
+            Overall a custom built blog can cost upwards of $24/mo.
+            <br>
+            <br>
+            Bear integrates all of these services. You don't even have to buy themes separately. 
+            <br>
+            <br>
+            When compared to other blogging platforms such as Ghost <a href="https://ghost.org/pricing/" target="_blank">($9/mo)</a> and Weebly <a href="https://www.weebly.com/za/pricing" target="_blank">($12/mo without ads)</a>, Bear comes in as being faster and more affordable.
+            You could choose Wordpress <a href="https://wordpress.com/pricing/" target="_blank">($4/mo)</a>, but who in their right mind wants to use Wordpress?
+            <br>
+            <br>
+            Most importantly, you'll be supporting the small, fast internet, and a blogging platform <a href="https://herman.bearblog.dev/building-software-to-last-forever" target="_blank">built to last forever</a>.
+        </p>
+    </details>
+</small>
+{% else %}
+<h3>You've already upgraded your Bear account! \ʕ•ᴥ•ʔ/</h3>
+{% endif %}
+
 {% endblock %}

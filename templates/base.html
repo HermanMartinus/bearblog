@@ -4,18 +4,15 @@
 <head>
   {% block referrer %}
   {% endblock %}
-  {% if request.META.HTTP_HOST == "hmartinus.com" %}
-  <meta name="robots" content="noindex">
-  <meta name="robots" content="nofollow">
-  {% endif %}
-  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5"/>
-  <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>{% block favicon %}🐼{% endblock %}</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+  
   <title>{% block title %}Bear Blog{% endblock %}</title>
   {% block canonical %}{% endblock %}
   {% block seo %}{% endblock %}
   {% block imports %}{% endblock %}
+  
+  <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E{% block favicon %}🐼{% endblock %}%3C/text%3E%3C/svg%3E">
 
   <style>
       {% autoescape off %}
@@ -52,12 +49,6 @@
     {% block footer %}
     {% include 'snippets/dashboard_footer.html' %}
     {% endblock %}
-    <style>
-      body:hover {
-        border-image: {% block hitcount %}{% endblock %};
-        border-width: 0;
-      }
-    </style>
   </footer>
 </body>
 </html>

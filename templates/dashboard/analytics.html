@@ -2,21 +2,25 @@
 
 {% block title %}Analytics | Bear Blog{% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<content>
-    <h1>Analytics (7 days)</h1>
-    
-    <p>
-        <b>Unique reads:</b> {{ unique_reads.hit_count__sum }}
-        <br>
-        <b>Unique visitors:</b> {{ unique_visitors }}
-    </p>
-    {{ chart|safe  }}
-    <h3>Need more in-depth analytics?</h3>
-    <p>
-        <a href="/dashboard/upgrade/">Upgrade</a> to get access to in-depth, long-term analytics (<a href="https://herman.bearblog.dev/public-analytics/" target="_blank">example</a>).
-    </p>
-</content>
+<h1>Analytics (7 days)</h1>
+
+<p>
+    <b>Unique reads:</b> {{ unique_reads.hit_count__sum }}
+    <br>
+    <b>Unique visitors:</b> {{ unique_visitors }}
+</p>
+{{ chart|safe  }}
+<h3>Need more in-depth analytics?</h3>
+<p>
+    <a href="/dashboard/upgrade/">Upgrade</a> to get access to in-depth, long-term analytics (<a href="https://herman.bearblog.dev/public-analytics/" target="_blank">example</a>).
+</p>
 {% endblock %}

@@ -1,5 +1,6 @@
 User-Agent: *
-Sitemap: {{ blog.useful_domain }}/sitemap.xml
+Sitemap: {% if blog %}{{ blog.useful_domain }}{% else %}https://bearblog.dev{% endif %}/sitemap.xml
+Disallow: /signup/
 Disallow: /accounts/
 Disallow: /dashboard/
 Disallow: /mothership/
@@ -7,3 +8,5 @@ Disallow: /studio/
 Disallow: /public-analytics/
 Disallow: /subscribe/
 Disallow: /confirm-subscription/
+
+{% if blog %}{{ blog.robots_txt }}{% endif %}

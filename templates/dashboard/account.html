@@ -1,40 +1,51 @@
 {% extends 'base.html' %}
 
-{% block title %}Account | Bear Blog{% endblock %}
+{% block title %}Settings | Bear Blog{% endblock %}
+
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
 
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<content>
-    <h1>Account</h1>
-    <form method="POST" class="post-form full-width">{% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Save</button>
-    </form>
-    <p>
-        <a href="/accounts/email/">Update email address</a>
-    </p>
-    <p>
-        <a href="/accounts/password/change/">Change password</a>
-    </p>
-    <p>
-        <a href="?export=true" download>Download all blog information</a>
-    </p>
+<h1>Settings</h1>
+<h2>Blog settings</h2>
+<p>
+    <a href="/dashboard/directives/">Header and footer directives</a>
+</p>
+<p>
+    <a href="/dashboard/settings/advanced/">Advanced settings</a>
+</p>
+<h2>Account</h2>
+<p>
+    <a href="/accounts/email/">Update email address</a>
+</p>
+<p>
+    <a href="/accounts/password/change/">Change password</a>
+</p>
+<p>
+    <a href="?export=true" download>Export all blog data</a>
+</p>
 
-    <p>
-        <a href="{% url 'user_delete' %}">Delete account</a>
-        {% if blog.upgraded %}
-        <br>
-        <small class="help-text">
-            Ensure your subscription is cancelled on
-            <a href="https://app.lemonsqueezy.com/my-orders/" target="_blank">LemonSqueezy</a>
-            (receipt in your email) before deleting your account.
-        </small>
-        {% endif %}
-    </p>
-    <p>
-        If you have any requests or want to log a bug, check out the
-        <a href="https://github.com/HermanMartinus/bearblog/issues" target="_blank">GitHub issues</a>.
-    </p>
-</content>
+{% if subscription_link %}
+<p>
+    <a href="{{ subscription_link }}" target="_blank">Manage subscription</a>
+</p>
+{% endif %}
+
+<p>
+    {% if not subscription_cancelled %}
+    <a onclick="alert('Please cancel your subscription before deleting your account.')">Delete account</a>
+    {% else %}
+    <a href="{% url 'user_delete' %}">Delete account</a>
+    {% endif %}
+</p>
+<p>
+    If you have any requests use the
+    <a href="https://bear.nolt.io" target="_blank">suggestions board</a>
+    or if you've found a bug pop me an <a href="mailto:herman@bearblog.dev">email</a>.
+</p>
 {% endblock %}

@@ -3,25 +3,25 @@ import os
 import dj_database_url
 from django.utils.log import DEFAULT_LOGGING
 from pathlib import Path
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+load_dotenv()
+
+PROJECT_NAME = "🐼 BEARBLOG 🐼"
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET')
 HEROKU_BEARER_TOKEN = os.getenv('HEROKU_BEARER_TOKEN')
 LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
-SENTRY_DSN = os.getenv('SENTRY_DSN')
+SLACK_WEBHOOK = os.getenv('SLACK_WEBHOOK')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = (os.environ.get('DEBUG') == 'True')
+DEBUG = (os.getenv('DEBUG') == 'True')
 
 # Logging settings
 if not DEBUG:
     def before_send(event, hint):
-        """Don't log django.DisallowedHost errors in Sentry."""
+        """Don't log django.DisallowedHost errors."""
         if 'log_record' in hint:
             if hint['log_record'].name == 'django.security.DisallowedHost':
                 return None
@@ -34,27 +34,23 @@ if not DEBUG:
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
-            'null': {
-                'class': 'logging.NullHandler',
+            'slack': {
+                'class': 'textblog.logger.SlackExceptionHandler',
+                'level': 'ERROR',
             },
         },
         'loggers': {
             'django.security.DisallowedHost': {
-                'handlers': ['null'],
+                'handlers': ['slack'],
+                'level': 'CRITICAL',
                 'propagate': False,
             },
         },
+        'root': {
+            'handlers': ['slack'],
+            'level': 'ERROR',
+        },
     }
-
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        integrations=[
-            DjangoIntegration(),
-        ],
-        traces_sample_rate=0.1,
-        send_default_pii=True,
-        before_send=before_send
-    )
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
@@ -101,11 +97,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'blogs.middleware.XClacksOverheadMiddleware'
 ]
 
 ROOT_URLCONF = 'textblog.urls'
 TEMPLATES = [
-  {
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.normpath(os.path.join(BASE_DIR, 'templates')),
@@ -129,7 +126,7 @@ WSGI_APPLICATION = 'textblog.wsgi.application'
 # All-auth setup
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 if not DEBUG:
-    ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+    ACCOUNT_EMAIL_VERIFICATION = 'none'
     ACCOUNT_CONFIRM_EMAIL_ON_GET = True
     ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_EMAIL_REQUIRED = True
@@ -149,8 +146,9 @@ DATABASES = {
     }
 }
 
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(db_from_env)
+if os.getenv('DATABASE_URL'):
+    db_from_env = dj_database_url.config(conn_max_age=600)
+    DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

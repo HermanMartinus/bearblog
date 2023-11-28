@@ -2,18 +2,20 @@
 
 {% block title %}Post template | Bear Blog{% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block content %}
-<content>
-    <h1>Post template</h1>
-    
-    <form method="POST" class="post-form full-width">
-        {% csrf_token %}
-        <p>
-            <button onclick="event.preventDefault(); window.location = '/dashboard/posts/'">&#8592; Back</button>
-            <button type="submit">Update</button>
-        </p>
-        {% include '../snippets/post_header_options.html' %}
-        {{ form.as_p }}
-    </form>
-</content>
+<h1>Post template</h1>
+<form method="POST" class="post-form full-width">
+    {% csrf_token %}
+    <p>
+        <button onclick="event.preventDefault(); window.location = '/dashboard/posts/'">&#8592; Back</button>
+        <button type="submit">Update</button>
+    </p>
+    {{ form.as_p }}
+</form>
 {% endblock %}

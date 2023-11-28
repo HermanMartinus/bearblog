@@ -108,3 +108,10 @@ pyvenv.cfg
 # mypy
 .mypy_cache/
 .jsbeautifyrc
+
+# Sandbox
+blogs/sandbox.py
+
+# Testing tools
+fixture.json
+sync_data.sh

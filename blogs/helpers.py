@@ -1,17 +1,23 @@
+from django.utils import timezone
+from django.contrib.sites.models import Site
+from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
+from django.contrib.gis.geoip2 import GeoIP2
+from django.http import Http404
+from django.conf import settings
+
+import os
+import random
 import threading
 import bleach
 from bs4 import BeautifulSoup
-from django.contrib.sites.models import Site
-from requests.exceptions import ConnectionError
-from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
+from requests.exceptions import ConnectionError, ReadTimeout
 import mistune
 import requests
-from django.http import Http404
 import subprocess
-from django.conf import settings
-from _datetime import timedelta
+from datetime import timedelta
 import geoip2
-from django.contrib.gis.geoip2 import GeoIP2
+from ipaddr import client_ip
+import hashlib
 
 
 def root(subdomain=''):
@@ -36,21 +42,10 @@ def sanitise_int(input, length=10):
         raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
 
-def sanitise_text(text):
-    htmlCodes = (
-        ('&', '&amp;'),
-        ('<', '&lt;'),
-        ('>', '&gt;'),
-        ('"', '&quot;'),
-        ("'", '&#39;'),)
-    for c, html_code in htmlCodes:
-        cleaned_text = text.replace(html_code, c)
-    return cleaned_text
-
-
 def is_protected(subdomain):
     protected_subdomains = [
         'login',
+        'mg',
         'www',
         'api',
         'signup',
@@ -85,15 +80,28 @@ def check_connection(blog):
         return
     else:
         try:
-            response = requests.request("GET", blog.useful_domain(), allow_redirects=False)
-            return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities"/>' in response.text)
+            response = requests.request("GET", blog.useful_domain, allow_redirects=False, timeout=10)
+            return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities">' in response.text)
         except ConnectionError:
+            return False
+        except ReadTimeout:
             return False
         except SystemExit:
             return False
 
 
-def get_user_location(user_ip):
+def salt_and_hash(request, duration='day'):
+    ip_date_salt_string = f"{client_ip(request)}-{timezone.now().date()}-{os.getenv('SALT')}"
+    
+    if duration == 'year':
+        ip_date_salt_string = f"{client_ip(request)}-{timezone.now().year}-{os.getenv('SALT')}"
+
+    hash_id = hashlib.sha256(ip_date_salt_string.encode('utf-8')).hexdigest()
+
+    return hash_id
+
+
+def get_country(user_ip):
     # user_ip = '45.222.31.178'
     try:
         g = GeoIP2()
@@ -121,7 +129,7 @@ def valid_xml_char_ordinal(c):
         codepoint in (0x9, 0xA, 0xD) or
         0xE000 <= codepoint <= 0xFFFD or
         0x10000 <= codepoint <= 0x10FFFF
-        )
+    )
 
 
 def daterange(start_date, end_date):
@@ -163,3 +171,16 @@ def send_async_mail(subject, html_message, from_email, recipient_list):
     else:
         print('Sent email to ', recipient_list)
         EmailThread(subject, html_message, from_email, recipient_list).start()
+
+
+def random_error_message():
+    errors = [
+        'Whoops. Looks like our servers are bearly functioning. Try again later.',
+        'Ensure content contains necessary parameters.',
+        'Something went wrong. Please try restarting your computer.',
+        'Your password needs a special character, a number, and a capital letter.',
+        'Ensure content is the correct length.',
+        'Bear with us as we fix our software.'
+    ]
+
+    return random.choice(errors)

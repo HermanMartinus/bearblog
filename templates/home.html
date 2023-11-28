@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load pygmentify_tags %}
-{% load markdownify %}
+{% load custom_tags %}
 
 {% block page_type %}home{% endblock %}
 
@@ -10,21 +10,23 @@
 
 {% block title %}{{ blog.title }}{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ blog.useful_domain }}" />{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ blog.useful_domain }}">{% endblock %}
 
 {% block seo %}
-{% if not blog.reviewed %}
-<meta name="robots" content="noindex">
-<meta name="robots" content="nofollow">
-{% endif %}
+{% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
-<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
+<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
 
 {% include 'snippets/seo_tags.html' with site_name=blog.title title=blog.title type="website" url=blog.useful_domain description=meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
-<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
+<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss">
 {% endblock %}
 
 {% block imports %}
+
+{% if blog.upgraded %}
+{{ blog.header_directive | safe }}
+{% endif %}
+
 {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
 {% if blog.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}
 {% endblock %}
@@ -33,40 +35,19 @@
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
+{% block nav %}{{ blog.nav | markdown:blog | safe }}{% endblock %}
 
 {% block content %}
-{% if request.user == blog.user %}
-<h3 style="position:relative;height:0;margin:0">
-   <a href="/dashboard/" target="_blank" style="position:absolute;right:0;color:lightgrey;text-decoration:none;">✎</a>
-</h3>
+{% if request.user == blog.user and not preview %}
+<a href="/dashboard/" target="_blank" style="position: fixed;right: 0;top: 0;padding: 20px;color: lightgrey;text-decoration: none;font-size: 25px;">✎</a>
 {% endif %}
 
 {% if blog.content %}
-<content>
-{% pygmentify %}
-    {{ blog.content | markdown | safe }}
-{% endpygmentify %}
-</content>
+
+{{ blog.content | markdown:blog | safe }}
+
 {% else %}
-<ul class="blog-posts">
-    {% for post in posts %}
-    <li>
-        <span>
-            <i>
-                <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
-                    {{ post.published_date|date:'d M, Y' }}
-                </time>
-            </i>
-        </span>
-        <a href="/{{ post.slug }}/">{{ post.title }}</a>
-    </li>
-    {% empty %}
-    <li>
-        No posts yet
-    </li>
-    {% endfor %}
-</ul>
+{% include "snippets/post_list.html" %}
 {% endif %}
 
 {% if posts.empty %}
@@ -78,5 +59,12 @@
 {% endblock %}
 
 {% block footer %}
-Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+{% if blog.upgraded and blog.footer_directive %}
+<span id="footer-directive">
+{{ blog.footer_directive | markdown:blog | safe }}
+</span>
+{% endif %}
+<span>
+    Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+</span>
 {% endblock %}

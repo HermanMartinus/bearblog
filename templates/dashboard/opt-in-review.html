@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Opt-in review | Bear Blog{% endblock %}
+
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
+{% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
+
+{% block content %}
+<h1>Opt-in review</h1>
+{% if blog.reviewed %}
+<p>Your blog has already been reviewed. \ʕ•ᴥ•ʔ/</p>
+{% elif blog.to_review %}
+<p>Your blog is under review. Blogs are reviewed once a week. <a href="/dashboard/upgrade/">Upgrade</a> to get approved immediately.
+{% else %}
+<p>
+    Hi there, Herman here  ʕ •ᴥ•ʔゝ
+    <br><br>
+    Since the rise of ChatGPT Bear has been fighting
+    <a href="https://herman.bearblog.dev/the-chatgpt-vs-bear-blog-spam-war/" target="_blank">a war against spam</a>.
+    Opting into a manual review is the only way to keep content devoid of spam while ensuring Bear remains free-to-use. 
+    <br><br>
+    I review new blogs once a week. If you'd like to skip the wait and get approved immediately you can
+    <a href="/dashboard/upgrade/">upgrade</a>. This comes with a bunch of other neat features too.
+    <br><br>
+    By submitting the form below you are opting into a human review of your blog (by yours truely).
+</p>
+<form method="POST" class="post-form full-width">{% csrf_token %}
+    <p>
+        <input type="checkbox" required name="spam">
+        <label for="spam"><small>I confirm that my blog is not being used for backlink spam or as a promotional tool</small></label>
+    </p>
+    <textarea name="note" placeholder="Optional note for reviewer..."></textarea>
+    <button type="submit" class="save btn btn-default">Submit</button>
+</form>
+{% endif %}
+{% endblock %}

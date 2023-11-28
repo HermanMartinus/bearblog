@@ -1,7 +1,7 @@
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import timezone
 from django.contrib.sites.models import Site
 
@@ -20,19 +20,23 @@ def discover(request):
     # admin actions
     if request.user.is_staff:
         if request.POST.get("hide-post", False):
-            post = Post.objects.get(pk=request.POST.get("hide-post", ''))
+            post = Post.objects.get(pk=request.POST.get("hide-post"))
             post.hidden = True
             post.save()
         if request.POST.get("block-blog", False):
-            post = Post.objects.get(pk=request.POST.get("block-blog", ''))
+            post = Post.objects.get(pk=request.POST.get("block-blog"))
             post.blog.blocked = True
             post.blog.save()
         if request.POST.get("boost-post", False):
-            post = Post.objects.get(pk=request.POST.get("boost-post", ''))
+            post = Post.objects.get(pk=request.POST.get("boost-post"))
             for i in range(0, 5):
-                upvote = Upvote(post=post, ip_address=f"boost-{i}")
+                upvote = Upvote(post=post, hash_id=f"boost-{i}")
                 upvote.save()
             post.update_score()
+        if request.POST.get("pin-post", False):
+            post = Post.objects.get(pk=request.POST.get("pin-post"))
+            post.pinned = not post.pinned
+            post.save()
 
     page = 0
     gravity = float(request.GET.get("gravity", 1.2))
@@ -45,12 +49,46 @@ def discover(request):
 
     newest = request.GET.get("newest")
 
+    pinned_posts = Post.objects.filter(pinned=True).order_by('-published_date')
+
+    # Base query excluding pinned posts
+    base_query = Post.objects.filter(
+        publish=True,
+        hidden=False,
+        blog__reviewed=True,
+        blog__blocked=False,
+        make_discoverable=True,
+        published_date__lte=timezone.now()
+    ).exclude(id__in=pinned_posts)
+
     if newest:
-        # New
+        other_posts = base_query.order_by("-published_date")
+    else:
+        other_posts = base_query.order_by("-score", "-published_date")
+
+    other_posts = other_posts.select_related("blog")[posts_from:posts_to]
+
+    posts = list(pinned_posts) + list(other_posts)
+
+    return render(request, "discover.html", {
+        "site": Site.objects.get_current(),
+        "posts": posts,
+        "previous_page": page - 1,
+        "next_page": page + 1,
+        "posts_from": posts_from,
+        "gravity": gravity,
+        "newest": newest,
+    })
+
+
+def search(request):
+    search_string = request.GET.get('query', "")
+    posts = None
+
+    if search_string:
         posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-            ).filter(
+            Post.objects.filter(
+                Q(content__icontains=search_string) | Q(title__icontains=search_string),
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
@@ -58,36 +96,15 @@ def discover(request):
                 make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
-            .order_by("-published_date")
-            .select_related("blog")[posts_from:posts_to]
-        )
-    else:
-        # Trending
-        posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-            ).filter(
-                publish=True,
-                hidden=False,
-                blog__reviewed=True,
-                blog__blocked=False,
-                make_discoverable=True,
-                published_date__lte=timezone.now()
-            )
-            .order_by("-score", "-published_date")
-            .select_related("blog")[posts_from:posts_to]
+            .order_by('-upvotes', "-published_date")
+            .select_related("blog")[0:50]
         )
 
-    return render(request, "discover.html", {
-            "site": Site.objects.get_current(),
-            "posts": posts,
-            "previous_page": page - 1,
-            "next_page": page + 1,
-            "posts_from": posts_from,
-            "gravity": gravity,
-            "newest": newest,
-        },
-    )
+    return render(request, "search.html", {
+        "site": Site.objects.get_current(),
+        "posts": posts,
+        "search_string": search_string,
+    })
 
 
 def feed(request):
@@ -101,10 +118,7 @@ def feed(request):
         fg.subtitle("Most recent posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/?newest=True", rel="alternate")
         all_posts = (
-            Post.objects.annotate(
-                upvote_count=Count("upvote"),
-            )
-            .filter(
+            Post.objects.filter(
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
@@ -115,6 +129,7 @@ def feed(request):
             .order_by("-published_date")
             .select_related("blog")[0:posts_per_page]
         )
+        all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
     else:
         fg.title("Bear Blog Trending Posts")
         fg.subtitle("Trending posts on Bear Blog")
@@ -131,22 +146,21 @@ def feed(request):
             .order_by("-score", "-published_date")
             .select_related("blog")[0:posts_per_page]
         )
+        all_posts = sorted(list(all_posts), key=lambda post: post.score)
 
     for post in all_posts:
         fe = fg.add_entry()
-        fe.id(f"{post.blog.useful_domain()}/{post.slug}/")
+        fe.id(f"{post.blog.useful_domain}/{post.slug}/")
         fe.title(post.title)
         fe.author({"name": post.blog.subdomain, "email": "hidden"})
-        fe.link(href=f"{post.blog.useful_domain()}/{post.slug}/")
-        fe.content(clean_text(mistune.html(post.content)), type="html")
+        fe.link(href=f"{post.blog.useful_domain}/{post.slug}/")
+        fe.content(clean_text(mistune.html(post.content.replace("{{ email-signup }}", ''))), type="html")
         fe.published(post.published_date)
         fe.updated(post.published_date)
 
     if request.GET.get("type") == "rss":
-        fg.link(href=f"{post.blog.useful_domain()}/feed/?type=rss", rel="self")
         rssfeed = fg.rss_str(pretty=True)
         return HttpResponse(rssfeed, content_type="application/rss+xml")
     else:
-        fg.link(href=f"{post.blog.useful_domain()}/feed/", rel="self")
         atomfeed = fg.atom_str(pretty=True)
         return HttpResponse(atomfeed, content_type="application/atom+xml")

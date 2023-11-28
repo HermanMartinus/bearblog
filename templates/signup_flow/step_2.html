@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}One last thing{% endblock %}
+
+{% block seo %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+
+<button onclick="history.back()">Back</button>
+
+{% if error_messages %}
+<p style="color:lightsalmon">
+    {% for error_message in error_messages %}
+        {{ error_message }}<br>
+    {% endfor %}
+</p>
+{% endif %}
+
+<form method="POST" class="full-width">
+    {% csrf_token %}
+    <p>
+        To ensure you keep control <b>{{ subdomain }}.bearblog.dev</b>
+    </p>
+    <p style="display: flex; gap: 20px;">
+        <input
+            type="email"
+            required name="email"
+            placeholder="Email address..."
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            value="{{ email }}"
+        >
+        <input
+            type="password"
+            required
+            name="password"
+            placeholder="Password..."
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            value="{{ password }}"
+        >
+    </p>
+
+    <input hidden name="title" value="{{ title }}">
+    <input hidden name="date">
+    <input hidden name="name">
+    <input hidden name="subdomain" value="{{ subdomain }}">
+    <textarea hidden name="content">{{ content }}</textarea>
+
+    <small><input type="checkbox" required>
+        I agree to the <a target="_blank" href="https://docs.bearblog.dev/terms-of-service">terms of service</a>.
+    </small>
+    <br>
+    
+    <button type="submit">Create &raquo;</button>
+</form>
+
+<script>
+document.querySelector('form input[name=email]').select();
+</script>
+
+{% endblock %}

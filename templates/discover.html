@@ -1,72 +1,92 @@
 {% extends 'base.html' %}
 
+{% block title %}{% if newest %}Most recent{% else %}Trending{% endif %} | Bear Blog{% endblock %}
+
 {% block seo %}
 <meta name="robots" content="nofollow">
-{% include 'snippets/seo_tags.html' with site_name='ʕ•ᴥ•ʔ Bear Blog' type="website" title='Discovery feed' url='https://bearblog.dev/discover' description='Discover articles and blogs on Bear' image="https://i.imgur.com/b499n4R.png" %}
-<link rel="alternate" type="application/rss+xml" href="feed/?type=rss{% if newest %}&newest=True{% endif %}" />
+{% include 'snippets/seo_tags.html' with site_name='ʕ•ᴥ•ʔ Bear Blog' type="website" title='Discovery feed' url='https://bearblog.dev/discover' description='Discover articles and blogs on Bear' image="https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556668-0.png" %}
+<link rel="alternate" type="application/rss+xml" href="feed/?type=rss{% if newest %}&newest=True{% endif %}">
 {% endblock %}
 
 {% block nav %}
 {% endblock %}
 
 {% block content %}
-<content>
-    <h1>
-        Discovery feed
-    </h1>
-    <nav>
-        {% if not newest %}
-        <b><a href="/discover/">Trending</a></b>
-        <a href="/discover/?newest=true">Most recent</a>
-        {% else %}
-        <a href="/discover/">Trending</a>
-        <b><a href="/discover/?newest=true">Most recent</a></b>
-        {% endif %}
-    </nav>
 
-    <ul class="discover-posts">
-        {% for post in posts %}
-        <li>
-            <span>
-                #{{ forloop.counter|add:posts_from }}
-            </span>
-            <div>
-                <a href="{{ post.blog.dynamic_domain }}/{{ post.slug }}">
-                    {{ post.title }}
-                </a>
+<h1>
+    Discovery feed
+</h1>
+<nav>
+    {% if not newest %}
+    <b><a href="/discover/">Trending</a></b>
+    <a href="/discover/?newest=true">Most recent</a>
+    {% else %}
+    <a href="/discover/">Trending</a>
+    <b><a href="/discover/?newest=true">Most recent</a></b>
+    {% endif %}
+    <a href="/search/">Search</a>
+</nav>
+{% if newest %}
+<p>
+    <small><i><a target="_blank" href="https://docs.bearblog.dev/review-process/">Not seeing your post?</a></i></small>
+</p>
+{% endif %}
+<ul class="discover-posts">
+    {% for post in posts %}
+    <li>
+        <span>
+            #{{ forloop.counter|add:posts_from }}
+        </span>
+        <div>
+            <a href="{{ post.blog.dynamic_useful_domain }}/{{ post.slug }}">
+                {{ post.title }}
+            </a>
+            <small>
+                <span>(<a href="{{ post.blog.dynamic_useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>
+                <br>
+                {% if post.pinned %}<small style="position: absolute; top:0; right:0;">📍 Pinned</small>{% endif %}
+                <small>Published {{ post.published_date|timesince }} ago</small>
                 <small>
-                    <span>(<a href="{{ post.blog.dynamic_domain }}">{{ post.blog.useful_domain }}</a>)</span>
-                    <br>
-                    <small>Published {{ post.published_date|timesince }} ago</small>
-                    -
-                    <small><b>{{ post.upvote_count }} toast{{ post.upvote_count|pluralize }}</b></small>
-                    {% if request.user.is_staff %}
-                        <details>
-                            <summary></summary>
-                            <form method="POST" style="display:inline">
-                                <input hidden name="hide-post" value="{{ post.pk }}" />
-                                <button onclick="event.preventDefault();if(confirm('Hide this post?')){event.target.parentElement.submit()}">Hide post</button>
-                            </form>
-                            <form method="POST" style="display:inline">
-                                <input hidden name="block-blog" value="{{ post.pk }}" />
-                                <button onclick="event.preventDefault();if(confirm('Block this blog?')){event.target.parentElement.submit()}">Block blog</button>
-                            </form>
-                            <form method="POST" style="display:inline">
-                                <input hidden name="boost-post" value="{{ post.pk }}" />
-                                <button onclick="event.preventDefault();if(confirm('Boost this post?')){event.target.parentElement.submit()}">Boost post</button>
-                            </form>
-                        </details>
-                    {% endif %}
+                    <svg style="height:16px;margin: 0 -8px -4px 0;" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>
+                    {{ post.upvotes }}
                 </small>
-            </div>
-        </li>
-        {% empty %}
-        <li>
-            We've run out of posts ʕノ•ᴥ•ʔノ ︵ ┻━┻
-        </li>
-        {% endfor %}
-    </ul>
-</content>
+                {% if request.user.is_staff %}
+                    <details>
+                        <summary></summary>
+                        <form method="POST" style="display:inline">
+                            <input hidden name="hide-post" value="{{ post.pk }}">
+                            <button onclick="event.preventDefault();if(confirm('Hide this post?')){event.target.parentElement.submit()}">Hide post</button>
+                        </form>
+                        <form method="POST" style="display:inline">
+                            <input hidden name="block-blog" value="{{ post.pk }}">
+                            <button onclick="event.preventDefault();if(confirm('Block this blog?')){event.target.parentElement.submit()}">Block blog</button>
+                        </form>
+                        <form method="POST" style="display:inline">
+                            <input hidden name="boost-post" value="{{ post.pk }}">
+                            <button onclick="event.preventDefault();if(confirm('Boost this post?')){event.target.parentElement.submit()}">Boost post</button>
+                        </form>
+                        <form method="POST" style="display:inline">
+                            <input hidden name="pin-post" value="{{ post.pk }}">
+                            <button onclick="event.preventDefault();if(confirm('Toggle pin this post?')){event.target.parentElement.submit()}">
+                                {% if post.pinned %}Un-{% endif %}Pin post
+                            </button>
+                        </form>
+
+                        <button onclick="window.open('https://news.ycombinator.com/submitlink?u={{ post.blog.useful_domain }}/{{ post.slug }}&t={{ post.title }}')">
+                            Post to Hacker News
+                        </button>
+                    </details>
+                {% endif %}
+            </small>
+        </div>
+    </li>
+    {% empty %}
+    <li>
+        We've run out of posts ʕノ•ᴥ•ʔノ ︵ ┻━┻
+    </li>
+    {% endfor %}
+</ul>
+
 <p>
     {% if previous_page >= 0 %}
     <a href="?page={{ previous_page }}{% if newest %}&newest=true{% endif %}">&laquo; Previous</a> |
@@ -90,7 +110,7 @@ This page is ranked according to the following algorithm:
 Score = log10(U) + (S / D * 8600)
 
 Where,
-U = Upvotes (toasts) of a post
+U = Upvotes of a post
 S = Seconds since Jan 1st, 2020
 D = Days modifier (currently at 14)
 

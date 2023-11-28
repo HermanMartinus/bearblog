@@ -1,44 +1,87 @@
-<input type="file" id="file" hidden multiple accept="image/*" />
-{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/markdown/markdown.min.js"></script>
-<style>
-	.CodeMirror {
-		height: unset;
-		border: 1px dashed black;
-		padding: 10px;
-	}
-</style> {% endcomment %}
-<script>
-	var textarea = document.querySelector('textarea')
-	{% comment %} var codemirror = CodeMirror.fromTextArea(textarea, {
-		mode: "markdown",
-		lineWrapping: true,
-		spellcheck: true
-	})  {% endcomment %}
-	textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
+<input type="file" id="file" hidden multiple accept="image/*">
 
+<script>
+	const form = document.querySelector('form')
+    form.addEventListener('submit', function() {
+        addHeaderContentToFormAndSubmit()
+    });
+
+	const addHeaderContentToFormAndSubmit = () => {
+		const header_content = document.getElementById('header_content').innerText;
+        document.getElementById('hidden_header_content').value = header_content;
+		form.submit()
+	}
+
+	document.addEventListener('keydown', function(event) {
+		if ((event.ctrlKey || event.metaKey) && event.keyCode === 83) {
+			event.preventDefault();
+			addHeaderContentToFormAndSubmit()
+		}
+	});
+
+	// Handle pasting of HTML into header content
+	document.getElementById('header_content').addEventListener('paste', function(e) {
+        e.preventDefault();
+
+        let text = '';
+
+        if (e.clipboardData || e.originalEvent.clipboardData) {
+            text = (e.originalEvent || e).clipboardData.getData('text/plain');
+        } else if (window.clipboardData) {
+            text = window.clipboardData.getData('Text');
+        }
+
+        if (document.queryCommandSupported('insertText')) {
+            document.execCommand('insertText', false, text);
+        } else {
+            document.execCommand('paste', false, text);
+        }
+    });
+
+	// Handle saving scroll position
+	const textarea = document.querySelector('textarea')
+
+	textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
 	textarea.addEventListener("scroll", function(event) {
 		sessionStorage.setItem('textareaY', textarea.scrollTop)
 	})
+
+	{% comment %} textarea.addEventListener('input', autoResize, false);
+
+	function autoResize() {
+		this.style.height = 'auto';
+		this.style.height = this.scrollHeight + 'px';
+	}
+	autoResize.call(textarea);
+
+	window.scrollTo(0, sessionStorage.getItem('scrollY'))
+	window.addEventListener("scroll", function(event) {
+		sessionStorage.setItem('scrollY', window.scrollY)
+	}) {% endcomment %}
 
 	const previewButton = document.querySelector('#preview')
 	if (previewButton) {
 		const previewForm = document.createElement('form')
 		previewForm.target = "print_popup"
 		previewForm.method = "POST"
-		previewForm.action = "/studio/preview/?type={% if post %}post{% else %}homepage{% endif %}"
+		previewForm.action = "/dashboard/preview/?type={% if post %}post{% else %}homepage{% endif %}"
 
-		const contentField = document.createElement("input");
-		contentField.type = "hidden"
-		contentField.name = "raw_content"
-		previewForm.appendChild(contentField)
+		const headerContent = document.createElement("input");
+		headerContent.type = "hidden"
+		headerContent.name = "header_content"
+		previewForm.appendChild(headerContent)
+		document.body.appendChild(previewForm)
+
+		const bodyContent = document.createElement("input");
+		bodyContent.type = "hidden"
+		bodyContent.name = "body_content"
+		previewForm.appendChild(bodyContent)
 		document.body.appendChild(previewForm)
 	
 		previewButton.onclick = event => {
-			console.log("Opening preveiw")
 			window.open('about:blank','print_popup','width=1000,height=800');
-			contentField.value = textarea.value
+			headerContent.value = document.querySelector('#header_content').innerText
+			bodyContent.value = document.querySelector('#body_content').value
 			previewForm.submit()
 		}
 	}
@@ -73,9 +116,6 @@
 	    var eventSource = xhr.upload || xhr
 
 	    eventSource.addEventListener("progress", function(e){
-	        var current = e.loaded || e.position
-	        var total = e.total || e.totalSize
-	        var percent = parseInt((current/total)*100, 10)
 	        uploadButton.innerText = "Uploading..."
 	    });
 	    xhr.open("POST", target, true)
@@ -83,7 +123,7 @@
 	    xhr.onload = function() {
 	        if (this.status === 200) {
 	            JSON.parse(this.responseText).forEach(image => {
-						const blogTitle = "{{ blog.title|safe }}"
+						const blogTitle = "{{ blog.title|escapejs }}"
 						const toInsert = `\n![${blogTitle}](${image})\n`
 						if (position == 0) {
 							textarea.value += toInsert
@@ -99,7 +139,9 @@
 	{% else %}
 	document.querySelector('#upload-image').onclick = event => {
 	    event.preventDefault()
-	    window.open('/dashboard/upgrade/')
+		if (confirm("You've discovered a Pro feature ʕ•ᴥ•ʔﾉ♡\n\nUpgrade to unlock it and support the Tiny Internet!")) {
+	    	window.open('/dashboard/upgrade/')
+		}
 	}
 	{% endif %}
 </script>

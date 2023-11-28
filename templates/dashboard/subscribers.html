@@ -2,36 +2,40 @@
 
 {% block title %}Email list | Bear Blog{% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<content>
-    <h1>Email list ({{ subscribers|length }})</h1>
+<h1>Email list ({{ subscribers|length }})</h1>
+<p>
+    <small>
+        Include the following snippet in your blog posts, navbar, or home page:
+        <br>
+        <code>Subscribe to my blog via [email](/subscribe/) or [RSS feed](/feed/).</code>
+    </small>
+</p>
+<p>
+    <small>
+        <b>Bear does not send emails to subscribers. This is an email subscriber list.</b>
+        <br>
+        <a href="https://docs.bearblog.dev/sending-emails" target="_blank">Guide</a> for sending emails.
+    </small>
+</p>
+<form method="POST" id="import-contacts" class="full-width">
     <p>
-        <small>
-            Include the following snippet in your blog posts, navbar, or home page:
-            <br>
-            <code>Subscribe to my blog via [email](/subscribe/) or [RSS feed](/feed/).</code>
-        </small>
+    <input type="submit" value="Save">
+    <button onclick="event.preventDefault();window.location = '?export-csv=True'" download>Export csv</button>
+    <button onclick="event.preventDefault();window.location = '?export-txt=True'" download>Export txt</button>
     </p>
-    <p>
-        <small>
-            <b>Bear does not send emails to subscribers. This is an email subscriber list.</b>
-            <br>
-            <a href="https://docs.bearblog.dev/sending-emails" target="_blank">Guide</a> for sending emails.
-        </small>
-    </p>
-    <form method="POST" id="import-contacts" class="full-width">
-        <p>
-        <input type="submit" value="Save" />
-        <button onclick="event.preventDefault();window.location = '?export-csv=True'" download>Export csv</button>
-        <button onclick="event.preventDefault();window.location = '?export-txt=True'" download>Export txt</button>
-        </p>
-        {% csrf_token %}
-        <textarea name="email_addresses" style="height: 400px">{% if email_addresses_text %}{{email_addresses_text}}{% else %}
+    {% csrf_token %}
+    <textarea name="email_addresses" style="height: 400px">{% if email_addresses_text %}{{email_addresses_text}}{% else %}
 {% for subscriber in subscribers %}{{ subscriber.email_address }}
 {% empty %}No emails yet{% endfor %}{% endif %}</textarea>
-        <small>One email address per line</small>
-    </form>
-</content>
+    <small>One email address per line</small>
+</form>
 {% endblock %}

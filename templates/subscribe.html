@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load markdownify %}
+{% load custom_tags %}
 
 {% block page_type %}subscribe{% endblock %}
 
@@ -7,7 +7,7 @@
 
 {% block title %}Subscribe | {{ blog.title }}{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ root }}/blog/" />{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ root }}/blog/">{% endblock %}
 
 {% block imports %}
 {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
@@ -17,7 +17,7 @@
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
+{% block nav %}{{ blog.nav | markdown:blog | safe }}{% endblock %}
 
 {% block content %}
 {% if blog.upgraded and not subscribe_message %}

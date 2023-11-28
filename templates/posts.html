@@ -1,5 +1,5 @@
 {% extends 'base.html'%}
-{% load markdownify %}
+{% load custom_tags %}
 
 {% block page_type %}blog{% endblock %}
 
@@ -9,69 +9,62 @@
 
 {% block title %}Blog | {{ blog.title }}{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ root }}/blog/" />{% endblock %}
-
-{% block imports %}
-{% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
-{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ root }}/blog/">{% endblock %}
 
 {% block seo %}
-{% if not blog.reviewed %}
-<meta name="robots" content="noindex">
-<meta name="robots" content="nofollow">
-{% endif %}
+{% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
-<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
+<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
 
 {% include 'snippets/seo_tags.html' with site_name=blog.title title="Blog" type="website" url=root description=blog.meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
-<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss" />
+<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss">
+{% endblock %}
+
+{% block imports %}
+
+{% if blog.upgraded %}
+{{ blog.header_directive | safe }}
+{% endif %}
+
+{% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
 {% endblock %}
 
 {% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
+{% block nav %}{{ blog.nav | markdown:blog | safe }}{% endblock %}
 
 {% block content %}
-<content>
-    {% if query %}
-    <h3 style="margin-bottom:0">Filtering for "{{ query }}"</h3>
-    <small>
-    <a href="/blog/">Remove filter</a>
-    </small>
-    {% endif %}
-    <ul class="blog-posts">
-        {% for post in posts %}
-        <li>
-            <span>
-                <i>
-                    <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
-                        {{ post.published_date|date:'d M, Y' }}
-                    </time>
-                </i>
-            </span>
-            <a href="/{{ post.slug }}/">{{ post.title }}</a>
-        </li>
-        {% empty %}
-        <li>
-            No posts yet
-        </li>
+
+{% if query %}
+<h3 style="margin-bottom:0">Filtering for "{{ query }}"</h3>
+<small>
+<a href="/blog/">Remove filter</a>
+</small>
+{% endif %}
+
+{% include "snippets/post_list.html" %}
+
+{% if not query %}
+<small>
+    <div class="tags">
+        {% for tag in blog.tags %}
+            <a href="/blog/?q={{ tag }}">#{{ tag }}</a>
         {% endfor %}
-    </ul>
-    {% if not query %}
-    <small>
-        <div class="tags">
-            {% for tag in tags %}
-                <a href="/blog/?q={{ tag }}">#{{ tag }}</a>
-            {% endfor %}
-        </div>
-    </small>
-    {% endif %}
-</content>
+    </div>
+</small>
+{% endif %}
 
 {% endblock %}
 
 {% block footer %}
-Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+{% if blog.upgraded and blog.footer_directive %}
+<span id="footer-directive">
+{{ blog.footer_directive | markdown:blog | safe }}
+</span>
+{% endif %}
+<span>
+    Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+</span>
 {% endblock %}

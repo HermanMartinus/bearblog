@@ -1,10 +1,1 @@
-{
-    "python.pythonPath": "venv/bin/python",
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
-    "python.linting.flake8Enabled": false,
-    "python.linting.pylintArgs": ["--ignore E501", "--load-plugins", "pylint_django", "--max-line-length=120"],
-    "python.formatting.autopep8Args": ["--max-line-length=150"],
-    "python.linting.pycodestyleEnabled": true,
-    "python.linting.pycodestyleArgs": ["--max-line-length=150"],
-}
+{}

@@ -15,36 +15,11 @@ import os
 import boto3
 import time
 import djqscsv
-import requests
 
-from blogs.forms import AccountForm, BlogForm, DomainForm, NavForm, PostForm, StyleForm
-from blogs.helpers import get_user_location, sanitise_int
+from blogs.forms import NavForm, StyleForm
+from blogs.helpers import get_country, sanitise_int
 from blogs.models import Blog, Post, Stylesheet, Upvote
-
-
-@login_required
-def dashboard(request):
-    try:
-        blog = Blog.objects.get(user=request.user)
-        if not blog.old_editor:
-            return redirect("/studio/")
-
-        if request.method == "POST":
-            form = BlogForm(request.POST, instance=blog)
-            if form.is_valid():
-                blog_info = form.save(commit=False)
-                blog_info.save()
-        else:
-            form = BlogForm(instance=blog)
-
-    except Blog.DoesNotExist:
-        return redirect("/studio/")
-
-    return render(request, 'dashboard/dashboard.html', {
-        'form': form,
-        'blog': blog,
-        'root': blog.useful_domain()
-    })
+from blogs.subscriptions import get_subscriptions
 
 
 @login_required
@@ -64,7 +39,7 @@ def nav(request):
     return render(request, 'dashboard/nav.html', {
         'form': form,
         'blog': blog,
-        'root': blog.useful_domain()
+        'root': blog.useful_domain
     })
 
 
@@ -90,14 +65,14 @@ def styles(request):
         blog.custom_styles = Stylesheet.objects.get(identifier=style).css
         blog.overwrite_styles = True
         if request.GET.get("preview", False):
-            return render(request, 'home.html', {'blog': blog})
+            return render(request, 'home.html', {'blog': blog, 'preview': True})
         blog.save()
         return redirect('/dashboard/styles/')
 
     return render(request, 'dashboard/styles.html', {
         'blog': blog,
         'form': form,
-        'stylesheets': Stylesheet.objects.all()
+        'stylesheets': Stylesheet.objects.all().order_by('pk')
     })
 
 
@@ -106,7 +81,7 @@ def posts_edit(request):
     blog = get_object_or_404(Blog, user=request.user)
 
     posts = Post.objects.annotate(
-            hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
+        hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
 
     return render(request, 'dashboard/posts.html', {
         'posts': posts,
@@ -115,64 +90,9 @@ def posts_edit(request):
 
 
 @login_required
-def post_new(request):
+def post_delete(request, uid):
     blog = get_object_or_404(Blog, user=request.user)
-
-    if request.method == "POST":
-        form = PostForm(request.user, request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.blog = blog
-            if not post.published_date:
-                post.published_date = timezone.now()
-            post.save()
-            form.save_m2m()
-
-            upvote = Upvote(post=post, ip_address=client_ip(request))
-            upvote.save()
-            return redirect(f"/dashboard/posts/{post.id}/")
-    else:
-        form = PostForm(request.user)
-    return render(request, 'dashboard/post_edit.html', {
-        'form': form,
-        'blog': blog
-    })
-
-
-@login_required
-def post_edit(request, pk):
-    blog = get_object_or_404(Blog, user=request.user)
-
-    post = get_object_or_404(Post, blog=blog, pk=sanitise_int(pk))
-    published_date_old = post.published_date
-    if request.method == "POST":
-        form = PostForm(request.user, request.POST, instance=post)
-        if form.is_valid():
-            post_new = form.save(commit=False)
-            post_new.blog = blog
-            # This prevents the resetting of time to 00:00 if same day edit
-            if (published_date_old and
-                post_new.published_date and
-                    published_date_old.date() == post_new.published_date.date()):
-                post_new.published_date = published_date_old
-            if not post_new.published_date:
-                post_new.published_date = timezone.now()
-            post_new.save()
-            form.save_m2m()
-    else:
-        form = PostForm(request.user, instance=post)
-
-    return render(request, 'dashboard/post_edit.html', {
-        'form': form,
-        'blog': blog,
-        'post': post,
-        'root': blog.useful_domain(),
-    })
-
-
-def post_delete(request, pk):
-    blog = get_object_or_404(Blog, user=request.user)
-    post = get_object_or_404(Post, blog=blog, pk=sanitise_int(pk))
+    post = get_object_or_404(Post, blog=blog, uid=uid)
     post.delete()
     return redirect('/dashboard/posts/')
 
@@ -181,7 +101,7 @@ def post_delete(request, pk):
 def upload_image(request):
     blog = get_object_or_404(Blog, user=request.user)
 
-    if request.method == "POST":
+    if request.method == "POST" and blog.upgraded is True:
         file_links = []
         time_string = str(time.time()).split('.')[0]
         count = 0
@@ -209,58 +129,45 @@ def upload_image(request):
                     Body=file,
                     ContentType=file.content_type,
                     ACL='public-read',
-                    )
+                )
 
         return HttpResponse(json.dumps(sorted(file_links)), 200)
-
-
-@login_required
-def domain_edit(request):
-    blog = Blog.objects.get(user=request.user)
-
-    if not blog.upgraded:
-        return redirect('/dashboard/upgrade/')
-
-    if request.method == "POST":
-        form = DomainForm(request.POST, instance=blog)
-        if form.is_valid():
-            blog_info = form.save(commit=False)
-            blog_info.save()
-    else:
-        form = DomainForm(instance=blog)
-
-    return render(request, 'dashboard/domain_edit.html', {
-        'form': form,
-        'blog': blog,
-        'root': blog.useful_domain(),
-    })
 
 
 @login_required
 def upgrade(request):
     blog = get_object_or_404(Blog, user=request.user)
 
-    country = get_user_location(client_ip(request))
+    country = get_country(client_ip(request))
     country_name = ''
     country_emoji = ''
     promo_code = ''
     discount = 0
 
-    if (country):
+    country_code = country.get("country_code")
+
+    if country_code:
         country_name = country.get('country_name', {})
-        country_emoji = lookup(f'REGIONAL INDICATOR SYMBOL LETTER {country.get("country_code")[0]}') + lookup(f'REGIONAL INDICATOR SYMBOL LETTER {country.get("country_code")[1]}')
+        country_emoji = lookup(
+            f'REGIONAL INDICATOR SYMBOL LETTER {country_code[0]}') + lookup(f'REGIONAL INDICATOR SYMBOL LETTER {country_code[1]}')
 
-        tier_2 = ['AD', 'AG', 'AW', 'BE', 'BS', 'BZ', 'CG', 'CN', 'CW', 'CY', 'DE', 'DM', 'EE', 'ES', 'FR', 'GR', 'HK', 'IT', 'KI', 'KN', 'KR', 'LC', 'MO', 'MT', 'NR', 'PG', 'PT', 'PW', 'QA', 'SB', 'SG', 'SI', 'SK', 'SM', 'SX', 'TO', 'UY', 'WS', 'ZW']
-        tier_3 = ['AE', 'AL', 'AR', 'AS', 'BA', 'BG', 'BH', 'BN', 'BR', 'BW', 'CD', 'CF', 'CI', 'CL', 'CM', 'CR', 'CV', 'CZ', 'DJ', 'DO', 'EC', 'FJ', 'GA', 'GD', 'GN', 'GQ', 'GT', 'HN', 'HR', 'HT', 'HU', 'IQ', 'JM', 'JO', 'KM', 'KW', 'LR', 'LS', 'LT', 'LV', 'MA', 'ME', 'MV', 'MX', 'NA', 'NE', 'OM', 'PA', 'PE', 'PL', 'PS', 'RO', 'RS', 'SA', 'SC', 'SN', 'ST', 'SV', 'SZ', 'TD', 'TG', 'TM', 'TT', 'VC', 'YE', 'ZA']
-        tier_4 = ['AF', 'AM', 'AO', 'AZ', 'BD', 'BF', 'BI', 'BJ', 'BO', 'BT', 'BY', 'CO', 'DZ', 'EG', 'ER', 'ET', 'GE', 'GH', 'GM', 'GW', 'GY', 'ID', 'IN', 'KE', 'KG', 'KH', 'KZ', 'LA', 'LB', 'LK', 'LY', 'MD', 'MG', 'MK', 'ML', 'MM', 'MN', 'MR', 'MU', 'MW', 'MY', 'MZ', 'NG', 'NI', 'NP', 'PH', 'PK', 'PY', 'RU', 'RW', 'SL', 'SO', 'SR', 'TH', 'TJ', 'TL', 'TN', 'TR', 'TZ', 'UA', 'UG', 'UZ', 'VN', 'ZM']
+        tier_2 = ['AD', 'AG', 'AW', 'BE', 'BS', 'BZ', 'CG', 'CN', 'CW', 'CY', 'DE', 'DM', 'EE', 'ES', 'FR', 'GR', 'HK', 'IT', 'KI',
+                  'KN', 'KR', 'LC', 'MO', 'MT', 'NR', 'PG', 'PT', 'PW', 'QA', 'SB', 'SG', 'SI', 'SK', 'SM', 'SX', 'TO', 'UY', 'WS', 'ZW']
+        tier_3 = ['AE', 'AL', 'AR', 'AS', 'BA', 'BG', 'BH', 'BN', 'BR', 'BW', 'CD', 'CF', 'CI', 'CL', 'CM', 'CR', 'CV', 'CZ', 'DJ', 'DO',
+                  'EC', 'FJ', 'GA', 'GD', 'GN', 'GQ', 'GT', 'HN', 'HR', 'HT', 'HU', 'IQ', 'JM', 'JO', 'KM', 'KW', 'LR', 'LS', 'LT', 'LV',
+                  'MA', 'ME', 'MV', 'MX', 'NA', 'NE', 'OM', 'PA', 'PE', 'PL', 'PS', 'RO', 'RS', 'SA', 'SC', 'SN', 'ST', 'SV', 'SZ',
+                  'TD', 'TG', 'TM', 'TT', 'VC', 'YE', 'ZA']
+        tier_4 = ['AF', 'AM', 'AO', 'AZ', 'BD', 'BF', 'BI', 'BJ', 'BO', 'BT', 'BY', 'CO', 'DZ', 'EG', 'ER', 'ET', 'GE', 'GH', 'GM', 'GW', 'GY',
+                  'ID', 'IN', 'KE', 'KG', 'KH', 'KZ', 'LA', 'LB', 'LK', 'LY', 'MD', 'MG', 'MK', 'ML', 'MM', 'MN', 'MR', 'MU', 'MW', 'MY', 'MZ',
+                  'NG', 'NI', 'NP', 'PH', 'PK', 'PY', 'RU', 'RW', 'SL', 'SO', 'SR', 'TH', 'TJ', 'TL', 'TN', 'TR', 'TZ', 'UA', 'UG', 'UZ', 'VN', 'ZM']
 
-        if country.get("country_code") in tier_2:
+        if country_code in tier_2:
             promo_code = 'PADDINGTON'
             discount = 15
-        if country.get("country_code") in tier_3:
+        if country_code in tier_3:
             promo_code = 'YOGI'
             discount = 30
-        if country.get("country_code") in tier_4:
+        if country_code in tier_4:
             promo_code = 'BALOO'
             discount = 50
 
@@ -274,23 +181,43 @@ def upgrade(request):
 
 
 @login_required
-def account(request):
+def opt_in_review(request):
     blog = get_object_or_404(Blog, user=request.user)
 
-    if request.method == "POST":
-        form = AccountForm(request.POST, instance=blog)
-        if form.is_valid():
-            blog_info = form.save(commit=False)
-            blog_info.save()
-    else:
-        form = AccountForm(instance=blog)
+    if request.method == 'POST':
+        spam = request.POST.get("spam", "")
+        note = request.POST.get("note", "")
+        if spam == 'on':
+            blog.reviewer_note = note
+            blog.to_review = True
+            blog.save()
+
+    return render(request, "dashboard/opt-in-review.html", {"blog": blog})
+
+
+@login_required
+def settings(request):
+    blog = get_object_or_404(Blog, user=request.user)
+    subscription_cancelled = None
+    subscription_link = None
+
+    if blog.order_id:
+        subscription = get_subscriptions(blog.order_id)
+
+        try:
+            if subscription:
+                subscription_cancelled = subscription['data'][0]['attributes']['cancelled']
+                subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal']
+        except KeyError and IndexError:
+            print('No sub found')
 
     if request.GET.get("export", ""):
         return djqscsv.render_to_csv_response(blog.post_set)
 
     return render(request, "dashboard/account.html", {
         "blog": blog,
-        'form': form,
+        'subscription_cancelled': subscription_cancelled,
+        'subscription_link': subscription_link
     })
 
 

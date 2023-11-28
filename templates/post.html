@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load pygmentify_tags %}
-{% load markdownify %}
+{% load custom_tags %}
 
 {% block page_type %}{% if post.is_page %}page{% else %}post{% endif %} {{ post.class_name }}{% endblock %}
 
@@ -10,31 +10,55 @@
 
 {% block title %}{{ post.title }} | {{ blog.title }}{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ canonical_url }}" />{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ canonical_url }}">{% endblock %}
 
 {% block seo %}
-{% if not blog.reviewed %}
-<meta name="robots" content="noindex">
-<meta name="robots" content="nofollow">
-{% endif %}
+{% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
-<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities"/>
+<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
 
 {% include 'snippets/seo_tags.html' with site_name=blog.title title=post.title type="article" url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
 {% endblock %}
 
-{% block hitcount %}{% if blog.analytics_active and not preview %}url("/hit/{{ post.pk }}{% if blog.blank_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}"){% endif %}{% endblock %}
-
 {% block imports %}
+
+{% if blog.upgraded %}
+{{ blog.header_directive | safe }}
+{% endif %}
+
 {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
 {% if post.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}
 {% endblock %}
 
-{% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
+{% block custom_styles %}
+{% include 'snippets/styles.html' with blog=blog %}
+.upvote-button {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background-color: inherit;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.upvote-button.upvoted {
+    color: salmon;
+}
+.upvote-count {
+    margin-top: -3px;
+}
+{% if blog.analytics_active and not preview %}
+body:hover {
+    border-image: url("/hit/{{ post.uid }}/{% if blog.blank_useful_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
+    border-width: 0;
+}
+{% endif %}
+{% endblock %}
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}{{ blog.nav | markdown | safe }}{% endblock %}
+{% block nav %}{{ blog.nav | markdown:post | safe }}{% endblock %}
 
 {% block content %}
 {% if preview %}
@@ -46,10 +70,8 @@
     </small>
 </p>
 {% else %}
-{% if request.user == blog.user %}
-<h3 style="position:relative;height:0;margin:0">
-   <a href="/studio/posts/{{ post.pk }}/" target="_blank" style="position:absolute;right:0;color:lightgrey;text-decoration:none;">✎</a>
-</h3>
+{% if request.user == blog.user and not preview %}
+<a href="/dashboard/posts/{{ post.slug }}/" target="_blank" style="position: fixed;right: 0;top: 0;padding: 20px;color: lightgrey;text-decoration: none;font-size: 25px;">✎</a>
 {% endif %}
 {% endif %}
 
@@ -60,18 +82,15 @@
 
 <p>
     <i>
-        <time datetime="{{ post.published_date|date:'Y-m-d' }}" pubdate>
-            {{ post.published_date|date:'d M, Y' }}
+        <time datetime="{{ post.published_date|date:'Y-m-d' }}">
+            {% format_date post.published_date blog.date_format blog.lang %}
         </time>
     </i>
 </p>
 {% endif %}
 
-<content>
-{% pygmentify %}
-    {{ content | markdown | safe }}
-{% endpygmentify %}
-</content>
+    {{ content | markdown:post | safe }}
+
 {% if canonical_url != full_path %}
 <p>
     <small>
@@ -81,11 +100,13 @@
 {% endif %}
 
 {% if not preview %}
+    {% if post.tags|length > 0 %}
     <p class="tags">
-    {% for tag in post.tags.all %}
+        {% for tag in post.tags %}
         <a href="/blog/?q={{tag}}">#{{ tag }}</a>
-    {% endfor %}
+        {% endfor %}
     </p>
+    {% endif %}
 
     {% if post.make_discoverable %}
     {% include 'snippets/upvote_form.html' with post=post upvoted=upvoted %}
@@ -96,5 +117,12 @@
 
 
 {% block footer %}
-Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+{% if blog.upgraded and blog.footer_directive %}
+<span id="footer-directive">
+{{ blog.footer_directive | markdown:post | safe }}
+</span>
+{% endif %}
+<span>
+    Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+</span>
 {% endblock %}

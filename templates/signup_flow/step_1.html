@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Create your blog{% endblock %}
+
+{% block seo %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+<h1>Create your blog</h1>
+
+{% if error_messages %}
+<p style="color:lightsalmon">
+    {% for error_message in error_messages %}
+        {{ error_message }}<br>
+    {% endfor %}
+</p>
+{% endif %}
+
+<form method="POST" class="full-width">
+    {% csrf_token %}
+    <input
+        type="text"
+        required
+        name="title"
+        placeholder="A title for your blog..."
+        value="{{ title }}"
+    >
+    <p style="display: flex;align-items:end">
+        <input
+            type="text"
+            required
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            name="subdomain"
+            placeholder="Preferred subdomain..."
+            value="{{ subdomain }}"
+            style="max-width:200px; margin-right: 10px;"
+        >
+        <span class="helptext">.bearblog.dev</span>
+    </p>
+
+    <p>
+        <textarea name="content" required placeholder="Some homepage text...">{{ content }}</textarea>
+    </p>
+    
+    <button type="submit">Create &raquo;</button>
+</form>
+
+<script>
+document.querySelector('form input[name=title]').select();
+
+{% if dodgy %}
+const inputs = document.querySelectorAll('textarea, input');
+inputs.forEach(input => {
+  input.onpaste = function(e) {
+    e.preventDefault();
+  };
+});
+
+function randomFocus() {
+  const randomIndex = Math.floor(Math.random() * inputs.length);
+  inputs[randomIndex].focus();
+}
+
+setInterval(randomFocus, 5000);
+{% endif %}
+</script>
+
+{% endblock %}

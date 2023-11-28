@@ -2,72 +2,60 @@
 
 {% block title %}Styling | Bear Blog {% endblock %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ blog.dashboard_styles | safe }}
+{% endblock %}
+
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<content>
-  <h1>Styling</h1>
-  <h3>Themes</h3>
-  <div
-    style="display: grid;grid-template-columns: 145px 200px 145px 200px;grid-gap: 0 27px;overflow-x: scroll;padding-bottom: 20px;"
-  >
-    {% for style in stylesheets %}
-    {{ style.title }}
+<h1>Themes</h1>
+<div style="width: 100%;text-align:right;">→</div>
+<div
+  style="display: grid;grid-template-columns: 150px 150px 150px 150px 150px 150px 150px;grid-gap: 27px;overflow-x: scroll;padding-bottom: 20px;"
+>
+  {% for style in stylesheets %}
+  <div style="width:100%; background-color: #eceff4; padding: 3px; text-align: center;">
+    <img src="{{ style.image }}" height=100>
+    <br>
+    <b>{{ style.title }}</b>
+    <br>
     <span>
       <button onclick="preview('{{ style.identifier }}')">Preview</button>
       <button onclick="setStyle('{{ style.identifier }}')">Apply theme</button> 
     </span>
-    {% endfor %}
   </div>
+  {% endfor %}
+</div>
+<div style="width: 100%;text-align:right;">→</div>
 
-  <form method="POST" class="post-form full-width">
-    <p class="sticky-tools">
+<form method="POST" class="post-form full-width">
+  <p class="sticky-controls">
+    <span>
       <button type="submit" class="save btn btn-default">Publish</button>
-      <button onclick="event.preventDefault();window.open('{{ blog.dynamic_domain }}');">
+      <button onclick="event.preventDefault();window.open('{{ blog.dynamic_useful_domain }}');">
         View
       </button>
-    </p>
-    {% csrf_token %} {{ form.as_p }}
-
-      <span class="helptext">
-        <b>If extending styling, ensure your styling caters to existing dark mode styles.</b>
-      </span>
-  </form>
-
-</content>
+    </span>
+  </p>
+  {% csrf_token %} {{ form.as_p }}
+</form>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/css/css.min.js"></script>
 <style>
 	.CodeMirror {
 		height: unset;
-		border: 1px dashed black;
+    background-color: #eceff4;
+    border: none;
+    outline: none;
     border-top: 0;
-		padding: 2px;
+		padding: 10px;
     min-height: 200px;
 	}
-
-  p:nth-child(3) {
-    margin-top: 0;
-  }
-
-  p:nth-child(3) > label {
-    display: none;
-  }
-
-  .sticky-tools {
-    position: sticky;
-    top: 0;
-    background-color: #fff;
-    border-bottom: 1px dashed;
-    margin-bottom: 0;
-    z-index: 10;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    background-color: #01242e;
-  }
 </style>
 <script>
   var codemirror = CodeMirror.fromTextArea(document.querySelector('textarea'), {mode: "css"})

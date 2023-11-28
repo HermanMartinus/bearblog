@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
-{% load markdownify %}
 
 {% block title %}
-Staff dashboard
+Staff Dashboard
 {% endblock %}
 
 
@@ -11,30 +10,81 @@ Staff dashboard
 {% endblock %}
 
 {% block heading %}
-Staff dashboard  ʕง•ᴥ•ʔง
+Staff Dashboard  ʕง•ᴥ•ʔง
 {% endblock %}
 
 {% block nav %}
-Nav here
+<a href="{% url 'review_flow' %}">Review {{ to_review }} blogs</a>
 {% endblock %}
 
 {% block content %}
-<content>
-<h2>Signups</h2>
-<embed type="image/svg+xml" src= {{ signup_chart|safe }} />
-<span class="helptext" style="display: flex; justify-content:space-between;">
-    <span>{{ start_date|date:"j F Y" }}</span>
-    <span>{{ end_date|date:"j F Y" }}</span> 
-</span>
+<main>
+    <p>
+        <h2>All time</h2>
+        <ul>
+            <li>Signups: {{ total_signups }}</li>
+            <li>Upgrades: {{ total_upgrades }}</li>
+            <li>Conversion rate: {{ total_conversion_rate }}</li>
+        </ul>
+    </p>
+    <p>
+        <h2>Past {{ days_filter }} days</h2>
+        <span>
+            <button onclick="window.location = '?days=7'">Last week</button>
+            <button onclick="window.location = '?days=30'">Last month</button>
+            <button onclick="window.location = '?days=60'">Last 3 months</button>
+            <button onclick="window.location = '?days=180'">Last 6 months</button>
+            <button onclick="window.location = '?days=365'">Last year</button>
+        </span>
+        <ul>
+            <li>Signups: {{ signups }}</li>
+            <li>Upgrades: {{ upgrades }}</li>
+            <li>Conversion rate: {{ conversion_rate }}</li>
+        </ul>
+    </p>
+    <h2>Signups</h2>
+    <embed type="image/svg+xml" src= {{ signup_chart|safe }} />
+    <span class="helptext" style="display: flex; justify-content:space-between;">
+        <span>{{ start_date|date:"j F Y" }}</span>
+        <span>{{ end_date|date:"j F Y" }}</span> 
+    </span>
 
-<h2>Upgrades</h2>
-<embed type="image/svg+xml" src= {{ upgrade_chart|safe }} />
-<span class="helptext" style="display: flex; justify-content:space-between;">
-    <span>{{ start_date|date:"j F Y" }}</span>
-    <span>{{ end_date|date:"j F Y" }}</span> 
-</span>
+    <h2>Upgrades</h2>
+    <embed type="image/svg+xml" src= {{ upgrade_chart|safe }} />
+    <span class="helptext" style="display: flex; justify-content:space-between;">
+        <span>{{ start_date|date:"j F Y" }}</span>
+        <span>{{ end_date|date:"j F Y" }}</span> 
+    </span>
 
-</content>
+    <h2>Empty blogs</h2>
+    <pre>
+        - Over 5 weeks old
+        - Not seen in the last two weeks
+        - Content under 50 characters
+        - No posts
+        - Not upgraded
+    </pre>
+    <ul>
+        {% for blog in empty_blogs %}
+        <li>
+            <b>{{ blog.title }} </b><a href="{{ blog.useful_domain }}" target="_blank">{{ blog.useful_domain }}</a>
+            <br>
+            <small>Created date: {{ blog.created_date }}</small>
+            <br>
+            <small>Last modified: <b>{{ blog.last_modified }}</b></small>
+            <br>
+            <i>
+                {{ blog.user.email }}
+            </i>
+            <br>
+            {{ blog.content }}
+            <br>
+            {{ blog.num_posts }}
+        </li>
+        {% endfor %}
+    </ul>
+    <button onclick="if (confirm('Are you sure?')) {window.location = '{% url 'delete_empty' %}'}">Delete empty</button>
+</main>
 {% endblock %}
 
 {% block footer %}
