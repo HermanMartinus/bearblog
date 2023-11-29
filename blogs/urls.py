@@ -42,13 +42,15 @@ urlpatterns = [
 
     path('dashboard/post-template/', studio.post_template, name="post_template"),
 
+    # Webhook
+    path('lemon-webhook/', subscriptions.lemon_webhook, name='lemon_webhook'),
 
+    # Discover
     path('discover/', discover.discover, name='discover'),
     path('discover/feed/', discover.feed, name='discover_feed'),
     path('search/', discover.search, name='search'),
 
-    path('lemon-webhook/', subscriptions.lemon_webhook, name='lemon_webhook'),
-
+    # Blog
     path('ping/', blog.ping, name='ping'),
     path('blog/', blog.posts, name='posts'),
     path('sitemap.xml', blog.sitemap, name='sitemap'),

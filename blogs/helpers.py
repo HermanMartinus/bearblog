@@ -1,3 +1,4 @@
+import string
 from django.utils import timezone
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
@@ -18,6 +19,8 @@ from datetime import timedelta
 import geoip2
 from ipaddr import client_ip
 import hashlib
+
+from blogs.models import Post
 
 
 def root(subdomain=''):
@@ -88,6 +91,20 @@ def check_connection(blog):
             return False
         except SystemExit:
             return False
+
+
+def pseudo_word(length=5):
+    vowels = "aeiou"
+    consonants = "".join(set(string.ascii_lowercase) - set(vowels))
+    
+    word = ""
+    for i in range(length):
+        if i % 2 == 0:
+            word += random.choice(consonants)
+        else:
+            word += random.choice(vowels)
+    
+    return word
 
 
 def salt_and_hash(request, duration='day'):
@@ -184,3 +201,22 @@ def random_error_message():
     ]
 
     return random.choice(errors)
+
+def random_post_link():
+    count = Post.objects.filter(
+            blog__reviewed=True,
+            publish=True,
+            published_date__lte=timezone.now(),
+            make_discoverable=True,
+            content__isnull=False
+        ).count()
+    random_index = random.randint(0, count - 1)
+    post = Post.objects.filter(
+        blog__reviewed=True,
+        publish=True,
+        published_date__lte=timezone.now(),
+        make_discoverable=True,
+        content__isnull=False
+    )[random_index]
+
+    return f"{post.blog.useful_domain}/{post.slug}"

@@ -16,24 +16,24 @@ import random
 import string
 
 from blogs.forms import AdvancedSettingsForm, PostTemplateForm
-from blogs.helpers import check_connection, is_protected, salt_and_hash, sanitise_int
+from blogs.helpers import check_connection, is_protected, pseudo_word, salt_and_hash, sanitise_int
 from blogs.models import Blog, Post, Upvote
 
 
 @login_required
 def studio(request):
-    blog = None
-    try:
-        blog = Blog.objects.get(user=request.user)
-    except Blog.DoesNotExist:
-        subdomain = request.user.username
-        if Blog.objects.filter(subdomain=request.user.username):
-            subdomain = request.user.username + '-' + str(randint(0, 9))
+    blog = Blog.objects.filter(user=request.user).first()
+
+    if not blog:
+        subdomain = pseudo_word()
+        while Blog.objects.filter(subdomain=subdomain).exists():
+            subdomain = pseudo_word()
         blog = Blog(
             user=request.user,
             title="My blog",
-            subdomain=slugify(subdomain).replace('_', '-'))
+            subdomain=subdomain)
         blog.save()
+
 
     error_messages = []
     header_content = request.POST.get('header_content', '')
