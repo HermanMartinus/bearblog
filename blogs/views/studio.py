@@ -235,7 +235,6 @@ def post(request, uid=None):
             slug = unique_slug(blog, post, slug)
             if post.slug != slug:
                 post.slug = slug
-                is_new = True
 
             if not post.published_date:
                 post.published_date = timezone.now()
