@@ -232,9 +232,7 @@ def post(request, uid=None):
             if not post.title:
                 post.title = "New post"
 
-            slug = unique_slug(blog, post, slug)
-            if post.slug != slug:
-                post.slug = slug
+            post.slug = unique_slug(blog, post, slug)
 
             if not post.published_date:
                 post.published_date = timezone.now()
