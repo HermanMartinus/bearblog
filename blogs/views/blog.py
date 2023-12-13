@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
 from django.utils import timezone
-from django.conf import settings
+from django.utils.text import slugify
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_posts, salt_and_hash, unmark
@@ -124,7 +124,7 @@ def post(request, slug):
         return posts(request)
 
     # Find by post slug
-    post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
+    post = Post.objects.filter(blog=blog, slug__iexact=slugify(slug)).first()
     if not post:
         # Find by post alias
         post = Post.objects.filter(blog=blog, alias__iexact=slug).first()
