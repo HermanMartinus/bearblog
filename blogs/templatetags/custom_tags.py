@@ -203,7 +203,7 @@ def element_replacement(markup, blog, post=None):
         limit = match.group('limit')
         order = match.group('order')
         description = match.group('description') == 'True'
-        filtered_posts = apply_filters(blog.post_set.filter(publish=True), tag, limit, order)
+        filtered_posts = apply_filters(blog.post_set.filter(publish=True, is_page=False), tag, limit, order)
         context = {'blog': blog, 'posts': filtered_posts, 'embed': True, 'show_description': description}
         return render_to_string('snippets/post_list.html', context)
     
