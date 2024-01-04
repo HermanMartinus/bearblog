@@ -19,6 +19,19 @@
 <p>
     <a href="/dashboard/settings/advanced/">Advanced settings</a>
 </p>
+{% comment %} 
+<p>
+    {% if blog.auth_token %}
+    <label for="auth_token">Auth token:</label>
+    <br>
+    <input type="text" readonly style="width:350px" value="{{ blog.auth_token }}">
+    <br>
+    <button onclick="window.location = '?generate=True'" style="font-size:20px;">⟳</button>
+    {% else %}
+    <button onclick="window.location = '?generate=True'">Generate auth token</button>
+    {% endif %}
+</p>
+{% endcomment %}
 <h2>Account</h2>
 <p>
     <a href="/accounts/email/">Update email address</a>

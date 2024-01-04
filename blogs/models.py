@@ -16,6 +16,7 @@ class Blog(models.Model):
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
+    auth_token = models.CharField(max_length=128, blank=True)
 
     nav = models.CharField(max_length=500, default="[Home](/) [Blog](/blog/)", blank=True)
     content = models.TextField(default="Hello World!", blank=True)
@@ -101,6 +102,19 @@ class Blog(models.Model):
     @property
     def last_posted(self):
         return self.post_set.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
+
+    def generate_auth_token(self):
+        allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
+        self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(30))
+        self.save()
+
+    # def save(self, *args, **kwargs):
+    #     # Create auth_token
+    #     if not self.auth_token:
+    #         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
+    #         self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(20))
+
+    #     super(Blog, self).save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain})'
@@ -195,6 +209,11 @@ class Subscriber(models.Model):
     email_address = models.EmailField()
     subscribed_date = models.DateTimeField(auto_now_add=True)
 
+
+class RssSubscriber(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    access_date = models.DateTimeField(auto_now_add=True)
+    hash_id = models.CharField(max_length=200)
 
 class Stylesheet(models.Model):
     title = models.CharField(max_length=100)

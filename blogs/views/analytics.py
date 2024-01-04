@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.db.models.functions import TruncDate
 
 from blogs.forms import AnalyticsForm
-from blogs.models import Blog, Hit, Post
+from blogs.models import Blog, Hit, Post, RssSubscriber
 from blogs.helpers import daterange, get_country, salt_and_hash
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
@@ -158,6 +158,9 @@ def render_analytics(request, blog, public=False):
     else:
         form = AnalyticsForm(instance=blog)
 
+    # RSS Subscriber count
+    rss_subscriber_count = RssSubscriber.objects.filter(blog=blog).count()
+
     return render(request, 'studio/analytics.html', {
         'public': public,
         'blog': blog,
@@ -167,6 +170,7 @@ def render_analytics(request, blog, public=False):
         'unique_reads': unique_reads,
         'unique_visitors': unique_visitors,
         'on_site': on_site,
+        'rss_subscriber_count': rss_subscriber_count,
         'chart': chart_render,
         'referrers': referrers,
         'devices': devices,

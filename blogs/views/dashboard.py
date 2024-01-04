@@ -213,6 +213,10 @@ def settings(request):
 
     if request.GET.get("export", ""):
         return djqscsv.render_to_csv_response(blog.post_set)
+    
+    if request.GET.get("generate"):
+        blog.generate_auth_token()
+        return redirect("settings")
 
     return render(request, "dashboard/account.html", {
         "blog": blog,

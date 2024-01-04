@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from django.utils import timezone
 
-from blogs.helpers import unmark
+from blogs.helpers import salt_and_hash, unmark
+from blogs.models import RssSubscriber
 from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
 
@@ -37,6 +38,10 @@ def feed(request):
         fe.published(post.published_date)
         fe.updated(post.published_date)
 
+    # Log feed request
+    hash_id = salt_and_hash(request)
+    RssSubscriber.objects.get_or_create(blog=blog, hash_id=hash_id)
+    
     if request.GET.get('type') == 'rss':
         rssfeed = fg.rss_str(pretty=True)
         return HttpResponse(rssfeed, content_type='application/rss+xml')
