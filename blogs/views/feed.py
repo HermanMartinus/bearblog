@@ -40,11 +40,11 @@ def feed(request):
         fe.updated(post.published_date)
 
     # Log feed request
-    try:
-        hash_id = salt_and_hash(request)
-        RssSubscriber.objects.get_or_create(blog=blog, hash_id=hash_id)
-    except MultipleObjectsReturned:
-        pass
+    # try:
+    #     hash_id = salt_and_hash(request)
+    #     RssSubscriber.objects.get_or_create(blog=blog, hash_id=hash_id)
+    # except MultipleObjectsReturned:
+    #     pass
 
     if request.GET.get('type') == 'rss':
         rssfeed = fg.rss_str(pretty=True)
