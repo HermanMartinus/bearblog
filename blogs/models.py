@@ -208,12 +208,18 @@ class Subscriber(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     email_address = models.EmailField()
     subscribed_date = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.blog.title} - {self.email_address}"
 
 
 class RssSubscriber(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     access_date = models.DateTimeField(auto_now_add=True)
     hash_id = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.access_date.strftime('%d %b %Y, %X')} - {self.blog} - {self.hash_id}"
 
 class Stylesheet(models.Model):
     title = models.CharField(max_length=100)
