@@ -159,7 +159,7 @@ def render_analytics(request, blog, public=False):
         form = AnalyticsForm(instance=blog)
 
     # RSS Subscriber count
-    rss_subscriber_count = RssSubscriber.objects.filter(blog=blog, access_date__lt=timezone.now() - timedelta(hours=24)).count()
+    rss_subscriber_count = RssSubscriber.objects.filter(blog=blog, access_date__gt=timezone.now() - timedelta(hours=24)).count()
 
     return render(request, 'studio/analytics.html', {
         'public': public,
