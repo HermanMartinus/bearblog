@@ -1,3 +1,4 @@
+from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponse
 from django.utils import timezone
 
@@ -39,9 +40,12 @@ def feed(request):
         fe.updated(post.published_date)
 
     # Log feed request
-    hash_id = salt_and_hash(request)
-    RssSubscriber.objects.get_or_create(blog=blog, hash_id=hash_id)
-    
+    try:
+        hash_id = salt_and_hash(request)
+        RssSubscriber.objects.get_or_create(blog=blog, hash_id=hash_id)
+    except MultipleObjectsReturned:
+        pass
+
     if request.GET.get('type') == 'rss':
         rssfeed = fg.rss_str(pretty=True)
         return HttpResponse(rssfeed, content_type='application/rss+xml')
