@@ -219,7 +219,7 @@ class RssSubscriber(models.Model):
     hash_id = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"{self.access_date.strftime('%d %b %Y, %X')} - {self.blog} - {self.hash_id}"
+        return f"{self.access_date.strftime('%d %b %Y, %X')} - {self.blog.title} - {self.hash_id}"
 
 class Stylesheet(models.Model):
     title = models.CharField(max_length=100)
