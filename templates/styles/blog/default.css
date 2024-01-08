@@ -59,7 +59,7 @@ nav a {
     margin-right: 8px;
 }
 
-strong, b, label {
+strong, b {
     color: var(--heading-color);
 }
 
