@@ -8,6 +8,11 @@ from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
 
 from feedgen.feed import FeedGenerator
+import re
+
+
+def clean_string(s):
+    return re.sub(r'[\x00-\x1F\x7F]', '', s)
 
 
 def feed(request):
@@ -35,7 +40,7 @@ def feed(request):
         fe.title(post.title)
         fe.author({'name': name, 'email': 'hidden'})
         fe.link(href=f"{blog.useful_domain}/{post.slug}/")
-        fe.content(markdown(post.content.replace('{{ email-signup }}', ''), blog), type="html")
+        fe.content(markdown(clean_string(post.content.replace('{{ email-signup }}', '')), blog), type="html")
         fe.published(post.published_date)
         fe.updated(post.published_date)
 
