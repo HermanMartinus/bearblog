@@ -40,7 +40,10 @@ def feed(request):
         fe.title(post.title)
         fe.author({'name': name, 'email': 'hidden'})
         fe.link(href=f"{blog.useful_domain}/{post.slug}/")
-        fe.content(markdown(post.content.replace('{{ email-signup }}', ''), blog), type="html")
+        try:
+            fe.content(markdown(post.content.replace('{{ email-signup }}', ''), blog), type="html")
+        except ValueError:
+            fe.content(markdown(clean_string(post.content.replace('{{ email-signup }}', '')), blog), type="html")
         fe.published(post.published_date)
         fe.updated(post.published_date)
 
