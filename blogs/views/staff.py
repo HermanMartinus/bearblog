@@ -28,7 +28,7 @@ def dashboard(request):
     non_empty_blog_ids = [blog.pk for blog in blogs if not blog.is_empty]
     blogs = blogs.filter(pk__in=non_empty_blog_ids)
 
-    to_review = Blog.objects.filter(to_review=True, reviewed=False, blocked=False).count()
+    to_review = blogs_to_review().count()
 
     # Signups
     date_iterator = start_date
@@ -137,6 +137,10 @@ def get_empty_blogs():
     return empty_blogs
 
 
+def blogs_to_review():
+    return Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
+
+
 @staff_member_required
 def delete_empty(request):
     for blog in get_empty_blogs():
@@ -148,18 +152,12 @@ def delete_empty(request):
 
 @staff_member_required
 def review_flow(request):
-    blogs = Blog.objects.filter(reviewed=False, blocked=False, to_review=True).annotate(
-        post_count=Count("post"),
-    ).prefetch_related("post_set").order_by('created_date')
+    blog = blogs_to_review().prefetch_related("post_set").order_by('created_date').first()
 
-    unreviewed_blogs = []
-    for blog in blogs:
-        if blog.to_review:
-            unreviewed_blogs.append(blog)
-
-    if unreviewed_blogs:
-        blog = unreviewed_blogs[0]
+    if blog:
         all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+
+        still_to_go = blogs_to_review().count() - 1
 
         return render(
             request,
@@ -169,8 +167,9 @@ def review_flow(request):
                 'content': blog.content or "~nothing here~",
                 'posts': all_posts,
                 'root': blog.useful_domain,
-                'still_to_go': len(unreviewed_blogs),
-            })
+                'still_to_go': still_to_go,
+            }
+        )
     else:
         return redirect('staff_dashboard')
 

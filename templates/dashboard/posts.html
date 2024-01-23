@@ -11,7 +11,7 @@
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-{% if not blog.reviewed and not blog.to_review and blog.older_than_one_day %}
+{% if not blog.reviewed and not blog.to_review %}
 <p style="background-color: rgb(0,0,0,0.1); text-align:center; padding: 5px">
     <i>
         Want to show up on the
