@@ -1,5 +1,5 @@
 from django.core.exceptions import MultipleObjectsReturned
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseServerError
 from django.utils import timezone
 
 from blogs.helpers import salt_and_hash, unmark
@@ -9,6 +9,9 @@ from blogs.views.blog import not_found, resolve_address
 
 from feedgen.feed import FeedGenerator
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def clean_string(s):
@@ -54,10 +57,14 @@ def feed(request):
     except MultipleObjectsReturned:
         pass
 
-    if request.GET.get('type') == 'rss':
-        rssfeed = fg.rss_str(pretty=True)
-        return HttpResponse(rssfeed, content_type='application/rss+xml')
-    else:
-        fg.link(href=f"{blog.useful_domain}/feed/", rel='self')
-        atomfeed = fg.atom_str(pretty=True)
-        return HttpResponse(atomfeed, content_type='application/atom+xml')
+    try:
+        if request.GET.get('type') == 'rss':
+            rssfeed = fg.rss_str(pretty=True)
+            return HttpResponse(rssfeed, content_type='application/rss+xml')
+        else:
+            fg.link(href=f"{blog.useful_domain}/feed/", rel='self')
+            atomfeed = fg.atom_str(pretty=True)
+            return HttpResponse(atomfeed, content_type='application/atom+xml')
+    except ValueError as e:
+        logger.error(f'Error generating feed for {blog}', exc_info=True)
+        return HttpResponseServerError("An error occurred while generating the feed.")
