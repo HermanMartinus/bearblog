@@ -1,16 +1,14 @@
-from datetime import timedelta
-from ssl import CertificateError
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
-from django.utils import timezone
+from django.utils.html import escape, format_html
+from django.urls import reverse
+
 from requests import TooManyRedirects
 
-from .models import Blog, PersistentStore, Post, RssSubscriber, Stylesheet, Upvote, Hit, Subscriber
-from django.utils.html import escape, format_html
+from blogs.models import Blog, PersistentStore, Post, RssSubscriber, Stylesheet, Upvote, Hit, Subscriber
 from blogs.helpers import check_connection, root
-from django.urls import reverse
 
 
 admin.autodiscover()

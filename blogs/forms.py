@@ -64,7 +64,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'dashboard_styles', 'robots_txt')
+        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'rss_alias', 'dashboard_styles', 'robots_txt')
 
 
 class AnalyticsForm(forms.ModelForm):

@@ -122,6 +122,11 @@ def post(request, slug):
     # Check for a custom blogreel path and render the blog page
     if slug == blog.blog_path:
         return posts(request)
+    
+     # Check for a custom RSS feed path
+    if slug == blog.rss_alias:
+        from blogs.views.feed import feed
+        return feed(request)
 
     # Find by post slug
     post = Post.objects.filter(blog=blog, slug__iexact=slugify(slug)).first()
@@ -162,17 +167,6 @@ def post(request, slug):
             'upvoted': upvoted
         }
     )
-
-
-def post_alias(request, resource):
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
-
-    post = Post.objects.filter(blog=blog, alias=resource).first()
-    if post:
-        return redirect(f"/{post.slug}")
-    return render(request, '404.html', {'blog': blog}, status=404)
 
 
 def generate_meta_image(request, slug):
