@@ -148,9 +148,12 @@ def blogs_to_review():
         'he/them',
         'she/them',
         'he/she',
+        'she/he',
         'they/them',
         'masc terms',
+        'masculine',
         'fem terms',
+        'feminine',
         'pronouns',
         'prns',
         'dni',
@@ -168,7 +171,8 @@ def blogs_to_review():
         'Pisces',
         'animanga',
         'idols',
-        'proship'
+        'proship',
+        'haters'
     ]
 
     new_blogs = Blog.objects.filter(
