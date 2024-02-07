@@ -140,10 +140,24 @@ def blogs_to_review():
     opt_in_blogs = Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
     
     ignore_terms = [
-        'ooc',
-        'doll',
         'infp',
         'isfj',
+        'infj',
+        'intj',
+        'intp',
+        'isfp',
+        'istp',
+        'istj',
+        'enfp',
+        'enfj',
+        'entp',
+        'entj',
+        'esfp',
+        'esfj',
+        'estp',
+        'estj',
+        'ooc',
+        'doll',
         'he/',
         'she/',
         'they/',
@@ -157,6 +171,7 @@ def blogs_to_review():
         'dnf',
         'dnm',
         'byf',
+        'dfi',
         'Aries',
         'Taurus',
         'Gemini',
@@ -177,7 +192,9 @@ def blogs_to_review():
         'autistic',
         'lesbian',
         'gay',
-        'intersex'
+        'intersex',
+        'boyfriend',
+        'girlfriend'
     ]
 
     new_blogs = Blog.objects.filter(
