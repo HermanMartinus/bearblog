@@ -178,7 +178,8 @@ def blogs_to_review():
         'haters',
         'autistic',
         'lesbian',
-        'gay'
+        'gay',
+        'intersex'
     ]
 
     new_blogs = Blog.objects.filter(
