@@ -167,7 +167,8 @@ def blogs_to_review():
         'Aquarius',
         'Pisces',
         'animanga',
-        'idols'
+        'idols',
+        'proship'
     ]
 
     new_blogs = Blog.objects.filter(
