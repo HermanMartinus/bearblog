@@ -15,7 +15,6 @@
 
 {% block heading %}
 <br>
-{% if spam %}<h1 style="color:red">SPAM</h1>{% endif %}
 {{ blog.title }}
 {% endblock %}
 
@@ -33,10 +32,11 @@ Have a great week!
 Herman
         </textarea>
         <br>
-        <input type="submit" value="Approve"> |
+        <input type="submit" value="A - Approve" id="A"> |
         <small>
-            <a href="approve/{{ blog.pk }}?no-email=True" >Approve (no email)</a>|
-            <a href="block/{{ blog.pk }}">Block</a>
+            <a href="approve/{{ blog.pk }}?no-email=True" id="W">W - Approve (no email)</a> |
+            <a href="ignore/{{ blog.pk }}" id="E">E - Ignore</a> |
+            <a href="block/{{ blog.pk }}" id="F">F - Block</a>
         </small>
     </form>
     <br>
@@ -52,6 +52,8 @@ Herman
 <br>
 <a href="mailto:{{ blog.user.email }}">{{ blog.user.email }}</a>
 <p><b>Created {{ blog.created_date | timesince }} ago</b></p>
+<p><b>Last modified {{ blog.last_modified | timesince }} ago</b></p>
+<p><b>Last posted {{ blog.last_posted | timesince }} ago</b></p>
 
 <nav>{{ blog.nav | markdown:blog | safe }}</nav>
 {{ content | markdown:blog | safe }}
@@ -84,5 +86,26 @@ Herman
 {% endblock %}
 
 {% block footer %}
+<script>
+    document.addEventListener('keydown', function(event) {
+        const key = event.key.toUpperCase(); // Normalize key to uppercase
+        
+        // Trigger the corresponding action based on the pressed key
+        switch (key) {
+            case 'A':
+                document.getElementById('A').click();
+                break;
+            case 'W':
+                document.getElementById('W').click();
+                break;
+            case 'E':
+                document.getElementById('E').click();
+                break;
+            case 'F':
+                document.getElementById('F').click();
+                break;
+        }
+    });
+</script>
 Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
 {% endblock %}

@@ -9,9 +9,11 @@ urlpatterns = [
     path('', blog.home, name='home'),
     path('logger-test/', logger.logger_test),
 
+    # Staff dashboard
     path('staff/review/', staff.review_flow, name='review_flow'),
     path('staff/review/approve/<pk>', staff.approve, name='review_approve'),
     path('staff/review/block/<pk>', staff.block, name='review_block'),
+    path('staff/review/ignore/<pk>', staff.ignore, name='review_ignore'),
     path('staff/review/delete/<pk>', staff.delete, name='review_delete'),
     path('staff/dashboard/', staff.dashboard, name='staff_dashboard'),
     path('staff/dashboard/delete-empty/', staff.delete_empty, name='delete_empty'),

@@ -29,6 +29,7 @@ class Blog(models.Model):
     footer_directive = models.TextField(blank=True)
 
     reviewed = models.BooleanField(default=False)
+    ignored_date = models.DateTimeField(blank=True, null=True)
     to_review = models.BooleanField(default=False)
     reviewer_note = models.TextField(blank=True)
 

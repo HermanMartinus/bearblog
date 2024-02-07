@@ -1,7 +1,7 @@
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models.functions import TruncDate, Length
 from django.http import JsonResponse
@@ -12,8 +12,6 @@ from blogs.models import Blog
 from datetime import timedelta
 import pygal
 from pygal.style import LightColorizedStyle
-import openai
-import os
 
 
 @staff_member_required
@@ -138,7 +136,22 @@ def get_empty_blogs():
 
 
 def blogs_to_review():
-    return Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
+    # QuerySet for blogs opted-in for review
+    opt_in_blogs = Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
+    
+    # QuerySet for new blogs and blogs where ignored_date is after last_modified or ignored_date is null
+    new_blogs = Blog.objects.filter(
+        reviewed=False, 
+        blocked=False, 
+        to_review=False
+    ).filter(
+        Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True)
+    )
+    
+    # Combine QuerySets using bitwise OR and remove duplicates
+    combined_blogs = (opt_in_blogs | new_blogs).distinct()
+    
+    return combined_blogs
 
 
 @staff_member_required
@@ -205,6 +218,14 @@ def block(request, pk):
 def delete(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.delete()
+    return redirect('review_flow')
+
+
+@staff_member_required
+def ignore(request, pk):
+    blog = get_object_or_404(Blog, pk=pk)
+    blog.ignored_date = timezone.now()
+    blog.save()
     return redirect('review_flow')
 
 
