@@ -36,7 +36,8 @@ Herman
         <small>
             <a href="approve/{{ blog.pk }}?no-email=True" id="W">W - Approve (no email)</a> |
             <a href="ignore/{{ blog.pk }}" id="E">E - Ignore</a> |
-            <a href="block/{{ blog.pk }}" id="F">F - Block</a>
+            <a href="block/{{ blog.pk }}" id="F">F - Block</a> |
+            <a href="delete/{{ blog.pk }}" id="G">G - Delete</a>
         </small>
     </form>
     <br>
@@ -103,6 +104,9 @@ Herman
                 break;
             case 'F':
                 document.getElementById('F').click();
+                break;
+            case 'G':
+                document.getElementById('G').click();
                 break;
         }
     });
