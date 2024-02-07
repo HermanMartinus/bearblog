@@ -128,14 +128,14 @@ def validate_subscriber_email(email, blog):
         Follow this <a href="{confirmation_link}">link</a> to confirm your subscription.
         <br>
         <br>
-        Made with <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+        Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
     '''
     text_message = f'''
         You've decided to subscribe to {blog.title} ({blog.useful_domain}). That's awesome!
 
         Follow this link to confirm your subscription: {confirmation_link}
 
-        Made with Bear ʕ•ᴥ•ʔ
+        Powered by Bear ʕ•ᴥ•ʔ
     '''
     send_async_mail(
         f'Confirm your subscription to {blog.title}',
