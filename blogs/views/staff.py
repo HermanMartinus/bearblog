@@ -139,12 +139,45 @@ def blogs_to_review():
     # QuerySet for blogs opted-in for review
     opt_in_blogs = Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
     
-    # QuerySet for new blogs and blogs where ignored_date is after last_modified or ignored_date is null
+    ignore_terms = [
+        'ooc',
+        'doll',
+        'infp',
+        'she/her',
+        'he/him',
+        'they/them',
+        'masc terms',
+        'fem terms',
+        'pronouns',
+        'prns',
+        'dni',
+        'Aries',
+        'Taurus',
+        'Gemini',
+        'Cancer',
+        'Leo',
+        'Virgo',
+        'Libra',
+        'Scorpio',
+        'Sagittarius',
+        'Capricorn',
+        'Aquarius',
+        'Pisces'
+    ]
+
     new_blogs = Blog.objects.filter(
         reviewed=False, 
         blocked=False, 
         to_review=False
-    ).filter(
+    )
+
+    # Dynamically build up a Q object for exclusion
+    exclude_conditions = Q()
+    for term in ignore_terms:
+        exclude_conditions |= Q(content__icontains=term)
+
+    # Apply the exclusion condition
+    new_blogs = new_blogs.exclude(exclude_conditions).filter(
         Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True)
     )
     
