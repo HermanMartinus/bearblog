@@ -174,6 +174,8 @@ def blogs_to_review():
         'byf',
         'dfi',
         'reqs',
+        'dm',
+        ':3',
         'Aries',
         'Taurus',
         'Gemini',
