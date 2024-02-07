@@ -145,6 +145,9 @@ def blogs_to_review():
         'infp',
         'she/her',
         'he/him',
+        'he/them',
+        'she/them',
+        'he/she',
         'they/them',
         'masc terms',
         'fem terms',
@@ -162,7 +165,9 @@ def blogs_to_review():
         'Sagittarius',
         'Capricorn',
         'Aquarius',
-        'Pisces'
+        'Pisces',
+        'animanga',
+        'idols'
     ]
 
     new_blogs = Blog.objects.filter(
