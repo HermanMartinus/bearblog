@@ -173,6 +173,7 @@ def blogs_to_review():
         'dnm',
         'byf',
         'dfi',
+        'reqs',
         'Aries',
         'Taurus',
         'Gemini',
@@ -200,6 +201,8 @@ def blogs_to_review():
         'genderfluid',
         'boyfriend',
         'girlfriend',
+        'gf',
+        'bf',
         'carrd',
         'rentry'
     ]
