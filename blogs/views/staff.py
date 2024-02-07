@@ -161,6 +161,7 @@ def blogs_to_review():
         'he/',
         'she/',
         'they/',
+        'it/',
         'masc terms',
         'masculine',
         'fem terms',
@@ -192,9 +193,12 @@ def blogs_to_review():
         'autistic',
         'lesbian',
         'gay',
+        'bisexual',
         'intersex',
+        'genderfluid',
         'boyfriend',
-        'girlfriend'
+        'girlfriend',
+        'carrd'
     ]
 
     new_blogs = Blog.objects.filter(
