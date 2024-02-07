@@ -136,116 +136,117 @@ def get_empty_blogs():
 
 
 def blogs_to_review():
-    # QuerySet for blogs opted-in for review
-    opt_in_blogs = Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
-    
-    ignore_terms = [
-        'infp',
-        'isfj',
-        'infj',
-        'intj',
-        'intp',
-        'isfp',
-        'istp',
-        'istj',
-        'enfp',
-        'enfj',
-        'entp',
-        'entj',
-        'esfp',
-        'esfj',
-        'estp',
-        'estj',
-        '14',
-        '15',
-        '16',
-        '17',
-        '18',
-        '19',
-        '20',
-        'ooc',
-        'doll',
-        'he/',
-        'she/',
-        'they/',
-        'it/',
-        'masc terms',
-        'masculine',
-        'fem terms',
-        'feminine',
-        'pronouns',
-        'irl',
-        'prns',
-        'dni',
-        'dnf',
-        'dnm',
-        'byf',
-        'dfi',
-        'reqs',
-        'dm',
-        'pls',
-        'nsfw',
-        'wip',
-        'model',
-        'minor',
-        ':3',
-        '<3',
-        'hii',
-        'heyy',
-        'Aries',
-        'Taurus',
-        'Gemini',
-        'Cancer',
-        'Leo',
-        'Virgo',
-        'Libra',
-        'Scorpio',
-        'Sagittarius',
-        'Capricorn',
-        'Aquarius',
-        'Pisces',
-        'animanga',
-        'manga',
-        'kdrama',
-        'idols',
-        'proship',
-        'haters',
-        'bpd',
-        'autistic',
-        'lesbian',
-        'gay',
-        'bisexual',
-        'intersex',
-        'pansexual',
-        'genderfluid',
-        'boyfriend',
-        'girlfriend',
-        'gf',
-        'bf',
-        'carrd',
-        'rentry'
-    ]
+    # Opted-in for review
+    to_review = Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
 
-    new_blogs = Blog.objects.filter(
-        reviewed=False, 
-        blocked=False, 
-        to_review=False
-    )
+    if to_review.count() < 1:
+        ignore_terms = [
+            'infp',
+            'isfj',
+            'infj',
+            'intj',
+            'intp',
+            'isfp',
+            'istp',
+            'istj',
+            'enfp',
+            'enfj',
+            'entp',
+            'entj',
+            'esfp',
+            'esfj',
+            'estp',
+            'estj',
+            '14',
+            '15',
+            '16',
+            '17',
+            '18',
+            '19',
+            '20',
+            'ooc',
+            'doll',
+            'he/',
+            'she/',
+            'they/',
+            'it/',
+            'masc terms',
+            'masculine',
+            'fem terms',
+            'feminine',
+            'pronouns',
+            'irl',
+            'prns',
+            'dni',
+            'dnf',
+            'dnm',
+            'byf',
+            'dfi',
+            'reqs',
+            'dm',
+            'pls',
+            'nsfw',
+            'wip',
+            'model',
+            'minor',
+            ':3',
+            '<3',
+            'hii',
+            'heyy',
+            'lmao',
+            'Aries',
+            'Taurus',
+            'Gemini',
+            'Cancer',
+            'Leo',
+            'Virgo',
+            'Libra',
+            'Scorpio',
+            'Sagittarius',
+            'Capricorn',
+            'Aquarius',
+            'Pisces',
+            'animanga',
+            'manga',
+            'kdrama',
+            'idols',
+            'proship',
+            'haters',
+            'bpd',
+            'autistic',
+            'lesbian',
+            'gay',
+            'bisexual',
+            'intersex',
+            'pansexual',
+            'genderfluid',
+            'boyfriend',
+            'girlfriend',
+            'gf',
+            'bf',
+            'carrd',
+            'rentry'
+        ]
 
-    # Dynamically build up a Q object for exclusion
-    exclude_conditions = Q()
-    for term in ignore_terms:
-        exclude_conditions |= Q(content__icontains=term)
+        new_blogs = Blog.objects.filter(
+            reviewed=False, 
+            blocked=False, 
+            to_review=False
+        )
 
-    # Apply the exclusion condition
-    new_blogs = new_blogs.exclude(exclude_conditions).filter(
-        Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True)
-    )
+        # Dynamically build up a Q object for exclusion
+        exclude_conditions = Q()
+        for term in ignore_terms:
+            exclude_conditions |= Q(content__icontains=term)
+
+        # Apply the exclusion condition
+        new_blogs = new_blogs.exclude(exclude_conditions).filter(
+            Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True)
+        )
+        
+        to_review = new_blogs
     
-    # Combine QuerySets using bitwise OR and remove duplicates
-    combined_blogs = (opt_in_blogs | new_blogs).distinct()
-    
-    return combined_blogs
+    return to_review
 
 
 @staff_member_required
