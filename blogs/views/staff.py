@@ -186,6 +186,8 @@ def blogs_to_review():
         'Aquarius',
         'Pisces',
         'animanga',
+        'manga',
+        'kdrama',
         'idols',
         'proship',
         'haters',
@@ -198,7 +200,8 @@ def blogs_to_review():
         'genderfluid',
         'boyfriend',
         'girlfriend',
-        'carrd'
+        'carrd',
+        'rentry'
     ]
 
     new_blogs = Blog.objects.filter(
