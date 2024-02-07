@@ -157,6 +157,9 @@ def blogs_to_review():
         'pronouns',
         'prns',
         'dni',
+        'dnf',
+        'dnm',
+        'byf',
         'Aries',
         'Taurus',
         'Gemini',
@@ -172,7 +175,10 @@ def blogs_to_review():
         'animanga',
         'idols',
         'proship',
-        'haters'
+        'haters',
+        'autistic',
+        'lesbian',
+        'gay'
     ]
 
     new_blogs = Blog.objects.filter(
