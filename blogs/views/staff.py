@@ -176,6 +176,7 @@ def blogs_to_review():
         'reqs',
         'dm',
         'pls',
+        'nsfw',
         'model',
         'minor',
         ':3',
