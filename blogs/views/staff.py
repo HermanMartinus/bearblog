@@ -246,7 +246,7 @@ def blogs_to_review():
         
         to_review = new_blogs
     
-    return to_review.prefetch_related("post_set").order_by('created_date')[:50]
+    return to_review.order_by('created_date')
 
 
 @staff_member_required
