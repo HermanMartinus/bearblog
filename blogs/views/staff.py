@@ -246,7 +246,7 @@ def blogs_to_review():
         
         to_review = new_blogs
     
-    return to_review.order_by('-created_date')
+    return to_review.order_by('created_date')
 
 
 @staff_member_required
