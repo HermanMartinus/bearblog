@@ -246,7 +246,7 @@ def blogs_to_review():
         
         to_review = new_blogs
     
-    return to_review
+    return to_review.prefetch_related("post_set").order_by('created_date')[:50]
 
 
 @staff_member_required
@@ -260,7 +260,7 @@ def delete_empty(request):
 
 @staff_member_required
 def review_flow(request):
-    blog = blogs_to_review().prefetch_related("post_set").order_by('created_date').first()
+    blog = blogs_to_review().first()
 
     if blog:
         all_posts = blog.post_set.filter(publish=True).order_by('-published_date')

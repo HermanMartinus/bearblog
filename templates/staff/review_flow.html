@@ -41,7 +41,7 @@ Herman
         </small>
     </form>
     <br>
-    {{ still_to_go }} blog(s) still to go
+    {{ still_to_go }}{% if still_to_go > 48 %}+{% endif %} blog(s) still to go
 </div>
 {% endblock %}
 
