@@ -72,7 +72,7 @@
     <hr>
 </div>
 {% endfor %}
-<button onclick="window.location.reload()">Next ››</button>
+<button onclick="window.scrollTo(0, 0); setTimeout(function() { window.location.reload(); }, 10)">Next ››</button>
 {% endblock %}
 
 {% block footer %}
