@@ -11,6 +11,7 @@ urlpatterns = [
 
     # Staff dashboard
     path('staff/review/', staff.review_flow, name='review_flow'),
+    path('staff/review-bulk/', staff.review_bulk, name='review_bulk'),
     path('staff/review/approve/<pk>', staff.approve, name='review_approve'),
     path('staff/review/block/<pk>', staff.block, name='review_block'),
     path('staff/review/ignore/<pk>', staff.ignore, name='review_ignore'),

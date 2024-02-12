@@ -139,7 +139,7 @@ def blogs_to_review():
     # Opted-in for review
     to_review = Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
 
-    if to_review.count() < 1:
+    if to_review.count() > 1:
         ignore_terms = [
             'infp',
             'isfj',
@@ -281,6 +281,18 @@ def review_flow(request):
     else:
         return redirect('staff_dashboard')
 
+@staff_member_required
+def review_bulk(request):
+    blogs = blogs_to_review()[:20]
+
+    return render(
+        request,
+        'staff/review_bulk.html',
+        {
+            'blogs': blogs
+        }
+    )
+
 
 @staff_member_required
 def approve(request, pk):
@@ -289,7 +301,7 @@ def approve(request, pk):
     blog.to_review = False
     blog.save()
 
-    message = request.POST.get("message", "")
+    message = request.POST.get("message", "Hey, I've just reviewed your blog. It looks good and has been approved.<br><br>Have a great week!<br>Herman")
 
     if message and not request.GET.get("no-email", ""):
         send_async_mail(
