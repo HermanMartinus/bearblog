@@ -139,7 +139,7 @@ def blogs_to_review():
     # Opted-in for review
     to_review = Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
 
-    if to_review.count() > 1:
+    if to_review.count() < 1:
         ignore_terms = [
             'infp',
             'isfj',

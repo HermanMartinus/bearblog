@@ -110,12 +110,14 @@
         .catch(error => console.error('Error:', error));
     }
     function deleteBlog(pk) {
-        document.querySelector(`#blog-${pk}`).style.background="grey"
-        fetch(`/staff/review/delete/${pk}`, {
-            method: 'GET'
-        })
-        .then(data => console.log(data))
-        .catch(error => console.error('Error:', error));
+        if (confirm('Delete this blog?')) {
+            document.querySelector(`#blog-${pk}`).style.background="grey"
+            fetch(`/staff/review/delete/${pk}`, {
+                method: 'GET'
+            })
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+        }
     }
     {% comment %} document.addEventListener('keydown', function(event) {
         const key = event.key.toUpperCase(); // Normalize key to uppercase
