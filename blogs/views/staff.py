@@ -191,6 +191,7 @@ def blogs_to_review():
             'minor',
             ':3',
             '<3',
+            '♡',
             'hii',
             'heyy',
             'lmao',
