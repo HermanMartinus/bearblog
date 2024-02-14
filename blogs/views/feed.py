@@ -54,7 +54,7 @@ def feed(request):
         except ValueError:
             fe.content(markdown(clean_string(post.content.replace('{{ email-signup }}', '')), blog), type="html")
         fe.published(post.published_date)
-        fe.updated(post.published_date)
+        fe.updated(post.last_modified)
 
     # Log feed request
     try:
