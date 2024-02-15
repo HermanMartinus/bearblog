@@ -23,7 +23,7 @@ from blogs.models import Post
 
 register = template.Library()
 
-SAFE_ATTRS = list(defs.safe_attrs) + ['style', 'controls', 'allowfullscreen', 'autoplay', 'loop']
+SAFE_ATTRS = list(defs.safe_attrs) + ['style', 'controls', 'allowfullscreen', 'autoplay', 'loop', 'open']
 
 HOST_WHITELIST = [
     'www.youtube.com',
