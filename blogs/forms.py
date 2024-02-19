@@ -55,6 +55,13 @@ class AdvancedSettingsForm(forms.ModelForm):
         help_text="Change the way your dashboard looks and feels with CSS."
     )
 
+    dashboard_footer = forms.CharField(
+        widget=forms.Textarea(),
+        label="Custom dashboard footer content",
+        required=False,
+        help_text="Add scripts and other footer content to your dashboard."
+    )
+
     robots_txt = forms.CharField(
         widget=forms.Textarea(),
         label="robots.txt content",
@@ -64,7 +71,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'rss_alias', 'dashboard_styles', 'robots_txt')
+        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'rss_alias', 'dashboard_styles', 'dashboard_footer', 'robots_txt')
 
 
 class AnalyticsForm(forms.ModelForm):

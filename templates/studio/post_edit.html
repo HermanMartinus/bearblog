@@ -115,4 +115,5 @@ New post | Bear Blog
 </form>
 
 {% include '../snippets/editor_functions.html' with blog=blog post=post%}
+{{ blog.dashboard_footer | safe }}
 {% endblock %}

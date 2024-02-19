@@ -46,6 +46,7 @@ class Blog(models.Model):
     favicon = models.CharField(max_length=10, default="🐼")
 
     dashboard_styles = models.TextField(blank=True)
+    dashboard_footer = models.TextField(blank=True)
 
     date_format = models.CharField(max_length=32, blank=True)
 

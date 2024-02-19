@@ -100,6 +100,7 @@
     <input type="hidden" id="hidden_header_content" name="header_content">
 
     <textarea
+        id="body_content"
         name="body_content"
         style="min-height: 500px;border-top: 1px solid lightgrey;"
         placeholder="..."
@@ -117,4 +118,5 @@
 </span>
 
 {% include '../snippets/editor_functions.html' with blog=blog%}
+{{ blog.dashboard_footer | safe }}
 {% endblock %}
