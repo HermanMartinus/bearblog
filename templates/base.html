@@ -28,9 +28,6 @@
   <header>
     <a class="title" href="/">
       <h1>
-        {% if request.META.HTTP_HOST == "hmartinus.com" %}
-        [Testing on {{ request.META.HTTP_HOST }}]
-        {% endif %}
         {% block heading %}
         <span class="title-bear">ʕ•ᴥ•ʔ</span> Bear
         {% endblock %}

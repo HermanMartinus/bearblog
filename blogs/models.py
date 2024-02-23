@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
+from allauth.account.models import EmailAddress
+
 import json
 from math import log
 import random
@@ -61,6 +63,15 @@ class Blog(models.Model):
     @property
     def older_than_one_day(self):
         return (timezone.now() - self.created_date).days > 1
+    
+    @property
+    def created_after_mandatory_opt_in(self):
+        mandatory_opt_in_date = timezone.make_aware(timezone.datetime(2024, 2, 22))
+        return self.created_date > mandatory_opt_in_date
+
+    @property
+    def user_email_verified(self):
+        return EmailAddress.objects.filter(user=self.user, verified=True).exists()
 
     @property
     def contains_code(self):

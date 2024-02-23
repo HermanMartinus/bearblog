@@ -19,10 +19,10 @@
     <a href="/accounts/logout/">Sign out</a>
 </span>
 
-{% if not blog.upgraded %}
-{% comment %} Announcement {% endcomment %}
-{% comment %} <br>
-<p style="background-color: rgb(0,0,0,1); text-align: center">
-<small>I'm running a <b>Black Friday special</b> right now!<br>Use the code <b>BLACKFRIDAY</b> to get <b>30% off</b> when upgrading!</small>
-</p> {% endcomment %}
+
+{% if not blog.upgraded and not blog.reviewed and not blog.user_email_verified and blog.created_after_mandatory_opt_in %}
+<br>
+<div style="margin-top: 15px; font-size: small;">
+    This blog will expire in 48 hours. <a href="/dashboard/verify-email/">Verify your email address</a> keep this blog active.
+</div>
 {% endif %}
