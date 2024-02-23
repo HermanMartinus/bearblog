@@ -20,9 +20,9 @@
 </span>
 
 
-{% if not blog.upgraded and not blog.reviewed and not blog.user_email_verified and blog.created_after_mandatory_opt_in %}
+{% comment %} {% if not blog.upgraded and not blog.reviewed and not blog.user_email_verified and blog.created_after_mandatory_opt_in %}
 <br>
 <div style="margin-top: 15px; font-size: small;">
     This blog will expire in 48 hours. <a href="/dashboard/verify-email/">Verify your email address</a> keep this blog active.
 </div>
-{% endif %}
+{% endif %} {% endcomment %}
