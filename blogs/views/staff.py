@@ -284,7 +284,7 @@ def review_flow(request):
 
 @staff_member_required
 def review_bulk(request):
-    blogs = blogs_to_review()[:20]
+    blogs = blogs_to_review()[:100]
 
     return render(
         request,
