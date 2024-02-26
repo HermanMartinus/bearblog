@@ -8,9 +8,6 @@ from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 
-from allauth.account.models import EmailAddress
-from allauth.account.utils import send_email_confirmation
-
 
 from ipaddr import client_ip
 from unicodedata import lookup
@@ -136,19 +133,6 @@ def upload_image(request):
                 )
 
         return HttpResponse(json.dumps(sorted(file_links)), 200)
-
-
-@login_required
-def verify_email(request):
-    if EmailAddress.objects.filter(user=request.user, verified=True).exists():
-        content = "Your email address has already been verified \ʕ•ᴥ•ʔ/"
-        return render(request, 'dashboard/message.html', {'title': 'Verify email address', 'content': content})
-    else:
-        try:
-            send_email_confirmation(request, request.user)
-            return redirect('account_email_verification_sent')
-        except Exception as e:
-            content = f"Something went wrong while sending the verification email: {str(e)}"
 
 
 @login_required

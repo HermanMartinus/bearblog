@@ -23,7 +23,6 @@ urlpatterns = [
     path('signup/', signup_flow.signup, name="signup_flow"),
 
     path('dashboard/', studio.studio, name="dashboard"),
-    path('dashboard/verify-email/', dashboard.verify_email, name="verify_email"),
     path('dashboard/nav/', dashboard.nav, name='nav'),
     path('dashboard/styles/', dashboard.styles, name='styles'),
     path('dashboard/settings/', dashboard.settings, name='settings'),
