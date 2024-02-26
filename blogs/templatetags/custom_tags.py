@@ -110,7 +110,7 @@ def markdown(content, blog_or_post=False):
     processed_markup = str(soup)
 
     # If not upgraded remove iframes and js
-    if not blog or not blog.upgraded:
+    if not blog or not blog.user.settings.upgraded:
         processed_markup = clean(processed_markup)
 
     # Replace LaTeX between $$ with MathML

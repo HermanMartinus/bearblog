@@ -24,8 +24,8 @@ from blogs.subscriptions import get_subscriptions
 
 
 @login_required
-def nav(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def nav(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     if request.method == "POST":
         form = NavForm(request.POST, instance=blog)
@@ -45,8 +45,8 @@ def nav(request):
 
 
 @login_required
-def styles(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def styles(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     if request.method == "POST":
         form = StyleForm(
@@ -68,7 +68,7 @@ def styles(request):
         if request.GET.get("preview", False):
             return render(request, 'home.html', {'blog': blog, 'preview': True})
         blog.save()
-        return redirect('/dashboard/styles/')
+        return redirect('styles', id=blog.id)
 
     return render(request, 'dashboard/styles.html', {
         'blog': blog,
@@ -78,8 +78,8 @@ def styles(request):
 
 
 @login_required
-def posts_edit(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def posts_edit(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     posts = Post.objects.annotate(
         hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
@@ -91,16 +91,16 @@ def posts_edit(request):
 
 
 @login_required
-def post_delete(request, uid):
-    blog = get_object_or_404(Blog, user=request.user)
+def post_delete(request, id, uid):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
     post = get_object_or_404(Post, blog=blog, uid=uid)
     post.delete()
-    return redirect('/dashboard/posts/')
+    return redirect('posts', id=blog.id)
 
 
 @csrf_exempt
-def upload_image(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def upload_image(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     if request.method == "POST" and blog.upgraded is True:
         file_links = []
@@ -137,8 +137,6 @@ def upload_image(request):
 
 @login_required
 def upgrade(request):
-    blog = get_object_or_404(Blog, user=request.user)
-
     country = get_country(client_ip(request))
     country_name = ''
     country_emoji = ''
@@ -173,7 +171,7 @@ def upgrade(request):
             discount = 50
 
     return render(request, "dashboard/upgrade.html", {
-        "blog": blog,
+
         "country_name": country_name,
         "country_emoji": country_emoji,
         "discount": discount,
@@ -182,8 +180,8 @@ def upgrade(request):
 
 
 @login_required
-def opt_in_review(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def opt_in_review(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     if request.method == 'POST':
         spam = request.POST.get("spam", "")
@@ -197,13 +195,13 @@ def opt_in_review(request):
 
 
 @login_required
-def settings(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def settings(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
     subscription_cancelled = None
     subscription_link = None
 
     if blog.order_id:
-        subscription = get_subscriptions(blog.order_id)
+        subscription = get_subscriptions(request.user.settings.order_id)
 
         try:
             if subscription:
@@ -217,7 +215,7 @@ def settings(request):
     
     if request.GET.get("generate"):
         blog.generate_auth_token()
-        return redirect("settings")
+        return redirect('settings', id=blog.id)
 
     return render(request, "dashboard/account.html", {
         "blog": blog,
@@ -234,8 +232,3 @@ def delete_user(request):
         return redirect('/')
 
     return render(request, 'account/account_confirm_delete.html')
-
-
-class PostDelete(DeleteView):
-    model = Post
-    success_url = '/dashboard/posts'

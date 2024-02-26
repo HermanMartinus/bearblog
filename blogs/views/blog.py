@@ -134,7 +134,7 @@ def post(request, slug):
         # Find by post alias
         post = Post.objects.filter(blog=blog, alias__iexact=slug).first()
         if post:
-            return redirect(f"/{post.slug}")
+            return redirect('post_edit', id=blog.id, slug=post.slug)
         else:
             return render(request, '404.html', {'blog': blog}, status=404)
 
@@ -243,7 +243,7 @@ def public_analytics(request):
     if not blog:
         return not_found(request)
 
-    if not blog or not blog.upgraded or not blog.public_analytics:
+    if not blog or not blog.user.settings.upgraded or not blog.public_analytics:
         return not_found(request)
 
     return render_analytics(request, blog, True)

@@ -1,13 +1,13 @@
 <span>
-    <a href="/dashboard/">Home</a>
+    <a href="{% url 'dashboard' id=blog.id %}">Home</a>
     {% if blog %}
-    <a href="/dashboard/nav/">Nav</a>
-    <a href="/dashboard/posts/">Posts</a>
-    <a href="/dashboard/styles/">Themes</a>
+    <a href="{% url 'nav' id=blog.id %}">Nav</a>
+    <a href="{% url 'posts' id=blog.id %}">Posts</a>
+    <a href="{% url 'styles' id=blog.id %}">Themes</a>
     {% if blog.analytics_active %}
-    <a href="/dashboard/analytics/">Analytics</a>
+    <a href="{% url 'analytics' id=blog.id %}">Analytics</a>
     {% endif %}
-    <a href="/dashboard/email-list/">Emails</a>
+    <a href="{% url 'email_list' id=blog.id %}">Emails</a>
     {% endif %}
     {% if not blog.upgraded %}
     <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear"></span></a>
@@ -15,14 +15,14 @@
 </span>
 
 <span>
-    <a href="/dashboard/settings/">Settings</a>
-    <a href="/accounts/logout/">Sign out</a>
+    <a href="{% url 'settings' id=blog.id %}">Settings</a>
+    <a href="{% url 'blog_list' %}">Blogs</a>
 </span>
 
 
 {% comment %} {% if not blog.upgraded and not blog.reviewed and blog.created_after_mandatory_opt_in %}
 <br>
 <div style="margin-top: 15px; font-size: small;">
-    This blog will expire in 48 hours. <a href="/dashboard/opt-in-review/">Verify your account</a> keep this blog active.
+    This blog will expire in 48 hours. <a href="{% url 'opt_in_review' id=blog.id %}">Verify your account</a> keep this blog active.
 </div>
 {% endif %} {% endcomment %}

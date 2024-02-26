@@ -15,7 +15,7 @@
 {% if blog.reviewed %}
 <p>Your blog has already been reviewed. \ʕ•ᴥ•ʔ/</p>
 {% elif blog.to_review %}
-<p>Your blog is under review. Blogs are reviewed about twice a week. <a href="/dashboard/upgrade/">Upgrade</a> to get approved immediately.
+<p>Your blog is under review. Blogs are reviewed about twice a week. <a href="{% url 'upgrade' id=blog.id %}">Upgrade</a> to get approved immediately.
 {% else %}
 <p>
     Hi, Herman here  ʕ •ᴥ•ʔゝ
@@ -25,7 +25,7 @@
     This manual review step is to keep spam off Bear while ensuring it remains free-to-use. 
     <br><br>
     I review new blogs about twice a week. If you'd like to skip the wait and get approved immediately you can
-    <a href="/dashboard/upgrade/">upgrade</a>. This comes with a bunch of other neat features too.
+    <a href="{% url 'upgrade' id=blog.id %}">upgrade</a>. This comes with a bunch of other neat features too.
     <br><br>
     By submitting the form below you are opting into a human review of your blog (by yours truly).
 </p>

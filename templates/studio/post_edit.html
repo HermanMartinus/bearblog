@@ -25,7 +25,7 @@ New post | Bear Blog
 {% endif %}
 <form method="POST" class="post-form full-width">
     <p class="sticky-controls">
-        <button onclick="event.preventDefault(); sessionStorage.clear(); window.location = '/dashboard/posts/'">&#8592; Back</button>
+        <button onclick="event.preventDefault(); sessionStorage.clear(); window.location = '/{{ blog.id }}/dashboard/posts/'">&#8592; Back</button>
         <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
         
         {% if post %}
@@ -34,7 +34,7 @@ New post | Bear Blog
             </button>
             <button
                 style="color: red; float: right;"
-                onclick="event.preventDefault();if(confirm('Are you sure?')){window.location = '/dashboard/posts/{{ post.uid }}/delete/';}"
+                onclick="event.preventDefault();if(confirm('Are you sure?')){window.location = '/{{ blog.id }}/dashboard/posts/{{ post.uid }}/delete/';}"
             >
                 Delete
             </button>

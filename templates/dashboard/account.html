@@ -11,13 +11,12 @@
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<h1>Settings</h1>
-<h2>Blog settings</h2>
+<h1>Blog settings</h1>
 <p>
-    <a href="/dashboard/directives/">Header and footer directives</a>
+    <a href="{% url 'directive_edit' id=blog.id %}">Header and footer directives</a>
 </p>
 <p>
-    <a href="/dashboard/settings/advanced/">Advanced settings</a>
+    <a href="{% url 'advanced_settings' id=blog.id %}">Advanced settings</a>
 </p>
 {% comment %} 
 <p>
@@ -32,33 +31,8 @@
     {% endif %}
 </p>
 {% endcomment %}
-<h2>Account</h2>
-<p>
-    <a href="/accounts/email/">Update email address</a>
-</p>
-<p>
-    <a href="/accounts/password/change/">Change password</a>
-</p>
+
 <p>
     <a href="?export=true" download>Export all blog data</a>
-</p>
-
-{% if subscription_link %}
-<p>
-    <a href="{{ subscription_link }}" target="_blank">Manage subscription</a>
-</p>
-{% endif %}
-
-<p>
-    {% if subscription_link and not subscription_cancelled %}
-    <a onclick="alert('Please cancel your subscription before deleting your account.')">Delete account</a>
-    {% else %}
-    <a href="{% url 'user_delete' %}">Delete account</a>
-    {% endif %}
-</p>
-<p>
-    If you have any requests use the
-    <a href="https://bear.nolt.io" target="_blank">suggestions board</a>
-    or if you've found a bug pop me an <a href="mailto:herman@bearblog.dev">email</a>.
 </p>
 {% endblock %}

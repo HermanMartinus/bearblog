@@ -15,11 +15,11 @@ from blogs.views.blog import resolve_address, not_found
 
 
 @login_required
-def email_list(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def email_list(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     if not blog.upgraded:
-        return redirect('/dashboard/upgrade/')
+        return redirect('upgrade')
 
     subscribers = Subscriber.objects.filter(blog=blog)
 

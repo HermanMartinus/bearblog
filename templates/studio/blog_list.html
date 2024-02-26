@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog list | Bear Blog{% endblock %}
+
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+{% endblock %}
+
+{% block nav %}{% endblock %}
+
+{% block content %}
+
+<h1>Your blogs</h1>
+
+{% if error_messages %}
+<p style="color:lightsalmon">
+    {% for error_message in error_messages %}
+        {{ error_message }}<br>
+    {% endfor %}
+</p>
+{% endif %}
+
+<ul>
+{% for blog in blogs %}
+    <li>
+        <a href="{% url 'dashboard' id=blog.id %}">{{ blog.title }}</a>
+        <small>[<a href="{{ blog.dynamic_useful_domain }}" target="_blank">link</a>]</small>
+    </li>
+{% endfor %}
+</ul>
+
+<button>Create new blog</button>
+<br>
+<small>Have a blog in a separate account you'd like to migrate over?</small>
+
+
+<h2>Account</h2>
+{% if not request.user.settings.upgraded %}
+<p>
+    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear"></span></a>
+</p>
+{% endif %}
+<p>
+    <a href="{% url 'account_logout' %}">Sign out</a>
+</p>
+
+<p>
+    <a href="/accounts/email/">Update email address</a>
+</p>
+<p>
+    <a href="/accounts/password/change/">Change password</a>
+</p>
+
+{% if subscription_link %}
+<p>
+    <a href="{{ subscription_link }}" target="_blank">Manage subscription</a>
+</p>
+{% endif %}
+
+<p>
+    {% if subscription_link and not subscription_cancelled %}
+    <a onclick="alert('Please cancel your subscription before deleting your account.')">Delete account</a>
+    {% else %}
+    <a href="{% url 'user_delete' %}">Delete account</a>
+    {% endif %}
+</p>
+<p>
+    If you have any requests use the
+    <a href="https://bear.nolt.io" target="_blank">suggestions board</a>
+    or if you've found a bug pop me an <a href="mailto:herman@bearblog.dev">email</a>.
+</p>
+
+
+{% endblock %}

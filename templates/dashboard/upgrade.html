@@ -8,9 +8,8 @@
     {{ blog.dashboard_styles | safe }}
 {% endblock %}
 
-{% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
-
 {% block content %}
+<button onclick="window.history.back()">← Back</button>
 <h1>Upgrade</h1>
 
 {% if not blog.upgraded %}
@@ -23,6 +22,7 @@
     I charge for the most resource-intensive features:
     <ul>
         <li>Custom domains</li>
+        <li>Open up to 5 blogs</li>
         <li>Image uploading</li>
         <li>In-depth analytics</li>
         <li>Run JS scripts</li>
@@ -45,7 +45,7 @@
 {% endif %}
 
 <p>
-    <button onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][blog]={{blog.subdomain}}')">Upgrade</button>
+    <button onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][user_id]={{user.id}}')">Upgrade</button>
 </p>
 
 <small>

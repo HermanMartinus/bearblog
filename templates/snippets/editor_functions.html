@@ -64,7 +64,7 @@
 		const previewForm = document.createElement('form')
 		previewForm.target = "print_popup"
 		previewForm.method = "POST"
-		previewForm.action = "/dashboard/preview/?type={% if post %}post{% else %}homepage{% endif %}"
+		previewForm.action = "/{{ blog.id }}/dashboard/preview/?type={% if post %}post{% else %}homepage{% endif %}"
 
 		const headerContent = document.createElement("input");
 		headerContent.type = "hidden"
@@ -103,7 +103,7 @@
 	    }
 
 	    var formData = new FormData();
-	    var target = '/dashboard/upload-image/'
+	    var target = "{% url 'upload_image' id=blog.id %}"
 
 	    var fileInput = document.getElementById("file")
 	    for (var i = 0; i<fileInput.files.length; i++) {

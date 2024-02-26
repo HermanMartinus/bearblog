@@ -23,11 +23,11 @@ import djqscsv
 
 
 @login_required
-def analytics(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def analytics(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
-    if blog.upgraded:
-        return analytics_upgraded(request)
+    if blog.user.settings.upgraded:
+        return analytics_upgraded(request, id=id)
 
     time_threshold = False
     chart_data = []
@@ -70,11 +70,11 @@ def analytics(request):
 
 
 @login_required
-def analytics_upgraded(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def analytics_upgraded(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
-    if not blog.upgraded:
-        return redirect('/dashboard/analytics/')
+    if not blog.user.settings.upgraded:
+        return redirect('analytics', id=blog.id)
 
     if request.GET.get('share', False):
         if request.GET.get('share') == 'public':

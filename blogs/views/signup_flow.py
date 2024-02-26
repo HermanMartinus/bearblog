@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model, login
 from django.core.validators import validate_email
 from blogs.helpers import random_error_message
 
-from blogs.models import Blog
+from blogs.models import Blog, UserSettings
 
 from akismet import Akismet
 
@@ -56,14 +56,18 @@ def signup(request):
             user = User.objects.create_user(username=email, email=email, password=password)
 
             user.backend = 'django.contrib.auth.backends.ModelBackend'
-
-            if not Blog.objects.filter(user=user).exists():
-                Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
+            
+            UserSettings.objects.create(user=user)
+            
+            blog = Blog.objects.filter(user=user).first()
+            if not blog:
+                blog = Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
 
             # Log in the user
             login(request, user)
 
-            return redirect('dashboard')
+            
+            return redirect('dashboard', id=blog.id)
 
     if title and subdomain and content and (not email or not password):
         return render(request, 'signup_flow/step_2.html', {

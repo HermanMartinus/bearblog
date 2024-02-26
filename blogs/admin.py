@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from requests import TooManyRedirects
 
-from blogs.models import Blog, PersistentStore, Post, RssSubscriber, Stylesheet, Upvote, Hit, Subscriber
+from blogs.models import Blog, PersistentStore, Post, RssSubscriber, Stylesheet, Upvote, Hit, Subscriber, UserSettings
 from blogs.helpers import check_connection, root
 
 
@@ -31,6 +31,19 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
+@admin.register(UserSettings)
+class UserSettingsAdmin(admin.ModelAdmin):
+    list_display = ('user_email', 'user_blogs', 'upgraded', 'upgraded_date', 'order_id')
+    
+    def user_email(self, obj):
+        return obj.user.email
+    user_email.short_description = 'User Email'
+
+    def user_blogs(self, obj):
+        return list(obj.user.blogs.all())
+    user_blogs.short_description = 'Blogs'
+
+    search_fields = ('user__email', 'user_blogs')
 
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):

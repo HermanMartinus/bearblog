@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block nav %}
-<a href="/dashboard/settings/">Back</a>
+<a href="/dashboard/">Back</a>
 {% endblock %}
 
 {% block content %}
 <h1 class="title">Delete account</h1>
 <form action="" method="post">{% csrf_token %}
-    <p>Are you sure you want to delete all blog content of <b>{{ request.user.email }}</b>?</p>
+    <p>Are you sure you want to delete all information (including all blogs and content) related to <b>{{ request.user.email }}</b>?</p>
     <input type="submit" value="Confirm">
 </form>
 {% endblock %}

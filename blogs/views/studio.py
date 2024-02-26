@@ -1,38 +1,43 @@
-import json
 from django.contrib.auth.decorators import login_required
 from django.db import DataError
 from django.forms import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render, redirect
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import URLValidator
 
-from ipaddr import client_ip
-from random import randint
+import json
 import re
 import random
 import string
 
 from blogs.forms import AdvancedSettingsForm, PostTemplateForm
-from blogs.helpers import check_connection, is_protected, pseudo_word, salt_and_hash, sanitise_int
+from blogs.helpers import check_connection, is_protected, pseudo_word, salt_and_hash
 from blogs.models import Blog, Post, Upvote
 
 
 @login_required
-def studio(request):
-    blog = Blog.objects.filter(user=request.user).first()
+def list(request):
+    blogs = Blog.objects.filter(user=request.user)
+    return render(request, 'studio/blog_list.html', {'blogs': blogs})
 
-    if not blog:
-        subdomain = pseudo_word()
-        while Blog.objects.filter(subdomain=subdomain).exists():
-            subdomain = pseudo_word()
-        blog = Blog(
-            user=request.user,
-            title="My blog",
-            subdomain=subdomain)
-        blog.save()
+
+@login_required
+def studio(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
+
+
+    # if not blog:
+    #     subdomain = pseudo_word()
+    #     while Blog.objects.filter(subdomain=subdomain).exists():
+    #         subdomain = pseudo_word()
+    #     blog = Blog(
+    #         user=request.user,
+    #         title="My blog",
+    #         subdomain=subdomain)
+    #     blog.save()
 
 
     error_messages = []
@@ -60,8 +65,8 @@ def studio(request):
 
 
 def parse_raw_homepage(blog, header_content, body_content):
-    raw_header = list(filter(None, header_content.split('\r\n')))
-
+    raw_header = [item for item in header_content.split('\r\n') if item]
+    
     # Clear out data
     blog.domain = ''
     blog.meta_description = ''
@@ -145,8 +150,8 @@ def parse_raw_homepage(blog, header_content, body_content):
 
 
 @login_required
-def post(request, uid=None):
-    blog = get_object_or_404(Blog, user=request.user)
+def post(request, id, uid=None):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
     tags = []
     post = None
 
@@ -159,7 +164,7 @@ def post(request, uid=None):
     preview = request.POST.get("preview", False) == "true"
 
     if request.method == "POST" and header_content:
-        header_content = list(filter(None, header_content.split('\r\n')))
+        raw_header = [item for item in header_content.split('\r\n') if item]
         is_new = False
 
         if not post:
@@ -180,7 +185,7 @@ def post(request, uid=None):
             post.all_tags = '[]'
 
             # Parse and populate header data
-            for item in header_content:
+            for item in raw_header:
                 item = item.split(':', 1)
                 name = item[0].strip()
                 value = item[1].strip()
@@ -204,7 +209,11 @@ def post(request, uid=None):
                         except ValueError:
                             error_messages.append('Bad date format. Use YYYY-MM-DD')
                 elif name == 'tags':
-                    tags = list(set([tag.strip() for tag in value.split(',')]))
+                    tags = []
+                    for tag in value.split(','):
+                        stripped_tag = tag.strip()
+                        if stripped_tag and stripped_tag not in tags:
+                            tags.append(stripped_tag)
                     post.all_tags = json.dumps(tags)
                 elif name == 'make_discoverable':
                     if type(value) is bool:
@@ -254,7 +263,7 @@ def post(request, uid=None):
                     post.update_score()
 
                     # Redirect to the new post detail view
-                    return redirect('post_edit', uid=post.uid)
+                    return redirect('post_edit', id=blog.id, uid=post.uid)
 
         except ValidationError:
             error_messages.append("One of the header options is invalid")
@@ -296,8 +305,8 @@ def unique_slug(blog, post, new_slug):
 
 @csrf_exempt
 @login_required
-def preview(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def preview(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     post = Post(blog=blog)
 
@@ -305,7 +314,7 @@ def preview(request):
     body_content = request.POST.get("body_content", "")
     try:
         if header_content:
-            header_content = list(filter(None, header_content.split('\r\n')))
+            raw_header = [item for item in header_content.split('\r\n') if item]
 
             if post is None:
                 post = Post(blog=blog)
@@ -322,7 +331,7 @@ def preview(request):
             post.lang = ''
 
             # Parse and populate header data
-            for item in header_content:
+            for item in raw_header:
                 item = item.split(':', 1)
                 name = item[0].strip()
                 value = item[1].strip()
@@ -397,8 +406,8 @@ def preview(request):
 
 
 @login_required
-def post_template(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def post_template(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     if request.method == "POST":
         form = PostTemplateForm(request.POST, instance=blog)
@@ -414,11 +423,11 @@ def post_template(request):
 
 
 @login_required
-def directive_edit(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def directive_edit(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     if not blog.upgraded:
-        return redirect('/dashboard/upgrade/')
+        return redirect('upgrade')
 
     header = request.POST.get("header", "")
     footer = request.POST.get("footer", "")
@@ -433,8 +442,8 @@ def directive_edit(request):
     })
 
 @login_required
-def advanced_settings(request):
-    blog = get_object_or_404(Blog, user=request.user)
+def advanced_settings(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
 
     if request.method == "POST":
         form = AdvancedSettingsForm(request.POST, instance=blog)

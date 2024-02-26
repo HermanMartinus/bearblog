@@ -21,29 +21,31 @@ urlpatterns = [
 
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('signup/', signup_flow.signup, name="signup_flow"),
-
-    path('dashboard/', studio.studio, name="dashboard"),
-    path('dashboard/nav/', dashboard.nav, name='nav'),
-    path('dashboard/styles/', dashboard.styles, name='styles'),
-    path('dashboard/settings/', dashboard.settings, name='settings'),
-    path('dashboard/settings/advanced/', studio.advanced_settings, name='advanced_settings'),
-    path('dashboard/directives/', studio.directive_edit, name="directive_edit"),
-    path('dashboard/email-list/', emailer.email_list, name='email_list'),
-
-    path('dashboard/analytics/', analytics.analytics, name='analytics'),
-    path('dashboard/analytics-upgraded/', analytics.analytics_upgraded, name="analytics_upgraded"),
-
     path('dashboard/upgrade/', dashboard.upgrade, name='upgrade'),
-    path('dashboard/opt-in-review/', dashboard.opt_in_review, name='opt_in_review'),
 
-    path('dashboard/posts/', dashboard.posts_edit, name='post'),
-    path('dashboard/posts/new/', studio.post, name="post_new"),
-    path('dashboard/posts/<uid>/', studio.post, name="post_edit"),
-    path('dashboard/posts/<uid>/delete/', dashboard.post_delete, name='post_delete'),
-    path('dashboard/preview/', studio.preview, name="post_preview"),
-    path('dashboard/upload-image/', dashboard.upload_image, name='upload_image'),
+    path('dashboard/', studio.list, name="blog_list"),
+    path('<id>/dashboard/', studio.studio, name="dashboard"),
+    path('<id>/dashboard/nav/', dashboard.nav, name='nav'),
+    path('<id>/dashboard/styles/', dashboard.styles, name='styles'),
+    path('<id>/dashboard/settings/', dashboard.settings, name='settings'),
+    path('<id>/dashboard/settings/advanced/', studio.advanced_settings, name='advanced_settings'),
+    path('<id>/dashboard/directives/', studio.directive_edit, name="directive_edit"),
+    path('<id>/dashboard/email-list/', emailer.email_list, name='email_list'),
 
-    path('dashboard/post-template/', studio.post_template, name="post_template"),
+    path('<id>/dashboard/analytics/', analytics.analytics, name='analytics'),
+    path('<id>/dashboard/analytics-upgraded/', analytics.analytics_upgraded, name="analytics_upgraded"),
+
+    
+    path('<id>/dashboard/opt-in-review/', dashboard.opt_in_review, name='opt_in_review'),
+
+    path('<id>/dashboard/posts/', dashboard.posts_edit, name='posts'),
+    path('<id>/dashboard/posts/new/', studio.post, name="post_new"),
+    path('<id>/dashboard/posts/<uid>/', studio.post, name="post_edit"),
+    path('<id>/dashboard/posts/<uid>/delete/', dashboard.post_delete, name='post_delete'),
+    path('<id>/dashboard/preview/', studio.preview, name="post_preview"),
+    path('<id>/dashboard/upload-image/', dashboard.upload_image, name='upload_image'),
+
+    path('<id>/dashboard/post-template/', studio.post_template, name="post_template"),
 
     # Webhook
     path('lemon-webhook/', subscriptions.lemon_webhook, name='lemon_webhook'),

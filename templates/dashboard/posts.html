@@ -16,18 +16,18 @@
     <i>
         Want to show up on the
         <a href="https://bearblog.dev/discover/" target="_blank">Discovery feed</a>?
-        <a href="/dashboard/opt-in-review/">Submit your blog for review</a>.
+        <a href="{% url 'opt_in_review' id=blog.id %}">Submit your blog for review</a>.
     </i>
 </p>
 {% endif %}
 
 <h1>Posts</h1>
-<a href="/dashboard/posts/new">
+<a href="{% url 'post_new' id=blog.id %}">
     <button>
     New post
     </button>
 </a>
-<a style="float:right;" href="/dashboard/post-template">
+<a style="float:right;" href="{% url 'post_template' id=blog.id %}">
     <button>Edit template</button>
 </a>
 <ul class="post-list">
@@ -40,7 +40,7 @@
                 </time>
             </i>
         </span>
-        <a href="/dashboard/posts/{{ post.uid }}">
+        <a href="{% url 'post_edit' id=blog.id  uid=post.uid %}">
             {% if post.is_page %}
                 [Page]
             {% endif %}
