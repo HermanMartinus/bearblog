@@ -1,6 +1,9 @@
 # Project structure
 
-Bear runs on a droplet with Caddy as the web server. The Django application is served by Gunicorn. The database is backed up using a cron job and with Litestream. Django, Caddy, and Litestream run as systemd services.
+Bear runs on a droplet with Caddy as the web server.
+The Django application is served by Gunicorn.
+The database is backed up using a cron job and with Litestream.
+Django, Caddy, and Litestream run as systemd services.
 
 ## Caddy:
 
