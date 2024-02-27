@@ -20,7 +20,7 @@
 {% block nav %}{{ blog.nav | markdown:blog | safe }}{% endblock %}
 
 {% block content %}
-{% if request.user.settings.upgraded and not subscribe_message %}
+{% if blog.user.settings.upgraded and not subscribe_message %}
 <p>
     <b>Subscribe to this blog</b>
 </p>
