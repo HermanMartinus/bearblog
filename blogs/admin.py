@@ -48,7 +48,7 @@ class UserSettingsAdmin(admin.ModelAdmin):
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
-        return Blog.objects.annotate(posts_count=Count('post'))
+        return Blog.objects.annotate(posts_count=Count('posts'))
 
     def post_count(self, obj):
         return obj.posts_count
