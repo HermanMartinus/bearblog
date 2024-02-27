@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ request.user.settings.dashboard_styles | safe }}
+{% endblock %}
+
 {% block nav %}
 <a href="/dashboard/">Back</a>
 {% endblock %}
