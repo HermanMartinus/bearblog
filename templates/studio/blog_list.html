@@ -17,7 +17,7 @@
 <ul>
 {% for blog in blogs %}
     <li>
-        <a href="{% url 'dashboard' id=blog.id %}">{{ blog.title }}</a>
+        <a href="{% url 'dashboard' id=blog.subdomain %}">{{ blog.title }}</a>
         {% comment %} <a href="{{ blog.dynamic_useful_domain }}" target="_blank">↪</a> {% endcomment %}
     </li>
 {% endfor %}
@@ -25,9 +25,9 @@
 <small>
     <details>
         <summary>Have multiple blogs on different accounts?</summary>
-        If you would like to migrate an existing blog to this account, send an email
-        <b>from the email address associated with the blog to migrate</b> to 
-        <a href="mailto:herman@bearblog.dev">herman@bearblog.dev</a> along with the account to migrate it to. 
+        If you would like to migrate an existing blog to this account, send an email to
+        <a href="mailto:herman@bearblog.dev">herman@bearblog.dev</a> 
+        <b>from the email address associated with the blog to migrate</b>.
     </details>
 </small>
 {% if not request.user.settings.upgraded %}

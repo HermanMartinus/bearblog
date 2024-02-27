@@ -51,7 +51,7 @@ body {
 
 
     <ul style="padding-bottom: 30px; max-height: 500px; overflow: auto; border: 1px dashed">
-        {% for post in blog.post_set.all %}
+        {% for post in blog.posts.all %}
         <li>
             <i>
                 <time datetime="{{ post.published_date|date:'Y-m-d' }}">

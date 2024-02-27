@@ -24,7 +24,7 @@ import djqscsv
 
 @login_required
 def analytics(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if blog.user.settings.upgraded:
         return analytics_upgraded(request, id=id)
@@ -71,10 +71,10 @@ def analytics(request, id):
 
 @login_required
 def analytics_upgraded(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if not blog.user.settings.upgraded:
-        return redirect('analytics', id=blog.id)
+        return redirect('analytics', id=blog.subdomain)
 
     if request.GET.get('share', False):
         if request.GET.get('share') == 'public':

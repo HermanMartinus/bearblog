@@ -24,7 +24,7 @@ from blogs.models import Blog, Post, Stylesheet
 
 @login_required
 def nav(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST":
         form = NavForm(request.POST, instance=blog)
@@ -45,7 +45,7 @@ def nav(request, id):
 
 @login_required
 def styles(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST":
         form = StyleForm(
@@ -67,7 +67,7 @@ def styles(request, id):
         if request.GET.get("preview", False):
             return render(request, 'home.html', {'blog': blog, 'preview': True})
         blog.save()
-        return redirect('styles', id=blog.id)
+        return redirect('styles', id=blog.subdomain)
 
     return render(request, 'dashboard/styles.html', {
         'blog': blog,
@@ -78,14 +78,14 @@ def styles(request, id):
 
 @login_required
 def blog_delete(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
     blog.delete()
     return redirect('account')
 
 
 @login_required
 def posts_edit(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     posts = Post.objects.annotate(
         hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
@@ -98,15 +98,15 @@ def posts_edit(request, id):
 
 @login_required
 def post_delete(request, id, uid):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
     post = get_object_or_404(Post, blog=blog, uid=uid)
     post.delete()
-    return redirect('posts', id=blog.id)
+    return redirect('posts', id=blog.subdomain)
 
 
 @csrf_exempt
 def upload_image(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST" and blog.user.settings.upgraded is True:
         file_links = []
@@ -188,7 +188,7 @@ def upgrade(request):
 
 @login_required
 def opt_in_review(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == 'POST':
         spam = request.POST.get("spam", "")
@@ -203,14 +203,14 @@ def opt_in_review(request, id):
 
 @login_required
 def settings(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
     
     if request.GET.get("export", ""):
-        return djqscsv.render_to_csv_response(blog.post_set)
+        return djqscsv.render_to_csv_response(blog.posts)
     
     if request.GET.get("generate"):
         blog.generate_auth_token()
-        return redirect('settings', id=blog.id)
+        return redirect('settings', subdomain=blog.subdomain)
 
     return render(request, "dashboard/settings.html", {
         "blog": blog,

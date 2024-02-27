@@ -67,7 +67,7 @@ def signup(request):
             login(request, user)
 
             
-            return redirect('dashboard', id=blog.id)
+            return redirect('dashboard', id=blog.subdomain)
 
     if title and subdomain and content and (not email or not password):
         return render(request, 'signup_flow/step_2.html', {

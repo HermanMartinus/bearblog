@@ -115,7 +115,7 @@ class Blog(models.Model):
     @property
     def is_empty(self):
         content_length = len(self.content) if self.content is not None else 0
-        return not self.upgraded and content_length < 20 and self.post_set.count() == 0 and self.custom_styles == ""
+        return not self.upgraded and content_length < 20 and self.posts.count() == 0 and self.custom_styles == ""
     
     @property
     def tags(self):
@@ -127,7 +127,7 @@ class Blog(models.Model):
     
     @property
     def last_posted(self):
-        return self.post_set.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
+        return self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
     def generate_auth_token(self):
         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')

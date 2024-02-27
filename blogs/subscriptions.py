@@ -21,7 +21,7 @@ def lemon_webhook(request):
         return HttpResponseForbidden('Invalid signature')
 
     data = json.loads(request.body, strict=False)
-
+    print('Received webhook call')
     # Account upgrade
     if 'order_created' in request.META.get('HTTP_X_EVENT_NAME', ''):
         user = None
@@ -60,6 +60,7 @@ def lemon_webhook(request):
         except KeyError:
             print('Could not find order_id')
 
+    print('Completed')
     return HttpResponse('Valid webhook call with no action taken')
 
 

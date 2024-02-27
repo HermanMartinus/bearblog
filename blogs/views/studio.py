@@ -58,19 +58,7 @@ def list(request):
 
 @login_required
 def studio(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
-
-
-    # if not blog:
-    #     subdomain = pseudo_word()
-    #     while Blog.objects.filter(subdomain=subdomain).exists():
-    #         subdomain = pseudo_word()
-    #     blog = Blog(
-    #         user=request.user,
-    #         title="My blog",
-    #         subdomain=subdomain)
-    #     blog.save()
-
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     error_messages = []
     header_content = request.POST.get('header_content', '')
@@ -87,6 +75,9 @@ def studio(request, id):
             error_messages.append(error)
 
     info_message = blog.domain and not check_connection(blog)
+
+    if not blog.subdomain == id:
+        return redirect('dashboard', id=blog.subdomain)
 
     return render(request, 'studio/studio.html', {
         'blog': blog,
@@ -183,7 +174,7 @@ def parse_raw_homepage(blog, header_content, body_content):
 
 @login_required
 def post(request, id, uid=None):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
     tags = []
     post = None
 
@@ -295,7 +286,7 @@ def post(request, id, uid=None):
                     post.update_score()
 
                     # Redirect to the new post detail view
-                    return redirect('post_edit', id=blog.id, uid=post.uid)
+                    return redirect('post_edit', id=blog.subdomain, uid=post.uid)
 
         except ValidationError:
             error_messages.append("One of the header options is invalid")
@@ -338,7 +329,7 @@ def unique_slug(blog, post, new_slug):
 @csrf_exempt
 @login_required
 def preview(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     post = Post(blog=blog)
 
@@ -439,7 +430,7 @@ def preview(request, id):
 
 @login_required
 def post_template(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST":
         form = PostTemplateForm(request.POST, instance=blog)
@@ -456,7 +447,7 @@ def post_template(request, id):
 
 @login_required
 def directive_edit(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if not blog.user.settings.upgraded:
         return redirect('upgrade')
@@ -475,7 +466,7 @@ def directive_edit(request, id):
 
 @login_required
 def advanced_settings(request, id):
-    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST":
         form = AdvancedSettingsForm(request.POST, instance=blog)

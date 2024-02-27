@@ -69,7 +69,7 @@ def home(request):
         daily_task()
         return render(request, 'landing.html')
 
-    all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
+    all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
 
     meta_description = blog.meta_description or unmark(blog.content)
 
@@ -95,7 +95,7 @@ def posts(request):
         posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         blog_posts = [post for post in posts if tag in post.tags]
     else:
-        all_posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
+        all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         blog_posts = get_posts(all_posts)
 
     meta_description = blog.meta_description or unmark(blog.content)
@@ -134,7 +134,7 @@ def post(request, slug):
         # Find by post alias
         post = Post.objects.filter(blog=blog, alias__iexact=slug).first()
         if post:
-            return redirect('post_edit', id=blog.id, slug=post.slug)
+            return redirect('post_edit', id=blog.subdomain, slug=post.slug)
         else:
             return render(request, '404.html', {'blog': blog}, status=404)
 
@@ -257,7 +257,7 @@ def sitemap(request):
     blog = resolve_address(request)
     posts = []
     try:
-        posts = blog.post_set.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
+        posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
     except AttributeError:
         posts = []
 

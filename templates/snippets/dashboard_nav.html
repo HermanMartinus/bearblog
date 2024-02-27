@@ -1,13 +1,13 @@
 <span>
-    <a href="{% url 'dashboard' id=blog.id %}">Home</a>
+    <a href="{% url 'dashboard' id=blog.subdomain %}">Home</a>
     {% if blog %}
-    <a href="{% url 'nav' id=blog.id %}">Nav</a>
-    <a href="{% url 'posts' id=blog.id %}">Posts</a>
-    <a href="{% url 'styles' id=blog.id %}">Themes</a>
+    <a href="{% url 'nav' id=blog.subdomain %}">Nav</a>
+    <a href="{% url 'posts' id=blog.subdomain %}">Posts</a>
+    <a href="{% url 'styles' id=blog.subdomain %}">Themes</a>
     {% if blog.analytics_active %}
-    <a href="{% url 'analytics' id=blog.id %}">Analytics</a>
+    <a href="{% url 'analytics' id=blog.subdomain %}">Analytics</a>
     {% endif %}
-    <a href="{% url 'email_list' id=blog.id %}">Emails</a>
+    <a href="{% url 'email_list' id=blog.subdomain %}">Emails</a>
     {% endif %}
     {% if not blog.user.settings.upgraded %}
     <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear"></span></a>
@@ -15,7 +15,7 @@
 </span>
 
 <span>
-    <a href="{% url 'settings' id=blog.id %}">Settings</a>
+    <a href="{% url 'settings' id=blog.subdomain %}">Settings</a>
     <a href="{% url 'account' %}">ʕ•ᴥ•ʔ</a>
 </span>
 
@@ -23,6 +23,6 @@
 {% comment %} {% if not blog.user.settings.upgraded and not blog.reviewed and blog.created_after_mandatory_opt_in %}
 <br>
 <div style="margin-top: 15px; font-size: small;">
-    This blog will expire in 48 hours. <a href="{% url 'opt_in_review' id=blog.id %}">Verify your account</a> keep this blog active.
+    This blog will expire in 48 hours. <a href="{% url 'opt_in_review' id=blog.subdomain %}">Verify your account</a> keep this blog active.
 </div>
 {% endif %} {% endcomment %}

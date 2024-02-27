@@ -264,7 +264,7 @@ def review_flow(request):
     blog = blogs_to_review().first()
 
     if blog:
-        all_posts = blog.post_set.filter(publish=True).order_by('-published_date')
+        all_posts = blog.posts.filter(publish=True).order_by('-published_date')
 
         still_to_go = blogs_to_review().count() - 1
 
@@ -339,7 +339,7 @@ def ignore(request, pk):
 
 def extract_blog_info(blog):
     posts_info = []
-    for post in blog.post_set.all():
+    for post in blog.posts.all():
         posts_info.append({'title': post.title, 'content': post.content})
 
     return {

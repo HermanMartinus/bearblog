@@ -13,10 +13,10 @@
 {% block content %}
 <h1>Settings</h1>
 <p>
-    <a href="{% url 'directive_edit' id=blog.id %}">Header and footer directives</a>
+    <a href="{% url 'directive_edit' id=blog.subdomain %}">Header and footer directives</a>
 </p>
 <p>
-    <a href="{% url 'advanced_settings' id=blog.id %}">Advanced settings</a>
+    <a href="{% url 'advanced_settings' id=blog.subdomain %}">Advanced settings</a>
 </p>
 {% comment %} 
 <p>
@@ -36,7 +36,7 @@
     <a href="?export=true" download>Export all blog data</a>
 </p>
 <p>
-    <a onclick="if (confirm('Are you sure you would like to delete {{ blog.title }}? This cannot be undone.')) { window.location.href='{% url 'blog_delete' blog.id %}'; }">
+    <a onclick="if (confirm('Are you sure you would like to delete {{ blog.title }}? This cannot be undone.')) { window.location.href='{% url 'blog_delete' blog.subdomain %}'; }">
         Delete blog
     </a>
 
