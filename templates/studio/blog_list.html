@@ -30,7 +30,7 @@
         <b>from the email address associated with the blog to migrate</b>.
     </details>
 </small>
-{% if not request.user.settings.upgraded %}
+{% if request.user.blogs.all|length > 0 and not request.user.settings.upgraded %}
 <p>
     <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs <span class="bear"></span></a>
 </p>
