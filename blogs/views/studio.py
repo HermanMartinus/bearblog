@@ -34,7 +34,7 @@ def list(request):
                     blog_info = form.save(commit=False)
                     blog_info.user = request.user
                     blog_info.save()
-                    return redirect('dashboard', id=blog_info.id)
+                    return redirect('dashboard', id=blog_info.subdomain)
                 else:
                     form.add_error('subdomain', 'This subdomain is already in use or protected.')
     else:
