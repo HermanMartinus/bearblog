@@ -134,7 +134,7 @@ def post(request, slug):
         # Find by post alias
         post = Post.objects.filter(blog=blog, alias__iexact=slug).first()
         if post:
-            return redirect('post_edit', id=blog.subdomain, slug=post.slug)
+            return redirect('post', id=blog.subdomain, slug=post.slug)
         else:
             return render(request, '404.html', {'blog': blog}, status=404)
 
