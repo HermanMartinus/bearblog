@@ -5,6 +5,7 @@
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
     {% include 'styles/dashboard.css' %}
+    {{ request.user.settings.dashboard_styles | safe }}
 {% endblock %}
 
 {% block nav %}{% endblock %}
@@ -50,6 +51,10 @@
 
 <p>
     <a href="{% url 'account_logout' %}">Sign out</a>
+</p>
+
+<p>
+    <a href="{% url 'dashboard_customisation' %}">Customise dashboard</a>
 </p>
 
 <p>

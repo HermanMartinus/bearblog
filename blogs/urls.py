@@ -21,9 +21,11 @@ urlpatterns = [
 
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('signup/', signup_flow.signup, name="signup_flow"),
-    path('dashboard/upgrade/', dashboard.upgrade, name='upgrade'),
 
     path('dashboard/', studio.list, name="account"),
+    path('dashboard/upgrade/', dashboard.upgrade, name='upgrade'),
+    path('dashboard/customise/', studio.dashboard_customisation, name="dashboard_customisation"),
+    
     path('<id>/dashboard/', studio.studio, name="dashboard"),
     path('<id>/delete/', dashboard.blog_delete, name="blog_delete"),
     path('<id>/dashboard/nav/', dashboard.nav, name='nav'),

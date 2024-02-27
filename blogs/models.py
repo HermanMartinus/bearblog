@@ -16,6 +16,8 @@ class UserSettings(models.Model):
     upgraded = models.BooleanField(default=False)
     upgraded_date = models.DateTimeField(blank=True, null=True)
     order_id = models.CharField(max_length=200, blank=True, null=True)
+    dashboard_styles = models.TextField(blank=True)
+    dashboard_footer = models.TextField(blank=True)
 
     def __str__(self):
         return f'{self.user} - Settings'
@@ -145,7 +147,7 @@ class Blog(models.Model):
 
 
 class Post(models.Model):
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='posts')
     uid = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)

@@ -7,7 +7,7 @@
     {% include 'styles/blog/default.css' %}
     {% include 'styles/dashboard.css' %}
     {% if not public %}
-    {{ blog.dashboard_styles | safe }}
+    {{ request.user.settings.dashboard_styles | safe }}
     {% endif %}
 {% endblock %}
 

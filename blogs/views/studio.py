@@ -13,7 +13,7 @@ import re
 import random
 import string
 
-from blogs.forms import AdvancedSettingsForm, BlogForm, PostTemplateForm
+from blogs.forms import AdvancedSettingsForm, BlogForm, DashboardCustomisationForm, PostTemplateForm
 from blogs.helpers import check_connection, is_protected, pseudo_word, salt_and_hash
 from blogs.models import Blog, Post, Upvote
 from blogs.subscriptions import get_subscriptions
@@ -488,3 +488,16 @@ def advanced_settings(request, id):
     return render(request, 'dashboard/advanced_settings.html', {
         'blog': blog,
         'form': form})
+
+
+@login_required
+def dashboard_customisation(request):
+    if request.method == "POST":
+        form = DashboardCustomisationForm(request.POST, instance=request.user.settings)
+        if form.is_valid():
+            user_settings = form.save(commit=False)
+            user_settings.save()
+    else:
+        form = DashboardCustomisationForm(instance=request.user.settings)
+
+    return render(request, 'dashboard/dashboard_customisation.html', {'form': form})

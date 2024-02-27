@@ -11,7 +11,7 @@ New post | Bear Blog
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
     {% include 'styles/dashboard.css' %}
-    {{ blog.dashboard_styles | safe }}
+    {{ request.user.settings.dashboard_styles | safe }}
 {% endblock %}
 
 {% block content %}
@@ -115,5 +115,5 @@ New post | Bear Blog
 </form>
 
 {% include '../snippets/editor_functions.html' with blog=blog post=post%}
-{{ blog.dashboard_footer | safe }}
+{{ request.user.settings.dashboard_footer | safe }}
 {% endblock %}

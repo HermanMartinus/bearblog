@@ -8,7 +8,7 @@ Directives | Bear Blog
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
     {% include 'styles/dashboard.css' %}
-    {{ blog.dashboard_styles | safe }}
+    {{ request.user.settings.dashboard_styles | safe }}
 {% endblock %}
 
 {% block content %}

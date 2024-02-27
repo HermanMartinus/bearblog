@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Blog
+from .models import Blog, UserSettings
 
 class BlogForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -13,6 +13,27 @@ class BlogForm(forms.ModelForm):
     class Meta:
         model = Blog
         fields = ('title', 'subdomain')
+
+
+class DashboardCustomisationForm(forms.ModelForm):
+    dashboard_styles = forms.CharField(
+        widget=forms.Textarea(),
+        label="Dashboard styles",
+        required=False,
+        help_text="Change the way your dashboard looks and feels with CSS."
+    )
+
+    dashboard_footer = forms.CharField(
+        widget=forms.Textarea(),
+        label="Dashbaord footer content",
+        required=False,
+        help_text="Add scripts and other footer content to your dashboard."
+    )
+
+    class Meta:
+        model = UserSettings
+        fields = ('dashboard_styles', 'dashboard_footer')
+
 
 class NavForm(forms.ModelForm):
     nav = forms.CharField(
@@ -60,20 +81,6 @@ class AdvancedSettingsForm(forms.ModelForm):
         help_text="<span>More in-depth analytics using <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a>.</span>"
     )
 
-    dashboard_styles = forms.CharField(
-        widget=forms.Textarea(),
-        label="Custom dashboard CSS",
-        required=False,
-        help_text="Change the way your dashboard looks and feels with CSS."
-    )
-
-    dashboard_footer = forms.CharField(
-        widget=forms.Textarea(),
-        label="Custom dashboard footer content",
-        required=False,
-        help_text="Add scripts and other footer content to your dashboard."
-    )
-
     robots_txt = forms.CharField(
         widget=forms.Textarea(),
         label="robots.txt content",
@@ -83,7 +90,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'rss_alias', 'dashboard_styles', 'dashboard_footer', 'robots_txt')
+        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'rss_alias', 'robots_txt')
 
 
 class AnalyticsForm(forms.ModelForm):

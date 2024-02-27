@@ -5,7 +5,7 @@
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
     {% include 'styles/dashboard.css' %}
-    {{ blog.dashboard_styles | safe }}
+    {{ request.user.settings.dashboard_styles | safe }}
 {% endblock %}
 
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
@@ -118,5 +118,5 @@
 </span>
 
 {% include '../snippets/editor_functions.html' with blog=blog%}
-{{ blog.dashboard_footer | safe }}
+{{ request.user.settings.dashboard_footer | safe }}
 {% endblock %}
