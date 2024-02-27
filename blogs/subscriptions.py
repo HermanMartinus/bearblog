@@ -28,11 +28,11 @@ def lemon_webhook(request):
         try:
             user_id = str(data['meta']['custom_data']['user_id'])
             user = get_object_or_404(User, id=user_id)
-            print(f'Found user {user}, upgrading account...')
+            print(f'Found user with user_id {user}, upgrading account...')
         except KeyError:
             email = str(data['data']['attributes']['user_email'])
             user = User.objects.get(email=email)
-            print(f'Found email address {email}, upgrading account...')
+            print(f'Found user with email address {email}, upgrading account...')
 
         if user:
             user.settings.upgraded = True
