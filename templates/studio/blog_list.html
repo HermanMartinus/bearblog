@@ -22,7 +22,14 @@
     </li>
 {% endfor %}
 </ul>
-
+<small>
+    <details>
+        <summary>Have multiple blogs on different accounts?</summary>
+        If you would like to migrate an existing blog to this account, send an email
+        <b>from the email address associated with the blog to migrate</b> to 
+        <a href="mailto:herman@bearblog.dev">herman@bearblog.dev</a> along with the account to migrate it to. 
+    </details>
+</small>
 {% if not request.user.settings.upgraded %}
 <p>
     <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs <span class="bear"></span></a>
@@ -79,7 +86,7 @@
 </p>
 <p>
     If you have any requests use the
-    <a href="https://bear.nolt.io" target="_blank">suggestions board</a>
+    <a href="https://bear.nolt.io" target="_blank">suggestions board</a>,
     or if you've found a bug pop me an <a href="mailto:herman@bearblog.dev">email</a>.
 </p>
 
