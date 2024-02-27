@@ -13,6 +13,20 @@
 
 <h1>Your blogs</h1>
 
+<ul>
+{% for blog in blogs %}
+    <li>
+        <a href="{% url 'dashboard' id=blog.id %}">{{ blog.title }}</a>
+        {% comment %} <a href="{{ blog.dynamic_useful_domain }}" target="_blank">↪</a> {% endcomment %}
+    </li>
+{% endfor %}
+</ul>
+
+{% if not request.user.settings.upgraded %}
+<p>
+    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs <span class="bear"></span></a>
+</p>
+{% else %}
 {% if error_messages %}
 <p style="color:lightsalmon">
     {% for error_message in error_messages %}
@@ -20,27 +34,20 @@
     {% endfor %}
 </p>
 {% endif %}
+<h2>Create a new blog</h2>
+<form method="POST" class="post-form full-width">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p>
+        <button type="submit">Create</button>
+    </p>
+</form>
 
-<ul>
-{% for blog in blogs %}
-    <li>
-        <a href="{% url 'dashboard' id=blog.id %}">{{ blog.title }}</a>
-        <small>[<a href="{{ blog.dynamic_useful_domain }}" target="_blank">link</a>]</small>
-    </li>
-{% endfor %}
-</ul>
-
-<button>Create new blog</button>
-<br>
-<small>Have a blog in a separate account you'd like to migrate over?</small>
+{% endif %}
 
 
 <h2>Account</h2>
-{% if not request.user.settings.upgraded %}
-<p>
-    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear"></span></a>
-</p>
-{% endif %}
+
 <p>
     <a href="{% url 'account_logout' %}">Sign out</a>
 </p>

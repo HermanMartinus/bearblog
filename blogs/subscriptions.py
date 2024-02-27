@@ -64,6 +64,7 @@ def lemon_webhook(request):
 
 
 def get_subscriptions(order_id=None, user_email=None):
+    print('getting')
     url = "https://api.lemonsqueezy.com/v1/subscriptions"
 
     if order_id:
@@ -81,6 +82,7 @@ def get_subscriptions(order_id=None, user_email=None):
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
+        print(response.json())
         return response.json()
     else:
         return response.text

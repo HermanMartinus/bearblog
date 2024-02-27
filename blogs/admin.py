@@ -43,7 +43,7 @@ class UserSettingsAdmin(admin.ModelAdmin):
         return list(obj.user.blogs.all())
     user_blogs.short_description = 'Blogs'
 
-    search_fields = ('user__email', 'user_blogs')
+    search_fields = ('user__email', 'user__blogs')
 
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):

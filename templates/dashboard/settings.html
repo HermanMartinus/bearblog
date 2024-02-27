@@ -35,4 +35,10 @@
 <p>
     <a href="?export=true" download>Export all blog data</a>
 </p>
+<p>
+    <a onclick="if (confirm('Are you sure you would like to delete {{ blog.title }}? This cannot be undone.')) { window.location.href='{% url 'blog_delete' blog.id %}'; }">
+        Delete blog
+    </a>
+
+</p>
 {% endblock %}

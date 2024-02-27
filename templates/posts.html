@@ -22,7 +22,7 @@
 
 {% block imports %}
 
-{% if blog.upgraded %}
+{% if blog.user.settings.upgraded %}
 {{ blog.header_directive | safe }}
 {% endif %}
 
@@ -59,7 +59,7 @@
 {% endblock %}
 
 {% block footer %}
-{% if blog.upgraded and blog.footer_directive %}
+{% if blog.user.settings.upgraded and blog.footer_directive %}
 <span id="footer-directive">
 {{ blog.footer_directive | markdown:blog | safe }}
 </span>

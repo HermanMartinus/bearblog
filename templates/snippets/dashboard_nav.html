@@ -9,18 +9,18 @@
     {% endif %}
     <a href="{% url 'email_list' id=blog.id %}">Emails</a>
     {% endif %}
-    {% if not blog.upgraded %}
+    {% if not blog.user.settings.upgraded %}
     <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear"></span></a>
     {% endif %}
 </span>
 
 <span>
     <a href="{% url 'settings' id=blog.id %}">Settings</a>
-    <a href="{% url 'blog_list' %}">Blogs</a>
+    <a href="{% url 'account' %}">ʕ•ᴥ•ʔ</a>
 </span>
 
 
-{% comment %} {% if not blog.upgraded and not blog.reviewed and blog.created_after_mandatory_opt_in %}
+{% comment %} {% if not blog.user.settings.upgraded and not blog.reviewed and blog.created_after_mandatory_opt_in %}
 <br>
 <div style="margin-top: 15px; font-size: small;">
     This blog will expire in 48 hours. <a href="{% url 'opt_in_review' id=blog.id %}">Verify your account</a> keep this blog active.

@@ -22,7 +22,7 @@ def signup(request):
     error_messages = []
 
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        return redirect('account')
 
     # Check password valid
     if password and len(password) < 6:

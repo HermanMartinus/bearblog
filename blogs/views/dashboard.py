@@ -20,7 +20,6 @@ import djqscsv
 from blogs.forms import NavForm, StyleForm
 from blogs.helpers import get_country
 from blogs.models import Blog, Post, Stylesheet
-from blogs.subscriptions import get_subscriptions
 
 
 @login_required
@@ -78,6 +77,13 @@ def styles(request, id):
 
 
 @login_required
+def blog_delete(request, id):
+    blog = get_object_or_404(Blog, user=request.user, id=id)
+    blog.delete()
+    return redirect('account')
+
+
+@login_required
 def posts_edit(request, id):
     blog = get_object_or_404(Blog, user=request.user, id=id)
 
@@ -102,7 +108,7 @@ def post_delete(request, id, uid):
 def upload_image(request, id):
     blog = get_object_or_404(Blog, user=request.user, id=id)
 
-    if request.method == "POST" and blog.upgraded is True:
+    if request.method == "POST" and blog.user.settings.upgraded is True:
         file_links = []
         time_string = str(time.time()).split('.')[0]
         count = 0
@@ -144,9 +150,10 @@ def upgrade(request):
     discount = 0
 
     country_code = country.get("country_code")
-
+   
     if country_code:
         country_name = country.get('country_name', {})
+        
         country_emoji = lookup(
             f'REGIONAL INDICATOR SYMBOL LETTER {country_code[0]}') + lookup(f'REGIONAL INDICATOR SYMBOL LETTER {country_code[1]}')
 
@@ -197,19 +204,7 @@ def opt_in_review(request, id):
 @login_required
 def settings(request, id):
     blog = get_object_or_404(Blog, user=request.user, id=id)
-    subscription_cancelled = None
-    subscription_link = None
-
-    if blog.order_id:
-        subscription = get_subscriptions(request.user.settings.order_id)
-
-        try:
-            if subscription:
-                subscription_cancelled = subscription['data'][0]['attributes']['cancelled']
-                subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal']
-        except KeyError and IndexError:
-            print('No sub found')
-
+    
     if request.GET.get("export", ""):
         return djqscsv.render_to_csv_response(blog.post_set)
     
@@ -217,10 +212,8 @@ def settings(request, id):
         blog.generate_auth_token()
         return redirect('settings', id=blog.id)
 
-    return render(request, "dashboard/account.html", {
+    return render(request, "dashboard/settings.html", {
         "blog": blog,
-        'subscription_cancelled': subscription_cancelled,
-        'subscription_link': subscription_link
     })
 
 

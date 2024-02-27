@@ -13,15 +13,47 @@ import re
 import random
 import string
 
-from blogs.forms import AdvancedSettingsForm, PostTemplateForm
+from blogs.forms import AdvancedSettingsForm, BlogForm, PostTemplateForm
 from blogs.helpers import check_connection, is_protected, pseudo_word, salt_and_hash
 from blogs.models import Blog, Post, Upvote
+from blogs.subscriptions import get_subscriptions
 
 
 @login_required
 def list(request):
     blogs = Blog.objects.filter(user=request.user)
-    return render(request, 'studio/blog_list.html', {'blogs': blogs})
+    if request.method == "POST":
+        form = BlogForm(request.POST)
+        if form.is_valid():
+            if blogs.count() >= 9:
+                form.add_error('title', 'You have reached the maximum number of blogs.')
+            else:
+                subdomain = form.cleaned_data['subdomain']
+
+                if not is_protected(subdomain):
+                    blog_info = form.save(commit=False)
+                    blog_info.user = request.user
+                    blog_info.save()
+                    return redirect('dashboard', id=blog_info.id)
+                else:
+                    form.add_error('subdomain', 'This subdomain is already in use or protected.')
+    else:
+        form = BlogForm()
+
+    subscription_cancelled = None
+    subscription_link = None
+
+    if request.user.settings.order_id:
+        subscription = get_subscriptions(request.user.settings.order_id)
+
+        try:
+            if subscription:
+                subscription_cancelled = subscription['data'][0]['attributes']['cancelled']
+                subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal']
+        except KeyError and IndexError:
+            print('No sub found')
+
+    return render(request, 'studio/blog_list.html', {'blogs': blogs, 'form': form, 'subscription_cancelled': subscription_cancelled, 'subscription_link': subscription_link})
 
 
 @login_required
@@ -101,7 +133,7 @@ def parse_raw_homepage(blog, header_content, body_content):
                 else:
                     error_messages.append(f"{value} has already been taken")
         elif name == "custom_domain":
-            if blog.upgraded:
+            if blog.user.settings.upgraded:
                 if Blog.objects.filter(domain=value).exclude(pk=blog.pk).count() == 0:
                     try:
                         validator = URLValidator()
@@ -426,7 +458,7 @@ def post_template(request, id):
 def directive_edit(request, id):
     blog = get_object_or_404(Blog, user=request.user, id=id)
 
-    if not blog.upgraded:
+    if not blog.user.settings.upgraded:
         return redirect('upgrade')
 
     header = request.POST.get("header", "")

@@ -2,6 +2,18 @@ from django import forms
 
 from .models import Blog
 
+class BlogForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(BlogForm, self).__init__(*args, **kwargs)
+        self.fields['title'].widget.attrs.update({'placeholder': 'A title for your blog...'})
+        self.fields['title'].label = False
+        self.fields['subdomain'].widget.attrs.update({'placeholder': 'Preferred subdomain...'})
+        self.fields['subdomain'].label = False
+
+    class Meta:
+        model = Blog
+        fields = ('title', 'subdomain')
+
 class NavForm(forms.ModelForm):
     nav = forms.CharField(
         label="Nav",

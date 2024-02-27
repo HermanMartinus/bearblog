@@ -86,7 +86,7 @@
 		}
 	}
 
-	{% if blog.upgraded %}
+	{% if blog.user.settings.upgraded %}
 	const uploadButton = document.querySelector('#upload-image')
 
 	uploadButton.onclick = event => {

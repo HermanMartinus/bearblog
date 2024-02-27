@@ -23,8 +23,9 @@ urlpatterns = [
     path('signup/', signup_flow.signup, name="signup_flow"),
     path('dashboard/upgrade/', dashboard.upgrade, name='upgrade'),
 
-    path('dashboard/', studio.list, name="blog_list"),
+    path('dashboard/', studio.list, name="account"),
     path('<id>/dashboard/', studio.studio, name="dashboard"),
+    path('<id>/delete/', dashboard.blog_delete, name="blog_delete"),
     path('<id>/dashboard/nav/', dashboard.nav, name='nav'),
     path('<id>/dashboard/styles/', dashboard.styles, name='styles'),
     path('<id>/dashboard/settings/', dashboard.settings, name='settings'),
