@@ -20,12 +20,13 @@ class UserAdmin(admin.ModelAdmin):
         blog = Blog.objects.get(user=obj)
         return format_html(
             "<a href='{url}' target='_blank'>{url}</a>",
-            url={blog.useful_domain})
+            url=blog.dynamic_useful_domain)
 
     subdomain_url.short_description = "Subdomain"
 
     list_display = ('email', 'subdomain_url', 'is_active', 'is_staff', 'date_joined')
     ordering = ('-date_joined',)
+    search_fields = ('email', 'blogs__subdomain')
 
 
 admin.site.unregister(User)
@@ -43,7 +44,7 @@ class UserSettingsAdmin(admin.ModelAdmin):
         return list(obj.user.blogs.all())
     user_blogs.short_description = 'Blogs'
 
-    search_fields = ('user__email', 'user__blogs')
+    search_fields = ('user__email', 'user__blogs__title', 'user__blogs__subdomain')
 
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
