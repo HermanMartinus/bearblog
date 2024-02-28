@@ -25,7 +25,7 @@ class DashboardCustomisationForm(forms.ModelForm):
 
     dashboard_footer = forms.CharField(
         widget=forms.Textarea(),
-        label="Dashbaord footer content",
+        label="Dashboard footer content",
         required=False,
         help_text="Add scripts and other footer content to your dashboard."
     )
