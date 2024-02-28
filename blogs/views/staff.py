@@ -58,7 +58,7 @@ def dashboard(request):
 
     # Upgrades
     date_iterator = start_date
-    upgraded_blogs = Blog.objects.filter(upgraded=True, user__settings__upgraded_date__gte=start_date).order_by('user__settings__upgraded_date')
+    upgraded_blogs = Blog.objects.filter(user__settings__upgraded=True, user__settings__upgraded_date__gte=start_date).order_by('user__settings__upgraded_date')
     upgrades_count = upgraded_blogs.annotate(date=TruncDate('user__settings__upgraded_date')).values('date').annotate(c=Count('date')).order_by()
 
 
@@ -88,11 +88,11 @@ def dashboard(request):
 
     # Calculate signups and upgrades for the past month
     signups = blogs.count()
-    upgrades = Blog.objects.filter(upgraded=True, user__settings__upgraded_date__gt=start_date).count()
+    upgrades = Blog.objects.filter(user__settings__upgraded=True, user__settings__upgraded_date__gt=start_date).count()
 
     # Calculate all-time totals
     total_signups = Blog.objects.count()
-    total_upgrades = Blog.objects.filter(upgraded=True).count()
+    total_upgrades = Blog.objects.filter(user__settings__upgraded=True).count()
 
     # Calculate conversion rates
     conversion_rate = upgrades / signups if signups > 0 else 0
@@ -131,7 +131,7 @@ def get_empty_blogs():
     # Most recent 100
     timeperiod = timezone.now() - timedelta(days=180)
     empty_blogs = Blog.objects.annotate(num_posts=Count('posts')).annotate(content_length=Length('content')).filter(
-        last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=60, upgraded=False, custom_styles="").order_by('-created_date')[:100]
+        last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=60, user__settings__upgraded=False, custom_styles="").order_by('-created_date')[:100]
 
     return empty_blogs
 
