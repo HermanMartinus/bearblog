@@ -2,10 +2,10 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from django.conf import settings
 from django.contrib.auth.models import User
+from django.conf import settings
 
-from blogs.models import Blog, UserSettings
+from blogs.models import UserSettings
 
 import requests
 import os

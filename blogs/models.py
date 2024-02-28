@@ -2,6 +2,8 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from allauth.account.models import EmailAddress
 
@@ -21,6 +23,12 @@ class UserSettings(models.Model):
 
     def __str__(self):
         return f'{self.user} - Settings'
+
+
+# On User save, create UserSettigs
+@receiver(post_save, sender=User)
+def create_user_settings(sender, instance, **kwargs):
+    UserSettings.objects.get_or_create(user=instance)
 
 
 class Blog(models.Model):

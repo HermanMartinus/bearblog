@@ -1,15 +1,13 @@
 
-import os
-from django.http import Http404
 from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model, login
-from django.core.validators import validate_email
-from blogs.helpers import random_error_message
 
-from blogs.models import Blog, UserSettings
+from blogs.helpers import random_error_message
+from blogs.models import Blog
 
 from akismet import Akismet
+import os
 
 
 def signup(request):
@@ -56,8 +54,6 @@ def signup(request):
             user = User.objects.create_user(username=email, email=email, password=password)
 
             user.backend = 'django.contrib.auth.backends.ModelBackend'
-            
-            UserSettings.objects.create(user=user)
             
             blog = Blog.objects.filter(user=user).first()
             if not blog:
