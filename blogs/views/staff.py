@@ -312,7 +312,7 @@ def approve(request, pk):
             'Herman Martinus <herman@bearblog.dev>',
             [blog.user.email]
         )
-    return redirect('review_flow')
+    return HttpResponse("Approved")
 
 
 @staff_member_required
@@ -320,14 +320,14 @@ def block(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.user.is_active = False
     blog.user.save()
-    return redirect('review_flow')
+    return HttpResponse("Blocked")
 
 
 @staff_member_required
 def delete(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.delete()
-    return redirect('review_flow')
+    return HttpResponse("Deleted")
 
 
 @staff_member_required
@@ -335,7 +335,7 @@ def ignore(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.ignored_date = timezone.now()
     blog.save()
-    return redirect('review_flow')
+    return HttpResponse("Ignored")
 
 
 @staff_member_required

@@ -21,6 +21,18 @@
     font-weight: 400;
 }
 
+.account::before {
+    content: "ʕ-ᴥ-ʔ";
+    width: 45px;
+    display: inline-block;
+    text-align: center;
+}
+
+.account:hover::before {
+    content: "ʕ•ᴥ•ʔ";
+    text-decoration: none;
+}
+
 header nav {
     display: flex;
     flex-flow: row wrap;
