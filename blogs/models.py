@@ -18,6 +18,7 @@ class UserSettings(models.Model):
     upgraded = models.BooleanField(default=False)
     upgraded_date = models.DateTimeField(blank=True, null=True)
     order_id = models.CharField(max_length=200, blank=True, null=True)
+
     dashboard_styles = models.TextField(blank=True)
     dashboard_footer = models.TextField(blank=True)
 
@@ -28,7 +29,9 @@ class UserSettings(models.Model):
 # On User save, create UserSettigs
 @receiver(post_save, sender=User)
 def create_user_settings(sender, instance, **kwargs):
-    UserSettings.objects.get_or_create(user=instance)
+    user_settings, created = UserSettings.objects.get_or_create(user=instance)
+    if user_settings.upgraded:
+        user_settings.user.blogs.update(reviewed=True)
 
 
 class Blog(models.Model):
