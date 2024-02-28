@@ -354,7 +354,7 @@ def migrate_blog(request):
     blog = Blog.objects.filter(subdomain=subdomain).first()
     if not blog:
         return HttpResponse("Blog not found.")
-    message += f"Found blog: {blog.title}...<br>"
+    message += f"Found blog: {blog.title} ({blog.useful_domain})...<br>"
     
     old_user = blog.user
     message += f'Migrating blog ({blog.title}) from {old_user} to {user}...<br>'

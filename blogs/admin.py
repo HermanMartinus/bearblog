@@ -2,29 +2,21 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
-from django.utils.html import escape, format_html
+from django.utils.html import escape, format_html, format_html_join
 from django.urls import reverse
-
-from requests import TooManyRedirects
+from django.utils.safestring import mark_safe
 
 from blogs.models import Blog, PersistentStore, Post, RssSubscriber, Stylesheet, Upvote, Hit, Subscriber, UserSettings
 from blogs.helpers import check_connection, root
 
+from requests import TooManyRedirects
 
 admin.autodiscover()
 admin.site.enable_nav_sidebar = False
 
 
 class UserAdmin(admin.ModelAdmin):
-    def subdomain_url(self, obj):
-        blog = Blog.objects.get(user=obj)
-        return format_html(
-            "<a href='{url}' target='_blank'>{url}</a>",
-            url=blog.dynamic_useful_domain)
-
-    subdomain_url.short_description = "Subdomain"
-
-    list_display = ('email', 'subdomain_url', 'is_active', 'is_staff', 'date_joined')
+    list_display = ('email', 'is_active', 'is_staff', 'date_joined')
     ordering = ('-date_joined',)
     search_fields = ('email', 'blogs__subdomain')
 
@@ -34,17 +26,35 @@ admin.site.register(User, UserAdmin)
 
 @admin.register(UserSettings)
 class UserSettingsAdmin(admin.ModelAdmin):
-    list_display = ('user_email', 'user_blogs', 'upgraded', 'upgraded_date', 'order_id')
+    list_display = ('email', 'date_joined', 'blogs', 'upgraded', 'upgraded_date', 'order_id')
     
-    def user_email(self, obj):
+    def email(self, obj):
         return obj.user.email
-    user_email.short_description = 'User Email'
+    
+    def date_joined(self, obj):
+        return obj.user.date_joined
 
-    def user_blogs(self, obj):
-        return list(obj.user.blogs.all())
-    user_blogs.short_description = 'Blogs'
+    def blogs(self, obj):
+        blogs_data = (
+            (
+                blog.dynamic_useful_domain,
+                blog.subdomain,
+                reverse('admin:blogs_blog_change', args=[blog.pk]),
+            ) for blog in obj.user.blogs.all()
+        )
+
+        blogs_links = format_html_join(
+            mark_safe(', '),
+            '{} <a href="{}" target="_blank">[edit]</a>',
+            ((format_html('<a href="{0}" target="_blank">{1}</a>', url, subdomain), edit_url) for url, subdomain, edit_url in blogs_data)
+        )
+        return blogs_links or 'No blogs'
 
     search_fields = ('user__email', 'user__blogs__title', 'user__blogs__subdomain')
+
+    list_filter = (
+        ('upgraded', admin.BooleanFieldListFilter),
+    )
 
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
