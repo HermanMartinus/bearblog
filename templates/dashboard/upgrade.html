@@ -12,7 +12,7 @@
 <button onclick="window.history.back()">← Back</button>
 <h1>Upgrade</h1>
 
-{% if not blog.user.settings.upgraded %}
+{% if not request.user.settings.upgraded %}
 <h3>Keep the tiny internet awesome!  \ʕ•ᴥ•ʔ/</h2>
 <p>
     Bear will never sell your data, or display ads.
