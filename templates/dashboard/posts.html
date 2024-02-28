@@ -34,11 +34,9 @@
     {% for post in posts %}
     <li>
         <span>
-            <i>
-                <time datetime="{{ post.published_date|date:'Y-m-d' }}">
-                    {{ post.published_date|date:'d M, Y' }}
-                </time>
-            </i>
+            <time datetime="{{ post.published_date|date:'Y-m-d' }}">
+                {{ post.published_date|date:'d M, Y' }}
+            </time>
         </span>
         <a href="{% url 'post_edit' id=blog.subdomain  uid=post.uid %}">
             {% if post.is_page %}

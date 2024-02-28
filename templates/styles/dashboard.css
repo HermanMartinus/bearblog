@@ -47,6 +47,11 @@ label {
     font-weight: bold;
 }
 
+time {
+    font-family: monospace;
+    font-size: 15px;
+}
+
 textarea,
 input:not([type="submit"]),
 .editable {

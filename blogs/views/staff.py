@@ -334,6 +334,7 @@ def delete(request, pk):
 def ignore(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.ignored_date = timezone.now()
+    blog.to_review = False
     blog.save()
     return HttpResponse("Ignored")
 
