@@ -26,13 +26,18 @@ admin.site.register(User, UserAdmin)
 
 @admin.register(UserSettings)
 class UserSettingsAdmin(admin.ModelAdmin):
-    list_display = ('email', 'date_joined', 'blogs', 'upgraded', 'upgraded_date', 'order_id')
+    list_display = ('email', 'date_joined', 'blogs', 'display_is_active', 'upgraded', 'upgraded_date', 'order_id')
     
     def email(self, obj):
         return obj.user.email
     
     def date_joined(self, obj):
         return obj.user.date_joined
+
+    def display_is_active(self, obj):
+        return obj.user.is_active
+    display_is_active.short_description = 'Active'
+    display_is_active.boolean = True
 
     def blogs(self, obj):
         blogs_data = (
@@ -54,6 +59,7 @@ class UserSettingsAdmin(admin.ModelAdmin):
 
     list_filter = (
         ('upgraded', admin.BooleanFieldListFilter),
+        ('user__is_active', admin.BooleanFieldListFilter),
     )
 
 @admin.register(Blog)
@@ -86,7 +92,7 @@ class BlogAdmin(admin.ModelAdmin):
 
     def user_link(self, obj):
         return format_html('<a href="{url}">{username}</a>',
-                           url=reverse("admin:auth_user_change", args=(obj.user.id,)),
+                           url=reverse("admin:blogs_usersettings_change", args=(obj.user.settings.id,)),
                            username=escape(obj.user))
 
     user_link.allow_tags = True
@@ -97,11 +103,16 @@ class BlogAdmin(admin.ModelAdmin):
 
     user_email.short_description = "Email"
 
+    def display_is_active(self, obj):
+        return obj.user.is_active
+    display_is_active.short_description = 'Active'
+    display_is_active.boolean = True
+
     list_display = (
         'title',
         'reviewed',
         'upgraded',
-        'blocked',
+        'display_is_active',
         'subdomain_url',
         'domain_url',
         'post_count',
@@ -114,15 +125,13 @@ class BlogAdmin(admin.ModelAdmin):
     list_filter = (
         ('domain', admin.EmptyFieldListFilter),
         ('upgraded', admin.BooleanFieldListFilter),
-        ('blocked', admin.BooleanFieldListFilter),
+        ('user__is_active', admin.BooleanFieldListFilter),
     )
 
     def block_blog(self, request, queryset):
         for blog in queryset:
             blog.user.is_active = False
             blog.user.save()
-            blog.blocked = True
-            blog.save()
             print(f"Blocked {blog} and banned {blog.user}")
 
     block_blog.short_description = "Block selected blogs"

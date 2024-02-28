@@ -66,6 +66,11 @@ body {
         {% endfor %}
     </ul>
 
+    {% if blog.reviewer_note %}
+    <p style="color: darkgreen">
+        {{ blog.reviewer_note }}
+    </p>
+    {% endif %}
     <div id="controls">
         <button id="approve" onclick="approveBlogWithEmail({{ blog.pk }})">Approve and email</button>
         <button id="approve" onclick="approveBlog({{ blog.pk }})">Approve</button>

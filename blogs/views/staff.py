@@ -21,7 +21,7 @@ def dashboard(request):
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 
-    blogs = Blog.objects.filter(blocked=False, created_date__gt=start_date).order_by('created_date')
+    blogs = Blog.objects.filter(user__is_active=True, created_date__gt=start_date).order_by('created_date')
 
     # Exclude empty blogs
     non_empty_blog_ids = [blog.pk for blog in blogs if not blog.is_empty]
@@ -138,7 +138,7 @@ def get_empty_blogs():
 
 def blogs_to_review():
     # Opted-in for review
-    to_review = Blog.objects.filter(reviewed=False, blocked=False, to_review=True)
+    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True)
 
     if to_review.count() < 1:
         ignore_terms = [
@@ -232,7 +232,7 @@ def blogs_to_review():
 
         new_blogs = Blog.objects.filter(
             reviewed=False, 
-            blocked=False, 
+            user__is_active=True, 
             to_review=False
         )
 
@@ -318,8 +318,8 @@ def approve(request, pk):
 @staff_member_required
 def block(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
-    blog.blocked = True
-    blog.save()
+    blog.user.is_active = False
+    blog.user.save()
     return redirect('review_flow')
 
 

@@ -25,8 +25,8 @@ def discover(request):
             post.save()
         if request.POST.get("block-blog", False):
             post = Post.objects.get(pk=request.POST.get("block-blog"))
-            post.blog.blocked = True
-            post.blog.save()
+            post.blog.user.is_active = False
+            post.blog.user.save()
         if request.POST.get("boost-post", False):
             post = Post.objects.get(pk=request.POST.get("boost-post"))
             for i in range(0, 5):
@@ -56,7 +56,7 @@ def discover(request):
         publish=True,
         hidden=False,
         blog__reviewed=True,
-        blog__blocked=False,
+        blog__user__is_active=True,
         make_discoverable=True,
         published_date__lte=timezone.now()
     ).exclude(id__in=pinned_posts)
@@ -92,7 +92,7 @@ def search(request):
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
-                blog__blocked=False,
+                blog__user__is_active=True,
                 make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
@@ -122,7 +122,7 @@ def feed(request):
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
-                blog__blocked=False,
+                blog__user__is_active=True,
                 make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
@@ -139,7 +139,7 @@ def feed(request):
                 publish=True,
                 hidden=False,
                 blog__reviewed=True,
-                blog__blocked=False,
+                blog__user__is_active=True,
                 make_discoverable=True,
                 published_date__lte=timezone.now()
             )

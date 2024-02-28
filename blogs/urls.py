@@ -1,5 +1,5 @@
 from django.urls import path
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView
 
 from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow
 from blogs import subscriptions
@@ -10,13 +10,14 @@ urlpatterns = [
     path('logger-test/', logger.logger_test),
 
     # Staff dashboard
+    path('staff/', RedirectView.as_view(pattern_name='staff_dashboard', permanent=False)),
+    path('staff/dashboard/', staff.dashboard, name='staff_dashboard'),
     path('staff/review/', staff.review_flow, name='review_flow'),
     path('staff/review-bulk/', staff.review_bulk, name='review_bulk'),
     path('staff/review/approve/<pk>', staff.approve, name='review_approve'),
     path('staff/review/block/<pk>', staff.block, name='review_block'),
     path('staff/review/ignore/<pk>', staff.ignore, name='review_ignore'),
     path('staff/review/delete/<pk>', staff.delete, name='review_delete'),
-    path('staff/dashboard/', staff.dashboard, name='staff_dashboard'),
     path('staff/dashboard/delete-empty/', staff.delete_empty, name='delete_empty'),
     path('staff/dashboard/migrate-blog/', staff.migrate_blog, name='migrate_blog'),
 

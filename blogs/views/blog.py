@@ -31,7 +31,7 @@ def resolve_address(request):
         return None
     elif any(site.domain in http_host for site in sites):
         # Subdomained blog
-        return get_object_or_404(Blog, subdomain__iexact=tldextract.extract(http_host).subdomain, blocked=False)
+        return get_object_or_404(Blog, subdomain__iexact=tldextract.extract(http_host).subdomain, user__is_active=True)
     else:
         # Custom domain blog
         return get_blog_with_domain(http_host)
@@ -41,13 +41,13 @@ def get_blog_with_domain(domain):
     if not domain:
         return False
     try:
-        return Blog.objects.get(domain=domain, blocked=False)
+        return Blog.objects.get(domain=domain, user__is_active=True)
     except Blog.DoesNotExist:
         # Handle www subdomain if necessary
         if 'www.' in domain:
-            return get_object_or_404(Blog, domain__iexact=domain.replace('www.', ''), blocked=False)
+            return get_object_or_404(Blog, domain__iexact=domain.replace('www.', ''), user__is_active=True)
         else:
-            return get_object_or_404(Blog, domain__iexact=f'www.{domain}', blocked=False)
+            return get_object_or_404(Blog, domain__iexact=f'www.{domain}', user__is_active=True)
 
 
 @csrf_exempt
