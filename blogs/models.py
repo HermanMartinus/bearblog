@@ -58,9 +58,6 @@ class Blog(models.Model):
     to_review = models.BooleanField(default=False)
     reviewer_note = models.TextField(blank=True)
 
-    upgraded = models.BooleanField(default=False)
-    upgraded_date = models.DateTimeField(blank=True, null=True)
-    order_id = models.CharField(max_length=200, blank=True, null=True)
     blocked = models.BooleanField(default=False)
 
     custom_styles = models.TextField(blank=True)
@@ -69,9 +66,6 @@ class Blog(models.Model):
         choices=((True, 'Overwrite default styles'), (False, 'Extend default styles')),
         verbose_name='')
     favicon = models.CharField(max_length=10, default="🐼")
-
-    dashboard_styles = models.TextField(blank=True)
-    dashboard_footer = models.TextField(blank=True)
 
     date_format = models.CharField(max_length=32, blank=True)
 

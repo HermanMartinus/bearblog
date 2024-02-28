@@ -69,7 +69,6 @@ class BlogAdmin(admin.ModelAdmin):
 
     def post_count(self, obj):
         return obj.posts_count
-
     post_count.short_description = ('Post count')
     post_count.admin_order_field = "posts_count"
 
@@ -79,7 +78,6 @@ class BlogAdmin(admin.ModelAdmin):
         return format_html(
             "<a href='http://{url}' target='_blank'>{url}</a>",
             url=obj.domain)
-
     domain_url.short_description = "Domain url"
     domain_url.admin_order_field = 'domain'
 
@@ -87,21 +85,23 @@ class BlogAdmin(admin.ModelAdmin):
         return format_html(
             "<a href='http://{url}' target='_blank'>{url}</a>",
             url=root(obj.subdomain))
-
     subdomain_url.short_description = "Subdomain"
 
     def user_link(self, obj):
         return format_html('<a href="{url}">{username}</a>',
                            url=reverse("admin:blogs_usersettings_change", args=(obj.user.settings.id,)),
                            username=escape(obj.user))
-
     user_link.allow_tags = True
     user_link.short_description = "User"
 
     def user_email(self, obj):
         return obj.user.email
-
     user_email.short_description = "Email"
+
+    def display_upgraded(self, obj):
+        return obj.user.settings.upgraded
+    display_upgraded.short_description = 'Upgraded'
+    display_upgraded.boolean = True
 
     def display_is_active(self, obj):
         return obj.user.is_active
@@ -111,7 +111,7 @@ class BlogAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'reviewed',
-        'upgraded',
+        'display_upgraded',
         'display_is_active',
         'subdomain_url',
         'domain_url',
@@ -124,7 +124,7 @@ class BlogAdmin(admin.ModelAdmin):
     ordering = ('-created_date',)
     list_filter = (
         ('domain', admin.EmptyFieldListFilter),
-        ('upgraded', admin.BooleanFieldListFilter),
+        ('user__settings__upgraded', admin.BooleanFieldListFilter),
         ('user__is_active', admin.BooleanFieldListFilter),
     )
 
@@ -136,18 +136,7 @@ class BlogAdmin(admin.ModelAdmin):
 
     block_blog.short_description = "Block selected blogs"
 
-    def validate_domains(self, request, queryset):
-        for blog in queryset:
-            print(f'Checking {blog.domain}')
-            try:
-                if check_connection(blog):
-                    print('good')
-                else:
-                    print('borked!')
-            except TooManyRedirects:
-                print('borked!')
-
-    actions = ['block_blog', 'validate_domains']
+    actions = ['block_blog']
 
 
 @admin.register(Post)

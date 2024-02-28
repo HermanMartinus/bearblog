@@ -58,8 +58,8 @@ def dashboard(request):
 
     # Upgrades
     date_iterator = start_date
-    upgraded_blogs = Blog.objects.filter(upgraded=True, upgraded_date__gte=start_date).order_by('upgraded_date')
-    upgrades_count = upgraded_blogs.annotate(date=TruncDate('upgraded_date')).values('date').annotate(c=Count('date')).order_by()
+    upgraded_blogs = Blog.objects.filter(upgraded=True, user__settings__upgraded_date__gte=start_date).order_by('user__settings__upgraded_date')
+    upgrades_count = upgraded_blogs.annotate(date=TruncDate('user__settings__upgraded_date')).values('date').annotate(c=Count('date')).order_by()
 
 
     # Create dates dict with zero upgrades
@@ -88,7 +88,7 @@ def dashboard(request):
 
     # Calculate signups and upgrades for the past month
     signups = blogs.count()
-    upgrades = Blog.objects.filter(upgraded=True, upgraded_date__gt=start_date).count()
+    upgrades = Blog.objects.filter(upgraded=True, user__settings__upgraded_date__gt=start_date).count()
 
     # Calculate all-time totals
     total_signups = Blog.objects.count()
