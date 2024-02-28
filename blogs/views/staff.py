@@ -5,6 +5,7 @@ from django.db.models import Count, Q, F
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models.functions import TruncDate, Length
 from django.http import JsonResponse
+from django.contrib.auth.models import User
 
 from blogs.helpers import send_async_mail
 from blogs.models import Blog
@@ -337,14 +338,35 @@ def ignore(request, pk):
     return redirect('review_flow')
 
 
-def extract_blog_info(blog):
-    posts_info = []
-    for post in blog.posts.all():
-        posts_info.append({'title': post.title, 'content': post.content})
+@staff_member_required
+def migrate_blog(request):    
+    subdomain = request.POST.get('subdomain')
+    email = request.POST.get('email')
+    message = ""
+    if not email or not subdomain:
+        return HttpResponse("Both email and subdomain must be provided.")
+    
+    user = User.objects.filter(email=email).first()
+    if not user:
+        return HttpResponse("User not found.")
+    message += f"Found user: {user}...<br>"
+    
+    blog = Blog.objects.filter(subdomain=subdomain).first()
+    if not blog:
+        return HttpResponse("Blog not found.")
+    message += f"Found blog: {blog.title}...<br>"
+    
+    old_user = blog.user
+    message += f'Migrating blog ({blog.title}) from {old_user} to {user}...<br>'
+    blog.user = user
+    blog.save()
 
-    return {
-        'title': blog.title,
-        'content': blog.content,
-        'url': blog.useful_domain,
-        'posts': posts_info
-    }
+    if old_user.blogs.count() == 0:
+        message += f'User {old_user} has no more blogs and will be deleted...<br>'
+        old_user.delete()
+        message += 'Deleted...\n'
+    
+    return HttpResponse(message)
+
+
+

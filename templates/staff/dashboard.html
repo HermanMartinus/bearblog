@@ -56,6 +56,15 @@ Staff Dashboard  ʕง•ᴥ•ʔง
         <span>{{ end_date|date:"j F Y" }}</span> 
     </span>
 
+    <h2>Migrate blog</h2>
+
+    <form method="post" action="{% url 'migrate_blog' %}" target="_blank" class="full-width">
+        {% csrf_token %}
+        <input type="text" name="subdomain" placeholder="Blog subdomain..." required>
+        <input type="email" name="email" placeholder="Recipient account email address..." required>
+        <button>Migrate</button>
+    </form>
+
     <h2>Empty blogs</h2>
     <pre>
         - Over 180 days since last modified
