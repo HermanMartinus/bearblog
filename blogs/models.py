@@ -137,13 +137,14 @@ class Blog(models.Model):
         self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(30))
         self.save()
 
-    # def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
     #     # Create auth_token
     #     if not self.auth_token:
     #         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
     #         self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(20))
-
-    #     super(Blog, self).save(*args, **kwargs)
+        if self.user.settings.upgraded:
+            self.reviewed = True
+        super(Blog, self).save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain})'
