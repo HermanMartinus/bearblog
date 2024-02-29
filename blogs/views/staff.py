@@ -1,3 +1,4 @@
+import json
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
@@ -8,7 +9,7 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 
 from blogs.helpers import send_async_mail
-from blogs.models import Blog
+from blogs.models import Blog, PersistentStore
 
 from datetime import timedelta
 import pygal
@@ -21,31 +22,27 @@ def dashboard(request):
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 
-    blogs = Blog.objects.filter(user__is_active=True, created_date__gt=start_date).order_by('created_date')
-
-    # Exclude empty blogs
-    non_empty_blog_ids = [blog.pk for blog in blogs if not blog.is_empty]
-    blogs = blogs.filter(pk__in=non_empty_blog_ids)
-
     to_review = blogs_to_review().count()
+
+    users = User.objects.filter(is_active=True, date_joined__gt=start_date).order_by('date_joined')
 
     # Signups
     date_iterator = start_date
-    blogs_count = blogs.annotate(date=TruncDate('created_date')).values('date').annotate(c=Count('date')).order_by()
+    user_count = users.annotate(date=TruncDate('date_joined')).values('date').annotate(c=Count('date')).order_by()
 
     # Create dates dict with zero signups
-    blog_dict = {}
+    user_dict = {}
     while date_iterator <= end_date:
-        blog_dict[date_iterator.strftime("%Y-%m-%d")] = 0
+        user_dict[date_iterator.strftime("%Y-%m-%d")] = 0
         date_iterator += timedelta(days=1)
 
     # Populate dict with signup count
-    for signup in blogs_count:
-        blog_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
+    for signup in user_count:
+        user_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
 
     # Generate chart
     chart_data = []
-    for date, count in blog_dict.items():
+    for date, count in user_dict.items():
         chart_data.append({'date': date, 'signups': count})
 
     chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
@@ -58,24 +55,24 @@ def dashboard(request):
 
     # Upgrades
     date_iterator = start_date
-    upgraded_blogs = Blog.objects.filter(user__settings__upgraded=True, user__settings__upgraded_date__gte=start_date).order_by('user__settings__upgraded_date')
-    upgrades_count = upgraded_blogs.annotate(date=TruncDate('user__settings__upgraded_date')).values('date').annotate(c=Count('date')).order_by()
+    upgraded_users = User.objects.filter(settings__upgraded=True, settings__upgraded_date__gte=start_date).order_by('settings__upgraded_date')
+    upgrades_count = upgraded_users.annotate(date=TruncDate('settings__upgraded_date')).values('date').annotate(c=Count('date')).order_by()
 
 
     # Create dates dict with zero upgrades
-    blog_dict = {}
+    user_dict = {}
     while date_iterator <= end_date:
-        blog_dict[date_iterator.strftime("%Y-%m-%d")] = 0
+        user_dict[date_iterator.strftime("%Y-%m-%d")] = 0
         date_iterator += timedelta(days=1)
 
     # Populate dict with signup count
     for signup in upgrades_count:
         if signup['date']:
-            blog_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
+            user_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
 
     # Generate chart
     chart_data = []
-    for date, count in blog_dict.items():
+    for date, count in user_dict.items():
         chart_data.append({'date': date, 'upgrades': count})
 
     chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
@@ -87,12 +84,12 @@ def dashboard(request):
     upgrade_chart = chart.render_data_uri()
 
     # Calculate signups and upgrades for the past month
-    signups = blogs.count()
-    upgrades = Blog.objects.filter(user__settings__upgraded=True, user__settings__upgraded_date__gt=start_date).count()
+    signups = users.count()
+    upgrades = User.objects.filter(settings__upgraded=True, settings__upgraded_date__gt=start_date).count()
 
     # Calculate all-time totals
-    total_signups = Blog.objects.count()
-    total_upgrades = Blog.objects.filter(user__settings__upgraded=True).count()
+    total_signups = User.objects.count()
+    total_upgrades = User.objects.filter(settings__upgraded=True).count()
 
     # Calculate conversion rates
     conversion_rate = upgrades / signups if signups > 0 else 0
@@ -107,7 +104,6 @@ def dashboard(request):
         request,
         'staff/dashboard.html',
         {
-            'blogs': blogs,
             'signups': signups,
             'upgrades': upgrades,
             'total_signups': total_signups,
@@ -127,9 +123,9 @@ def dashboard(request):
 
 def get_empty_blogs():
     # Empty blogs
-    # Not used in the last 180 days
+    # Not used in the last 270 days
     # Most recent 100
-    timeperiod = timezone.now() - timedelta(days=180)
+    timeperiod = timezone.now() - timedelta(days=270)
     empty_blogs = Blog.objects.annotate(num_posts=Count('posts')).annotate(content_length=Length('content')).filter(
         last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=60, user__settings__upgraded=False, custom_styles="").order_by('-created_date')[:100]
 
@@ -141,94 +137,7 @@ def blogs_to_review():
     to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True)
 
     if to_review.count() < 1:
-        ignore_terms = [
-            'infp',
-            'isfj',
-            'infj',
-            'intj',
-            'intp',
-            'isfp',
-            'istp',
-            'istj',
-            'enfp',
-            'enfj',
-            'entp',
-            'entj',
-            'esfp',
-            'esfj',
-            'estp',
-            'estj',
-            '14',
-            '15',
-            '16',
-            '17',
-            '18',
-            '19',
-            '20',
-            'ooc',
-            'doll',
-            'he/',
-            'she/',
-            'they/',
-            'it/',
-            'masc terms',
-            'masculine',
-            'fem terms',
-            'feminine',
-            'pronouns',
-            'irl',
-            'prns',
-            'dni',
-            'dnf',
-            'dnm',
-            'byf',
-            'dfi',
-            'reqs',
-            'dm',
-            'pls',
-            'nsfw',
-            'wip',
-            'model',
-            'minor',
-            ':3',
-            '<3',
-            '♡',
-            'hii',
-            'heyy',
-            'lmao',
-            'Aries',
-            'Taurus',
-            'Gemini',
-            'Cancer',
-            'Leo',
-            'Virgo',
-            'Libra',
-            'Scorpio',
-            'Sagittarius',
-            'Capricorn',
-            'Aquarius',
-            'Pisces',
-            'animanga',
-            'manga',
-            'kdrama',
-            'idols',
-            'proship',
-            'haters',
-            'bpd',
-            'autistic',
-            'lesbian',
-            'gay',
-            'bisexual',
-            'intersex',
-            'pansexual',
-            'genderfluid',
-            'boyfriend',
-            'girlfriend',
-            'gf',
-            'bf',
-            'carrd',
-            'rentry'
-        ]
+        persistent_store = PersistentStore.load()
 
         new_blogs = Blog.objects.filter(
             reviewed=False, 
@@ -238,7 +147,7 @@ def blogs_to_review():
 
         # Dynamically build up a Q object for exclusion
         exclude_conditions = Q()
-        for term in ignore_terms:
+        for term in persistent_store.ignore_terms:
             exclude_conditions |= Q(content__icontains=term)
 
         # Apply the exclusion condition
@@ -262,8 +171,8 @@ def delete_empty(request):
 
 @staff_member_required
 def review_bulk(request):
-    still_to_go = blogs_to_review().count()
     blogs = blogs_to_review()[:100]
+    still_to_go = blogs.count()
 
     if blogs:
         return render(
