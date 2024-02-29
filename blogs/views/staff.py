@@ -303,9 +303,9 @@ def approve(request, pk):
     blog.to_review = False
     blog.save()
 
-    message = request.POST.get("message", "Hey, I've just reviewed your blog. It looks good and has been approved.<br><br>Have a great week!<br>Herman")
+    message = request.GET.get("message", "")
 
-    if message and not request.GET.get("no-email", ""):
+    if message:
         send_async_mail(
             "I've just reviewed your blog",
             message,
