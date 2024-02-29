@@ -6,7 +6,7 @@
 {% block title %}Review flow{% endblock %}
 
 
-{% block heading %}🚮<hr>{% endblock %}
+{% block heading %}Review flow{% endblock %}
 
 {% block seo %}
 <meta name="robots" content="noindex">
@@ -32,6 +32,10 @@ body {
 {% endblock %}
 
 {% block content %}
+<a href="{% url 'staff_dashboard' %}">Back</a>
+<h3>Still to go: {{ still_to_go }}</h3>
+<hr>
+
 {% for blog in blogs %}
 <div id="blog-{{ blog.pk }}">
     <h3>{{ blog.title }}</h3>

@@ -261,39 +261,21 @@ def delete_empty(request):
 
 
 @staff_member_required
-def review_flow(request):
-    blog = blogs_to_review().first()
+def review_bulk(request):
+    still_to_go = blogs_to_review().count()
+    blogs = blogs_to_review()[:100]
 
-    if blog:
-        all_posts = blog.posts.filter(publish=True).order_by('-published_date')
-
-        still_to_go = blogs_to_review().count() - 1
-
+    if blogs:
         return render(
             request,
-            'staff/review_flow.html',
+            'staff/review_bulk.html',
             {
-                'blog': blog,
-                'content': blog.content or "~nothing here~",
-                'posts': all_posts,
-                'root': blog.useful_domain,
-                'still_to_go': still_to_go,
+                'blogs': blogs,
+                'still_to_go': still_to_go
             }
         )
     else:
         return redirect('staff_dashboard')
-
-@staff_member_required
-def review_bulk(request):
-    blogs = blogs_to_review()[:100]
-
-    return render(
-        request,
-        'staff/review_bulk.html',
-        {
-            'blogs': blogs
-        }
-    )
 
 
 @staff_member_required
