@@ -265,7 +265,7 @@ class Stylesheet(models.Model):
 # Singleton model to store Bear specific settings
 class PersistentStore(models.Model):
     last_executed = models.DateTimeField(default=timezone.now)
-    review_ignore_terms = models.TextField(blank=True)
+    review_ignore_terms = models.TextField(blank=True, default='[]')
 
     @property
     def ignore_terms(self):

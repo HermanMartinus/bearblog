@@ -33,5 +33,12 @@
 {% endblock %}
 
 {% block footer %}
-Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+{% if blog.user.settings.upgraded and blog.footer_directive %}
+<span id="footer-directive">
+{{ blog.footer_directive | markdown:blog | safe }}
+</span>
+{% endif %}
+<span>
+    Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+</span>
 {% endblock %}
