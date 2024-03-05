@@ -193,7 +193,7 @@ def apply_filters(posts, tag=None, limit=None, order=None):
 def element_replacement(markup, blog, post=None):
     # Match the entire {{ posts ... }} directive, including parameters
     pattern = r'\{\{\s*posts([^}]*)\}\}'
-
+    
     def replace_with_filtered_posts(match):
         params_str = match.group(1) 
         tag, limit, order, description, content = None, None, None, False, False
@@ -210,7 +210,8 @@ def element_replacement(markup, blog, post=None):
                 order = param[3]
             elif 'description:' in param[0]:
                 description = param[4] == 'True'
-            elif 'content:' in param[0]:
+            # Only show content if injection is on page or homepage
+            elif 'content:' in param[0] and not post or post.is_page:
                 content = param[5] == 'True'
 
         filtered_posts = apply_filters(blog.posts.filter(publish=True, is_page=False), tag, limit, order)
