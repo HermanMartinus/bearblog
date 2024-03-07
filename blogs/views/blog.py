@@ -149,7 +149,7 @@ def post(request, slug):
     if post.canonical_url and post.canonical_url.startswith('https://'):
         canonical_url = post.canonical_url
 
-    if post.publish is False and not request.GET.get('preview', False):
+    if post.publish is False and not request.GET.get('token') == post.token:
         return not_found(request)
 
     return render(

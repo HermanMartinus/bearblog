@@ -11,6 +11,7 @@ import json
 from math import log
 import random
 import string
+import hashlib
 
 
 class UserSettings(models.Model):
@@ -181,6 +182,10 @@ class Post(models.Model):
     @property
     def tags(self):
         return sorted(json.loads(self.all_tags))
+    
+    @property
+    def token(self):
+        return hashlib.sha256(self.uid.encode()).hexdigest()[0:10]
 
     def update_score(self):
         self.upvotes = self.upvote_set.count()
