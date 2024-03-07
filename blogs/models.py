@@ -276,10 +276,15 @@ class Stylesheet(models.Model):
 class PersistentStore(models.Model):
     last_executed = models.DateTimeField(default=timezone.now)
     review_ignore_terms = models.TextField(blank=True, default='[]')
+    review_highlight_terms = models.TextField(blank=True, default='[]')
 
     @property
     def ignore_terms(self):
         return sorted(json.loads(self.review_ignore_terms))
+    
+    @property
+    def highlight_terms(self):
+        return sorted(json.loads(self.review_highlight_terms))
     
     @classmethod
     def load(cls):

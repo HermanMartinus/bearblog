@@ -105,23 +105,37 @@ Herman
 <script>
     function highlightKeywords(keywords) {
         const regex = new RegExp(keywords.join('|'), 'gi');
-        const elements = document.getElementsByTagName('*');
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
         
-        for (const element of elements) {
-            if (element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
-            const text = element.textContent;
-            const matches = text.match(regex);
+        const nodeList = [];
+        while (walker.nextNode()) {
+          nodeList.push(walker.currentNode);
+        }
+        
+        for (const node of nodeList) {
+          const text = node.textContent;
+          const matches = text.match(regex);
+          
+          if (matches) {
+            const fragment = document.createDocumentFragment();
+            let lastIndex = 0;
             
-            if (matches) {
-                const newElement = document.createElement('span');
-                newElement.innerHTML = text.replace(regex, '<mark>$&</mark>');
-                element.parentNode.replaceChild(newElement, element);
+            for (const match of matches) {
+              const index = text.toLowerCase().indexOf(match.toLowerCase(), lastIndex);
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, index)));
+              const mark = document.createElement('mark');
+              mark.textContent = text.slice(index, index + match.length);
+              fragment.appendChild(mark);
+              lastIndex = index + match.length;
             }
-            }
+            
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+            node.parentNode.replaceChild(fragment, node);
+          }
         }
     }
         
-    const keywords = ['seo', 'marketing', 'backlink', 'crypto', 'blockchain', 'coins', 'tokens'];
+    const keywords = {{ highlight_terms | safe }};
     highlightKeywords(keywords);
 
     function approveBlogWithEmail(pk) {

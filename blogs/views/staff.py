@@ -173,6 +173,7 @@ def delete_empty(request):
 def review_bulk(request):
     blogs = blogs_to_review()[:100]
     still_to_go = blogs.count()
+    persistent_store = PersistentStore.load()
 
     if blogs:
         return render(
@@ -180,7 +181,8 @@ def review_bulk(request):
             'staff/review_bulk.html',
             {
                 'blogs': blogs,
-                'still_to_go': still_to_go
+                'still_to_go': still_to_go,
+                'highlight_terms': persistent_store.highlight_terms
             }
         )
     else:
