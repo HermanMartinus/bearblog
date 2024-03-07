@@ -103,6 +103,27 @@ Herman
 
 {% block footer %}
 <script>
+    function highlightKeywords(keywords) {
+        const regex = new RegExp(keywords.join('|'), 'gi');
+        const elements = document.getElementsByTagName('*');
+        
+        for (const element of elements) {
+            if (element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
+            const text = element.textContent;
+            const matches = text.match(regex);
+            
+            if (matches) {
+                const newElement = document.createElement('span');
+                newElement.innerHTML = text.replace(regex, '<mark>$&</mark>');
+                element.parentNode.replaceChild(newElement, element);
+            }
+            }
+        }
+    }
+        
+    const keywords = ['seo', 'marketing', 'backlink', 'crypto', 'blockchain', 'coins', 'tokens'];
+    highlightKeywords(keywords);
+
     function approveBlogWithEmail(pk) {
         message = document.querySelector(`#blog-${pk} .message`).value
 
