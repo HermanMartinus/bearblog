@@ -197,9 +197,7 @@ class Post(models.Model):
             if seconds > 0:
                 score = (log_of_upvotes) + ((seconds - 1577811600) / (14 * 86400))
                 self.score = score
-
         self.save()
-        return
     
     def save(self, *args, **kwargs):
         self.slug = self.slug.lower()
@@ -221,6 +219,13 @@ class Upvote(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     hash_id = models.CharField(max_length=200)
+
+    def save(self, *args, **kwargs):
+        # Save the Upvote instance
+        super(Upvote, self).save(*args, **kwargs)
+        
+        # Now that the Upvote is saved and counted, update the post score
+        self.post.update_score()
 
     def __str__(self):
         return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.hash_id} - {self.post}"

@@ -283,7 +283,6 @@ def post(request, id, uid=None):
                     # Self-upvote
                     upvote = Upvote(post=post, hash_id=salt_and_hash(request, 'year'))
                     upvote.save()
-                    post.update_score()
 
                     # Redirect to the new post detail view
                     return redirect('post_edit', id=blog.subdomain, uid=post.uid)

@@ -230,8 +230,6 @@ def upvote(request, uid):
         print("Upvoting", post)
         upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
 
-        post.update_score()
-
         if created:
             return HttpResponse(f'Upvoted {post.title}')
         raise Http404('Duplicate upvote')
