@@ -13,21 +13,20 @@
 {% block canonical %}<link rel="canonical" href="{{ canonical_url }}">{% endblock %}
 
 {% block seo %}
-{% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
+    {% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
-<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
+    <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
 
-{% include 'snippets/seo_tags.html' with site_name=blog.title title=post.title type="article" url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
+    {% include 'snippets/seo_tags.html' with site_name=blog.title title=post.title type="article" url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
 {% endblock %}
 
 {% block imports %}
+    {% if blog.user.settings.upgraded %}
+    {{ blog.header_directive | safe }}
+    {% endif %}
 
-{% if blog.user.settings.upgraded %}
-{{ blog.header_directive | safe }}
-{% endif %}
-
-{% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
-{% if post.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}
+    {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
+    {% if post.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}
 {% endblock %}
 
 {% block custom_styles %}
@@ -48,11 +47,16 @@
 .upvote-count {
     margin-top: -3px;
 }
+{% endblock %}
+
+{% block analytics %}
 {% if blog.analytics_active and not preview %}
-body:hover {
-    border-image: url("/hit/{{ post.uid }}/{% if blog.blank_useful_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
-    border-width: 0;
-}
+<style>
+    body:hover {
+        border-image: url("/hit/{{ post.uid }}/{% if blog.blank_useful_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
+        border-width: 0;
+    }
+</style>
 {% endif %}
 {% endblock %}
 
