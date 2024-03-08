@@ -87,12 +87,24 @@ def blog_delete(request, id):
 def posts_edit(request, id):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
-    posts = Post.objects.annotate(
-        hit_count=Count('hit')).filter(blog=blog).order_by('-published_date')
+    posts = Post.objects.filter(blog=blog, is_page=False).order_by('-published_date')
 
     return render(request, 'dashboard/posts.html', {
+        'pages': False,
+        'blog': blog,
         'posts': posts,
-        'blog': blog
+    })
+
+@login_required
+def pages_edit(request, id):
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+
+    posts = Post.objects.filter(blog=blog, is_page=True).order_by('-published_date')
+
+    return render(request, 'dashboard/posts.html', {
+        'pages': True,
+        'blog': blog,
+        'posts': posts,
     })
 
 
@@ -100,8 +112,11 @@ def posts_edit(request, id):
 def post_delete(request, id, uid):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
     post = get_object_or_404(Post, blog=blog, uid=uid)
+    is_page = post.is_page
     post.delete()
-    return redirect('posts', id=blog.subdomain)
+    if is_page:
+        return redirect('pages_edit', id=blog.subdomain)
+    return redirect('posts_edit', id=blog.subdomain)
 
 
 @csrf_exempt

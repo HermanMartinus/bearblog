@@ -175,6 +175,7 @@ def parse_raw_homepage(blog, header_content, body_content):
 @login_required
 def post(request, id, uid=None):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    is_page = request.GET.get('is_page', '')
     tags = []
     post = None
 
@@ -309,7 +310,8 @@ def post(request, id, uid=None):
         'post': post,
         'error_messages': error_messages,
         'template_header': template_header,
-        'template_body': template_body
+        'template_body': template_body,
+        'is_page': is_page
     })
 
 

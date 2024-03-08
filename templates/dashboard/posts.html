@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Posts | Bear Blog{% endblock %}
+{% block title %}{% if pages %}Pages{% else %}Posts{% endif %} | Bear Blog{% endblock %}
 
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
@@ -21,7 +21,14 @@
 </p>
 {% endif %}
 
-<h1>Posts</h1>
+<h1>{% if pages %}Pages{% else %}Posts{% endif %}</h1>
+{% if pages %}
+<a href="{% url 'post_new' id=blog.subdomain %}?is_page=True">
+    <button>
+    New page
+    </button>
+</a>
+{% else %}
 <a href="{% url 'post_new' id=blog.subdomain %}">
     <button>
     New post
@@ -30,6 +37,7 @@
 <a style="float:right;" href="{% url 'post_template' id=blog.subdomain %}">
     <button>Edit template</button>
 </a>
+{% endif %}
 <ul class="post-list">
     {% for post in posts %}
     <li>
@@ -39,9 +47,6 @@
             </time>
         </span>
         <a href="{% url 'post_edit' id=blog.subdomain  uid=post.uid %}">
-            {% if post.is_page %}
-                [Page]
-            {% endif %}
             {{ post.title }}
         </a>
         {% if not post.publish %}

@@ -2,11 +2,9 @@
     <a href="{% url 'dashboard' id=blog.subdomain %}">Home</a>
     {% if blog %}
     <a href="{% url 'nav' id=blog.subdomain %}">Nav</a>
-    <a href="{% url 'posts' id=blog.subdomain %}">Posts</a>
+    <a href="{% url 'posts_edit' id=blog.subdomain %}">Posts</a>
+    <a href="{% url 'pages_edit' id=blog.subdomain %}">Pages</a>
     <a href="{% url 'styles' id=blog.subdomain %}">Themes</a>
-    {% if blog.analytics_active %}
-    <a href="{% url 'analytics' id=blog.subdomain %}">Analytics</a>
-    {% endif %}
     <a href="{% url 'email_list' id=blog.subdomain %}">Emails</a>
     {% endif %}
     {% if not blog.user.settings.upgraded %}
@@ -15,6 +13,9 @@
 </span>
 
 <span>
+    {% if blog.analytics_active %}
+    <a href="{% url 'analytics' id=blog.subdomain %}">Analytics</a>
+    {% endif %}
     <a href="{% url 'settings' id=blog.subdomain %}">Settings</a>
     <a href="{% url 'account' %}" class="account"></a>
 </span>

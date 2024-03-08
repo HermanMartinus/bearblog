@@ -25,7 +25,11 @@ New post | Bear Blog
 {% endif %}
 <form method="POST" class="post-form full-width">
     <p class="sticky-controls">
-        <button onclick="event.preventDefault(); sessionStorage.clear(); window.location = '/{{ blog.subdomain }}/dashboard/posts/'">&#8592; Back</button>
+        <button
+            onclick="event.preventDefault(); sessionStorage.clear(); window.location = '{% if post.is_page or is_page %}{% url 'pages_edit' id=blog.subdomain %}{% else %}{% url 'posts_edit' id=blog.subdomain %}{% endif %}'"
+        >
+            &#8592; Back
+        </button>
         <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
         
         {% if post %}
@@ -65,7 +69,7 @@ New post | Bear Blog
             tags: {% if blog.tags %}{{ blog.tags|join:", " }}{% else %}bears, writing, thoughts{% endif %}<br>
             make_discoverable: true
         </p>
-        <a href="https://docs.bearblog.dev/home-page" target="_blank">
+        <a href="https://docs.bearblog.dev/post" target="_blank">
             More info
         </a>
     </details>
@@ -91,7 +95,7 @@ New post | Bear Blog
         <b>is_page:</b> {{ post.is_page|lower }}{% endif %}{% if post.class_name %}<br>
         <b>class_name:</b> {{ post.class_name }}{% endif %}{% if not post.make_discoverable %}<br>
         <b>make_discoverable:</b> {{ post.make_discoverable|lower }}<br>{% endif %}{% elif template_header %}
-        <b>{{ template_header|linebreaksbr }}</b>{% else %}<b>title:</b> <br>{% endif %}
+        <b>{{ template_header|linebreaksbr }}</b>{% if is_page %}<b>is_page:</b> true{% endif %}{% else %}<b>title:</b> <br>{% if is_page %}<b>is_page:</b> true{% endif %}{% endif %}
     </div>
 
     <input type="hidden" id="hidden_header_content" name="header_content">

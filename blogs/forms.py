@@ -72,7 +72,8 @@ class StyleForm(forms.ModelForm):
 class AdvancedSettingsForm(forms.ModelForm):
     analytics_active = forms.BooleanField(
         label="Collect analytics",
-        required=False
+        required=False,
+        help_text="Disable to not collect read analytics"
     )
 
     fathom_site_id = forms.CharField(
