@@ -3,7 +3,7 @@ asgiref==3.4.1
 beautifulsoup4==4.9.1
 bleach==4.1.0
 boto3==1.21.44
-certifi==2020.6.20
+certifi==2022.12.7
 chardet==3.0.4
 defusedxml==0.6.0
 distlib==0.3.0
