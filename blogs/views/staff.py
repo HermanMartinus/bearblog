@@ -211,7 +211,7 @@ def approve(request, pk):
 @staff_member_required
 def block(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
-    blog.user.is_active = False
+    blog.user.is_active = not blog.user.is_active
     blog.user.save()
     return HttpResponse("Blocked")
 
