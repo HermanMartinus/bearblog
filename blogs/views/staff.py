@@ -151,7 +151,7 @@ def blogs_to_review():
             exclude_conditions |= Q(content__icontains=term)
 
         # Apply the exclusion condition
-        new_blogs = new_blogs.exclude(exclude_conditions).filter(
+        new_blogs = new_blogs.exclude(exclude_conditions).exclude(user__email__icontains="qq.com").filter(
             Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True)
         )
         
