@@ -15,15 +15,12 @@
     <a href="/dashboard/">Dashboard</a>
     {% else %}
     <a href="{% url 'signup_flow' %}">Sign up</a>
-    {% comment %} <a href="/accounts/signup/">Sign up</a> {% endcomment %}
     <a href="/accounts/login/">Log in</a>
     {% endif %}
     <a href="/discover/">Discover</a>
 </nav>
 <p>
     This is a blogging platform where words matter most.
-    <br>
-    Your readers are protected while your content is delivered at light speed.
 </p>
 <h4>
     Shun the bloat of the current web, embrace the <i>bear</i> necessities.
@@ -40,7 +37,8 @@
 </ul>
 <p><a href="https://herman.bearblog.dev" target="_blank">View example blog</a></p>
 <h3>
-   Publish something awesome with your <i>bear</i> hands <span class="bear"></span>
+   Publish something awesome with your <i>bear</i> hands
+   <a class="bear" href="https://herman.bearblog.dev/praise-for-bear/" target="_blank" style="text-decoration: none; color: inherit;"></a>
 </h3>
 
 {% endblock %}
