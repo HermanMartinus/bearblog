@@ -3,8 +3,8 @@
 }
 
 @keyframes blink {
-    0%, 3%, 100% { content: "ᕦʕ •ᴥ•ʔᕤ"; }
-    2% { content: "ᕦʕ -ᴥ-ʔᕤ"; }
+    0%, 96% { content: "ᕦʕ •ᴥ•ʔᕤ"; }
+    97%, 100% { content: "ᕦʕ -ᴥ-ʔᕤ"; }
 }
 
 .bear::before {
@@ -15,7 +15,7 @@
 
 .bear:hover::before {
     content: "ᕙʕ ಠᴥಠʔᕗ";
-    font-weight: 400;
+    animation: none;
 }
 
 .upgrade .bear::before {
@@ -25,7 +25,6 @@
 
 .upgrade:hover .bear::before {
     content: "ᕙʕ.ಠᴥಠʔᕗ";
-    font-weight: 400;
 }
 
 .account::before {
