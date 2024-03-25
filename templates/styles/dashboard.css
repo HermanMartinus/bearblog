@@ -2,10 +2,17 @@
     font-weight: 400;
 }
 
+@keyframes blink {
+    0%, 3%, 100% { content: "ᕦʕ •ᴥ•ʔᕤ"; }
+    2% { content: "ᕦʕ -ᴥ-ʔᕤ"; }
+}
+
 .bear::before {
     content: "ᕦʕ •ᴥ•ʔᕤ";
     font-weight: 400;
+    animation: blink 5s infinite;
 }
+
 .bear:hover::before {
     content: "ᕙʕ ಠᴥಠʔᕗ";
     font-weight: 400;
