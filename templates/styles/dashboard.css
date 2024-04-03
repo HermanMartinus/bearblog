@@ -149,6 +149,17 @@ button#toggle-full-screen {
     display: block;
 }
 
+.notification {
+    width: 100%;
+    text-align: left;
+    padding: 5px 0;
+    margin-bottom: -15px;
+}
+
+.notification a {
+    margin: 0;
+}
+
 /* dashboard post list and analytics */
 ul.post-list {
     list-style-type: none;
