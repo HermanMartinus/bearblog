@@ -90,11 +90,12 @@ def analytics_upgraded(request, id):
 
 
 def render_analytics(request, blog, public=False):
+    now = timezone.now()
     post_filter = request.GET.get('post', False)
     referrer_filter = request.GET.get('referrer', False)
     days_filter = int(request.GET.get('days', 7))
-    start_date = (timezone.now() - timedelta(days=days_filter)).date()
-    end_date = timezone.now().date()
+    start_date = (now - timedelta(days=days_filter)).date()
+    end_date = now.date()
 
     base_hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date)
 
@@ -105,18 +106,19 @@ def render_analytics(request, blog, public=False):
 
     posts = Post.objects.annotate(
         hit_count=Count('hit', filter=Q(hit__in=base_hits)),
-    ).prefetch_related('hit_set', 'upvote_set').filter(
+    ).filter(
         blog=blog,
         publish=True,
     ).filter(Q(slug=post_filter) if post_filter else Q()
-             ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+            ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+
 
     hits = base_hits.order_by('created_date')
     start_date = hits.first().created_date.date() if hits.exists() else start_date
 
     unique_reads = hits.count()
     unique_visitors = hits.values('hash_id').distinct().count()
-    on_site = hits.filter(created_date__gt=timezone.now()-timedelta(minutes=4)).count()
+    on_site = hits.filter(created_date__gt=now-timedelta(minutes=4)).count()
 
     referrers = hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
     devices = hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
@@ -159,7 +161,7 @@ def render_analytics(request, blog, public=False):
         form = AnalyticsForm(instance=blog)
 
     # RSS Subscriber count
-    rss_subscriber_count = RssSubscriber.objects.filter(blog=blog, access_date__gt=timezone.now() - timedelta(hours=24)).count()
+    rss_subscriber_count = RssSubscriber.objects.filter(blog=blog, access_date__gt=now - timedelta(hours=24)).count()
 
     return render(request, 'studio/analytics.html', {
         'public': public,
