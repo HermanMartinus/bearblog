@@ -142,7 +142,7 @@ Herman
 
     function approveBlogWithEmail(pk) {
         const message = document.querySelector(`#blog-${pk} .message`).value;
-        const deprioritise = document.querySelector('#deprioritise').checked;
+        const deprioritise = document.querySelector(`#blog-${pk} .deprioritise`).checked;
         document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
         
         const url = `/staff/review/approve/${pk}?message=${encodeURIComponent(message)}&deprioritise=${deprioritise}`;
@@ -156,7 +156,7 @@ Herman
     }
     
     function approveBlog(pk) {
-        const deprioritise = document.querySelector('#deprioritise').checked;
+        const deprioritise = document.querySelector(`#blog-${pk} .deprioritise`).checked;
         document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
         
         const url = `/staff/review/approve/${pk}?deprioritise=${deprioritise}`;
