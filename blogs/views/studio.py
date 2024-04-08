@@ -28,9 +28,9 @@ def list(request):
             if blogs.count() >= 9:
                 form.add_error('title', 'You have reached the maximum number of blogs.')
             else:
-                subdomain = form.cleaned_data['subdomain']
+                subdomain = slugify(form.cleaned_data['subdomain'])
 
-                if not is_protected(subdomain):
+                if not is_protected(subdomain) and not Blog.objects.filter(subdomain=subdomain).exists():
                     blog_info = form.save(commit=False)
                     blog_info.user = request.user
                     blog_info.save()
