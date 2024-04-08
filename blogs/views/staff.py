@@ -194,10 +194,13 @@ def approve(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.reviewed = True
     blog.to_review = False
+    if request.GET.get("deprioritise", False):
+        blog.deprioritise = True
+
     blog.save()
 
     message = request.GET.get("message", "")
-
+    
     if message:
         send_async_mail(
             "I've just reviewed your blog",

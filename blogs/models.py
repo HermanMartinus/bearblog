@@ -58,6 +58,7 @@ class Blog(models.Model):
     ignored_date = models.DateTimeField(blank=True, null=True)
     to_review = models.BooleanField(default=False)
     reviewer_note = models.TextField(blank=True)
+    deprioritise = models.BooleanField(default=False)
 
     custom_styles = models.TextField(blank=True)
     overwrite_styles = models.BooleanField(
@@ -195,7 +196,10 @@ class Post(models.Model):
 
             seconds = self.published_date.timestamp()
             if seconds > 0:
-                score = (log_of_upvotes) + ((seconds - 1577811600) / (14 * 86400))
+                if self.blog.deprioritise:
+                    score = 0
+                else:
+                    score = (log_of_upvotes) + ((seconds - 1577811600) / (14 * 86400))
                 self.score = score
         self.save()
     

@@ -87,6 +87,8 @@ Herman
         </textarea>
     </details>
     <br>
+    <input type="checkbox" id="deprioritise" name="deprioritise"> deprioritise
+    <br>
     <div class="controls">
         <button onclick="approveBlogWithEmail({{ blog.pk }})">Approve and email</button>
         <button onclick="approveBlog({{ blog.pk }})">Approve</button>
@@ -139,23 +141,34 @@ Herman
     highlightKeywords(keywords);
 
     function approveBlogWithEmail(pk) {
-        message = document.querySelector(`#blog-${pk} .message`).value
-
-        document.querySelector(`#blog-${pk}`).style.background="lightgreen"
-        fetch(`/staff/review/approve/${pk}?message=${message}`, {
-            method: 'GET',
-        })
-        .then(data => console.log(data))
-        .catch(error => console.error('Error:', error));
-    }
-    function approveBlog(pk) {
-        document.querySelector(`#blog-${pk}`).style.background="lightgreen"
-        fetch(`/staff/review/approve/${pk}`, {
+        const message = document.querySelector(`#blog-${pk} .message`).value;
+        const deprioritise = document.querySelector('#deprioritise').checked;
+        document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
+        
+        const url = `/staff/review/approve/${pk}?message=${encodeURIComponent(message)}&deprioritise=${deprioritise}`;
+    
+        fetch(url, {
             method: 'GET'
         })
+        .then(response => response.json())
         .then(data => console.log(data))
         .catch(error => console.error('Error:', error));
     }
+    
+    function approveBlog(pk) {
+        const deprioritise = document.querySelector('#deprioritise').checked;
+        document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
+        
+        const url = `/staff/review/approve/${pk}?deprioritise=${deprioritise}`;
+    
+        fetch(url, {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+    }
+    
     function ignoreBlog(pk) {
         document.querySelector(`#blog-${pk}`).style.background="lightyellow"
         fetch(`/staff/review/ignore/${pk}`, {
