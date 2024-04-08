@@ -143,29 +143,32 @@ Herman
     function approveBlogWithEmail(pk) {
         const message = document.querySelector(`#blog-${pk} .message`).value;
         const deprioritise = document.querySelector(`#blog-${pk} .deprioritise`).checked;
-        document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
         
-        const url = `/staff/review/approve/${pk}?message=${encodeURIComponent(message)}&deprioritise=${deprioritise}`;
-    
-        fetch(url, {
-            method: 'GET'
-        })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(error => console.error('Error:', error));
+        sendApproveBlog(pk, message, deprioritise)
+
+        document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
     }
     
     function approveBlog(pk) {
         const deprioritise = document.querySelector(`#blog-${pk} .deprioritise`).checked;
-        document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
         
-        const url = `/staff/review/approve/${pk}?deprioritise=${deprioritise}`;
-    
+        sendApproveBlog(pk, false, deprioritise)
+
+        document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
+    }
+
+    function sendApproveBlog(pk, message=false, deprioritise=false) {
+        let queryParams = [];
+        if (message) queryParams.push(`message=${message}`);
+        if (deprioritise) queryParams.push(`deprioritise=${deprioritise}`);
+        const queryString = queryParams.join('&');
+
+        const url = `/staff/review/approve/${pk}?${queryString}`;
+
         fetch(url, {
             method: 'GET'
         })
-        .then(response => response.json())
-        .then(data => console.log(data))
+        .then(response => console.log(response))
         .catch(error => console.error('Error:', error));
     }
     
