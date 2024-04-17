@@ -62,6 +62,10 @@
                             <button onclick="event.preventDefault();if(confirm('Block this blog?')){event.target.parentElement.submit()}">Block blog</button>
                         </form>
                         <form method="POST" style="display:inline">
+                            <input hidden name="deprioritise-blog" value="{{ post.pk }}">
+                            <button onclick="event.preventDefault();if(confirm('Deprioritise this blog?')){event.target.parentElement.submit()}">Deprioritise blog</button>
+                        </form>
+                        <form method="POST" style="display:inline">
                             <input hidden name="boost-post" value="{{ post.pk }}">
                             <button onclick="event.preventDefault();if(confirm('Boost this post?')){event.target.parentElement.submit()}">Boost post</button>
                         </form>

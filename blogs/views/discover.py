@@ -23,6 +23,10 @@ def discover(request):
             post = Post.objects.get(pk=request.POST.get("hide-post"))
             post.hidden = True
             post.save()
+        if request.POST.get("deprioritise-blog", False):
+            post = Post.objects.get(pk=request.POST.get("deprioritise-blog"))
+            post.blog.deprioritise = True
+            post.blog.save()
         if request.POST.get("block-blog", False):
             post = Post.objects.get(pk=request.POST.get("block-blog"))
             post.blog.user.is_active = False
