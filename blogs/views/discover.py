@@ -60,6 +60,7 @@ def discover(request):
         hidden=False,
         blog__reviewed=True,
         blog__user__is_active=True,
+        blog__hidden=False,
         make_discoverable=True,
         published_date__lte=timezone.now()
     ).exclude(id__in=pinned_posts)
@@ -96,6 +97,7 @@ def search(request):
                 hidden=False,
                 blog__reviewed=True,
                 blog__user__is_active=True,
+                blog__hidden=False,
                 make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
@@ -126,6 +128,7 @@ def feed(request):
                 hidden=False,
                 blog__reviewed=True,
                 blog__user__is_active=True,
+                blog__hidden=False,
                 make_discoverable=True,
                 published_date__lte=timezone.now(),
             )
@@ -143,6 +146,7 @@ def feed(request):
                 hidden=False,
                 blog__reviewed=True,
                 blog__user__is_active=True,
+                blog__hidden=False,
                 make_discoverable=True,
                 published_date__lte=timezone.now()
             )
