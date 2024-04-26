@@ -214,7 +214,7 @@ def element_replacement(markup, blog, post=None):
             elif 'content:' in param[0] and not post or post.is_page:
                 content = param[5] == 'True'
 
-        filtered_posts = apply_filters(blog.posts.filter(publish=True, is_page=False), tag, limit, order)
+        filtered_posts = apply_filters(blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now()), tag, limit, order)
         context = {'blog': blog, 'posts': filtered_posts, 'embed': True, 'show_description': description, 'show_content': content}
         return render_to_string('snippets/post_list.html', context)
 
