@@ -38,6 +38,7 @@ def feed(request):
     fg.title(blog.title)
     fg.subtitle(blog.meta_description or unmark(blog.content) or blog.title)
     fg.link(href=f"{blog.useful_domain}/", rel='alternate')
+    
 
     name = blog.subdomain
     if blog.user.first_name and blog.user.last_name:
@@ -49,6 +50,8 @@ def feed(request):
         fe.title(post.title)
         fe.author({'name': name, 'email': 'hidden'})
         fe.link(href=f"{blog.useful_domain}/{post.slug}/")
+        if post.meta_description:
+            fe.summary(post.meta_description)
         try:
             fe.content(markdown(post.content.replace('{{ email-signup }}', ''), blog), type="html")
         except ValueError:
