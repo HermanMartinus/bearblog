@@ -131,7 +131,7 @@ def upload_image(request, id):
 
         for file in request.FILES.getlist('file'):
             extention = file.name.split('.')[-1]
-            if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp')):
+            if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif')):
 
                 filepath = f'{blog.subdomain}-{time_string}-{count}.{extention}'
                 url = f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{filepath}'
