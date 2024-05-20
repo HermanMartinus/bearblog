@@ -28,11 +28,9 @@ Directives | Bear Blog
             <label>Head directive:</label>
             <br>
             <textarea name="header" style="height: 150px;">{{ blog.header_directive }}</textarea>
-            {% if misplaced_attribute %}
-            <p style="color:lightsalmon;font-size:small">
+            <p style="color:lightsalmon;font-size:small;display:none;" class="domain-error">
                 ʕ ·ᴥ·ʔ The custom_domain attribute should be with the blog attributes on the <a href="{% url 'dashboard' id=blog.subdomain %}">home page</a>, not here. 
             </p>
-            {% endif %}
         </p>
         <p>
             <label>Footer directive:</label>
@@ -42,4 +40,18 @@ Directives | Bear Blog
         </p>
     </form>
 </main>
+
+<script>
+    const textarea = document.querySelector('textarea[name="header"]');
+    const domainErrorDiv = document.querySelector('.domain-error');
+
+    textarea.addEventListener('input', () => {
+        if (textarea.value.includes('custom_domain')) {
+        domainErrorDiv.style.display = 'block';
+        } else {
+        domainErrorDiv.style.display = 'none';
+        }
+    });
+</script>
+
 {% endblock %}

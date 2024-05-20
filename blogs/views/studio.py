@@ -460,11 +460,6 @@ def directive_edit(request, id):
         blog.header_directive = header
         blog.footer_directive = footer
         blog.save()
-    
-    misplaced_attribute = False
-    if "custom_domain" in blog.header_directive:
-        misplaced_attribute = True
-    print(blog.header_directive)
 
     return render(request, 'studio/directive_edit.html', {
         'blog': blog,
