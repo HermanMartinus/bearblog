@@ -28,6 +28,11 @@ Directives | Bear Blog
             <label>Head directive:</label>
             <br>
             <textarea name="header" style="height: 150px;">{{ blog.header_directive }}</textarea>
+            {% if misplaced_attribute %}
+            <p style="color:lightsalmon;font-size:small">
+                ʕ ·ᴥ·ʔ The custom_domain attribute should be with the blog attributes on the <a href="{% url 'dashboard' id=blog.subdomain %}">home page</a>, not here. 
+            </p>
+            {% endif %}
         </p>
         <p>
             <label>Footer directive:</label>
