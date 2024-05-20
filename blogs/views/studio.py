@@ -462,8 +462,7 @@ def directive_edit(request, id):
         blog.save()
 
     return render(request, 'studio/directive_edit.html', {
-        'blog': blog,
-        'misplaced_attribute': misplaced_attribute
+        'blog': blog
     })
 
 @login_required
