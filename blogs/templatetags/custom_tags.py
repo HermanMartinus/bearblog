@@ -93,10 +93,17 @@ class MyRenderer(HTMLRenderer):
         return html
     
     def inline_math(self, text):
-        return latex2mathml.converter.convert(text)
+        try:
+            return latex2mathml.converter.convert(text)
+        except Exception as e:
+            print("LaTeX rendering error")
+
     
     def block_math(self, text):
-        return latex2mathml.converter.convert(text).replace('display="inline"', 'display="block"')
+        try:
+            return latex2mathml.converter.convert(text).replace('display="inline"', 'display="block"')
+        except Exception as e:
+            print("LaTeX rendering error")
     
     def block_code(self, code, info=None):
         if info is None:
