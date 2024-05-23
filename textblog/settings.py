@@ -59,9 +59,6 @@ ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
-# Allow iframe embeds
-X_FRAME_OPTIONS = 'ALLOWALL'
-
 INTERNAL_IPS = ['127.0.0.1']
 
 # Application definition
