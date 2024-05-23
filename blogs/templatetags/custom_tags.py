@@ -15,6 +15,9 @@ from lxml.html.clean import Cleaner, defs
 from slugify import slugify
 
 import mistune
+from mistune import HTMLRenderer, create_markdown
+from mistune.plugins.math import math
+
 import lxml
 import latex2mathml.converter
 import re
@@ -64,11 +67,59 @@ def typographic_replacements(text):
         text = text.replace(old, new)
     return text
 
+def replace_inline_latex(text):
+    latex_exp_inline = re.compile(r'\$\$([^\n]*?)\$\$')
+    replaced_text = latex_exp_inline.sub(r'$\1$', text)
+
+    return replaced_text
+
+class MyRenderer(HTMLRenderer):
+    def heading(self, text, level, **attrs):
+        return f'<h{level} id={slugify(text)}>{text}</h{level}>'
+    
+    def link(self, text, url, title=None):
+        if 'tab:' in url:
+            url = url.replace('tab:', '')
+            return f"<a href='{url}' target='_blank'>{text}</a>"
+        return f"<a href='{url}'>{text}</a>"
+
+    def text(self, text):
+        return typographic_replacements(text)
+    
+    def inline_html(self, html):
+        return html
+    
+    def block_html(self, html):
+        return html
+    
+    def inline_math(self, text):
+        return latex2mathml.converter.convert(text)
+    
+    def block_math(self, text):
+        return latex2mathml.converter.convert(text).replace('display="inline"', 'display="block"')
+    
+    def block_code(self, code, info=None):
+        if info is None:
+            info = 'text'
+        try:
+            lexer = get_lexer_by_name(info)
+        except ValueError:
+            lexer = get_lexer_by_name('text')
+        
+        formatter = HtmlFormatter(style='friendly')
+        highlighted_code = highlight(code, lexer, formatter)
+        return highlighted_code
+    
+    
+markdown_renderer = create_markdown(
+    renderer=MyRenderer(),
+    plugins=['math', 'strikethrough', 'footnotes', 'table', 'superscript', 'subscript', 'mark'],
+    escape=False)
 
 @register.filter
 def markdown(content, blog_or_post=False):
     post = None
-    blog= None
+    blog = None
     if blog_or_post:
         if isinstance(blog_or_post, Post):
             post = blog_or_post
@@ -78,46 +129,15 @@ def markdown(content, blog_or_post=False):
         
     if not content:
         return ''
+    
+    # Removes old formatted inline LaTeX
+    content = replace_inline_latex(content)
 
-    markup = mistune.html(content)
-
-    soup = BeautifulSoup(markup, 'html.parser')
-
-    heading_tags = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-    for tag in heading_tags:
-        tag.attrs['id'] = slugify(tag.text)
-
-    for anchor in soup.find_all('a', href=True):
-        if 'tab:' in anchor.attrs['href']:
-            anchor.attrs['href'] = anchor.attrs['href'].replace('tab:', '')
-            anchor.attrs['target'] = '_blank'
-
-    for code_block in soup.find_all('code'):
-        if code_block.parent and code_block.parent.name == 'pre':
-            # Add pygments
-            language = code_block.get('class', [''])[0].split('-')[-1]
-            try:
-                lexer = get_lexer_by_name(language)
-            except ValueError:
-                lexer = get_lexer_by_name('text')
-
-            formatter = HtmlFormatter(style='friendly')
-            highlighted_code = highlight(code_block.get_text(), lexer, formatter)
-
-            new_code = BeautifulSoup(highlighted_code, 'html.parser')
-            code_block.parent.replace_with(new_code)
-
-    processed_markup = str(soup)
+    processed_markup = markdown_renderer(content)
 
     # If not upgraded remove iframes and js
     if not blog or not blog.user.settings.upgraded:
         processed_markup = clean(processed_markup)
-
-    # Replace LaTeX between $$ with MathML
-    processed_markup = excluding_pre(processed_markup, render_latex)
-
-    # Add typographic replacements
-    processed_markup = excluding_pre(processed_markup, typographic_replacements)
 
     # Replace {{ xyz }} elements
     if blog:
@@ -146,29 +166,6 @@ def excluding_pre(markup, func, blog=None, post=None):
 
     for key in sorted(placeholders.keys(), reverse=True):
         markup = markup.replace(key, placeholders[key])
-
-    return markup
-
-
-def render_latex(markup):
-    latex_exp_block = re.compile(r'\$\$\n([\s\S]*?)\n\$\$')
-    latex_exp_inline = re.compile(r'\$\$([^\n]*?)\$\$')
-
-    def replace_with_mathml(match):
-        latex_content = match.group(1)
-        mathml_output = latex2mathml.converter.convert(latex_content)
-        return mathml_output
-
-    def replace_with_mathml_block(match):
-        latex_content = match.group(1)
-        mathml_output = latex2mathml.converter.convert(latex_content).replace('display="inline"', 'display="block"')
-        return mathml_output
-
-    try:
-        markup = latex_exp_block.sub(replace_with_mathml_block, markup)
-        markup = latex_exp_inline.sub(replace_with_mathml, markup)
-    except Exception as e:
-        print("LaTeX rendering error")
 
     return markup
 
