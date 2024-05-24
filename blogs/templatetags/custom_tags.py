@@ -133,12 +133,12 @@ def markdown(content, blog_or_post=False):
             blog = post.blog
         else:
             blog = blog_or_post
-        
-    if not content:
-        return ''
     
     # Removes old formatted inline LaTeX
     content = replace_inline_latex(content)
+
+    if not content:
+        return ''
 
     processed_markup = markdown_renderer(content)
 
