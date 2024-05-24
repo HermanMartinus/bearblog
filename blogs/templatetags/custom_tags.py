@@ -140,7 +140,7 @@ def markdown(content, blog_or_post=False):
     if not content:
         return ''
 
-    processed_markup = markdown_renderer(content)
+    processed_markup = markdown_renderer(str(content))
 
     # If not upgraded remove iframes and js
     if not blog or not blog.user.settings.upgraded:
