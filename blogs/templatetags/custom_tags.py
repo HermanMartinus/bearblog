@@ -125,6 +125,10 @@ markdown_renderer = create_markdown(
 
 @register.filter
 def markdown(content, blog_or_post=False):
+    content = str(content)
+    if not content:
+        return ''
+
     post = None
     blog = None
     if blog_or_post:
@@ -133,13 +137,9 @@ def markdown(content, blog_or_post=False):
             blog = post.blog
         else:
             blog = blog_or_post
-    
-    # Removes old formatted inline LaTeX
-    content = str(content)
-    content = replace_inline_latex(content)
 
-    if not content:
-        return ''
+    # Removes old formatted inline LaTeX
+    content = replace_inline_latex(content)
 
     processed_markup = markdown_renderer(content)
 
