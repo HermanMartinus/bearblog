@@ -141,7 +141,10 @@ def markdown(content, blog_or_post=False):
     # Removes old formatted inline LaTeX
     content = replace_inline_latex(content)
 
-    processed_markup = markdown_renderer(str(content))
+    try:
+        processed_markup = markdown_renderer(content)
+    except TypeError:
+        return ''
 
     # If not upgraded remove iframes and js
     if not blog or not blog.user.settings.upgraded:
