@@ -2,6 +2,9 @@ from django import forms
 
 from .models import Blog, UserSettings
 
+import re
+
+
 class BlogForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BlogForm, self).__init__(*args, **kwargs)
@@ -82,6 +85,12 @@ class AdvancedSettingsForm(forms.ModelForm):
         help_text="<span>More in-depth analytics using <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a>.</span>"
     )
 
+    meta_tag = forms.CharField(
+        label="Custom meta tag",
+        required=False,
+        help_text="The structure of a meta tag is strictly &lt;meta name='' property='' content='' /&gt"
+    )
+
     robots_txt = forms.CharField(
         widget=forms.Textarea(),
         label="robots.txt content",
@@ -89,9 +98,17 @@ class AdvancedSettingsForm(forms.ModelForm):
         help_text="This will be appended to the mandatory robots.txt content. View yours at example.bearblog.dev/robots.txt"
     )
 
+    def clean_meta_tag(self):
+        meta_tag = self.cleaned_data.get('meta_tag')
+        if meta_tag:
+            pattern = r'<meta\s+((?!\b(?:javascript|script|url|onerror)\b)[^>])*?>'
+            if not re.search(pattern, meta_tag, re.IGNORECASE):
+                raise forms.ValidationError("Invalid meta tag")
+        return meta_tag
+
     class Meta:
         model = Blog
-        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'rss_alias', 'robots_txt')
+        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'rss_alias', 'meta_tag', 'robots_txt')
 
 
 class AnalyticsForm(forms.ModelForm):

@@ -87,7 +87,6 @@ def parse_raw_homepage(blog, header_content, body_content):
     # Clear out data
     blog.meta_description = ''
     blog.meta_image = ''
-    blog.meta_tag = ''
     blog.lang = 'en'
     blog.date_format = ''
 
@@ -115,12 +114,6 @@ def parse_raw_homepage(blog, header_content, body_content):
             blog.meta_image = value
         elif name == 'lang':
             blog.lang = value
-        elif name == 'custom_meta_tag':
-            pattern = r'<meta\s+(?:[^>]*(?!\b(?:javascript|scripts|url)\b)[^>]*)*>'
-            if re.search(pattern, value, re.IGNORECASE):
-                blog.meta_tag = value
-            else:
-                error_messages.append("Invalid custom_meta_tag")
         elif name == 'date_format':
             blog.date_format = value
         else:

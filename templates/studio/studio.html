@@ -60,8 +60,7 @@
         <b>meta_description:</b> {{ blog.meta_description }}{% endif %}{% if blog.meta_image %}<br>
         <b>meta_image:</b> {{ blog.meta_image }}{% endif %}{% if blog.lang != 'en' %}<br>
         <b>lang:</b> {{ blog.lang }}{% endif %}{% if blog.date_format != '' %}<br>
-        <b>date_format:</b> {{ blog.date_format }}{% endif %}{% if blog.meta_tag and blog.meta_tag != "<meta name='' property='' content=''>" %}<br>
-        <b>custom_meta_tag:</b> {{ blog.meta_tag }}{% endif %}
+        <b>date_format:</b> {{ blog.date_format }}{% endif %}
     </div>
 
     <input type="hidden" id="hidden_header_content" name="header_content">
