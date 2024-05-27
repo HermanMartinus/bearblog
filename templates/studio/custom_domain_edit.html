@@ -11,6 +11,8 @@ Custom domain | Bear Blog
     {{ request.user.settings.dashboard_styles | safe }}
 {% endblock %}
 
+{% block heading %}{{ blog.title }}{% endblock %}
+
 {% block content %}
 <main>
     <h1>Custom domain</h1>

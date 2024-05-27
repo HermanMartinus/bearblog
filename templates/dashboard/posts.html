@@ -10,6 +10,8 @@
 
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
+{% block heading %}{{ blog.title }}{% endblock %}
+
 {% block content %}
 
 <h1>{% if pages %}Pages{% else %}Posts{% endif %}</h1>

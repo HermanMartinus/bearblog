@@ -10,9 +10,11 @@
 
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
+{% block heading %}{{ blog.title }}{% endblock %}
+
 {% block content %}
 
-<h1>Home <span style="font-weight: 400">- {{ blog.blank_useful_domain }}</span></h1>
+<h1>Home</h1>
 
 
 {% if error_messages %}
