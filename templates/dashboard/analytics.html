@@ -11,13 +11,16 @@
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<h1>Analytics (7 days)</h1>
+<h1>Analytics</h1>
 
 <p>
     <b>Unique reads:</b> {{ unique_reads.hit_count__sum }}
     <br>
     <b>Unique visitors:</b> {{ unique_visitors }}
 </p>
+<small>
+    Displaying the past 7 days
+</small>
 {{ chart|safe  }}
 <h3>Need more in-depth analytics?</h3>
 <p>

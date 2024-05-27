@@ -11,19 +11,17 @@
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
 {% block content %}
-<h1>Email list ({{ subscribers|length }})</h1>
-<p>
-    <small>
-        Include the following snippet in your blog posts, navbar, or home page:
-        <br>
-        <code>Subscribe to my blog via [email](/subscribe/) or [RSS feed](/feed/).</code>
-    </small>
-</p>
+<h1>Email list</h1>
 <p>
     <small>
         <b>Bear does not send emails to subscribers. This is an email subscriber list.</b>
         <br>
         <a href="https://docs.bearblog.dev/sending-emails" target="_blank">Guide</a> for email newsletters.
+    </small>
+</p>
+<p>
+    <small>
+        Number of subscribers: <b>{{ subscribers|length }}</b>
     </small>
 </p>
 <form method="POST" id="import-contacts" class="full-width">

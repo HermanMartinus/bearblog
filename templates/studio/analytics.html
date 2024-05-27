@@ -18,18 +18,24 @@
 {% endblock %}
 
 {% block content %}
-<h1>Analytics{% if public %} for {{ blog.title }}{% endif %} ({{ days_filter }} days)</h1>
+<h1>Analytics{% if public %} for {{ blog.title }}{% endif %}</h1>
 <p>
     <b>Reading now:</b> {{ on_site|intcomma }}
+    
 </p>
-<span style="float:right; padding: 5px 0">
-    <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last week</button>
-    <button onclick="window.location = '?days=30{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last month</button>
-    <button onclick="window.location = '?days=90{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 3 months</button>
-    <button onclick="window.location = '?days=180{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 6 months</button>
-    <button onclick="window.location = '?days=365{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last year</button>
-    <button onclick="window.location = '?days=99999{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">All time</button>
-</span>
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+    <small>
+        Displaying the past {{ days_filter }} days
+    </small>
+    <span>
+        <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last week</button>
+        <button onclick="window.location = '?days=30{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last month</button>
+        <button onclick="window.location = '?days=90{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 3 months</button>
+        <button onclick="window.location = '?days=180{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last 6 months</button>
+        <button onclick="window.location = '?days=365{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last year</button>
+        <button onclick="window.location = '?days=99999{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">All time</button>
+    </span>
+</div>
 <embed type="image/svg+xml" src= {{ chart|safe }} />
 <span class="helptext" style="display: flex; justify-content:space-between;">
     <span>{{ start_date|date:"j F Y" }}</span>
