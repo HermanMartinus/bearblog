@@ -8,8 +8,6 @@
     {{ request.user.settings.dashboard_styles | safe }}
 {% endblock %}
 
-{% block heading %}{{ blog.title }}{% endblock %}
-
 {% block content %}
 <h1>Post template</h1>
 <form method="POST" class="post-form full-width">
