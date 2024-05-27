@@ -74,9 +74,6 @@ def studio(request, id):
         except DataError as error:
             error_messages.append(error)
 
-    if not blog.subdomain == id:
-        return redirect('dashboard', id=blog.subdomain)
-
     return render(request, 'studio/studio.html', {
         'blog': blog,
         'error_messages': error_messages,
@@ -107,18 +104,6 @@ def parse_raw_homepage(blog, header_content, body_content):
 
         if name == 'title':
             blog.title = value
-        elif name == 'bear_domain':
-            subdomain = slugify(value.split('.')[0]).replace('_', '-')
-            if not subdomain:
-                error_messages.append("{value} is not a valid bear_domain")
-            else:
-                if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).count():
-                    if not is_protected(subdomain):
-                        blog.subdomain = subdomain
-                    else:
-                        error_messages.append(f"{value} is protected")
-                else:
-                    error_messages.append(f"{value} has already been taken")
         elif name == 'favicon':
             if len(value) < 20:
                 blog.favicon = value

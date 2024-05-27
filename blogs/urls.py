@@ -74,5 +74,4 @@ urlpatterns = [
     path('confirm-subscription/', emailer.confirm_subscription, name='confirm_subscription'),
     path("feed/", feed.feed, name="rss_feed"),
     path('<path:slug>/', blog.post, name='post'),
-    # path('<slug>/meta_image/', blog.generate_meta_image, name='generate_meta_image'),
 ]

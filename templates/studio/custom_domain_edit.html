@@ -23,7 +23,7 @@ Custom domain | Bear Blog
             <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}');">View</button>
         </p>
 
-        {% if error_messages or info_message %}
+        {% if error_messages %}
         <p style="color:lightsalmon">
             {% for error_message in error_messages %}
                 {{ error_message }}<br>

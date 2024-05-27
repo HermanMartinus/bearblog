@@ -13,6 +13,21 @@
 {% block content %}
 <h1>Settings</h1>
 <p>
+    <form method="POST" class="post-form full-width">
+        {% csrf_token %}
+        {% if error_messages %}
+        <p style="color:lightsalmon">
+            {% for error_message in error_messages %}
+                {{ error_message }}<br>
+            {% endfor %}
+        </p>
+        {% endif %}
+        <label for="slug">Subdomain</label>
+        <input type="text" name="subdomain" value="{{ blog.subdomain }}" required/>
+        <button type="submit">Save</button>
+    </form>
+</p>
+<p>
     <a href="{% url 'custom_domain_edit' id=blog.subdomain %}">Custom domain</a>
 </p>
 <p>

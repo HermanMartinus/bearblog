@@ -12,7 +12,8 @@
 
 {% block content %}
 
-<h1>Home</h1>
+<h1>Home <span style="font-weight: 400">- {{ blog.blank_useful_domain }}</span></h1>
+
 
 {% if error_messages %}
 <p style="color:lightsalmon">
@@ -35,7 +36,6 @@
         </summary>
         <p>
             title: Baloo's blog<br>
-            bear_domain: baloo.bearblog.dev<br>
             favicon: 🐻<br>
             meta_description: Look for the bear necessities.<br>
             meta_image: https://example.com/image.jpeg<br>
@@ -56,7 +56,6 @@
         style="margin-bottom:-1px; border-bottom: 1px solid lightgrey;"
     >
         <b>title:</b> {{ blog.title }}<br>
-        <b>bear_domain:</b> {{ blog.blank_bear_domain }}<br>
         <b>favicon:</b> {{ blog.favicon }}{% if blog.meta_description %}<br>
         <b>meta_description:</b> {{ blog.meta_description }}{% endif %}{% if blog.meta_image %}<br>
         <b>meta_image:</b> {{ blog.meta_image }}{% endif %}{% if blog.lang != 'en' %}<br>

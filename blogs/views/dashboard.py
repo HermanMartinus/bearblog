@@ -1,12 +1,9 @@
-
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic.edit import DeleteView
-from django.utils import timezone
-from django.db.models import Count
 from django.contrib.auth import get_user_model
+from django.utils.text import slugify
 
 
 from ipaddr import client_ip
@@ -17,8 +14,9 @@ import boto3
 import time
 import djqscsv
 
+
 from blogs.forms import NavForm, StyleForm
-from blogs.helpers import get_country
+from blogs.helpers import get_country, is_protected
 from blogs.models import Blog, Post, Stylesheet
 
 
@@ -221,6 +219,22 @@ def opt_in_review(request, id):
 def settings(request, id):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
     
+    error_messages = []
+    
+    if request.method == "POST":
+        subdomain = request.POST.get('subdomain')
+
+        if subdomain:
+            subdomain = slugify(subdomain.split('.')[0]).replace('_', '-')
+            if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).exists() and not is_protected(subdomain):
+                blog.subdomain = subdomain
+                blog.save()
+                return redirect('settings', id=blog.subdomain)
+            else:
+                error_messages.append(f'The subdomain "{subdomain}" is reserved')
+
+
+
     if request.GET.get("export", ""):
         return djqscsv.render_to_csv_response(blog.posts)
     
@@ -230,6 +244,7 @@ def settings(request, id):
 
     return render(request, "dashboard/settings.html", {
         "blog": blog,
+        "error_messages": error_messages
     })
 
 
