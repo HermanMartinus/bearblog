@@ -32,6 +32,7 @@ urlpatterns = [
     path('<id>/dashboard/nav/', dashboard.nav, name='nav'),
     path('<id>/dashboard/styles/', dashboard.styles, name='styles'),
     path('<id>/dashboard/settings/', dashboard.settings, name='settings'),
+    path('<id>/dashboard/custom-domain/', studio.custom_domain_edit, name='custom_domain_edit'),
     path('<id>/dashboard/settings/advanced/', studio.advanced_settings, name='advanced_settings'),
     path('<id>/dashboard/directives/', studio.directive_edit, name="directive_edit"),
     path('<id>/dashboard/email-list/', emailer.email_list, name='email_list'),

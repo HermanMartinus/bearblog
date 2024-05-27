@@ -74,8 +74,6 @@ def studio(request, id):
         except DataError as error:
             error_messages.append(error)
 
-    info_message = blog.domain and not check_connection(blog)
-
     if not blog.subdomain == id:
         return redirect('dashboard', id=blog.subdomain)
 
@@ -83,7 +81,6 @@ def studio(request, id):
         'blog': blog,
         'error_messages': error_messages,
         'header_content': header_content,
-        'info_message': info_message
     })
 
 
@@ -91,7 +88,6 @@ def parse_raw_homepage(blog, header_content, body_content):
     raw_header = [item for item in header_content.split('\r\n') if item]
     
     # Clear out data
-    blog.domain = ''
     blog.meta_description = ''
     blog.meta_image = ''
     blog.meta_tag = ''
@@ -123,20 +119,6 @@ def parse_raw_homepage(blog, header_content, body_content):
                         error_messages.append(f"{value} is protected")
                 else:
                     error_messages.append(f"{value} has already been taken")
-        elif name == "custom_domain":
-            if blog.user.settings.upgraded:
-                if Blog.objects.filter(domain=value).exclude(pk=blog.pk).count() == 0:
-                    try:
-                        validator = URLValidator()
-                        validator('http://' + value)
-                        blog.domain = value
-                    except ValidationError:
-                        error_messages.append(f'{value} is an invalid custom_domain')
-                        print("error")
-                else:
-                    error_messages.append(f"{value} is already registered with another blog")
-            else:
-                error_messages.append("Upgrade your blog to add a custom domain")
         elif name == 'favicon':
             if len(value) < 20:
                 blog.favicon = value
@@ -444,6 +426,43 @@ def post_template(request, id):
     return render(request, 'studio/post_template_edit.html', {
         'blog': blog,
         'form': form})
+
+
+@login_required
+def custom_domain_edit(request, id):
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+
+    if not blog.user.settings.upgraded:
+        return redirect('upgrade')
+
+    error_messages = []
+
+    if request.method == "POST":
+        custom_domain = request.POST.get("custom-domain", "")
+
+        if Blog.objects.filter(domain=custom_domain).exclude(pk=blog.pk).count() == 0:
+            try:
+                validator = URLValidator()
+                validator('http://' + custom_domain)
+                blog.domain = custom_domain
+                blog.save()
+            except ValidationError:
+                error_messages.append(f'{custom_domain} is an invalid custom_domain')
+                print("error")
+        elif not custom_domain:
+            blog.domain = ''
+            blog.save()
+        else:
+            error_messages.append(f"{custom_domain} is already registered with another blog")
+
+    # If records not set correctly
+    if blog.domain and not check_connection(blog):
+        error_messages.append(f"The DNS records for { blog.domain } have not been set.")
+
+    return render(request, 'studio/custom_domain_edit.html', {
+        'blog': blog,
+        'error_messages': error_messages
+    })
 
 
 @login_required

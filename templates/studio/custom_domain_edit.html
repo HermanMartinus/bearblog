@@ -1,0 +1,111 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+Custom domain | Bear Blog
+{% endblock %}
+
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ request.user.settings.dashboard_styles | safe }}
+{% endblock %}
+
+{% block content %}
+<main>
+    <h1>Custom domain</h1>
+    
+    <form method="POST" class="post-form full-width">
+        {% csrf_token %}
+        <p style="line-height: 0">
+            <button onclick="event.preventDefault(); window.location = '/{{ blog.subdomain}}/dashboard/settings/'">&#8592; Back</button>
+            <button type="submit">Save</button>
+            <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}');">View</button>
+        </p>
+
+        {% if error_messages or info_message %}
+        <p style="color:lightsalmon">
+            {% for error_message in error_messages %}
+                {{ error_message }}<br>
+            {% endfor %}
+        </p>
+        {% endif %}
+        
+        <p>
+            <label>Domain:</label>
+            <br>
+            <input type="text" name="custom-domain" value="{{ blog.domain }}">
+            <p class="helptext">
+                example.com or blog.example.com
+            </p>
+        </p>
+    </form>
+
+    <p>
+        
+        <p>Once you have a domain registered with a <a href="https://porkbun.com" target="_blank">domain registrar</a>, add the following DNS records:</p>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Name/Host</th>
+                <th>Content/Answer</th>
+                <th>TTL</th>
+            </tr>
+            <tr>
+                <td>CNAME</td>
+                <td><small>@</small></td>
+                <td><small>domain-proxy.bearblog.dev</small></td>
+                <td>3600</td>
+            </tr>
+            <tr>
+                <td>CNAME</td>
+                <td><small>www</small></td>
+                <td><small>domain-proxy.bearblog.dev</small></td>
+                <td>3600</td>
+            </tr>
+        </table>
+
+        <details>
+            <summary><small>CNAME records aren't available at my registrar</small></summary>
+
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>Name/Host</th>
+                    <th>Content/Answer</th>
+                    <th>TTL</th>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td><small>@</small></td>
+                    <td><small>159.223.204.176</small></td>
+                    <td>3600</td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td><small>www</small></td>
+                    <td><small>159.223.204.176</small></td>
+                    <td>3600</td>
+                </tr>
+            </table>
+        </details>
+
+        <p>If you'd like your blog at a subdomain (eg: blog.example.com) set a single record with your subdomain (eg: blog) as the Name/Host.</p>
+
+        <p>
+            <small>
+                <b>If you're using Cloudflare set SSL/TLS Mode to Full (Strict), or turn off the proxy (the little orange cloud).</b>
+                <br>
+                <b>It may take up to 20 minutes for the DNS records to propagate.</b>
+                <br>
+                You can check whether your DNS records have propagated with
+                <a href="https://dnschecker.org/#CNAME/{{ blog.domain }}" target="_blank">DNS Checker</a>.
+                <br>
+                <br>
+                <a href="https://docs.bearblog.dev/custom-domains/" target="_blank">Having issues?</a>
+            </small>
+        </p>
+    </p>
+</main>
+
+{% endblock %}

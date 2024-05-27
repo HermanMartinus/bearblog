@@ -13,6 +13,9 @@
 {% block content %}
 <h1>Settings</h1>
 <p>
+    <a href="{% url 'custom_domain_edit' id=blog.subdomain %}">Custom domain</a>
+</p>
+<p>
     <a href="{% url 'directive_edit' id=blog.subdomain %}">Header and footer directives</a>
 </p>
 <p>
