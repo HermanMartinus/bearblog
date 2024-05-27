@@ -425,14 +425,14 @@ def custom_domain_edit(request, id):
     if request.method == "POST":
         custom_domain = request.POST.get("custom-domain", "")
 
-        if Blog.objects.filter(domain=custom_domain).exclude(pk=blog.pk).count() == 0:
+        if Blog.objects.filter(domain__iexact=custom_domain).exclude(pk=blog.pk).count() == 0:
             try:
                 validator = URLValidator()
                 validator('http://' + custom_domain)
                 blog.domain = custom_domain
                 blog.save()
             except ValidationError:
-                error_messages.append(f'{custom_domain} is an invalid custom_domain')
+                error_messages.append(f'{custom_domain} is an invalid domain')
                 print("error")
         elif not custom_domain:
             blog.domain = ''
