@@ -23,7 +23,8 @@
         </p>
         {% endif %}
         <label for="slug">Subdomain</label>
-        <input type="text" name="subdomain" value="{{ blog.subdomain }}" required/>
+        <input type="text" name="subdomain" value="{{ blog.subdomain }}" required autocorrect="off" autocomplete="off" spellcheck="off"/>
+        <span class="helptext">.bearblog.dev</span>
         <button type="submit">Save</button>
     </form>
 </p>
