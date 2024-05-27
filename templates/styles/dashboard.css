@@ -10,7 +10,7 @@
 .bear::before {
     content: "ᕦʕ •ᴥ•ʔᕤ";
     font-weight: 400;
-    animation: blink 5s infinite;
+    animation: blink 10s infinite;
 }
 
 .bear:hover::before {

@@ -24,7 +24,7 @@
     <a href="{% url 'account' %}" class="account"></a>
 </span>
 
-{% if not blog.reviewed and not blog.to_review and posts.count > 0 %}
+{% if not blog.reviewed and not blog.to_review and blog.posts.count > 0 %}
 <p class="notification">
     🐼 Want to show up on the
     <a href="https://bearblog.dev/discover/" target="_blank">Discovery feed</a>?
