@@ -10,23 +10,17 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
 from html import escape
-from bs4 import BeautifulSoup
-from lxml.html.clean import Cleaner, defs
 from slugify import slugify
 
-import mistune
 from mistune import HTMLRenderer, create_markdown
-from mistune.plugins.math import math
 
-import lxml
 import latex2mathml.converter
 import re
 
+from blogs.helpers import unmark
 from blogs.models import Post
 
 register = template.Library()
-
-SAFE_ATTRS = list(defs.safe_attrs) + ['style', 'controls', 'allowfullscreen', 'autoplay', 'loop', 'open']
 
 HOST_WHITELIST = [
     'www.youtube.com',
@@ -147,8 +141,8 @@ def markdown(content, blog_or_post=False):
         return ''
 
     # If not upgraded remove iframes and js
-    # if not blog or not blog.user.settings.upgraded:
-    #     processed_markup = clean(processed_markup)
+    if not blog or not blog.user.settings.upgraded:
+        processed_markup = clean(processed_markup)
 
     # Replace {{ xyz }} elements
     if blog:
@@ -265,21 +259,29 @@ def element_replacement(markup, blog, post=None):
 
 @register.filter
 def clean(markup):
-    defs.safe_attrs = SAFE_ATTRS
-    Cleaner.safe_attrs = defs.safe_attrs
-    cleaner = Cleaner(host_whitelist=HOST_WHITELIST, safe_attrs=SAFE_ATTRS)
-    try:
-        cleaned_markup = cleaner.clean_html(markup)
-    except lxml.etree.ParserError:
-        cleaned_markup = ""
+    cleaned_markup = re.sub(r'<script.*?>.*?</script>', '', markup, flags=re.DOTALL | re.IGNORECASE)
+    
+    cleaned_markup = re.sub(r'\son\w+="[^"]*"', '', cleaned_markup, flags=re.IGNORECASE)
+    cleaned_markup = re.sub(r'\son\w+=\'[^\']*\'', '', cleaned_markup, flags=re.IGNORECASE)
+    cleaned_markup = re.sub(r'\son\w+=\w+', '', cleaned_markup, flags=re.IGNORECASE)
+    cleaned_markup = re.sub(r'(<\w+\s+.*?)(href|src)\s*=\s*["\']?javascript:[^"\']*["\']?', r'\1', cleaned_markup, flags=re.IGNORECASE)
+    cleaned_markup = re.sub(r'<(object|embed|form|input|button).*?>', '', cleaned_markup, flags=re.IGNORECASE)
+    cleaned_markup = re.sub(r'</(object|embed|form|input|button)>', '', cleaned_markup, flags=re.IGNORECASE)
+    
+    def iframe_whitelisted(match):
+        src = match.group(2)
+        if any(host in src for host in HOST_WHITELIST):
+            return match.group(0)
+        return ''
+
+    cleaned_markup = re.sub(r'(<iframe.*?src=["\'])([^"\']*)(["\'].*?>.*?</iframe>)', iframe_whitelisted, cleaned_markup, flags=re.DOTALL | re.IGNORECASE)
 
     return cleaned_markup
 
 
 @register.filter
-def unmark(content):
-    markup = mistune.html(content)
-    return BeautifulSoup(markup, "lxml").text.strip()[:400] + '...'
+def remove_markup(content):
+    return unmark(content)[:400] + '...'
 
 
 @register.simple_tag

@@ -1,4 +1,3 @@
-import string
 from django.utils import timezone
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
@@ -6,13 +5,13 @@ from django.contrib.gis.geoip2 import GeoIP2
 from django.http import Http404
 from django.conf import settings
 
+import re
+import string
 import os
 import random
 import threading
 import bleach
-from bs4 import BeautifulSoup
 from requests.exceptions import ConnectionError, ReadTimeout
-import mistune
 import requests
 import subprocess
 from datetime import timedelta
@@ -129,9 +128,23 @@ def get_country(user_ip):
         return {}
 
 
-def unmark(markdown):
-    markup = mistune.html(markdown)
-    return BeautifulSoup(markup, "lxml").text.strip()[:157] + '...'
+def unmark(content):
+    content = re.sub(r'^\s{0,3}#{1,6}\s+.*$', '', content, flags=re.MULTILINE)
+    content = re.sub(r'^\s{0,3}[-*]{3,}\s*$', '', content, flags=re.MULTILINE)
+    content = re.sub(r'^\s{0,3}>\s+.*$', '', content, flags=re.MULTILINE)
+    content = re.sub(r'```.*?```', '', content, flags=re.DOTALL)
+    content = re.sub(r'`[^`]+`', '', content)
+    content = re.sub(r'!\[.*?\]\(.*?\)', '', content)
+    content = re.sub(r'\[.*?\]\(.*?\)', '', content)
+    content = re.sub(r'(\*\*|__)(.*?)\1', '', content)
+    content = re.sub(r'(\*|_)(.*?)\1', '', content)
+    content = re.sub(r'~~.*?~~', '', content)
+    content = re.sub(r'^\s{0,3}[-*+]\s+.*$', '', content, flags=re.MULTILINE)
+    content = re.sub(r'^\s{0,3}\d+\.\s+.*$', '', content, flags=re.MULTILINE)
+    content = re.sub(r'^\s*\|.*?\|\s*$', '', content, flags=re.MULTILINE)
+    content = re.sub(r'^\s*[:-]{3,}\s*$', '', content, flags=re.MULTILINE)
+
+    return content
 
 
 def clean_text(text):

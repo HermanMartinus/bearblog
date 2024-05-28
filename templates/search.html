@@ -43,7 +43,7 @@
                     {{ post.upvotes }}
                 </small>
                 <p>
-                    {{ post.content|unmark }}
+                    {{ post.content|remove_markup }}
                 </p>
             </small>
         </div>
