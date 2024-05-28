@@ -74,5 +74,5 @@ def feed(request):
             atomfeed = fg.atom_str(pretty=True)
             return HttpResponse(atomfeed, content_type='application/atom+xml')
     except ValueError as e:
-        logger.error(f'Error generating feed for {blog}', exc_info=True)
+        # logger.error(f'Error generating feed for {blog}', exc_info=True)
         return HttpResponseServerError("An error occurred while generating the feed.")
