@@ -12,7 +12,7 @@ import os
 
 def signup(request):
     title = request.POST.get('title', '')
-    subdomain = slugify(request.POST.get('subdomain', ''))
+    subdomain = slugify(request.POST.get('subdomain', '')).replace('_', '-')
     content = request.POST.get('content', '')
     email = request.POST.get('email', '')
     password = request.POST.get('password', '')
