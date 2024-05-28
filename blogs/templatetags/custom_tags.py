@@ -147,8 +147,8 @@ def markdown(content, blog_or_post=False):
         return ''
 
     # If not upgraded remove iframes and js
-    if not blog or not blog.user.settings.upgraded:
-        processed_markup = clean(processed_markup)
+    # if not blog or not blog.user.settings.upgraded:
+    #     processed_markup = clean(processed_markup)
 
     # Replace {{ xyz }} elements
     if blog:
