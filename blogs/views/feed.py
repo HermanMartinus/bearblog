@@ -15,8 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def clean_string(s):
-    return re.sub(r'[\x00-\x1F\x7F]', '', s)
-
+    return re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', s)
 
 def feed(request):
     blog = resolve_address(request)
