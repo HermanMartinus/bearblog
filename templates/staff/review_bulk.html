@@ -58,8 +58,8 @@ body {
         {% for post in blog.posts.all %}
         <li>
             <i>
-                <time datetime="{{ post.published_date|date:'Y-m-d' }}">
-                    - {{ post.published_date|date:'d M, Y' }}
+                <time datetime="{{ post.published_date|date:'Y-m-d\TH:i:s\Z' }}">
+                    {% format_date post.published_date blog.date_format blog.lang %}
                 </time>
             </i>
             <h3><a href="{{ root }}/{{ post.slug }}/" target="_blank">{{ post.title }}</a></h3>

@@ -1,12 +1,46 @@
 <input type="file" id="file" hidden multiple accept="image/*">
 
 <script>
+	// Handle local time display
+	function utcToLocal(utcDatetimeStr) {
+		const utcDate = new Date(utcDatetimeStr + 'Z');
+
+		const year = utcDate.getFullYear();
+		const month = (utcDate.getMonth() + 1).toString().padStart(2, '0');
+		const day = utcDate.getDate().toString().padStart(2, '0');
+		const hours = utcDate.getHours().toString().padStart(2, '0');
+		const minutes = utcDate.getMinutes().toString().padStart(2, '0');
+
+		return `${year}-${month}-${day} ${hours}:${minutes}`;
+	}
+
+	function localToUtc(localDatetimeStr) {
+		const localDate = new Date(localDatetimeStr);
+	
+		const year = localDate.getUTCFullYear();
+		const month = (localDate.getUTCMonth() + 1).toString().padStart(2, '0');
+		const day = localDate.getUTCDate().toString().padStart(2, '0');
+		const hours = localDate.getUTCHours().toString().padStart(2, '0');
+		const minutes = localDate.getUTCMinutes().toString().padStart(2, '0');
+	
+		return `${year}-${month}-${day} ${hours}:${minutes}`;
+	}
+	
+	//$publishedDate = document.getElementById('published-date');
+	//$publishedDate.innerText = utcToLocal($publishedDate.innerText);
+
+	// Handle form submission
 	const form = document.querySelector('form')
     form.addEventListener('submit', function() {
         addHeaderContentToFormAndSubmit()
     });
 
 	const addHeaderContentToFormAndSubmit = () => {
+		// Convert local time back to UTC
+		// if ($publishedDate) {
+		// 	$publishedDate.innerText = localToUtc($publishedDate.innerText);
+		//}
+
 		const header_content = document.getElementById('header_content').innerText;
         document.getElementById('hidden_header_content').value = header_content;
 		form.submit()
@@ -45,19 +79,6 @@
 	textarea.addEventListener("scroll", function(event) {
 		sessionStorage.setItem('textareaY', textarea.scrollTop)
 	})
-
-	{% comment %} textarea.addEventListener('input', autoResize, false);
-
-	function autoResize() {
-		this.style.height = 'auto';
-		this.style.height = this.scrollHeight + 'px';
-	}
-	autoResize.call(textarea);
-
-	window.scrollTo(0, sessionStorage.getItem('scrollY'))
-	window.addEventListener("scroll", function(event) {
-		sessionStorage.setItem('scrollY', window.scrollY)
-	}) {% endcomment %}
 
 	const previewButton = document.querySelector('#preview')
 	if (previewButton) {
