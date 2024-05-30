@@ -85,6 +85,7 @@ def parse_raw_homepage(blog, header_content, body_content):
     raw_header = [item for item in header_content.split('\r\n') if item]
     
     # Clear out data
+    blog.favicon = ''
     blog.meta_description = ''
     blog.meta_image = ''
     blog.lang = 'en'
@@ -107,7 +108,7 @@ def parse_raw_homepage(blog, header_content, body_content):
             if len(value) < 20:
                 blog.favicon = value
             else:
-                error_messages.append("Favicon is too long")
+                error_messages.append("Favicon is too long. Use an emoji.")
         elif name == 'meta_description':
             blog.meta_description = value
         elif name == 'meta_image':
@@ -123,8 +124,6 @@ def parse_raw_homepage(blog, header_content, body_content):
         blog.title = "My blog"
     if not blog.subdomain:
         blog.slug = slugify(blog.user.username)
-    if not blog.favicon:
-        blog.favicon = "🐻"
 
     blog.content = body_content
     blog.last_modified = timezone.now()

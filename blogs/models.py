@@ -66,7 +66,7 @@ class Blog(models.Model):
         default=False,
         choices=((True, 'Overwrite default styles'), (False, 'Extend default styles')),
         verbose_name='')
-    favicon = models.CharField(max_length=10, default="🐼")
+    favicon = models.CharField(max_length=100, default="🐼", blank=True)
 
     date_format = models.CharField(max_length=32, blank=True)
 

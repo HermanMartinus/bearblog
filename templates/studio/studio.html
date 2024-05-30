@@ -53,8 +53,8 @@
         contenteditable="true"
         style="margin-bottom:-1px; border-bottom: 1px solid lightgrey;"
     >
-        <b>title:</b> {{ blog.title }}<br>
-        <b>favicon:</b> {{ blog.favicon }}{% if blog.meta_description %}<br>
+        <b>title:</b> {{ blog.title }}{% if blog.favicon %}<br>
+        <b>favicon:</b> {{ blog.favicon }}{% endif %}{% if blog.meta_description %}<br>
         <b>meta_description:</b> {{ blog.meta_description }}{% endif %}{% if blog.meta_image %}<br>
         <b>meta_image:</b> {{ blog.meta_image }}{% endif %}{% if blog.lang != 'en' %}<br>
         <b>lang:</b> {{ blog.lang }}{% endif %}{% if blog.date_format != '' %}<br>
