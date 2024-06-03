@@ -1,16 +1,60 @@
 <input type="file" id="file" hidden multiple accept="image/*">
 
 <script>
-	const form = document.querySelector('form')
-    form.addEventListener('submit', function() {
+
+	const $publishedDate = document.getElementById('published-date');
+	const $form = document.querySelector('form');
+	const $headerContent = document.getElementById('header_content');
+	const $hiddenHeaderContent = document.getElementById('hidden_header_content');
+	const $textarea = document.querySelector('textarea')
+	const $previewButton = document.getElementById('preview')
+	const $uploadButton = document.querySelector('#upload-image')
+	
+	const timezoneOffset = () => {
+		const offset = -new Date().getTimezoneOffset();
+		const sign = offset >= 0 ? '+' : '-';
+		const hours = String(Math.abs(offset / 60)).padStart(2, '0');
+		const minutes = String(Math.abs(offset % 60)).padStart(2, '0');
+		const signedOffset = `${sign}${hours}:${minutes}`;
+
+		return signedOffset
+	};
+
+	const utcToLocalTime = (utcDateTime) => {
+		const offset = -new Date().getTimezoneOffset();
+	
+		const utcDate = new Date(utcDateTime + 'Z'); // Adding 'Z' to indicate UTC
+		const localDate = new Date(utcDate.getTime() + offset * 60000);
+		const formattedLocalDate = localDate.toISOString().slice(0, 16).replace('T', ' ');
+		return formattedLocalDate;
+	};
+
+	// Showing local published date
+	if ($publishedDate) {
+		try {
+			$publishedDate.innerText = utcToLocalTime($publishedDate.innerText);
+		} catch (error) {
+			console.error('Error converting UTC to local time:', error);
+		}
+	}
+
+	// Submitting form with header content
+	const addHeaderContentToFormAndSubmit = () => {
+		if ($publishedDate) {
+			try {
+				$publishedDate.innerText = $publishedDate.innerText + timezoneOffset();
+			} catch (error) {
+				console.error('Error adding timezone offset:', error);
+			}
+		}
+		$hiddenHeaderContent.value = $headerContent.innerText;
+		$form.submit();
+	}
+
+	$form.addEventListener('submit', function(e) {
+		e.preventDefault();
         addHeaderContentToFormAndSubmit()
     });
-
-	const addHeaderContentToFormAndSubmit = () => {
-		const header_content = document.getElementById('header_content').innerText;
-        document.getElementById('hidden_header_content').value = header_content;
-		form.submit()
-	}
 
 	document.addEventListener('keydown', function(event) {
 		if ((event.ctrlKey || event.metaKey) && event.keyCode === 83) {
@@ -20,7 +64,7 @@
 	});
 
 	// Handle pasting of HTML into header content
-	document.getElementById('header_content').addEventListener('paste', function(e) {
+	$headerContent.addEventListener('paste', function(e) {
         e.preventDefault();
 
         let text = '';
@@ -39,28 +83,13 @@
     });
 
 	// Handle saving scroll position
-	const textarea = document.querySelector('textarea')
-
-	textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
-	textarea.addEventListener("scroll", function(event) {
-		sessionStorage.setItem('textareaY', textarea.scrollTop)
+	$textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
+	$textarea.addEventListener("scroll", function(event) {
+		sessionStorage.setItem('textareaY', $textarea.scrollTop)
 	})
 
-	{% comment %} textarea.addEventListener('input', autoResize, false);
-
-	function autoResize() {
-		this.style.height = 'auto';
-		this.style.height = this.scrollHeight + 'px';
-	}
-	autoResize.call(textarea);
-
-	window.scrollTo(0, sessionStorage.getItem('scrollY'))
-	window.addEventListener("scroll", function(event) {
-		sessionStorage.setItem('scrollY', window.scrollY)
-	}) {% endcomment %}
-
-	const previewButton = document.querySelector('#preview')
-	if (previewButton) {
+	// Preview post
+	if ($previewButton) {
 		const previewForm = document.createElement('form')
 		previewForm.target = "print_popup"
 		previewForm.method = "POST"
@@ -78,7 +107,7 @@
 		previewForm.appendChild(bodyContent)
 		document.body.appendChild(previewForm)
 	
-		previewButton.onclick = event => {
+		$previewButton.onclick = event => {
 			window.open('about:blank','print_popup','width=1000,height=800');
 			headerContent.value = document.querySelector('#header_content').innerText
 			bodyContent.value = document.querySelector('#body_content').value
@@ -86,18 +115,20 @@
 		}
 	}
 
+	// Upgraded features
 	{% if request.user.settings.upgraded %}
-	const uploadButton = document.querySelector('#upload-image')
+	// Upload images
+	const $fileInput = document.getElementById("file");
 
-	uploadButton.onclick = event => {
+	$uploadButton.onclick = event => {
 	    event.preventDefault()
-	    document.getElementById("file").click()
+	    $fileInput.click()
 	}
 
-	document.getElementById("file").addEventListener("change", upload)
+	$fileInput.addEventListener("change", upload)
 
 	function upload() {
-	    if(document.getElementById("file").files[0].size > 10000000){
+	    if($fileInput.files[0].size > 10000000){
 	        alert(`File over the 10mb limit. Use https://tinypng.com to minimise it.`)
 	        return
 	    }
@@ -105,18 +136,16 @@
 	    var formData = new FormData();
 	    var target = "{% url 'upload_image' id=blog.subdomain %}"
 
-	    var fileInput = document.getElementById("file")
-	    for (var i = 0; i<fileInput.files.length; i++) {
-	        formData.append("file", fileInput.files[i])
+	    for (var i = 0; i<$fileInput.files.length; i++) {
+	        formData.append("file", $fileInput.files[i])
 	    }
-	    const textarea = document.querySelector('textarea')
-	    const position = textarea.selectionStart || 0
+	    const position = $textarea.selectionStart || 0
 
 	    var xhr = new XMLHttpRequest()
 	    var eventSource = xhr.upload || xhr
 
 	    eventSource.addEventListener("progress", function(e){
-	        uploadButton.innerText = "Uploading..."
+	        $uploadButton.innerText = "Uploading..."
 	    });
 	    xhr.open("POST", target, true)
 	    xhr.send(formData)
@@ -126,18 +155,18 @@
 						const blogTitle = "{{ blog.title|escapejs }}"
 						const toInsert = `\n![${blogTitle}](${image})\n`
 						if (position == 0) {
-							textarea.value += toInsert
+							$textarea.value += toInsert
 						} else {
-							textarea.value = textarea.value.substring(0, position) + toInsert + textarea.value.substring(position, textarea.value.length)
+							$textarea.value = $textarea.value.substring(0, position) + toInsert + $textarea.value.substring(position, $textarea.value.length)
 						}
 	            })
-	            uploadButton.innerText = 'The image(s) have been added'
-	            setTimeout(() => uploadButton.innerText = "Insert image", 3000)
+	            $uploadButton.innerText = 'The image(s) have been added'
+	            setTimeout(() => $uploadButton.innerText = "Insert image", 3000)
 	        }
 	    };
 	}
 	{% else %}
-	document.querySelector('#upload-image').onclick = event => {
+	$uploadButton.onclick = event => {
 	    event.preventDefault()
 		if (confirm("You've discovered a Pro feature ʕ•ᴥ•ʔﾉ♡\n\nUpgrade to unlock it and support the Tiny Internet!")) {
 	    	window.open('/dashboard/upgrade/')

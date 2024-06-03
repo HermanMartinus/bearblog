@@ -183,7 +183,7 @@ def post(request, id, uid=None):
                     slug = value
                 elif name == 'alias':
                     post.alias = value
-                elif name == 'published_date':
+                elif name == 'posted_at':
                     # Check if previously posted 'now'
                     value = str(value).replace('/', '-')
                     if not str(post.published_date).startswith(value):
