@@ -5,7 +5,7 @@
     <li>
         <span>
             <i>
-                <time datetime="{{ post.published_date|date:'Y-m-d H:i' }}">
+                <time datetime="{{ post.published_date|date:'Y-m-d\TH:i\Z' }}">
                     {% format_date post.published_date blog.date_format blog.lang tz %}
                 </time>
             </i>
