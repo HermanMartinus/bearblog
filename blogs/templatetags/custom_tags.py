@@ -74,8 +74,14 @@ class MyRenderer(HTMLRenderer):
     def link(self, text, url, title=None):
         if 'tab:' in url:
             url = url.replace('tab:', '')
+            if title:
+                return f"<a href='{url}' target='_blank' title='{title}'>{text}</a>"
             return f"<a href='{url}' target='_blank'>{text}</a>"
+        
+        if title:
+            return f"<a href='{url}' title='{title}'>{text}</a>"
         return f"<a href='{url}'>{text}</a>"
+
 
     def text(self, text):
         return typographic_replacements(text)
