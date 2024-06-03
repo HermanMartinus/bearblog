@@ -188,7 +188,7 @@ def post(request, id, uid=None):
                     try:
                         post.published_date = timezone.datetime.fromisoformat(value)
                     except ValueError:
-                        error_messages.append('Bad date format. Use YYYY-MM-DD')
+                        error_messages.append('Bad date format. Use YYYY-MM-DD HH:MM')
                 elif name == 'tags':
                     tags = []
                     for tag in value.split(','):

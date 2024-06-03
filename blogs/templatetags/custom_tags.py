@@ -301,7 +301,7 @@ def format_date(date, format_string, lang=None, tz='UTC'):
         timezone.activate(tz)
         date = timezone.localtime(date)
     except Exception as e:
-        print('Failed to convert to local')
+        pass
 
     timezone.deactivate()
 
