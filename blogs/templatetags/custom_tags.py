@@ -303,6 +303,8 @@ def format_date(date, format_string, lang=None, tz='UTC'):
     except Exception as e:
         print('Failed to convert to local')
 
+    timezone.deactivate()
+
     if lang:
         current_lang = translation.get_language()
         translation.activate(lang)
