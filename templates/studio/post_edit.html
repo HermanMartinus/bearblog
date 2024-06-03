@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_tags %}
 
 {% block title %}
 {% if post %}
@@ -51,7 +52,7 @@ New post | Bear Blog
             {% endif %}
         </button>
     </p>
-    
+
     <details style="font-size: 12px; margin-bottom: 10px;">
         <summary>
             Attributes
@@ -86,7 +87,7 @@ New post | Bear Blog
         <b>title:</b> {{ post.title }}<br>
         <b>link:</b> {{ post.slug }}{% if post.alias %}<br>
         <b>alias:</b> {{ post.alias }}{% endif %}<br>
-        <b>published_date:</b> <span id="published-date">{{ post.published_date|date:"Y-m-d H:i" }}</span>{% if post.canonical_url %}<br>
+        <b>published_date:</b> <span id="published-date">{% format_date post.published_date 'Y-m-d H:i' 'en' tz %}</span>{% if post.canonical_url %}<br>
         <b>canonical_url:</b> {{ post.canonical_url }}{% endif %}{% if post.meta_description %}<br>
         <b>meta_description:</b> {{ post.meta_description }}{% endif %}{% if post.meta_image %}<br>
         <b>meta_image:</b> {{ post.meta_image }}{% endif %}{% if post.lang %}<br>

@@ -34,8 +34,8 @@
     {% for post in posts %}
     <li>
         <span>
-            <time datetime="{{ post.published_date|date:'Y-m-d\TH:i:s\Z' }}">
-                {% format_date post.published_date blog.date_format blog.lang %}
+            <time datetime="{{ post.published_date|date:'Y-m-d H:i' }}">
+                {% format_date post.published_date blog.date_format blog.lang tz %}
             </time>
         </span>
         <a href="{% url 'post_edit' id=blog.subdomain  uid=post.uid %}">

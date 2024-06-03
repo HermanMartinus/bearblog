@@ -108,7 +108,7 @@ def posts(request):
             'posts': blog_posts,
             'root': blog.useful_domain,
             'meta_description':  meta_description,
-            'query': tag,
+            'query': tag
         }
     )
 

@@ -291,11 +291,17 @@ def remove_markup(content):
 
 
 @register.simple_tag
-def format_date(date, format_string, lang=None):
+def format_date(date, format_string, lang=None, tz='UTC'):
     if date is None:
         return ''
     if not format_string:
         format_string = 'd M, Y'
+
+    try:
+        timezone.activate(tz)
+        date = timezone.localtime(date)
+    except Exception as e:
+        print('Failed to convert to local')
 
     if lang:
         current_lang = translation.get_language()

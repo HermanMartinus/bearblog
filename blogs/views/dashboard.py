@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 
-
 from ipaddr import client_ip
 from unicodedata import lookup
 import json
@@ -13,7 +12,6 @@ import os
 import boto3
 import time
 import djqscsv
-
 
 from blogs.forms import NavForm, StyleForm
 from blogs.helpers import get_country, is_protected
@@ -90,7 +88,7 @@ def posts_edit(request, id):
     return render(request, 'dashboard/posts.html', {
         'pages': False,
         'blog': blog,
-        'posts': posts,
+        'posts': posts
     })
 
 @login_required
@@ -102,7 +100,7 @@ def pages_edit(request, id):
     return render(request, 'dashboard/posts.html', {
         'pages': True,
         'blog': blog,
-        'posts': posts,
+        'posts': posts
     })
 
 

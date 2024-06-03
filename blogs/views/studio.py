@@ -184,13 +184,11 @@ def post(request, id, uid=None):
                 elif name == 'alias':
                     post.alias = value
                 elif name == 'published_date':
-                    # Check if previously posted 'now'
                     value = str(value).replace('/', '-')
-                    if not str(post.published_date).startswith(value):
-                        try:
-                            post.published_date = timezone.datetime.fromisoformat(value)
-                        except ValueError:
-                            error_messages.append('Bad date format. Use YYYY-MM-DD')
+                    try:
+                        post.published_date = timezone.datetime.fromisoformat(value)
+                    except ValueError:
+                        error_messages.append('Bad date format. Use YYYY-MM-DD')
                 elif name == 'tags':
                     tags = []
                     for tag in value.split(','):

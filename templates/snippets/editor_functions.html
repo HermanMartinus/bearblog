@@ -20,24 +20,6 @@
 		return signedOffset
 	};
 
-	const utcToLocalTime = (utcDateTime) => {
-		const offset = -new Date().getTimezoneOffset();
-	
-		const utcDate = new Date(utcDateTime + 'Z'); // Adding 'Z' to indicate UTC
-		const localDate = new Date(utcDate.getTime() + offset * 60000);
-		const formattedLocalDate = localDate.toISOString().slice(0, 16).replace('T', ' ');
-		return formattedLocalDate;
-	};
-
-	// Showing local published date
-	if ($publishedDate) {
-		try {
-			$publishedDate.innerText = utcToLocalTime($publishedDate.innerText);
-		} catch (error) {
-			console.error('Error converting UTC to local time:', error);
-		}
-	}
-
 	// Submitting form with header content
 	const addHeaderContentToFormAndSubmit = () => {
 		if ($publishedDate) {
