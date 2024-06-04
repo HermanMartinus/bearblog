@@ -3,13 +3,13 @@ from django.db import DataError
 from django.forms import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render, redirect
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import URLValidator
 
+from datetime import datetime
 import json
-import re
 import random
 import string
 
@@ -184,11 +184,20 @@ def post(request, id, uid=None):
                 elif name == 'alias':
                     post.alias = value
                 elif name == 'published_date':
-                    value = str(value).replace('/', '-')
-                    try:
-                        post.published_date = timezone.datetime.fromisoformat(value)
-                    except ValueError:
-                        error_messages.append('Bad date format. Use YYYY-MM-DD HH:MM')
+                    if not value:
+                        post.published_date = timezone.now()
+                    else:
+                        value = str(value).replace('/', '-')
+                        try:
+                            # Convert given date/time from local timezone to UTC
+                            naive_datetime = datetime.fromisoformat(value)
+                            user_timezone = request.COOKIES.get('timezone', 'UTC')
+                            user_tz = timezone.get_default_timezone() if user_timezone == 'UTC' else timezone.pytz.timezone(user_timezone)
+                            aware_datetime = timezone.make_aware(naive_datetime, user_tz)
+                            utc_datetime = aware_datetime.astimezone(timezone.utc)
+                            post.published_date = utc_datetime
+                        except ValueError:
+                            error_messages.append('Bad date format. Use YYYY-MM-DD HH:MM')
                 elif name == 'tags':
                     tags = []
                     for tag in value.split(','):

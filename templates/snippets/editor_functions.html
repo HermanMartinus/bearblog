@@ -10,25 +10,8 @@
 	const $previewButton = document.getElementById('preview')
 	const $uploadButton = document.querySelector('#upload-image')
 	
-	const timezoneOffset = () => {
-		const offset = -new Date().getTimezoneOffset();
-		const sign = offset >= 0 ? '+' : '-';
-		const hours = String(Math.abs(offset / 60)).padStart(2, '0');
-		const minutes = String(Math.abs(offset % 60)).padStart(2, '0');
-		const signedOffset = `${sign}${hours}:${minutes}`;
-
-		return signedOffset
-	};
-
 	// Submitting form with header content
 	const addHeaderContentToFormAndSubmit = () => {
-		if ($publishedDate) {
-			try {
-				$publishedDate.innerText = $publishedDate.innerText + timezoneOffset();
-			} catch (error) {
-				console.error('Error adding timezone offset:', error);
-			}
-		}
 		$hiddenHeaderContent.value = $headerContent.innerText;
 		$form.submit();
 	}
