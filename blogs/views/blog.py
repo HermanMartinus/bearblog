@@ -169,58 +169,6 @@ def post(request, slug):
     )
 
 
-def generate_meta_image(request, slug):
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
-
-    post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
-
-    img = Image.new('RGB', (250, 180), color="#01242e")
-    d = ImageDraw.Draw(img)
-
-    font_title = ImageFont.load_default()
-    font_date = ImageFont.load_default()
-    font_description = ImageFont.load_default()
-
-    description = post.meta_description or post.content
-    if len(description) > 180:
-        description = description[0:180].strip() + '...'
-
-    # Insert line breaks after a space without breaking a word
-    words = description.split(' ')
-    lines = []
-    current_line = ''
-
-    for word in words:
-        if len(current_line) + len(word) <= 35:
-            current_line += ' ' + word if current_line else word
-        else:
-            lines.append(current_line.strip())
-            current_line = word
-
-    if current_line:
-        lines.append(current_line.strip())
-
-    description = '\n'.join(lines)
-
-    title = f"# {post.title}"
-    if len(title) > 35:
-        title = f"{title[0:35].strip()}..."
-
-    # Draw text
-    d.text((10, 10), title, fill=(255, 255, 255), font=font_title)
-    d.text((10, 40), f"*{format_date(post.published_date, blog.date_format, blog.lang)}*", fill=(255, 255, 255), font=font_date)
-    d.text((10, 60), description, fill=(255, 255, 255), font=font_description)
-    d.text((10, 160), blog.useful_domain, fill=(255, 255, 255), font=font_description)
-
-    img_io = BytesIO()
-    img.save(img_io, 'PNG', quality=100)
-    img_io.seek(0)
-
-    return FileResponse(img_io, filename='meta.png', content_type='image/png')
-
-
 @csrf_exempt
 def upvote(request, uid):
     hash_id = salt_and_hash(request, 'year')
