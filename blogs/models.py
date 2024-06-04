@@ -81,11 +81,6 @@ class Blog(models.Model):
     @property
     def older_than_one_day(self):
         return (timezone.now() - self.created_date).days > 1
-    
-    @property
-    def created_after_mandatory_opt_in(self):
-        mandatory_opt_in_date = timezone.make_aware(timezone.datetime(2024, 2, 22))
-        return self.created_date > mandatory_opt_in_date
 
     @property
     def user_email_verified(self):
