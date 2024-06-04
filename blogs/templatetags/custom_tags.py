@@ -72,6 +72,8 @@ class MyRenderer(HTMLRenderer):
         return f'<h{level} id={slugify(text)}>{text}</h{level}>'
     
     def link(self, text, url, title=None):
+        if title:
+            title = title.replace("'", "&apos;").replace('"', "&quot;")
         if 'tab:' in url:
             url = url.replace('tab:', '')
             if title:
