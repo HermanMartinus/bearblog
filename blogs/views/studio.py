@@ -196,7 +196,7 @@ def post(request, id, uid=None):
                             aware_datetime = timezone.make_aware(naive_datetime, user_tz)
                             utc_datetime = aware_datetime.astimezone(timezone.utc)
                             post.published_date = utc_datetime
-                        except ValueError:
+                        except Exception as e:
                             error_messages.append('Bad date format. Use YYYY-MM-DD HH:MM')
                 elif name == 'tags':
                     tags = []
