@@ -209,9 +209,9 @@ class Post(models.Model):
             allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
             self.uid = ''.join(random.choice(allowed_chars) for _ in range(20))
 
-        # Prevent future score from holding currently true
-        self.update_score()
-        
+        # Recalculate score to prevent future date spoofing
+        # self.update_score()
+
         super(Post, self).save(*args, **kwargs)
 
     def __str__(self):
