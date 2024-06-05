@@ -246,6 +246,9 @@ def post(request, id, uid=None):
             else:
                 post.save()
 
+                # Recalculate score to prevent future date spoofing
+                post.update_score()
+                
                 if is_new:
                     # Self-upvote
                     upvote = Upvote(post=post, hash_id=salt_and_hash(request, 'year'))
