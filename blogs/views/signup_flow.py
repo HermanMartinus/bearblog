@@ -1,4 +1,5 @@
 
+from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model, login
@@ -51,19 +52,23 @@ def signup(request):
         if user:
             error_messages.append('An account with this email address already exists.')
         else:
-            user = User.objects.create_user(username=email, email=email, password=password)
-
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            try:
+                user = User.objects.create_user(username=email, email=email, password=password)
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
             
-            blog = Blog.objects.filter(user=user).first()
-            if not blog:
-                blog = Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
+                blog = Blog.objects.filter(user=user).first()
+                if not blog:
+                    blog = Blog.objects.create(title=title, subdomain=subdomain, content=content, user=user)
 
-            # Log in the user
-            login(request, user)
+                # Log in the user
+                login(request, user)
+
+                return redirect('dashboard', id=blog.subdomain)
+            except IntegrityError:
+                error_messages.append('An account with this email address already exists.')
+                
 
             
-            return redirect('dashboard', id=blog.subdomain)
 
     if title and subdomain and content and (not email or not password):
         return render(request, 'signup_flow/step_2.html', {
