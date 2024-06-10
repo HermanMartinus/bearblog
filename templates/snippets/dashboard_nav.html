@@ -12,7 +12,7 @@
     <a href="{% url 'email_list' id=blog.subdomain %}">Emails</a>
     {% endif %}
     {% if not blog.user.settings.upgraded %}
-    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear"></span></a>
+    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear flex"></span></a>
     {% endif %}
 </span>
 
@@ -21,7 +21,7 @@
     <a href="{% url 'analytics' id=blog.subdomain %}">Analytics</a>
     {% endif %}
     <a href="{% url 'settings' id=blog.subdomain %}">Settings</a>
-    <a href="{% url 'account' %}" class="account"></a>
+    <a href="{% url 'account' %}" class="account bear"></a>
 </span>
 
 {% if not blog.reviewed and not blog.to_review and blog.posts.count > 0 %}

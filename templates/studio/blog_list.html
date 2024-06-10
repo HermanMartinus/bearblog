@@ -18,7 +18,6 @@
 {% for blog in blogs %}
     <li>
         <a href="{% url 'dashboard' id=blog.subdomain %}">{{ blog.title }}</a>
-        {% comment %} <a href="{{ blog.dynamic_useful_domain }}" target="_blank">↪</a> {% endcomment %}
     </li>
 {% endfor %}
 </ul>
@@ -32,7 +31,7 @@
 </small>
 {% if request.user.blogs.all|length > 0 and not request.user.settings.upgraded %}
 <p>
-    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs <span class="bear"></span></a>
+    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs <span class="bear flex"></span></a>
 </p>
 {% else %}
 {% if error_messages %}

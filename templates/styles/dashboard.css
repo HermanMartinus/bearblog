@@ -1,5 +1,24 @@
-.title-bear {
+.bear {
     font-weight: 400;
+    font-family:  "Lucida", monospace;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.flex::before {
+    content: "ᕦʕ •ᴥ•ʔᕤ";
+    animation: blink 10s infinite;
+}
+
+.flex:hover::before {
+    content: "ᕙʕ ಠᴥಠʔᕗ";
+    animation: none;
+}
+
+.upgrade:hover .flex::before {
+    content: "ᕙʕ ಠᴥಠʔᕗ";
+    animation: none;
+    text-decoration: underline;
 }
 
 @keyframes blink {
@@ -7,36 +26,16 @@
     97%, 100% { content: "ᕦʕ -ᴥ-ʔᕤ"; }
 }
 
-.bear::before {
-    content: "ᕦʕ •ᴥ•ʔᕤ";
-    font-weight: 400;
-    animation: blink 10s infinite;
+a.account:hover {
+    text-decoration: none;
 }
 
-.bear:hover::before {
-    content: "ᕙʕ ಠᴥಠʔᕗ";
-    animation: none;
-}
-
-.upgrade .bear::before {
-    content: "ᕦʕ.•ᴥ•ʔᕤ";
-    font-weight: 400;
-}
-
-.upgrade:hover .bear::before {
-    content: "ᕙʕ.ಠᴥಠʔᕗ";
-}
-
-.account::before {
+a.account::before {
     content: "ʕ-ᴥ-ʔ";
-    width: 47px;
-    display: inline-block;
-    text-align: center;
 }
 
 .account:hover::before {
     content: "ʕ•ᴥ•ʔ";
-    text-decoration: none;
 }
 
 header nav {
