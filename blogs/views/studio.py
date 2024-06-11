@@ -14,7 +14,7 @@ import random
 import string
 
 from blogs.forms import AdvancedSettingsForm, BlogForm, DashboardCustomisationForm, PostTemplateForm
-from blogs.helpers import check_connection, is_protected, pseudo_word, salt_and_hash
+from blogs.helpers import check_connection, is_protected, salt_and_hash
 from blogs.models import Blog, Post, Upvote
 from blogs.subscriptions import get_subscriptions
 
