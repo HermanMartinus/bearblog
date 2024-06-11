@@ -1,6 +1,9 @@
 <input type="file" id="file" hidden multiple accept="image/*">
 
 <script>
+	// Set timezone cookie for logged in users
+	const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    document.cookie = `timezone=${tz};path=/`
 
 	const $publishedDate = document.getElementById('published-date');
 	const $form = document.querySelector('form');
