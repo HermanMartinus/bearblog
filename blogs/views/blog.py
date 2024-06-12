@@ -176,11 +176,14 @@ def upvote(request, uid):
     if uid == request.POST.get("uid", "") and not request.POST.get("title", False):
         post = get_object_or_404(Post, uid=uid)
         print("Upvoting", post)
-        upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
-
-        if created:
+        try:
+            upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
+        
+            if created:
+                return HttpResponse(f'Upvoted {post.title}')
+            raise Http404('Duplicate upvote')
+        except Upvote.MultipleObjectsReturned:
             return HttpResponse(f'Upvoted {post.title}')
-        raise Http404('Duplicate upvote')
     raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
 
