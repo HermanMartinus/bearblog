@@ -67,6 +67,22 @@ def replace_inline_latex(text):
 
     return replaced_text
 
+def fix_links(text):
+    parentheses_pattern = r'\[([^\]]+)\]\(((?:tab:)?https?://[^\)]+\([^\)]+\)[^\)]*)\)'
+
+    def escape_parentheses(match):
+        label = match.group(1)
+        url = match.group(2)
+        # Escape parentheses in the URL
+        escaped_url = url.replace('(', '%28').replace(')', '%29')
+        print('Fixed parentheses:', escaped_url)
+        return f'[{label}]({escaped_url})'
+
+    fixed_text = re.sub(parentheses_pattern, escape_parentheses, text)
+    
+
+    return fixed_text
+
 class MyRenderer(HTMLRenderer):
     def heading(self, text, level, **attrs):
         return f'<h{level} id={slugify(text)}>{text}</h{level}>'
@@ -142,6 +158,8 @@ def markdown(content, blog_or_post=False):
 
     # Removes old formatted inline LaTeX
     content = replace_inline_latex(content)
+    # Find urls with parentheses and escape them
+    content = fix_links(content)
 
     try:
         processed_markup = markdown_renderer(content)

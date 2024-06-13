@@ -29,6 +29,11 @@
 </head>
 
 <body class="{% block page_type %}{% endblock %}">
+  {% if 'lh.co' in request.get_host %}
+  <p style="background-color: wheat; position: absolute; top:-15px; right:0; left:0; text-align: center;">
+    Development server: {{ request.get_host }}
+  </p>
+  {% endif %}
   <header>
     <a class="title" href="{% block heading-link %}/{% endblock %}">
       <h1>
