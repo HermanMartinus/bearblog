@@ -137,7 +137,7 @@ class MyRenderer(HTMLRenderer):
     
 markdown_renderer = create_markdown(
     renderer=MyRenderer(),
-    plugins=['math', 'strikethrough', 'footnotes', 'table', 'superscript', 'subscript', 'mark', 'task_lists'],
+    plugins=['math', 'strikethrough', 'footnotes', 'table', 'superscript', 'subscript', 'mark', 'task_lists', 'abbr'],
     escape=False)
 
 @register.filter
