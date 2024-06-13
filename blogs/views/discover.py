@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, Q
 from django.utils import timezone
 from django.contrib.sites.models import Site
+from django.db.models.functions import Length
 
 from blogs.models import Post, Upvote
 from blogs.helpers import clean_text, sanitise_int
@@ -14,6 +15,18 @@ import mistune
 gravity = 1.2
 posts_per_page = 20
 
+def get_base_query():
+    """Returns the base query for fetching posts."""
+    return Post.objects.annotate(content_length=Length('content')).filter(
+        publish=True, # Is published
+        content_length__gt=500, # Content length greater than 500 characters
+        hidden=False, # Post not hidden
+        blog__reviewed=True, # Blog has been reviewed
+        blog__user__is_active=True, # User not blocked
+        blog__hidden=False, # Blog not hidden
+        make_discoverable=True, # Set to discoverable
+        published_date__lte=timezone.now() # Published in the past
+    )
 
 @csrf_exempt
 def discover(request):
@@ -58,16 +71,8 @@ def discover(request):
 
     pinned_posts = Post.objects.filter(pinned=True).order_by('-published_date')
 
-    # Base query excluding pinned posts
-    base_query = Post.objects.filter(
-        publish=True,
-        hidden=False,
-        blog__reviewed=True,
-        blog__user__is_active=True,
-        blog__hidden=False,
-        make_discoverable=True,
-        published_date__lte=timezone.now()
-    ).exclude(id__in=pinned_posts)
+    # Use the base query function excluding pinned posts
+    base_query = get_base_query().exclude(id__in=pinned_posts)
 
     if newest:
         other_posts = base_query.order_by("-published_date")
@@ -89,33 +94,6 @@ def discover(request):
     })
 
 
-def search(request):
-    search_string = request.GET.get('query', "")
-    posts = None
-
-    if search_string:
-        posts = (
-            Post.objects.filter(
-                Q(content__icontains=search_string) | Q(title__icontains=search_string),
-                publish=True,
-                hidden=False,
-                blog__reviewed=True,
-                blog__user__is_active=True,
-                blog__hidden=False,
-                make_discoverable=True,
-                published_date__lte=timezone.now(),
-            )
-            .order_by('-upvotes', "-published_date")
-            .select_related("blog")[0:50]
-        )
-
-    return render(request, "search.html", {
-        "site": Site.objects.get_current(),
-        "posts": posts,
-        "search_string": search_string,
-    })
-
-
 def feed(request):
     fg = FeedGenerator()
     fg.id("bearblog")
@@ -126,37 +104,13 @@ def feed(request):
         fg.title("Bear Blog Most Recent Posts")
         fg.subtitle("Most recent posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/?newest=True", rel="alternate")
-        all_posts = (
-            Post.objects.filter(
-                publish=True,
-                hidden=False,
-                blog__reviewed=True,
-                blog__user__is_active=True,
-                blog__hidden=False,
-                make_discoverable=True,
-                published_date__lte=timezone.now(),
-            )
-            .order_by("-published_date")
-            .select_related("blog")[0:posts_per_page]
-        )
+        all_posts = get_base_query().order_by("-published_date").select_related("blog")[0:posts_per_page]
         all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
     else:
         fg.title("Bear Blog Trending Posts")
         fg.subtitle("Trending posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/", rel="alternate")
-        all_posts = (
-            Post.objects.filter(
-                publish=True,
-                hidden=False,
-                blog__reviewed=True,
-                blog__user__is_active=True,
-                blog__hidden=False,
-                make_discoverable=True,
-                published_date__lte=timezone.now()
-            )
-            .order_by("-score", "-published_date")
-            .select_related("blog")[0:posts_per_page]
-        )
+        all_posts = get_base_query().order_by("-score", "-published_date").select_related("blog")[0:posts_per_page]
         all_posts = sorted(list(all_posts), key=lambda post: post.score)
 
     for post in all_posts:
@@ -175,3 +129,23 @@ def feed(request):
     else:
         atomfeed = fg.atom_str(pretty=True)
         return HttpResponse(atomfeed, content_type="application/atom+xml")
+    
+
+def search(request):
+    search_string = request.GET.get('query', "")
+    posts = None
+
+    if search_string:
+        posts = (
+            get_base_query().filter(
+                Q(content__icontains=search_string) | Q(title__icontains=search_string)
+            )
+            .order_by('-upvotes', "-published_date")
+            .select_related("blog")[0:50]
+        )
+
+    return render(request, "search.html", {
+        "site": Site.objects.get_current(),
+        "posts": posts,
+        "search_string": search_string,
+    })
