@@ -59,14 +59,6 @@
                             <button onclick="event.preventDefault();if(confirm('Hide this post?')){event.target.parentElement.submit()}">Hide post</button>
                         </form>
                         <form method="POST" style="display:inline">
-                            <input hidden name="block-blog" value="{{ post.pk }}">
-                            <button onclick="event.preventDefault();if(confirm('Block this blog?')){event.target.parentElement.submit()}">Block blog</button>
-                        </form>
-                        <form method="POST" style="display:inline">
-                            <input hidden name="deprioritise-blog" value="{{ post.pk }}">
-                            <button onclick="event.preventDefault();if(confirm('Deprioritise this blog?')){event.target.parentElement.submit()}">Deprioritise blog</button>
-                        </form>
-                        <form method="POST" style="display:inline">
                             <input hidden name="boost-post" value="{{ post.pk }}">
                             <button onclick="event.preventDefault();if(confirm('Boost this post?')){event.target.parentElement.submit()}">Boost post</button>
                         </form>
@@ -75,6 +67,18 @@
                             <button onclick="event.preventDefault();if(confirm('Toggle pin this post?')){event.target.parentElement.submit()}">
                                 {% if post.pinned %}Un-{% endif %}Pin post
                             </button>
+                        </form>
+                        <form method="POST" style="display:inline">
+                            <input hidden name="hide-blog" value="{{ post.pk }}">
+                            <button onclick="event.preventDefault();if(confirm('Hide this blog?')){event.target.parentElement.submit()}">Hide blog</button>
+                        </form>
+                        <form method="POST" style="display:inline">
+                            <input hidden name="deprioritise-blog" value="{{ post.pk }}">
+                            <button onclick="event.preventDefault();if(confirm('Deprioritise this blog?')){event.target.parentElement.submit()}">Deprioritise blog</button>
+                        </form>
+                        <form method="POST" style="display:inline">
+                            <input hidden name="block-blog" value="{{ post.pk }}">
+                            <button onclick="event.preventDefault();if(confirm('Block this blog?')){event.target.parentElement.submit()}">Block blog</button>
                         </form>
 
                         <button onclick="window.open('https://news.ycombinator.com/submitlink?u={{ post.blog.useful_domain }}/{{ post.slug }}&t={{ post.title }}')">

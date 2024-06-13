@@ -23,14 +23,6 @@ def discover(request):
             post = Post.objects.get(pk=request.POST.get("hide-post"))
             post.hidden = True
             post.save()
-        if request.POST.get("deprioritise-blog", False):
-            post = Post.objects.get(pk=request.POST.get("deprioritise-blog"))
-            post.blog.deprioritise = True
-            post.blog.save()
-        if request.POST.get("block-blog", False):
-            post = Post.objects.get(pk=request.POST.get("block-blog"))
-            post.blog.user.is_active = False
-            post.blog.user.save()
         if request.POST.get("boost-post", False):
             post = Post.objects.get(pk=request.POST.get("boost-post"))
             for i in range(0, 5):
@@ -40,6 +32,18 @@ def discover(request):
             post = Post.objects.get(pk=request.POST.get("pin-post"))
             post.pinned = not post.pinned
             post.save()
+        if request.POST.get("deprioritise-blog", False):
+            post = Post.objects.get(pk=request.POST.get("deprioritise-blog"))
+            post.blog.deprioritise = True
+            post.blog.save()
+        if request.POST.get("hide-blog", False):
+            post = Post.objects.get(pk=request.POST.get("hide-blog"))
+            post.blog.hidden = True
+            post.blog.save()
+        if request.POST.get("block-blog", False):
+            post = Post.objects.get(pk=request.POST.get("block-blog"))
+            post.blog.user.is_active = False
+            post.blog.user.save()
 
     page = 0
     gravity = float(request.GET.get("gravity", 1.2))
