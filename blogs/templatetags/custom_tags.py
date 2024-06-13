@@ -75,7 +75,6 @@ def fix_links(text):
         url = match.group(2)
         # Escape parentheses in the URL
         escaped_url = url.replace('(', '%28').replace(')', '%29')
-        print('Fixed parentheses:', escaped_url)
         return f'[{label}]({escaped_url})'
 
     fixed_text = re.sub(parentheses_pattern, escape_parentheses, text)
