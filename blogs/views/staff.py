@@ -194,8 +194,12 @@ def approve(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     blog.reviewed = True
     blog.to_review = False
+    
     if request.GET.get("deprioritise", False):
         blog.deprioritise = True
+    
+    if request.GET.get("hide", False):
+        blog.hidden = True
 
     blog.save()
 
