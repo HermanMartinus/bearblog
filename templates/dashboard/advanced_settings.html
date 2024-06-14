@@ -10,7 +10,8 @@
 
 {% block content %}
 <h1>Advanced settings</h1>
-<form method="POST" class="post-form full-width">{% csrf_token %}
+<form method="POST" class="post-form full-width" onkeypress="if(event.key === 'Enter') { event.preventDefault(); }">
+    {% csrf_token %}
     <p style="line-height: 0">
         <button onclick="event.preventDefault(); window.location = '/{{ blog.subdomain }}/dashboard/settings/'">&#8592; Back</button>
         <button type="submit">Save</button>

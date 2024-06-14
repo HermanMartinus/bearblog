@@ -15,7 +15,7 @@ Custom domain | Bear Blog
 <main>
     <h1>Custom domain</h1>
     
-    <form method="POST" class="post-form full-width">
+    <form method="POST" class="post-form full-width" onkeypress="if(event.key === 'Enter') { event.preventDefault(); }">
         {% csrf_token %}
         <p style="line-height: 0">
             <button onclick="event.preventDefault(); window.location = '/{{ blog.subdomain}}/dashboard/settings/'">&#8592; Back</button>
