@@ -167,6 +167,7 @@ class Post(models.Model):
     lang = models.CharField(max_length=10, blank=True)
     class_name = models.CharField(max_length=200, blank=True)
 
+    first_published_at = models.DateTimeField(blank=True, null=True)
     upvotes = models.IntegerField(default=0)
     score = models.FloatField(default=0)
     hidden = models.BooleanField(default=False)
@@ -190,7 +191,9 @@ class Post(models.Model):
         if self.upvotes > 1:
             log_of_upvotes = log(self.upvotes, 10)
 
-            seconds = self.published_date.timestamp()
+            posted_at = self.first_published_at or self.published_date
+
+            seconds = posted_at.timestamp()
             if seconds > 0:
                 if self.blog.deprioritise:
                     score = 0
@@ -208,6 +211,10 @@ class Post(models.Model):
         if not self.uid:
             allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
             self.uid = ''.join(random.choice(allowed_chars) for _ in range(20))
+
+        # Set first_published_at for score calculation
+        if self.publish and self.first_published_at is None:
+            self.first_published_at = timezone.now()
 
         super(Post, self).save(*args, **kwargs)
 
