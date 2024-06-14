@@ -19,7 +19,7 @@ def get_base_query():
     """Returns the base query for fetching posts."""
     return Post.objects.annotate(content_length=Length('content')).filter(
         publish=True, # Is published
-        content_length__gt=500, # Content length greater than 500 characters
+        content_length__gt=300, # Content length greater than 500 characters
         hidden=False, # Post not hidden
         blog__reviewed=True, # Blog has been reviewed
         blog__user__is_active=True, # User not blocked
