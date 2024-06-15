@@ -214,7 +214,7 @@ class Post(models.Model):
 
         # Set first_published_at for score calculation
         if self.publish and self.first_published_at is None:
-            self.first_published_at = timezone.now()
+            self.first_published_at = self.published_date or timezone.now()
 
         super(Post, self).save(*args, **kwargs)
 
