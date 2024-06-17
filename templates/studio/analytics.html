@@ -159,7 +159,7 @@
             <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a> is a great, privacy respecting analytics tool.
             <br>
             Sign up with the above link to get $10 off.
-            <form method="POST" class="post-form" onkeypress="if(event.key === 'Enter') { event.preventDefault(); }">
+            <form method="POST" class="post-form">
                 {% csrf_token %}
                 {{ form.as_p }}
                 <button type="submit" class="save btn btn-default">Save</button>
