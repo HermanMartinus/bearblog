@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -123,15 +124,13 @@ def upload_image(request, id):
     if request.method == "POST" and blog.user.settings.upgraded is True:
         file_links = []
         time_string = str(time.time()).split('.')[0]
-        count = 0
 
         for file in request.FILES.getlist('file'):
-            extention = file.name.split('.')[-1]
-            if extention.lower().endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif')):
+            extension = file.name.split('.')[-1].lower()
+            if extension.endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'heic')):
 
-                filepath = f'{blog.subdomain}-{time_string}-{count}.{extention}'
+                filepath = f'{blog.subdomain}-{time_string}.{extension}'
                 url = f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{filepath}'
-                count = count + 1
                 file_links.append(url)
 
                 session = boto3.session.Session()
@@ -149,6 +148,8 @@ def upload_image(request, id):
                     ContentType=file.content_type,
                     ACL='public-read',
                 )
+            else:
+                raise ValidationError(f'Format not supported: {extension}')
 
         return HttpResponse(json.dumps(sorted(file_links)), 200)
 
