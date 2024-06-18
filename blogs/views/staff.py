@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 
 from blogs.helpers import send_async_mail
-from blogs.models import Blog, PersistentStore
+from blogs.models import Blog, PersistentStore, Post
 
 from datetime import timedelta
 import pygal
@@ -138,26 +138,54 @@ def blogs_to_review():
 
     if to_review.count() < 1:
         persistent_store = PersistentStore.load()
+        highlight_terms = persistent_store.highlight_terms
 
         new_blogs = Blog.objects.filter(
             reviewed=False, 
             user__is_active=True, 
-            to_review=False
+            to_review=False,
+            ignored_date__isnull=True
         )
 
         # Dynamically build up a Q object for exclusion
         exclude_conditions = Q()
         for term in persistent_store.ignore_terms:
             exclude_conditions |= Q(content__icontains=term)
-
+        
         # Apply the exclusion condition
         new_blogs = new_blogs.exclude(exclude_conditions).filter(
             Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True)
         )
         
-        to_review = new_blogs
+        # Initialize an empty list to hold blogs that match the highlight terms criteria
+        blogs_matching_highlight_terms = []
+
+        for blog in new_blogs:
+            term_count = 0
+            content = f"{blog.title} {blog.content}"
+
+            # Count the instances of highlight terms in the blog
+            for term in highlight_terms:
+                term_count += content.lower().count(term.lower())
+
+            # Include the blog if it has 2 or more instances of highlight terms
+            if term_count >= 2:
+                # Check each post related to the blog for highlighted terms
+                posts = Post.objects.filter(blog=blog, publish=True, is_page=False, published_date__lt=timezone.now())
+                for post in posts:
+                    post_content = f"{post.title} {post.content}"
+                    for term in highlight_terms:
+                        term_count += post_content.lower().count(term.lower())
+
+                    # Include the blog if it has 2 or more instances of highlight terms in posts
+                    if term_count >= 2:
+                        blogs_matching_highlight_terms.append(blog)
+                        break
+        
+        to_review = blogs_matching_highlight_terms
+
     
-    return to_review.order_by('created_date')
+    return Blog.objects.filter(id__in=[blog.id for blog in to_review]).order_by('created_date')
 
 
 @staff_member_required
