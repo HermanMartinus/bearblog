@@ -143,8 +143,7 @@ def blogs_to_review():
         new_blogs = Blog.objects.filter(
             reviewed=False, 
             user__is_active=True, 
-            to_review=False,
-            ignored_date__isnull=True
+            to_review=False
         )
 
         # Dynamically build up a Q object for exclusion
