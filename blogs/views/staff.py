@@ -2,7 +2,7 @@ import json
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models.functions import TruncDate, Length
 from django.http import JsonResponse
@@ -141,47 +141,42 @@ def blogs_to_review():
         highlight_terms = persistent_store.highlight_terms
 
         new_blogs = Blog.objects.filter(
-            reviewed=False, 
-            user__is_active=True, 
-            to_review=False
-        )
+            reviewed=False,
+            user__is_active=True,
+            to_review=False,
+            ignored_date__isnull=True
+        ).prefetch_related('posts').values('id', 'title', 'content')
 
-        # Dynamically build up a Q object for exclusion
-        exclude_conditions = Q()
-        # for term in persistent_store.ignore_terms:
-        #     exclude_conditions |= Q(content__icontains=term)
-        
-        # Apply the exclusion condition
-        new_blogs = new_blogs.exclude(exclude_conditions).filter(
-            Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True)
-        )
-        
         # Initialize an empty list to hold blogs that match the highlight terms criteria
         blogs_matching_highlight_terms = []
 
         for blog in new_blogs:
             term_count = 0
-            content = f"{blog.title} {blog.content}"
+            content = f"{blog['title']} {blog['content']}"
 
-            # Count the instances of highlight terms in the blog
+            # Count the instances of highlight terms in the blog's title and content
             for term in highlight_terms:
                 term_count += content.lower().count(term.lower())
 
             # Include the blog if it has 2 or more instances of highlight terms
             if term_count >= 2:
-                # Check each post related to the blog for highlighted terms
-                posts = Post.objects.filter(blog=blog, publish=True, is_page=False, published_date__lt=timezone.now())
-                for post in posts:
-                    post_content = f"{post.title} {post.content}"
-                    for term in highlight_terms:
-                        term_count += post_content.lower().count(term.lower())
+                blogs_matching_highlight_terms.append(blog)
+                continue
 
-                    # Include the blog if it has 2 or more instances of highlight terms in posts
-                    if term_count >= 2:
-                        blogs_matching_highlight_terms.append(blog)
-                        break
+            # Check each post related to the blog for highlighted terms
+            for post in blog.get('prefetched_posts', []):
+                post_content = f"{post['title']} {post['content']}"
+                for term in highlight_terms:
+                    term_count += post_content.lower().count(term.lower())
+
+                # Include the blog if it has 2 or more instances of highlight terms in posts
+                if term_count >= 2:
+                    blogs_matching_highlight_terms.append(blog)
+                    break
+
+        blog_ids_to_review = [blog['id'] for blog in blogs_matching_highlight_terms]
         
-        to_review = blogs_matching_highlight_terms
+        to_review = Blog.objects.filter(id__in=blog_ids_to_review).order_by('created_date')
 
     
     return Blog.objects.filter(id__in=[blog.id for blog in to_review]).order_by('created_date')

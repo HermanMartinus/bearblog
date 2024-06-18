@@ -50,8 +50,9 @@ body {
         Last posted {{ blog.last_posted | timesince }} ago
     </b></p>
 
-    <nav>{{ blog.nav | markdown:blog | safe }}</nav>
-    {{ blog.content | markdown:blog | safe }}
+    <nav>{{ blog.nav  }}</nav>
+    <br><br>
+    {{ blog.content | linebreaksbr }}
 
 
     <ul style="padding-bottom: 30px; max-height: 500px; overflow: auto; border: 1px dashed">
@@ -64,7 +65,7 @@ body {
             </i>
             <h3><a href="{{ root }}/{{ post.slug }}/" target="_blank">{{ post.title }}</a></h3>
             <p>
-                {{ post.content | markdown:post | safe }}
+                {{ post.content | linebreaksbr }}
             </p>
         </li>
         {% endfor %}
