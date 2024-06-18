@@ -149,8 +149,8 @@ def blogs_to_review():
 
         # Dynamically build up a Q object for exclusion
         exclude_conditions = Q()
-        for term in persistent_store.ignore_terms:
-            exclude_conditions |= Q(content__icontains=term)
+        # for term in persistent_store.ignore_terms:
+        #     exclude_conditions |= Q(content__icontains=term)
         
         # Apply the exclusion condition
         new_blogs = new_blogs.exclude(exclude_conditions).filter(
