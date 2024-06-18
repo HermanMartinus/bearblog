@@ -1,10 +1,6 @@
 <input type="file" id="file" hidden multiple accept="image/*">
 
 <script>
-	// Set timezone cookie for logged in users
-	const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    document.cookie = `timezone=${tz};path=/`
-
 	const $publishedDate = document.getElementById('published-date');
 	const $form = document.querySelector('form');
 	const $headerContent = document.getElementById('header_content');
@@ -12,6 +8,26 @@
 	const $textarea = document.querySelector('textarea')
 	const $previewButton = document.getElementById('preview')
 	const $uploadButton = document.querySelector('#upload-image')
+
+	// Prevent losing content by clicking away if content has been edited
+	let contentEdited = false;
+
+	$form.addEventListener('input', function(){
+		contentEdited = true;
+	})
+
+	window.addEventListener('beforeunload', event => {
+		if (contentEdited) {
+			const message = 'You have unsaved changes. Are you sure you want to leave?';
+			event.returnValue = message;
+			return message;
+		}
+	});
+
+
+	// Set timezone cookie
+	const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	document.cookie = `timezone=${tz};path=/`
 	
 	// Submitting form with header content
 	const addHeaderContentToFormAndSubmit = () => {
@@ -20,6 +36,7 @@
 	}
 
 	$form.addEventListener('submit', function(e) {
+		contentEdited = false;
 		e.preventDefault();
         addHeaderContentToFormAndSubmit()
     });
@@ -94,6 +111,18 @@
 	}
 
 	$fileInput.addEventListener("change", upload);
+
+	window.addEventListener("dragover", event => {
+		event.preventDefault();
+	});
+	
+	window.addEventListener("drop", event => {
+		event.preventDefault();
+		const files = event.dataTransfer.files;
+		if (files.length > 0) {
+			uploadNextFile(0, files);
+		}
+	});
 
 	function upload() {
 		const files = $fileInput.files;
