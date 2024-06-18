@@ -176,10 +176,10 @@ def blogs_to_review():
 
         blog_ids_to_review = [blog['id'] for blog in blogs_matching_highlight_terms]
         
-        to_review = Blog.objects.filter(id__in=blog_ids_to_review).order_by('created_date')
+        to_review = Blog.objects.filter(id__in=blog_ids_to_review)
 
     
-    return Blog.objects.filter(id__in=[blog.id for blog in to_review]).order_by('-created_date')
+    return to_review.order_by('created_date')
 
 
 @staff_member_required
