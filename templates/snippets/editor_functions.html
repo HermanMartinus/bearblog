@@ -9,22 +9,6 @@
 	const $previewButton = document.getElementById('preview')
 	const $uploadButton = document.querySelector('#upload-image')
 
-	// Prevent losing content by clicking away if content has been edited
-	let contentEdited = false;
-
-	$form.addEventListener('input', function(){
-		contentEdited = true;
-	})
-
-	window.addEventListener('beforeunload', event => {
-		if (contentEdited) {
-			const message = 'You have unsaved changes. Are you sure you want to leave?';
-			event.returnValue = message;
-			return message;
-		}
-	});
-
-
 	// Set timezone cookie
 	const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 	document.cookie = `timezone=${tz};path=/`
@@ -36,7 +20,6 @@
 	}
 
 	$form.addEventListener('submit', function(e) {
-		contentEdited = false;
 		e.preventDefault();
         addHeaderContentToFormAndSubmit()
     });
