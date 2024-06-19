@@ -139,9 +139,48 @@ Herman
           }
         }
     }
-        
+    
+    highlightURLS()
     const keywords = {{ highlight_terms | safe }};
     highlightKeywords(keywords);
+
+    function highlightURLS() {
+        const regex =  /(https?:\/\/[^\s"')]+)/gi;
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+        
+        const nodeList = [];
+        while (walker.nextNode()) {
+          nodeList.push(walker.currentNode);
+        }
+        
+        for (const node of nodeList) {
+          const text = node.textContent;
+          const matches = text.match(regex);
+          
+          if (matches) {
+            const fragment = document.createDocumentFragment();
+            let lastIndex = 0;
+            
+            for (const match of matches) {
+                if (match.includes('lh.co','bearblog.dev','imgur','youtu.be','neocities')) {
+                    break;
+                }
+              const index = text.toLowerCase().indexOf(match.toLowerCase(), lastIndex);
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, index)));
+              const mark = document.createElement('mark');
+              mark.style.backgroundColor = 'lightgreen';
+              mark.textContent = text.slice(index, index + match.length);
+              fragment.appendChild(mark);
+              lastIndex = index + match.length;
+            }
+            
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+            node.parentNode.replaceChild(fragment, node);
+          }
+        }
+    }
+
+    
 
     function approveBlogWithEmail(pk) {
         const message = document.querySelector(`#blog-${pk} .message`).value;
