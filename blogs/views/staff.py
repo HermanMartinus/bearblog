@@ -161,7 +161,7 @@ def blogs_to_review():
             term_count=Count('id', filter=highlight_filter),
             post_term_count=Count('posts__id', filter=post_highlight_filter)
         ).filter(
-            Q(content_length__gte=100, term_count__gte=2) | Q(content_length__lt=100, post_term_count__gte=2)
+            Q(term_count__gte=2) | Q(content_length__lt=100, post_term_count__gte=2)
         )
 
         to_review = new_blogs
