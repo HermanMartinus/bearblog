@@ -134,38 +134,35 @@ def blogs_to_review():
     # Opted-in for review
     to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True)
 
-    # Dodgy blogs
-    if not to_review.exists():
+    if to_review.count() < 1:
         persistent_store = PersistentStore.load()
         highlight_terms = persistent_store.highlight_terms
 
-        # Create a single query for highlight terms
-        highlight_filter = Q()
-        for term in highlight_terms:
-            highlight_filter |= Q(title__icontains=term) | Q(content__icontains=term)
-
-        # Filter posts based on content length and highlight terms
-        post_highlight_filter = Q()
-        for term in highlight_terms:
-            post_highlight_filter |= Q(posts__title__icontains=term) | Q(posts__content__icontains=term)
-
-        new_blogs = Blog.objects.annotate(
-            content_length=Length('content')
-        ).filter(
+        new_blogs = Blog.objects.filter(
             reviewed=False,
             user__is_active=True,
             to_review=False,
-            user__settings__upgraded=False,
             ignored_date__isnull=True
-        ).prefetch_related('posts').annotate(
-            term_count=Count('id', filter=highlight_filter),
-            post_term_count=Count('posts__id', filter=post_highlight_filter)
-        ).filter(
-            Q(term_count__gte=2) | Q(content_length__lt=100, post_term_count__gte=2)
-        )
+        ).prefetch_related('posts')
 
-        to_review = new_blogs
+        blog_ids_to_review = []
 
+        for blog in new_blogs:
+            term_count = 0
+            content = f"{blog.title} {blog.content}"
+            
+            # post = blog.posts.first()
+            # if post:
+            #     content += f"{post.title} {post.content}"
+            for term in highlight_terms:
+                term_count += content.lower().count(term.lower())
+
+            if term_count >= 2:
+                blog_ids_to_review.append(blog.id)
+        
+        to_review = Blog.objects.filter(id__in=blog_ids_to_review)
+
+    
     return to_review.order_by('created_date')
 
 
