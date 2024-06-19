@@ -2,7 +2,7 @@ import json
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
-from django.db.models import Q, Count, Case, When, IntegerField
+from django.db.models import Count, Q, F, Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models.functions import TruncDate, Length
 from django.http import JsonResponse
@@ -137,45 +137,29 @@ def blogs_to_review():
     to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True)
 
     # Dodgy blogs
-    if to_review.count() < 1:
+    if not to_review.exists():
         persistent_store = PersistentStore.load()
         highlight_terms = persistent_store.highlight_terms
-        
+
+        # Create a single query for highlight terms
+        highlight_filter = Q()
+        for term in highlight_terms:
+            highlight_filter |= Q(title__icontains=term) | Q(content__icontains=term) | Q(posts__title__icontains=term) | Q(posts__content__icontains=term)
+
         new_blogs = Blog.objects.filter(
             reviewed=False,
             user__is_active=True,
             to_review=False,
             user__settings__upgraded=False,
-            # ignored_date__isnull=True,
-        )
+            ignored_date__isnull=True,
+        ).prefetch_related('posts').annotate(
+            term_count=Count('id', filter=highlight_filter)
+        ).filter(term_count__gte=2)
 
-        # Create conditions for each highlight term
-        term_conditions = [Q(content__icontains=term) | Q(title__icontains=term) | Q(posts__title__icontains=term) | Q(posts__content__icontains=term) for term in highlight_terms]
-        
-        # Combine conditions with OR
-        combined_conditions = term_conditions.pop()
-        for condition in term_conditions:
-            combined_conditions |= condition
-        
-        # Annotate blogs with the count of matching terms
-        new_blogs = new_blogs.annotate(
-            term_matches=Count(
-                Case(
-                    *[
-                        When(Q(content__icontains=term) | Q(title__icontains=term) | Q(posts__title__icontains=term) | Q(posts__content__icontains=term), then=1)
-                        for term in highlight_terms
-                    ],
-                    output_field=IntegerField()
-                )
-            )
-        ).filter(term_matches__gte=2)
-
-        # Prefetch posts to optimize the query
-        new_blogs = new_blogs.prefetch_related('posts')
-
-        return new_blogs.order_by('created_date')
+        to_review = new_blogs
 
     return to_review.order_by('created_date')
+
 
 
 
