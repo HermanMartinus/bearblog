@@ -1,11 +1,9 @@
-import json
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
-from django.db.models import Count, Q, F, Prefetch
+from django.db.models import Q, Count
+from django.db.models.functions import Length, TruncDate, Length
 from django.shortcuts import get_object_or_404, redirect, render
-from django.db.models.functions import TruncDate, Length
-from django.http import JsonResponse
 from django.contrib.auth.models import User
 
 from blogs.helpers import send_async_mail
@@ -144,23 +142,31 @@ def blogs_to_review():
         # Create a single query for highlight terms
         highlight_filter = Q()
         for term in highlight_terms:
-            highlight_filter |= Q(title__icontains=term) | Q(content__icontains=term) | Q(posts__title__icontains=term) | Q(posts__content__icontains=term)
+            highlight_filter |= Q(title__icontains=term) | Q(content__icontains=term)
 
-        new_blogs = Blog.objects.filter(
+        # Filter posts based on content length and highlight terms
+        post_highlight_filter = Q()
+        for term in highlight_terms:
+            post_highlight_filter |= Q(posts__title__icontains=term) | Q(posts__content__icontains=term)
+
+        new_blogs = Blog.objects.annotate(
+            content_length=Length('content')
+        ).filter(
             reviewed=False,
             user__is_active=True,
             to_review=False,
             user__settings__upgraded=False,
-            ignored_date__isnull=True,
+            ignored_date__isnull=True
         ).prefetch_related('posts').annotate(
-            term_count=Count('id', filter=highlight_filter)
-        ).filter(term_count__gte=2)
+            term_count=Count('id', filter=highlight_filter),
+            post_term_count=Count('posts__id', filter=post_highlight_filter)
+        ).filter(
+            Q(term_count__gte=2) | (Q(content_length__lt=100) & Q(post_term_count__gte=2))
+        )
 
         to_review = new_blogs
 
     return to_review.order_by('created_date')
-
-
 
 
 @staff_member_required
@@ -174,7 +180,7 @@ def delete_empty(request):
 
 @staff_member_required
 def review_bulk(request):
-    blogs = blogs_to_review()[:100]
+    blogs = blogs_to_review()[:20]
     still_to_go = blogs.count()
     persistent_store = PersistentStore.load()
 
