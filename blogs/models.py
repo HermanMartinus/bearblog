@@ -148,7 +148,7 @@ class Blog(models.Model):
         for term in persistent_store.highlight_terms:
             dodgy_term_count += all_content.lower().count(term.lower())
 
-        self.dodginess_score = dodgy_term_count / len(all_content) *10000
+        self.dodginess_score = dodgy_term_count # / len(all_content) *10000
 
     def save(self, *args, **kwargs):
         if self.user.settings.upgraded:

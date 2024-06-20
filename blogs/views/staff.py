@@ -139,7 +139,7 @@ def blogs_to_review():
             reviewed=False,
             user__is_active=True,
             to_review=False,
-            dodginess_score__gt=5,
+            dodginess_score__gt=2,
             ignored_date__isnull=True
         ).prefetch_related('posts').order_by('-dodginess_score')
 
