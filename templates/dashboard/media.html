@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Media | Bear Blog{% endblock %}
+
+{% block custom_styles %}
+    {% include 'styles/blog/default.css' %}
+    {% include 'styles/dashboard.css' %}
+    {{ request.user.settings.dashboard_styles | safe }}
+{% endblock %}
+
+{% block content %}
+<h1>Media (experimental)</h1>
+<div style="display: flex; flex-flow: row wrap; gap: 5px;">
+    {% for url in uploaded_media %}
+    <span style="text-align: center; border: 1px solid;">
+        <img style="object-fit: contain;" src="{{ url }}" width=150 height=150 />
+        <br>
+        <button onclick="navigator.clipboard.writeText('{{ url }}').then(() => alert('URL copied to clipboard'));">Copy URL</button>
+        <button style="color: red;" onclick="confirm('Deleting not currently available')">
+            Delete
+        </button>
+    </span>
+    {% endfor %}
+</div>
+{% endblock %}

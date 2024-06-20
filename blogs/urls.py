@@ -36,6 +36,7 @@ urlpatterns = [
     path('<id>/dashboard/settings/advanced/', studio.advanced_settings, name='advanced_settings'),
     path('<id>/dashboard/directives/', studio.directive_edit, name="directive_edit"),
     path('<id>/dashboard/email-list/', emailer.email_list, name='email_list'),
+    path('<id>/dashboard/media/', dashboard.media_center, name='media'),
 
     path('<id>/dashboard/analytics/', analytics.analytics, name='analytics'),
     path('<id>/dashboard/analytics-upgraded/', analytics.analytics_upgraded, name="analytics_upgraded"),

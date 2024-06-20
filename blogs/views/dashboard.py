@@ -138,7 +138,7 @@ def upload_image(request, id):
                     's3',
                     endpoint_url='https://sfo2.digitaloceanspaces.com',
                     region_name='sfo2',
-                    aws_access_key_id='KKKRU7JXRF6ZOLEGJPPX',
+                    aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
                     aws_secret_access_key=os.getenv('SPACES_SECRET'))
 
                 response = client.put_object(
@@ -152,6 +152,40 @@ def upload_image(request, id):
                 raise ValidationError(f'Format not supported: {extension}')
 
         return HttpResponse(json.dumps(sorted(file_links)), 200)
+
+
+@login_required
+def media_center(request, id):
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    uploaded_media = get_uploaded_images(blog)
+
+    return render(request, 'dashboard/media.html', {
+        'uploaded_media': uploaded_media,
+        'blog': blog,
+    })
+
+def get_uploaded_images(blog):
+    session = boto3.session.Session()
+    client = session.client(
+        's3',
+        endpoint_url='https://sfo2.digitaloceanspaces.com',
+        region_name='sfo2',
+        aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('SPACES_SECRET'))
+
+    prefix = f'{blog.subdomain}-'
+    response = client.list_objects_v2(Bucket='bear-images', Prefix=prefix)
+
+    if 'Contents' not in response:
+        return []
+
+    image_urls = [
+        f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{item["Key"]}'
+        for item in response['Contents']
+        if item['Key'].split('.')[-1].lower() in ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'heic', 'ico']
+    ]
+
+    return sorted(image_urls)
 
 
 @login_required
