@@ -154,7 +154,8 @@ class Blog(models.Model):
         if self.user.settings.upgraded:
             self.reviewed = True
         
-        self.determine_dodginess()
+        if not self.reviewed:
+            self.determine_dodginess()
         
         super(Blog, self).save(*args, **kwargs)
 
