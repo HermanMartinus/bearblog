@@ -54,6 +54,7 @@ class Blog(models.Model):
     header_directive = models.TextField(blank=True)
     footer_directive = models.TextField(blank=True)
 
+    dodginess_score = models.FloatField(default=0)
     reviewed = models.BooleanField(default=False)
     ignored_date = models.DateTimeField(blank=True, null=True)
     to_review = models.BooleanField(default=False)
@@ -135,13 +136,26 @@ class Blog(models.Model):
         self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(30))
         self.save()
 
+    def determine_dodginess(self):
+        persistent_store = PersistentStore.load()
+        dodgy_term_count = 0
+        all_content = f"{self.title} {self.content}"
+        
+        post = self.posts.first()
+        if post:
+            all_content += f"{post.title} {post.content}"
+
+        for term in persistent_store.highlight_terms:
+            dodgy_term_count += all_content.lower().count(term.lower())
+
+        self.dodginess_score = dodgy_term_count / len(all_content) *10000
+
     def save(self, *args, **kwargs):
-    #     # Create auth_token
-    #     if not self.auth_token:
-    #         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
-    #         self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(20))
         if self.user.settings.upgraded:
             self.reviewed = True
+        
+        self.determine_dodginess()
+        
         super(Blog, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -200,7 +214,6 @@ class Post(models.Model):
                 else:
                     score = (log_of_upvotes) + ((seconds - 1577811600) / (14 * 86400))
                 self.score = score
-        self.save()
     
     def save(self, *args, **kwargs):
         self.slug = self.slug.lower()
@@ -215,6 +228,12 @@ class Post(models.Model):
         # Set first_published_at for score calculation
         if self.publish and self.first_published_at is None:
             self.first_published_at = self.published_date or timezone.now()
+
+        # Update the score for the discover feed
+        self.update_score()
+
+        # Save blog to trigger determine_dodginess
+        self.blog.save()
 
         super(Post, self).save(*args, **kwargs)
 
@@ -231,8 +250,8 @@ class Upvote(models.Model):
         # Save the Upvote instance
         super(Upvote, self).save(*args, **kwargs)
         
-        # Now that the Upvote is saved and counted, update the post score
-        self.post.update_score()
+        # Update the post score on post save
+        self.post.save()
 
     def __str__(self):
         return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.hash_id} - {self.post}"

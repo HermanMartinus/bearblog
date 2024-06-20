@@ -245,9 +245,6 @@ def post(request, id, uid=None):
                 return post
             else:
                 post.save()
-
-                # Recalculate score to prevent future date spoofing
-                post.update_score()
                 
                 if is_new:
                     # Self-upvote

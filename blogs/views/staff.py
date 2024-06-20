@@ -132,38 +132,19 @@ def get_empty_blogs():
 
 def blogs_to_review():
     # Opted-in for review
-    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True)
+    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True).order_by('created_date')
 
     if to_review.count() < 1:
-        persistent_store = PersistentStore.load()
-        highlight_terms = persistent_store.highlight_terms
-
-        new_blogs = Blog.objects.filter(
+        to_review = Blog.objects.filter(
             reviewed=False,
             user__is_active=True,
             to_review=False,
+            dodginess_score__gt=5,
             ignored_date__isnull=True
-        ).prefetch_related('posts')
-
-        blog_ids_to_review = []
-
-        for blog in new_blogs:
-            term_count = 0
-            content = f"{blog.title} {blog.content}"
-            
-            # post = blog.posts.first()
-            # if post:
-            #     content += f"{post.title} {post.content}"
-            for term in highlight_terms:
-                term_count += content.lower().count(term.lower())
-
-            if term_count >= 2:
-                blog_ids_to_review.append(blog.id)
-        
-        to_review = Blog.objects.filter(id__in=blog_ids_to_review)
+        ).prefetch_related('posts').order_by('-dodginess_score')
 
     
-    return to_review.order_by('created_date')
+    return to_review
 
 
 @staff_member_required
@@ -177,7 +158,7 @@ def delete_empty(request):
 
 @staff_member_required
 def review_bulk(request):
-    blogs = blogs_to_review()[:20]
+    blogs = blogs_to_review()[:100]
     still_to_go = blogs.count()
     persistent_store = PersistentStore.load()
 
