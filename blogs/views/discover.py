@@ -5,6 +5,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from django.contrib.sites.models import Site
 from django.db.models.functions import Length
+from django.core.cache import cache
 
 from blogs.models import Post, Upvote
 from blogs.helpers import clean_text, sanitise_int
@@ -15,18 +16,23 @@ import mistune
 gravity = 1.2
 posts_per_page = 20
 
+CACHE_TIMEOUT = 300  # 5 minutes in seconds
+
 def get_base_query():
-    """Returns the base query for fetching posts."""
-    return Post.objects.annotate(content_length=Length('content')).filter(
-        publish=True, # Is published
-        content_length__gt=200, # Content length greater than 500 characters
-        hidden=False, # Post not hidden
-        blog__reviewed=True, # Blog has been reviewed
-        blog__user__is_active=True, # User not blocked
-        blog__hidden=False, # Blog not hidden
-        make_discoverable=True, # Set to discoverable
-        published_date__lte=timezone.now() # Published in the past
+    """Returns the base query for fetching posts, with caching."""
+    
+    queryset = Post.objects.annotate(content_length=Length('content')).filter(
+        publish=True,
+        content_length__gt=200,
+        hidden=False,
+        blog__reviewed=True,
+        blog__user__is_active=True,
+        blog__hidden=False,
+        make_discoverable=True,
+        published_date__lte=timezone.now()
     )
+
+    return queryset
 
 @csrf_exempt
 def discover(request):
@@ -104,14 +110,32 @@ def feed(request):
         fg.title("Bear Blog Most Recent Posts")
         fg.subtitle("Most recent posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/?newest=True", rel="alternate")
-        all_posts = get_base_query().order_by("-published_date").select_related("blog")[0:posts_per_page]
-        all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
+        
+        CACHE_KEY = 'discover_newest_feed'
+        cached_queryset = cache.get(CACHE_KEY)
+    
+        if cached_queryset is None:
+            all_posts = get_base_query().order_by("-published_date").select_related("blog")[0:posts_per_page]
+            all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
+            cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
+        else:
+            all_posts = cached_queryset
+            print('Getting discover newest feed from cache')
     else:
         fg.title("Bear Blog Trending Posts")
         fg.subtitle("Trending posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/", rel="alternate")
-        all_posts = get_base_query().order_by("-score", "-published_date").select_related("blog")[0:posts_per_page]
-        all_posts = sorted(list(all_posts), key=lambda post: post.score)
+
+        CACHE_KEY = 'discover_trending_feed'
+        cached_queryset = cache.get(CACHE_KEY)
+    
+        if cached_queryset is None:
+            all_posts = get_base_query().order_by("-score", "-published_date").select_related("blog")[0:posts_per_page]
+            all_posts = sorted(list(all_posts), key=lambda post: post.score)
+            cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
+        else:
+            all_posts = cached_queryset
+            print('Getting discover trending feed from cache')
 
     for post in all_posts:
         fe = fg.add_entry()
