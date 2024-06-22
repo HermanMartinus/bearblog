@@ -38,7 +38,11 @@ def feed(request):
 
     if tag:
         all_posts = all_posts.filter(all_tags__icontains=tag)
+
     all_posts = all_posts.order_by('-published_date')[:10]
+    all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
+
+    all_posts = all_posts
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain)
