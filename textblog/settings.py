@@ -65,6 +65,7 @@ INTERNAL_IPS = ['127.0.0.1']
 SITE_ID = 1
 
 INSTALLED_APPS = [
+    'judoscale.django',
     'django.contrib.admin',
     'django.contrib.sites',
     'django.contrib.auth',
