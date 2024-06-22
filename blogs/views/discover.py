@@ -47,6 +47,10 @@ def discover(request):
             for i in range(0, 5):
                 upvote = Upvote(post=post, hash_id=f"boost-{i}")
                 upvote.save()
+        if request.POST.get("deprioritise-post", False):
+            post = Post.objects.get(pk=request.POST.get("deprioritise-post"))
+            post.deprioritise = True
+            post.save()
         if request.POST.get("pin-post", False):
             post = Post.objects.get(pk=request.POST.get("pin-post"))
             post.pinned = not post.pinned

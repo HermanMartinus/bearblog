@@ -63,6 +63,10 @@
                             <button onclick="event.preventDefault();if(confirm('Boost this post?')){event.target.parentElement.submit()}">Boost post</button>
                         </form>
                         <form method="POST" style="display:inline">
+                            <input hidden name="deprioritise-post" value="{{ post.pk }}">
+                            <button onclick="event.preventDefault();if(confirm('Deprioritise this post?')){event.target.parentElement.submit()}">Deprioritise post</button>
+                        </form>
+                        <form method="POST" style="display:inline">
                             <input hidden name="pin-post" value="{{ post.pk }}">
                             <button onclick="event.preventDefault();if(confirm('Toggle pin this post?')){event.target.parentElement.submit()}">
                                 {% if post.pinned %}Un-{% endif %}Pin post

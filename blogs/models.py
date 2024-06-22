@@ -192,6 +192,7 @@ class Post(models.Model):
     score = models.FloatField(default=0)
     hidden = models.BooleanField(default=False)
     pinned = models.BooleanField(default=False)
+    deprioritise = models.BooleanField(default=False)
 
     @property
     def contains_code(self):
@@ -215,7 +216,7 @@ class Post(models.Model):
 
             seconds = posted_at.timestamp()
             if seconds > 0:
-                if self.blog.deprioritise:
+                if self.blog.deprioritise or self.deprioritise:
                     score = 0
                 else:
                     score = (log_of_upvotes) + ((seconds - 1577811600) / (14 * 86400))
