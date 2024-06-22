@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.cache import cache
 
 from allauth.account.models import EmailAddress
 
@@ -148,7 +149,7 @@ class Blog(models.Model):
         for term in persistent_store.highlight_terms:
             dodgy_term_count += all_content.lower().count(term.lower())
 
-        self.dodginess_score = dodgy_term_count # / len(all_content) *10000
+        self.dodginess_score = dodgy_term_count
 
     def save(self, *args, **kwargs):
         if self.user.settings.upgraded:
@@ -156,6 +157,10 @@ class Blog(models.Model):
         
         if not self.reviewed:
             self.determine_dodginess()
+        
+        # Invalidate feed cache
+        CACHE_KEY = f'{self.subdomain}_all_posts'
+        cache.delete(CACHE_KEY)
         
         super(Blog, self).save(*args, **kwargs)
 

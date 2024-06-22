@@ -1,6 +1,7 @@
 from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import timezone
+from django.core.cache import cache
 
 from blogs.helpers import salt_and_hash, unmark
 from blogs.models import RssSubscriber
@@ -13,6 +14,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+CACHE_TIMEOUT = 3600  # 1 hour in seconds
 
 def clean_string(s):
     return re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', s)
@@ -23,13 +25,20 @@ def feed(request):
         return not_found(request)
 
     tag = request.GET.get('q')
+    
+    CACHE_KEY = f'{blog.subdomain}_all_posts'
+    cached_queryset = cache.get(CACHE_KEY)
+
+    if cached_queryset is None:
+        all_posts = blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now())
+        cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
+    else:
+        all_posts = cached_queryset
+        print(f'Getting {blog.useful_domain} feed from cache')
 
     if tag:
-        all_posts = blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now(), all_tags__icontains=tag).order_by('-published_date')[:10]
-    else:
-        all_posts = blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now()).order_by('-published_date')[:10]
-
-    all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
+        all_posts = all_posts.filter(all_tags__icontains=tag)
+    all_posts = all_posts.order_by('-published_date')[:10]
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain)
