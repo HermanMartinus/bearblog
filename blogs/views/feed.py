@@ -34,7 +34,6 @@ def feed(request):
         cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
     else:
         all_posts = cached_queryset
-        print(f'Getting {blog.useful_domain} feed from cache')
 
     if tag:
         all_posts = all_posts.filter(all_tags__icontains=tag)

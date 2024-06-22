@@ -120,7 +120,6 @@ def feed(request):
             cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
         else:
             all_posts = cached_queryset
-            print('Getting discover newest feed from cache')
     else:
         fg.title("Bear Blog Trending Posts")
         fg.subtitle("Trending posts on Bear Blog")
@@ -135,7 +134,6 @@ def feed(request):
             cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
         else:
             all_posts = cached_queryset
-            print('Getting discover trending feed from cache')
 
     for post in all_posts:
         fe = fg.add_entry()
