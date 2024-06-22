@@ -161,7 +161,8 @@ class Blog(models.Model):
         # Invalidate feed cache
         CACHE_KEY = f'{self.subdomain}_all_posts'
         cache.delete(CACHE_KEY)
-        
+        print(f"Cache invalidated for key: {self.useful_domain}")        
+
         super(Blog, self).save(*args, **kwargs)
 
     def __str__(self):
