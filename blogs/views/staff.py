@@ -20,7 +20,9 @@ def dashboard(request):
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 
-    to_review = blogs_to_review().count()
+    opt_in_blogs_count = opt_in_blogs().count()
+    dodgy_blogs_count = dodgy_blogs().count()
+    new_blogs_count = new_blogs().count()
 
     users = User.objects.filter(is_active=True, date_joined__gt=start_date).order_by('date_joined')
 
@@ -112,7 +114,9 @@ def dashboard(request):
             'upgrade_chart': upgrade_chart,
             'start_date': start_date,
             'end_date': end_date,
-            'to_review': to_review,
+            'opt_in_blogs_count': opt_in_blogs_count,
+            'dodgy_blogs_count': dodgy_blogs_count,
+            'new_blogs_count': new_blogs_count,
             'empty_blogs': empty_blogs,
             'days_filter': days_filter
         }
@@ -130,23 +134,6 @@ def get_empty_blogs():
     return empty_blogs
 
 
-def blogs_to_review():
-    # Opted-in for review
-    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True).order_by('created_date')
-
-    if to_review.count() < 1:
-        to_review = Blog.objects.filter(
-            reviewed=False,
-            user__is_active=True,
-            to_review=False,
-            dodginess_score__gt=2,
-            ignored_date__isnull=True
-        ).prefetch_related('posts').order_by('-dodginess_score')
-
-    
-    return to_review
-
-
 @staff_member_required
 def delete_empty(request):
     for blog in get_empty_blogs():
@@ -156,9 +143,39 @@ def delete_empty(request):
     return redirect('staff_dashboard')
 
 
+def new_blogs():
+    to_review = Blog.objects.filter(reviewed=False, user__is_active=True).order_by('created_date')
+    
+    return to_review
+
+
+def opt_in_blogs():
+    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True).order_by('created_date')
+    
+    return to_review
+
+
+def dodgy_blogs():
+    to_review = Blog.objects.filter(
+        reviewed=False,
+        user__is_active=True,
+        to_review=False,
+        dodginess_score__gt=2,
+        ignored_date__isnull=True
+    ).prefetch_related('posts').order_by('-dodginess_score')
+
+    return to_review
+
+
 @staff_member_required
 def review_bulk(request):
-    blogs = blogs_to_review()[:100]
+    if 'opt-in' in request.path:
+        blogs = opt_in_blogs()[:100]
+    elif 'new' in request.path:
+        blogs = new_blogs()[:100]
+    elif 'dodgy' in request.path:
+        blogs = dodgy_blogs()[:100]
+
     still_to_go = blogs.count()
     persistent_store = PersistentStore.load()
 

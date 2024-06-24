@@ -12,7 +12,9 @@ urlpatterns = [
     # Staff dashboard
     path('staff/', RedirectView.as_view(pattern_name='staff_dashboard', permanent=False)),
     path('staff/dashboard/', staff.dashboard, name='staff_dashboard'),
-    path('staff/review/', staff.review_bulk, name='review'),
+    path('staff/review/new/', staff.review_bulk, name='review_new'),
+    path('staff/review/opt-in/', staff.review_bulk, name='review_opt_in'),
+    path('staff/review/dodgy/', staff.review_bulk, name='review_dodgy'),
     path('staff/review/approve/<pk>', staff.approve, name='review_approve'),
     path('staff/review/block/<pk>', staff.block, name='review_block'),
     path('staff/review/ignore/<pk>', staff.ignore, name='review_ignore'),
@@ -20,6 +22,7 @@ urlpatterns = [
     path('staff/dashboard/delete-empty/', staff.delete_empty, name='delete_empty'),
     path('staff/dashboard/migrate-blog/', staff.migrate_blog, name='migrate_blog'),
 
+    # User dashboard
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
     path('signup/', signup_flow.signup, name="signup_flow"),
 
