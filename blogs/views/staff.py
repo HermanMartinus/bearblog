@@ -23,6 +23,7 @@ def dashboard(request):
     opt_in_blogs_count = opt_in_blogs().count()
     dodgy_blogs_count = dodgy_blogs().count()
     new_blogs_count = new_blogs().count()
+    all_empty_blogs = empty_blogs()
 
     users = User.objects.filter(is_active=True, date_joined__gt=start_date).order_by('date_joined')
 
@@ -98,8 +99,6 @@ def dashboard(request):
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
 
-    empty_blogs = get_empty_blogs()
-
     return render(
         request,
         'staff/dashboard.html',
@@ -117,30 +116,30 @@ def dashboard(request):
             'opt_in_blogs_count': opt_in_blogs_count,
             'dodgy_blogs_count': dodgy_blogs_count,
             'new_blogs_count': new_blogs_count,
-            'empty_blogs': empty_blogs,
+            'empty_blogs': all_empty_blogs,
             'days_filter': days_filter
         }
     )
 
 
-def get_empty_blogs():
-    # Empty blogs
-    # Not used in the last 270 days
-    # Most recent 100
-    timeperiod = timezone.now() - timedelta(days=270)
-    empty_blogs = Blog.objects.annotate(num_posts=Count('posts')).annotate(content_length=Length('content')).filter(
-        last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=60, user__settings__upgraded=False, custom_styles="").order_by('-created_date')[:100]
-
-    return empty_blogs
 
 
 @staff_member_required
 def delete_empty(request):
-    for blog in get_empty_blogs():
+    for blog in empty_blogs():
         print(f'Deleting {blog}')
         blog.delete()
 
     return redirect('staff_dashboard')
+
+
+def empty_blogs():
+    # Not used in the last year
+    timeperiod = timezone.now() - timedelta(days=365)
+    blogs = Blog.objects.annotate(num_posts=Count('posts')).annotate(content_length=Length('content')).filter(
+        last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=60, user__settings__upgraded=False, custom_styles="").order_by('-created_date')[:100]
+
+    return blogs
 
 
 def new_blogs():
