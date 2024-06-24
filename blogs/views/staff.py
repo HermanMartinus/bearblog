@@ -125,7 +125,6 @@ def dashboard(request):
 @staff_member_required
 def delete_empty(request):
     for blog in empty_blogs():
-        print(f'Deleting {blog}')
         blog.delete()
 
     return redirect('staff_dashboard')
