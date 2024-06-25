@@ -102,6 +102,9 @@ class MyRenderer(HTMLRenderer):
 
 
     def text(self, text):
+        # Replace trailing backslashes with <br>
+        if re.match(r'^\s*\\\s*$', text):
+            text = '<br>'
         return typographic_replacements(text)
     
     def inline_html(self, html):
