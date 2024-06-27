@@ -11,14 +11,17 @@
 {% block content %}
 <h1>Media (experimental)</h1>
 <div style="display: flex; flex-flow: row wrap; gap: 5px;">
-    {% for url in uploaded_media %}
-    <span style="text-align: center; border: 1px solid;">
-        <img style="object-fit: contain;" src="{{ url }}" width=150 height=150 />
+    {% for media in blog.media.all %}
+    <span style="text-align: center; background-color: #eceff4;">
+        <img style="object-fit: contain;" src="{{ media.url }}" width=150 height=150 />
         <br>
-        <button onclick="navigator.clipboard.writeText('{{ url }}').then(() => alert('URL copied to clipboard'));">Copy URL</button>
-        <button style="color: red;" onclick="confirm('Deleting not currently available')">
-            Delete
-        </button>
+        <small>{{ media.created_at|date:'d M, Y'}}</small>
+        <br>
+        <button onclick="navigator.clipboard.writeText('{{ media.url }}').then(() => alert('URL copied to clipboard'));">Copy URL</button>
+        <form method="post" action="{% url 'delete_image' id=blog.subdomain image_key=media.url|cut:'https://bear-images.sfo2.cdn.digitaloceanspaces.com/' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="color: red;" onclick="return confirm('Are you sure you want to delete this image?');">Delete</button>
+        </form>
     </span>
     {% endfor %}
 </div>

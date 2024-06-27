@@ -6,10 +6,9 @@ from django.utils.html import escape, format_html, format_html_join
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from blogs.models import Blog, PersistentStore, Post, RssSubscriber, Stylesheet, Upvote, Hit, Subscriber, UserSettings
-from blogs.helpers import check_connection, root
+from blogs.models import Blog, PersistentStore, Post, RssSubscriber, Stylesheet, Upvote, Hit, Subscriber, UserSettings, Media
+from blogs.helpers import root
 
-from requests import TooManyRedirects
 
 admin.autodiscover()
 admin.site.enable_nav_sidebar = False
@@ -149,6 +148,7 @@ class PostAdmin(admin.ModelAdmin):
 admin.site.register(Upvote)
 admin.site.register(Stylesheet)
 admin.site.register(RssSubscriber)
+admin.site.register(Media)
 
 
 @admin.register(Hit)

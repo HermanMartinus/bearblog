@@ -79,7 +79,7 @@ class Blog(models.Model):
     post_template = models.TextField(blank=True)
     robots_txt = models.TextField(blank=True)
     rss_alias = models.CharField(max_length=100, blank=True)
-
+    
     @property
     def older_than_one_day(self):
         return (timezone.now() - self.created_date).days > 1
@@ -294,6 +294,7 @@ class RssSubscriber(models.Model):
     def __str__(self):
         return f"{self.access_date.strftime('%d %b %Y, %X')} - {self.blog.title} - {self.hash_id}"
 
+
 class Stylesheet(models.Model):
     title = models.CharField(max_length=100)
     identifier = models.SlugField(max_length=100, unique=True)
@@ -304,6 +305,18 @@ class Stylesheet(models.Model):
     def __str__(self):
         return self.title
 
+
+class Media(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='media')
+    url = models.URLField(max_length=500)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.blog.subdomain} - {self.url} - {self.created_at}"
+    
 
 # Singleton model to store Bear specific settings
 class PersistentStore(models.Model):

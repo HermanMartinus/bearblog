@@ -1,3 +1,4 @@
+
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -5,9 +6,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
+from django.utils import timezone
 
 from ipaddr import client_ip
 from unicodedata import lookup
+from datetime import datetime
+import re
 import json
 import os
 import boto3
@@ -16,7 +20,7 @@ import djqscsv
 
 from blogs.forms import NavForm, StyleForm
 from blogs.helpers import get_country, is_protected
-from blogs.models import Blog, Post, Stylesheet
+from blogs.models import Blog, Media, Post, Stylesheet
 
 
 @login_required
@@ -148,6 +152,9 @@ def upload_image(request, id):
                     ContentType=file.content_type,
                     ACL='public-read',
                 )
+
+                # Create Media object
+                Media.objects.create(blog=blog, url=url)
             else:
                 raise ValidationError(f'Format not supported: {extension}')
 
@@ -157,12 +164,32 @@ def upload_image(request, id):
 @login_required
 def media_center(request, id):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-    uploaded_media = get_uploaded_images(blog)
+
+    if not blog.media.exists():
+        uploaded_images = get_uploaded_images(blog)
+        # Create Media objects for existing images
+        for url in uploaded_images:
+            created_at = extract_date_from_url(url)
+            Media.objects.get_or_create(blog=blog, url=url, defaults={'created_at': created_at})
 
     return render(request, 'dashboard/media.html', {
-        'uploaded_media': uploaded_media,
         'blog': blog,
     })
+
+
+def extract_date_from_url(url):
+    # Regular expression to match the timestamp in the image name
+    pattern = r'(?:.com/[^-]+-(\d+)(?:-\d+)?\.)'
+    match = re.search(pattern, url)
+    if match:
+        timestamp = int(match.group(1))
+        dt = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+        print(timestamp)
+        print(dt)
+        return dt
+    else:
+        raise ValueError("Invalid URL format")
+    
 
 def get_uploaded_images(blog):
     session = boto3.session.Session()
@@ -186,6 +213,30 @@ def get_uploaded_images(blog):
     ]
 
     return sorted(image_urls)
+
+
+@login_required
+def delete_image(request, id, image_key):
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    
+    if not blog.subdomain in image_key:
+        return redirect('media', id=id)
+    
+    if request.method == "POST":
+        session = boto3.session.Session()
+        client = session.client(
+            's3',
+            endpoint_url='https://sfo2.digitaloceanspaces.com',
+            region_name='sfo2',
+            aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('SPACES_SECRET')
+        )
+        
+        client.delete_object(Bucket='bear-images', Key=image_key)
+        url = f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{image_key}'
+        Media.objects.filter(blog=blog, url=url).delete()
+        
+    return redirect('media', id=id)
 
 
 @login_required
