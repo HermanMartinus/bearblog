@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import RedirectView
 
-from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow
+from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media
 from blogs import subscriptions
 from textblog import logger
 
@@ -39,13 +39,13 @@ urlpatterns = [
     path('<id>/dashboard/settings/advanced/', studio.advanced_settings, name='advanced_settings'),
     path('<id>/dashboard/directives/', studio.directive_edit, name="directive_edit"),
     path('<id>/dashboard/email-list/', emailer.email_list, name='email_list'),
-    path('<id>/dashboard/media/', dashboard.media_center, name='media'),
-    path('<id>/dashboard/media/delete/<path:image_key>/', dashboard.delete_image, name='delete_image'),
+    path('<id>/dashboard/media/', media.media_center, name='media'),
+    path('<id>/dashboard/media/delete-selected/', media.delete_selected_media, name='delete_selected_media'),
+    path('<id>/dashboard/upload-image/', media.upload_image, name='upload_image'),
 
     path('<id>/dashboard/analytics/', analytics.analytics, name='analytics'),
     path('<id>/dashboard/analytics-upgraded/', analytics.analytics_upgraded, name="analytics_upgraded"),
 
-    
     path('<id>/dashboard/opt-in-review/', dashboard.opt_in_review, name='opt_in_review'),
 
     path('<id>/dashboard/posts/', dashboard.posts_edit, name='posts_edit'),
@@ -54,7 +54,6 @@ urlpatterns = [
     path('<id>/dashboard/posts/<uid>/', studio.post, name="post_edit"),
     path('<id>/dashboard/posts/<uid>/delete/', dashboard.post_delete, name='post_delete'),
     path('<id>/dashboard/preview/', studio.preview, name="post_preview"),
-    path('<id>/dashboard/upload-image/', dashboard.upload_image, name='upload_image'),
 
     path('<id>/dashboard/post-template/', studio.post_template, name="post_template"),
 

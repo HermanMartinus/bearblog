@@ -189,6 +189,26 @@ ul.post-list li small {
     flex: 0 0 115px;
 }
 
+/* media center */
+
+.media-container {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 5px;
+}
+.media-item {
+    text-align: center;
+    background-color: #eceff4;
+    position: relative;
+}
+.media-checkbox {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    margin: 0 !important;
+    height: unset !important;
+}
+
 /* discovery feed */
 ul.discover-posts {
     list-style-type: none;
