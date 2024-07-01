@@ -39,9 +39,12 @@ urlpatterns = [
     path('<id>/dashboard/settings/advanced/', studio.advanced_settings, name='advanced_settings'),
     path('<id>/dashboard/directives/', studio.directive_edit, name="directive_edit"),
     path('<id>/dashboard/email-list/', emailer.email_list, name='email_list'),
+
+    # Media
     path('<id>/dashboard/media/', media.media_center, name='media'),
     path('<id>/dashboard/media/delete-selected/', media.delete_selected_media, name='delete_selected_media'),
     path('<id>/dashboard/upload-image/', media.upload_image, name='upload_image'),
+    path('media/<str:img>/', media.image_proxy, name="image-proxy"),
 
     path('<id>/dashboard/analytics/', analytics.analytics, name='analytics'),
     path('<id>/dashboard/analytics-upgraded/', analytics.analytics_upgraded, name="analytics_upgraded"),

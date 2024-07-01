@@ -10,11 +10,8 @@ from django.utils.text import slugify
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import get_posts, salt_and_hash, unmark
 from blogs.tasks import daily_task
-from blogs.templatetags.custom_tags import format_date
 from blogs.views.analytics import render_analytics
 
-from io import BytesIO
-from PIL import Image, ImageDraw, ImageFont
 import tldextract
 
 
