@@ -41,7 +41,8 @@ HOST_WHITELIST = [
     'mrkennedy.ca',
     'open.spotify.com',
     'umap.openstreetmap.fr',
-    'music.163.com'
+    'music.163.com',
+    'sheevcharan.substack.com'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
