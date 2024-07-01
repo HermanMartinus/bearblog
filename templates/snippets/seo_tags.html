@@ -8,18 +8,16 @@
 <meta property="og:type" content="{{ type }}">
 <meta property="og:url" content="{{ url }}">
 <meta property="og:description" content="{{ description }}">
-{% if image %}
-  <meta property="og:image" content="{{ image }}">
-{% endif %}
+<meta property="og:image" content="{% if image %}{{ image }}{% else %}https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556668-0.png{% endif %}">
+
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary">
 <meta property="twitter:url" content="{{ url }}">
 <meta property="twitter:title" content="{{ title }}">
 <meta property="twitter:description" content="{{ description }}">
-{% if image %}
-  <meta property="twitter:image" content="{{ image }}">
-{% endif %}
+<meta property="twitter:image" content="{% if image %}{{ image }}{% else %}https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556668-0.png{% endif %}">
+
 {{ meta_tag | safe }}
 
 <!-- Microdata -->
