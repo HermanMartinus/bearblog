@@ -115,10 +115,6 @@ def post(request, slug):
     blog = resolve_address(request)
     if not blog:
         return not_found(request)
-
-    # Check for a custom blogreel path and render the blog page
-    if slug == blog.blog_path:
-        return posts(request)
     
      # Check for a custom RSS feed path
     if slug == blog.rss_alias:
@@ -133,8 +129,11 @@ def post(request, slug):
         if post:
             return redirect('post', slug=post.slug)
         else:
+            # Check for a custom blogreel path and render the blog page
+            if slug == blog.blog_path or slug == 'blog':
+                return posts(request)
             return render(request, '404.html', {'blog': blog}, status=404)
-
+    
     # Check if upvoted
     hash_id = salt_and_hash(request, 'year')
     upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
