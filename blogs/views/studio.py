@@ -171,7 +171,13 @@ def post(request, id, uid=None):
             for item in raw_header:
                 item = item.split(':', 1)
                 name = item[0].strip()
-                value = item[1].strip()
+
+                # Prevent index error
+                if len(item) == 2:
+                    value = item[1].strip()
+                else:
+                    value = ''
+
                 if str(value).lower() == 'true':
                     value = True
                 if str(value).lower() == 'false':
@@ -254,14 +260,9 @@ def post(request, id, uid=None):
                     # Redirect to the new post detail view
                     return redirect('post_edit', id=blog.subdomain, uid=post.uid)
 
-        except ValidationError:
-            error_messages.append("One of the header options is invalid")
-        except IndexError:
-            error_messages.append("One of the header options is invalid")
-        except ValueError as error:
-            error_messages.append(error)
-        except DataError as error:
-            error_messages.append(error)
+        except Exception as error:
+            error_messages.append(f"Header attribute error - your post has not been saved. Error: {str(error)}")
+            post.content = body_content
 
     template_header = ""
     template_body = ""
