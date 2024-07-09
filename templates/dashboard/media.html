@@ -31,7 +31,7 @@
 document.getElementById('deleteSelected').addEventListener('click', function() {
     var selected = document.querySelectorAll('input[name="selected_media"]:checked');
     if (selected.length > 0) {
-        if (confirm(`Are you sure you want to permenantly delete the selected media (${selected.length})?`)) {
+        if (confirm(`Are you sure you want to permenantly delete the selected media (${selected.length})? This will break the image link if in use somewhere.`)) {
             document.getElementById('deleteForm').submit();
         }
     } else {
