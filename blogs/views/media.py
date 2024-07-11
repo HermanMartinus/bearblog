@@ -29,7 +29,10 @@ def upload_image(request, id):
         for file in request.FILES.getlist('file'):
             extension = file.name.split('.')[-1].lower()
             if extension.endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'heic', 'ico')):
-
+                
+                if file.size > 10 * 1024 * 1024:  # 10MB in bytes
+                    raise ValidationError(f'File {file.name} exceeds 10MB limit')
+                
                 filepath = f'{blog.subdomain}-{time_string}.{extension}'
                 url = f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{filepath}'
                 file_links.append(url)
