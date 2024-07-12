@@ -64,7 +64,10 @@ def upload_image(request, id):
 @login_required
 def media_center(request, id):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-
+    
+    if not blog.user.settings.upgraded:
+        return redirect('upgrade')
+    
     if not blog.media.exists():
         uploaded_images = get_uploaded_images(blog)
         # Create Media objects for existing images
