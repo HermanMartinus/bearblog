@@ -23,7 +23,7 @@ def get_base_query():
     
     queryset = Post.objects.annotate(content_length=Length('content')).filter(
         publish=True,
-        content_length__gt=200,
+        content_length__gt=100,
         hidden=False,
         blog__reviewed=True,
         blog__user__is_active=True,
