@@ -142,7 +142,7 @@ def delete_selected_media(request, id):
                 return HttpResponseForbidden("Error: Attempted to delete unauthorized media")
             
         
-    return redirect('media', id=id)
+    return redirect('media_center', id=id)
 
 
 def image_proxy(request, img):
