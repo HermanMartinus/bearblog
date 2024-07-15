@@ -10,29 +10,36 @@
 
 {% block content %}
 <button onclick="window.history.back()">← Back</button>
-<h1>Upgrade</h1>
+{% comment %} <h1>Upgrade</h1> {% endcomment %}
 
 {% if not request.user.settings.upgraded %}
-<h3>Keep the tiny internet awesome!  <span class="bear">\ʕ•ᴥ•ʔ/</span></h2>
+<h2>Upgrade and keep the tiny internet awesome!  <span class="bear">\ʕ•ᴥ•ʔ/</span></h2>
 <p>
-    Bear will never sell your data, or display ads.
+    With Bear, you're not just blogging - you're nurturing a space that's truly yours.
     <br>
     <br>
-    To keep the servers running and the coffee hot,<br>
-    I charge for the most resource-intensive features:
+    We don't make money by selling data, tracking readers, or displaying ads.
+    We do it by creating <b>something great</b> and charging a fee for it.
+    <br>
+    <br>
+    That's a straightforward business model that's also <b>sustainable</b>.
+    <br>
+    <br>
+    Here's what you get if you upgrade:
     <ul>
         <li>Custom domains</li>
         <li>Publish up to 10 sites</li>
         <li>Image uploading</li>
         <li>In-depth analytics</li>
         <li>Email subscriber capture</li>
-        <li>Run JS scripts</li>
-        <li>Add code to head and footer</li>
+        <li>Add javascript to page content</li>
+        <li>Add code to head and footer elements</li>
+        <li>Remove Bear branding (but only if you want to)</li>
     </ul>
 </p>
 <p>
     <b>
-        Upgrade for $5 per month <small style="font-size: 10px; color: grey;">(or $48 per year)</small>
+        Upgrade for $7 per month <small style="font-size: 10px; color: grey;">(or $69 per year)</small>
     </b>
 </p>
 
@@ -48,28 +55,18 @@
     <button onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][user_id]={{user.id}}')">Upgrade</button>
 </p>
 
+
+
 <small>
-    <details>
-        <summary>Need convincing?</summary>
-        <p>
-            Bear's relative cost is great when compared to stringing together disparate services.
-            <br>
-            <br>
-            Privacy respecting analytics comes at a premium of <a href="https://usefathom.com/pricing" target="_blank">$14/mo</a>, and hosting and image hosting can cost upwards of <a href="https://www.digitalocean.com/pricing/droplets" target="_blank">$5/mo</a> a piece.
-            Overall a custom built blog can cost upwards of $24/mo.
-            <br>
-            <br>
-            Bear integrates all of these services. You don't even have to buy themes separately. 
-            <br>
-            <br>
-            When compared to other blogging platforms such as Ghost <a href="https://ghost.org/pricing/" target="_blank">($9/mo)</a> and Weebly <a href="https://www.weebly.com/za/pricing" target="_blank">($12/mo without ads)</a>, Bear comes in as being faster and more affordable.
-            You could choose Wordpress <a href="https://wordpress.com/pricing/" target="_blank">($4/mo)</a>, but who in their right mind wants to use Wordpress?
-            <br>
-            <br>
-            Most importantly, you'll be supporting the small, fast internet, and a blogging platform <a href="https://herman.bearblog.dev/building-software-to-last-forever" target="_blank">built to last forever</a>.
-        </p>
-    </details>
+    With Bear, you're not just getting a blogging tool - you're gaining back control in an ever enshittifying Internet. 
+    But most importantly, you'll be supporting the small, fast internet, and a blogging platform <a href="https://herman.bearblog.dev/building-software-to-last-forever" target="_blank">built to last forever</a>.
 </small>
+
+<p>
+    <small>
+    <a href="https://herman.bearblog.dev/praise-for-bear/" target="_balnk">Still need convincing?</a>
+    </small>
+</p>
 {% else %}
 <h3>You've already upgraded your Bear account! <span class="bear">\ʕ•ᴥ•ʔ/</span></h3>
 {% endif %}
