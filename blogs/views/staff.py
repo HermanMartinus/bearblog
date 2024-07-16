@@ -143,7 +143,7 @@ def new_blogs():
         user__is_active=True,
         ignored_date__isnull=True,
         to_review=False,
-        created_date__gte=timezone.now() - timedelta(days=2)
+        created_date__lte=timezone.now() - timedelta(days=2)
     ).order_by('created_date')
     
     return to_review
