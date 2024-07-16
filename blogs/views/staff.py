@@ -138,6 +138,9 @@ def empty_blogs():
 
 
 def new_blogs():
+    persistent_store = PersistentStore.load()
+    ignore_terms = persistent_store.ignore_terms
+
     to_review = Blog.objects.filter(
         Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True),
         reviewed=False,
@@ -145,6 +148,9 @@ def new_blogs():
         to_review=False,
         created_date__lte=timezone.now() - timedelta(days=2)
     ).order_by('created_date')
+
+    for term in ignore_terms:
+        to_review = to_review.exclude(content__icontains=term)
     
     return to_review
 
