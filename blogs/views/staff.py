@@ -120,8 +120,6 @@ def dashboard(request):
     )
 
 
-
-
 @staff_member_required
 def delete_empty(request):
     for blog in empty_blogs():
@@ -140,7 +138,13 @@ def empty_blogs():
 
 
 def new_blogs():
-    to_review = Blog.objects.filter(reviewed=False, user__is_active=True).order_by('created_date')
+    to_review = Blog.objects.filter(
+        reviewed=False,
+        user__is_active=True,
+        ignored_date__isnull=True,
+        to_review=False,
+        created_date__gte=timezone.now() - timedelta(days=2)
+    ).order_by('created_date')
     
     return to_review
 
