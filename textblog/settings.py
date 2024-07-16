@@ -59,7 +59,7 @@ ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
-CSP_FRAME_SRC = ("'self'", 'bearblog.dev')
+X_FRAME_OPTIONS = 'ALLOW-FROM https://bearblog.dev'
 
 INTERNAL_IPS = ['127.0.0.1']
 
