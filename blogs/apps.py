@@ -9,5 +9,6 @@ class BlogsConfig(AppConfig):
 
     def ready(self):
         print("ʕ≧ᴥ≦ʔ Bear has been activated!")
-        logger.info("ʕ≧ᴥ≦ʔ Bear has been activated!")
+        logger.error(f'ʕ≧ᴥ≦ʔ Bear has been activated!', exc_info=True)
+        # logger.info("ʕ≧ᴥ≦ʔ Bear has been activated!")
 
