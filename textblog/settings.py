@@ -45,11 +45,6 @@ if not DEBUG:
                 'level': 'CRITICAL',
                 'propagate': False,
             },
-            'blogs': {
-                'handlers': ['console', 'slack'],
-                'level': 'INFO',
-                'propagate': True,
-            },
         },
         'root': {
             'handlers': ['slack'],
