@@ -51,12 +51,11 @@ body {
         Last posted {{ blog.last_posted | timesince }} ago
     </b></p>
 
-    <nav>{{ blog.nav  }}</nav>
     <br><br>
-    {{ blog.content | linebreaksbr }}
-
-
-    <ul style="padding-bottom: 30px; max-height: 500px; overflow: auto; border: 1px dashed">
+    <ul style="padding-bottom: 30px; max-height: 400px; overflow: auto; border: 1px dashed">
+        <li>
+            {{ blog.content | linebreaksbr }}
+        </li>
         {% for post in blog.posts.all %}
         <li>
             <i>
@@ -72,7 +71,7 @@ body {
         {% endfor %}
     </ul>
 
-    <iframe src="{{ blog.useful_domain }}" loading="lazy" width="100%" height="400"></iframe>
+    <iframe src="{{ blog.bear_domain }}" loading="lazy" width="100%" height="400"></iframe>
 
     {% if blog.reviewer_note %}
     <p style="color: darkgreen">
