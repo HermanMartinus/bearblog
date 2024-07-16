@@ -1,7 +1,7 @@
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
-from django.db.models import Q, Count
+from django.db.models import Q, F, Count
 from django.db.models.functions import Length, TruncDate, Length
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.models import User
@@ -139,9 +139,9 @@ def empty_blogs():
 
 def new_blogs():
     to_review = Blog.objects.filter(
+        Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True),
         reviewed=False,
         user__is_active=True,
-        ignored_date__isnull=True,
         to_review=False,
         created_date__lte=timezone.now() - timedelta(days=2)
     ).order_by('created_date')
