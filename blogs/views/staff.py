@@ -22,6 +22,8 @@ def dashboard(request):
 
     opt_in_blogs_count = opt_in_blogs().count()
     dodgy_blogs_count = dodgy_blogs().count()
+    new_blogs_count = new_blogs().count()
+
     all_empty_blogs = empty_blogs()
 
     users = User.objects.filter(is_active=True, date_joined__gt=start_date).order_by('date_joined')
@@ -114,6 +116,7 @@ def dashboard(request):
             'end_date': end_date,
             'opt_in_blogs_count': opt_in_blogs_count,
             'dodgy_blogs_count': dodgy_blogs_count,
+            'new_blogs_count': new_blogs_count,
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter
         }
