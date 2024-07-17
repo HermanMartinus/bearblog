@@ -17,6 +17,8 @@ import time
 
 from blogs.models import Blog, Media
 
+file_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'heic', 'ico', 'mp4']
+
 @csrf_exempt
 @login_required
 def upload_image(request, id):
@@ -28,7 +30,7 @@ def upload_image(request, id):
 
         for file in request.FILES.getlist('file'):
             extension = file.name.split('.')[-1].lower()
-            if extension.endswith(('png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'heic', 'ico')):
+            if extension.endswith(tuple(file_types)):
                 
                 if file.size > 10 * 1024 * 1024:  # 10MB in bytes
                     raise ValidationError(f'File {file.name} exceeds 10MB limit')
@@ -110,7 +112,7 @@ def get_uploaded_images(blog):
     image_urls = [
         f'https://bear-images.sfo2.cdn.digitaloceanspaces.com/{item["Key"]}'
         for item in response['Contents']
-        if item['Key'].split('.')[-1].lower() in ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'heic', 'ico']
+        if item['Key'].split('.')[-1].lower() in file_types
     ]
 
     return sorted(image_urls)
