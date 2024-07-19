@@ -88,9 +88,9 @@ def discover(request):
     base_query = get_base_query().exclude(id__in=pinned_posts)
 
     if newest:
-        other_posts = base_query.order_by("-first_published_at")
+        other_posts = base_query.order_by("-published_date")
     else:
-        other_posts = base_query.order_by("-score", "-first_published_at")
+        other_posts = base_query.order_by("-score", "-published_date")
 
     other_posts = other_posts.select_related("blog")[posts_from:posts_to]
 
