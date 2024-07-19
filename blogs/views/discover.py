@@ -79,7 +79,10 @@ def discover(request):
 
     newest = request.GET.get("newest")
 
-    pinned_posts = Post.objects.filter(pinned=True).order_by('-published_date')
+    if not newest and not page:
+        pinned_posts = Post.objects.filter(pinned=True).order_by('-published_date')
+    else:
+        pinned_posts = []
 
     # Use the base query function excluding pinned posts
     base_query = get_base_query().exclude(id__in=pinned_posts)
