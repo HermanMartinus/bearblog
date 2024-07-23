@@ -28,6 +28,7 @@
     <a href="/search/">Search</a>
 </nav>
 
+{% if request.user.is_staff %}
 <p>
     <details style="font-size: small; color: grey;">
         <summary>Language ({% if lang %}{{ lang }}{% else %}No filter{% endif %})</summary>
@@ -39,6 +40,7 @@
         {% endfor %}
     </details>
 </p>
+{% endif %}
 
 {% if newest %}
 <p>
