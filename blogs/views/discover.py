@@ -13,7 +13,6 @@ from blogs.helpers import clean_text, sanitise_int
 from feedgen.feed import FeedGenerator
 import mistune
 
-gravity = 1.2
 posts_per_page = 20
 
 CACHE_TIMEOUT = 300  # 5 minutes in seconds
@@ -34,8 +33,7 @@ def get_base_query():
 
     return queryset
 
-@csrf_exempt
-def discover(request):
+def admin_actions(request):
     # admin actions
     if request.user.is_staff:
         if request.POST.get("hide-post", False):
@@ -68,8 +66,22 @@ def discover(request):
             post.blog.user.is_active = False
             post.blog.user.save()
 
+
+@csrf_exempt
+def discover(request):
+    admin_actions(request)
+
     page = 0
-    gravity = float(request.GET.get("gravity", 1.2))
+
+    available_languages = [
+        "af", "ar", "az", "be", "bg", "bs", "ca", "cs", "cy", "da", "de", "dv",
+        "el", "en", "es", "et", "eu", "fa", "fi", "fo", "fr", "gl", "gu", "he",
+        "hi", "hr", "hu", "hy", "id", "is", "it", "ja", "ka", "kk", "kn", "ko",
+        "kok", "ky", "lt", "lv", "mi", "mk", "mn", "mr", "ms", "mt", "nb", "nl",
+        "nn", "no", "ns", "pa", "pl", "pt", "quz", "ro", "ru", "sa", "se", "sk",
+        "sl", "sma", "smj", "smn", "sms", "sq", "sr", "sv", "sw", "syr", "ta",
+        "te", "th", "tn", "tr", "tt", "uk", "ur", "uz", "vi", "xh", "zh", "zu"
+    ]
 
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
@@ -87,6 +99,14 @@ def discover(request):
     # Use the base query function excluding pinned posts
     base_query = get_base_query().exclude(id__in=pinned_posts)
 
+    lang = request.COOKIES.get('lang')
+
+    if lang:
+        base_query = base_query.filter(
+            (Q(lang__icontains=lang) & ~Q(lang='')) |
+            (Q(lang='') & Q(blog__lang__icontains=lang) & ~Q(blog__lang=''))
+        )
+
     if newest:
         other_posts = base_query.order_by("-published_date")
     else:
@@ -98,15 +118,17 @@ def discover(request):
 
     return render(request, "discover.html", {
         "site": Site.objects.get_current(),
+        "lang": lang,
+        "available_languages": available_languages,
         "posts": posts,
         "previous_page": page - 1,
         "next_page": page + 1,
         "posts_from": posts_from,
-        "gravity": gravity,
         "newest": newest,
     })
 
 
+# RSS/Atom feed
 def feed(request):
     fg = FeedGenerator()
     fg.id("bearblog")

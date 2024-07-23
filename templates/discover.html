@@ -27,6 +27,19 @@
     {% endif %}
     <a href="/search/">Search</a>
 </nav>
+
+<p>
+    <details style="font-size: small; color: grey;">
+        <summary>Language ({% if lang %}{{ lang }}{% else %}No filter{% endif %})</summary>
+        <a href="{{ request.path }}" onclick="document.cookie='lang=; path=/;';">None</a>
+        {% for language in available_languages %}
+            {% if language %}
+            <a href="{{ request.path }}" onclick="document.cookie='lang={{ language }}; path=/;';">{{ language }}</a>
+            {% endif %}
+        {% endfor %}
+    </details>
+</p>
+
 {% if newest %}
 <p>
     <small><i><a target="_blank" href="https://docs.bearblog.dev/review-process/">Not seeing your post?</a></i></small>

@@ -4,10 +4,10 @@ from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model, login
 
-from blogs.helpers import random_error_message
 from blogs.models import Blog
 
 from akismet import Akismet
+import random
 import os
 
 
@@ -121,3 +121,16 @@ def spam_check(title, content, email, user_ip, user_agent):
     if is_spam > 0:
         return True
     return False
+
+
+def random_error_message():
+    errors = [
+        'Whoops. Looks like our servers are bearly functioning. Try again later.',
+        'Ensure content contains necessary parameters.',
+        'Something went wrong. Please try restarting your computer.',
+        'Your password needs a special character, a number, and a capital letter.',
+        'Ensure content is the correct length.',
+        'Bear with us as we fix our software.'
+    ]
+
+    return random.choice(errors)
