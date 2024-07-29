@@ -83,6 +83,21 @@ def discover(request):
         "te", "th", "tn", "tr", "tt", "uk", "ur", "uz", "vi", "xh", "zh", "zu"
     ]
 
+    # Try to get the used languages from the cache
+    used_languages = cache.get('used_languages')
+
+    if not used_languages:
+        # Get distinct languages from posts if not cached
+        used_languages = set(Post.objects.values_list('lang', flat=True).distinct())
+        # Cache the used languages for 1 hour (3600 seconds)
+        cache.set('used_languages', used_languages, 3600)
+
+    # Filter available_languages to only include those that are in used_languages using startswith
+    available_languages = [
+        lang for lang in available_languages
+        if any(used_lang.startswith(lang) for used_lang in used_languages)
+    ]
+
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
 
