@@ -138,11 +138,10 @@ Score = log10(U) + (S / D * 8600)
 Where,
 U = Upvotes of a post
 S = Seconds since Jan 1st, 2020
-D = Days modifier (currently at 20)
+D = Days modifier (currently at 16)
 
 --
-D values is used to specify that content D days old needs to have 10 times
-as many upvotes as something published now in order to outrank it.
+D values is used to modify the effect of time on the score. The higher D, the more time gravity influences post score.
         </pre>
     </small>
 </p>
