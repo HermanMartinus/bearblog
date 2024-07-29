@@ -120,6 +120,8 @@ def discover(request):
 
 
 def get_available_languages():
+
+    return ["cs", "de", "en", "es", "fi", "fr", "hu", "id", "it", "ja", "ko", "nl", "pl", "pt", "ru", "sv", "tr", "zh"]
     # Try to get the used languages from the cache
     available_languages = cache.get('available_languages')
 
