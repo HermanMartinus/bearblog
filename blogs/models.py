@@ -219,7 +219,8 @@ class Post(models.Model):
                 if self.blog.deprioritise or self.deprioritise:
                     score = 0
                 else:
-                    score = (log_of_upvotes) + ((seconds - 1577811600) / (20 * 86400))
+                    gravity = 16
+                    score = (log_of_upvotes) + ((seconds - 1577811600) / (gravity * 86400))
                 self.score = score
     
     def save(self, *args, **kwargs):
