@@ -73,30 +73,6 @@ def discover(request):
 
     page = 0
 
-    available_languages = [
-        "af", "ar", "az", "be", "bg", "bs", "ca", "cs", "cy", "da", "de", "dv",
-        "el", "en", "es", "et", "eu", "fa", "fi", "fo", "fr", "gl", "gu", "he",
-        "hi", "hr", "hu", "hy", "id", "is", "it", "ja", "ka", "kk", "kn", "ko",
-        "kok", "ky", "lt", "lv", "mi", "mk", "mn", "mr", "ms", "mt", "nb", "nl",
-        "nn", "no", "ns", "pa", "pl", "pt", "quz", "ro", "ru", "sa", "se", "sk",
-        "sl", "sma", "smj", "smn", "sms", "sq", "sr", "sv", "sw", "syr", "ta",
-        "te", "th", "tn", "tr", "tt", "uk", "ur", "uz", "vi", "xh", "zh", "zu"
-    ]
-
-    # Try to get the used languages from the cache
-    used_languages = cache.get('used_languages')
-
-    if not used_languages:
-        # Get distinct languages from posts if not cached
-        used_languages = set(Post.objects.values_list('lang', flat=True).distinct())
-        # Cache the used languages for 1 hour (3600 seconds)
-        cache.set('used_languages', used_languages, 3600)
-
-    # Filter available_languages to only include those that are in used_languages using startswith
-    available_languages = [
-        lang for lang in available_languages
-        if any(used_lang.startswith(lang) for used_lang in used_languages)
-    ]
 
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
@@ -134,13 +110,43 @@ def discover(request):
     return render(request, "discover.html", {
         "site": Site.objects.get_current(),
         "lang": lang,
-        "available_languages": available_languages,
+        "available_languages": get_available_languages(),
         "posts": posts,
         "previous_page": page - 1,
         "next_page": page + 1,
         "posts_from": posts_from,
         "newest": newest,
     })
+
+
+def get_available_languages():
+    # Try to get the used languages from the cache
+    available_languages = cache.get('available_languages')
+
+    if not available_languages:
+        all_languages = [
+            "af", "ar", "az", "be", "bg", "bs", "ca", "cs", "cy", "da", "de", "dv",
+            "el", "en", "es", "et", "eu", "fa", "fi", "fo", "fr", "gl", "gu", "he",
+            "hi", "hr", "hu", "hy", "id", "is", "it", "ja", "ka", "kk", "kn", "ko",
+            "kok", "ky", "lt", "lv", "mi", "mk", "mn", "mr", "ms", "mt", "nb", "nl",
+            "nn", "no", "ns", "pa", "pl", "pt", "quz", "ro", "ru", "sa", "se", "sk",
+            "sl", "sma", "smj", "smn", "sms", "sq", "sr", "sv", "sw", "syr", "ta",
+            "te", "th", "tn", "tr", "tt", "uk", "ur", "uz", "vi", "xh", "zh", "zu"
+        ]
+
+        # Get distinct languages from posts if not cached
+        used_languages = set(Post.objects.values_list('lang', flat=True).distinct())
+
+        # Filter available_languages to only include those that are in used_languages using startswith
+        available_languages = [
+            lang for lang in all_languages
+            if any(used_lang.startswith(lang) for used_lang in used_languages)
+        ]
+
+        # Cache the used languages for 1 hour (3600 seconds)
+        cache.set('available_languages', available_languages, 3600)
+    
+    return available_languages
 
 
 # RSS/Atom feed
