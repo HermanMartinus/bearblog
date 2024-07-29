@@ -76,24 +76,40 @@ def subscribe(request):
 
 @csrf_exempt
 def email_subscribe(request):
+    if is_dodgy(request):
+        return HttpResponse("Something went wrong. Try subscribing again. ʕノ•ᴥ•ʔノ ︵ ┻━┻")
+    
     blog = resolve_address(request)
     if not blog:
         return not_found(request)
-
+    
     if request.method == "POST":
-        if request.POST.get("email", "") and not request.POST.get("name", False):
-            recent_subscriptions = Subscriber.objects.filter(subscribed_date__gt=timezone.now()-timezone.timedelta(minutes=2)).count()
-            if recent_subscriptions > 10:
-                return HttpResponse("Too many recent subscriptions timeout")
-            email = request.POST.get("email", "")
-            subscriber_dupe = Subscriber.objects.filter(blog=blog, email_address=email).count()
-            if subscriber_dupe < 1:
-                validate_subscriber_email(email, blog)
-                return HttpResponse("You've been subscribed! ＼ʕ •ᴥ•ʔ／")
-            else:
-                return HttpResponse("You are already subscribed.")
+        email = request.POST.get("email")
+        match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email)
+        if not match:
+            return HttpResponse("Bad email address.")
+        
+        recent_subscriptions = Subscriber.objects.filter(blog=blog, subscribed_date__gt=timezone.now()-timezone.timedelta(minutes=2)).count()
+        if recent_subscriptions > 10:
+            return HttpResponse("Too many recent subscriptions timeout")
+
+        subscriber, created = Subscriber.objects.get_or_create(blog=blog, email_address=email)
+        if created:
+            return HttpResponse("You've been subscribed! ＼ʕ •ᴥ•ʔ／")
+        else:
+            return HttpResponse("You're already subscribed.")
 
     return HttpResponse("Something went wrong.")
+
+
+def is_dodgy(request):
+    if request.POST.get("name"):
+        print('Name was filled in')
+        return True
+
+    if request.POST.get("confirm") != "829389c2a9f0402b8a3600e52f2ad4e1":
+        print('Confirm code was incorrect')
+        return True
 
 
 def confirm_subscription(request):

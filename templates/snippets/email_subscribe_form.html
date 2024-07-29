@@ -1,11 +1,23 @@
 <form class="email-signup" action="/email-subscribe/" method="post">
-    <input type="text" name="name" style="display:none">
-    <input type="email" placeholder="Email address..." name="email" style="background-color: #eceff4; padding: 5px;">
+    <input type="text" name="name" autocomplete="off" autocorrect='off' style="display: none;">
+    <input type="text" name="confirm" autocomplete="off" autocorrect='off' style="display: none;">
+    <input type="email" placeholder="Email address..." name="email" required autocomplete="off" autocorrect='off' style="background-color: #eceff4; padding: 5px;">
     <br>
     <input type="submit" value="Subscribe">
 </form>
 <script>
     const signupForm = document.querySelector('.email-signup')
+    const confirm = signupForm.querySelector('input[name="confirm"]')
+    setTimeout(() => {
+        confirm.value = "829389c2a9f0402";
+    }, 1000);
+    
+    signupForm.querySelector('input[name="email"]').addEventListener('input', () => {
+        if(!confirm.value.includes("b8a3600e52f2ad4e1")) {
+            confirm.value += "b8a3600e52f2ad4e1";
+        }
+    });
+
     signupForm.addEventListener('submit', (e) => {
         e.preventDefault();
         fetch(signupForm.action, {
