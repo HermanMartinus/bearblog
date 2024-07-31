@@ -210,7 +210,13 @@ class Post(models.Model):
         self.upvotes = self.upvote_set.count()
 
         if self.upvotes > 1:
-            log_of_upvotes = log(self.upvotes, 10)
+
+            upvotes = self.upvotes
+            # Cap upvotes at 40 so they don't stick to the top forever
+            if upvotes > 40:
+                upvotes = 40
+
+            log_of_upvotes = log(upvotes, 10)
 
             posted_at = self.first_published_at or self.published_date
 
