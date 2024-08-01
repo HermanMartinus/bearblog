@@ -207,12 +207,14 @@ class Post(models.Model):
 
     def update_score(self):
         self.upvotes = self.upvote_set.count()
-        upvotes = self.upvotes + self.shadow_votes
+        upvotes = self.upvotes
 
         if upvotes > 1: 
             # Cap upvotes at 40 so they don't stick to the top forever
             if upvotes > 40:
                 upvotes = 40
+
+            upvotes += self.shadow_votes
 
             log_of_upvotes = log(upvotes, 10)
 
