@@ -36,27 +36,14 @@ def get_base_query():
 def admin_actions(request):
     # admin actions
     if request.user.is_staff:
-        if request.POST.get("hide-post", False):
-            post = Post.objects.get(pk=request.POST.get("hide-post"))
-            post.hidden = True
-            post.save()
-        if request.POST.get("boost-post", False):
-            post = Post.objects.get(pk=request.POST.get("boost-post"))
-            for i in range(0, 5):
-                upvote = Upvote(post=post, hash_id=f"boost-{i}")
-                upvote.save()
-        if request.POST.get("deprioritise-post", False):
-            post = Post.objects.get(pk=request.POST.get("deprioritise-post"))
-            post.deprioritise = True
-            post.save()
         if request.POST.get("pin-post", False):
             post = Post.objects.get(pk=request.POST.get("pin-post"))
             post.pinned = not post.pinned
             post.save()
-        if request.POST.get("deprioritise-blog", False):
-            post = Post.objects.get(pk=request.POST.get("deprioritise-blog"))
-            post.blog.deprioritise = True
-            post.blog.save()
+        if request.POST.get("hide-post", False):
+            post = Post.objects.get(pk=request.POST.get("hide-post"))
+            post.hidden = True
+            post.save()
         if request.POST.get("hide-blog", False):
             post = Post.objects.get(pk=request.POST.get("hide-blog"))
             post.blog.hidden = True
@@ -65,6 +52,11 @@ def admin_actions(request):
             post = Post.objects.get(pk=request.POST.get("block-blog"))
             post.blog.user.is_active = False
             post.blog.user.save()
+        
+        if request.POST.get("set-votes", False):
+            post = Post.objects.get(pk=request.POST.get("set-votes"))
+            post.shadow_votes = int(request.POST.get("shadow-votes"))
+            post.save()
 
 
 @csrf_exempt

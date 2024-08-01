@@ -60,7 +60,6 @@ class Blog(models.Model):
     ignored_date = models.DateTimeField(blank=True, null=True)
     to_review = models.BooleanField(default=False)
     reviewer_note = models.TextField(blank=True)
-    deprioritise = models.BooleanField(default=False)
     hidden = models.BooleanField(default=False)
 
     custom_styles = models.TextField(blank=True)
@@ -189,10 +188,10 @@ class Post(models.Model):
 
     first_published_at = models.DateTimeField(blank=True, null=True)
     upvotes = models.IntegerField(default=0)
+    shadow_votes = models.IntegerField(default=0)
     score = models.FloatField(default=0)
     hidden = models.BooleanField(default=False)
     pinned = models.BooleanField(default=False)
-    deprioritise = models.BooleanField(default=False)
 
     @property
     def contains_code(self):
@@ -208,10 +207,9 @@ class Post(models.Model):
 
     def update_score(self):
         self.upvotes = self.upvote_set.count()
+        upvotes = self.upvotes + self.shadow_votes
 
-        if self.upvotes > 1:
-
-            upvotes = self.upvotes
+        if upvotes > 1: 
             # Cap upvotes at 40 so they don't stick to the top forever
             if upvotes > 40:
                 upvotes = 40
@@ -222,11 +220,8 @@ class Post(models.Model):
 
             seconds = posted_at.timestamp()
             if seconds > 0:
-                if self.blog.deprioritise or self.deprioritise:
-                    score = 0
-                else:
-                    gravity = 14
-                    score = (log_of_upvotes) + ((seconds - 1577811600) / (gravity * 86400))
+                gravity = 14
+                score = (log_of_upvotes) + ((seconds - 1577811600) / (gravity * 86400))
                 self.score = score
     
     def save(self, *args, **kwargs):

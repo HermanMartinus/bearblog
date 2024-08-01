@@ -88,7 +88,6 @@ Herman
         </textarea>
     </details>
     <br>
-    <input type="checkbox" class="deprioritise" name="deprioritise"> deprioritise |
     <input type="checkbox" class="hide" name="hide"> hide
     <br>
     <br>
@@ -184,27 +183,24 @@ Herman
 
     function approveBlogWithEmail(pk) {
         const message = document.querySelector(`#blog-${pk} .message`).value;
-        const deprioritise = document.querySelector(`#blog-${pk} .deprioritise`).checked;
         const hide = document.querySelector(`#blog-${pk} .hide`).checked;
         
-        sendApproveBlog(pk, message, deprioritise, hide)
+        sendApproveBlog(pk, message, hide)
 
         document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
     }
     
     function approveBlog(pk) {
-        const deprioritise = document.querySelector(`#blog-${pk} .deprioritise`).checked;
         const hide = document.querySelector(`#blog-${pk} .hide`).checked;
 
-        sendApproveBlog(pk, false, deprioritise, hide)
+        sendApproveBlog(pk, false, hide)
 
         document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
     }
 
-    function sendApproveBlog(pk, message=false, deprioritise=false, hide=false) {
+    function sendApproveBlog(pk, message=false, hide=false) {
         let queryParams = [];
         if (message) queryParams.push(`message=${message}`);
-        if (deprioritise) queryParams.push(`deprioritise=${deprioritise}`);
         if (hide) queryParams.push(`hide=${hide}`);
         
         const queryString = queryParams.join('&');
