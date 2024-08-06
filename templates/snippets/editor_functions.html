@@ -83,6 +83,13 @@
 		}
 	}
 
+	function deletePost() {
+		if (confirm('Are you sure?')) {
+			$form.action = '/{{ blog.subdomain }}/dashboard/posts/{{ post.uid }}/delete/';
+			$form.submit()
+		}
+	}
+
 	// Upgraded features
 	{% if request.user.settings.upgraded %}
 	// Upload images

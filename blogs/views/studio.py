@@ -64,7 +64,7 @@ def studio(request, id):
     header_content = request.POST.get('header_content', '')
     body_content = request.POST.get('body_content', '')
 
-    if header_content:
+    if request.method == "POST" and header_content:
         try:
             error_messages.extend(parse_raw_homepage(blog, header_content, body_content))
         except IndexError:
@@ -468,6 +468,7 @@ def directive_edit(request, id):
     return render(request, 'studio/directive_edit.html', {
         'blog': blog
     })
+
 
 @login_required
 def advanced_settings(request, id):

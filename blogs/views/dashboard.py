@@ -102,12 +102,13 @@ def pages_edit(request, id):
 
 @login_required
 def post_delete(request, id, uid):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-    post = get_object_or_404(Post, blog=blog, uid=uid)
-    is_page = post.is_page
-    post.delete()
-    if is_page:
-        return redirect('pages_edit', id=blog.subdomain)
+    if request.method == "POST":
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+        post = get_object_or_404(Post, blog=blog, uid=uid)
+        is_page = post.is_page
+        post.delete()
+        if is_page:
+            return redirect('pages_edit', id=blog.subdomain)
     return redirect('posts_edit', id=blog.subdomain)
 
 

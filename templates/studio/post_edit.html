@@ -39,7 +39,7 @@ New post | Bear Blog
             </button>
             <button
                 style="color: red; float: right;"
-                onclick="event.preventDefault();if(confirm('Are you sure?')){window.location = '/{{ blog.subdomain }}/dashboard/posts/{{ post.uid }}/delete/';}"
+                onclick="event.preventDefault(); deletePost();"
             >
                 Delete
             </button>
