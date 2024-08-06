@@ -76,8 +76,8 @@ def analytics_upgraded(request, id):
     if not blog.user.settings.upgraded:
         return redirect('analytics', id=blog.subdomain)
 
-    if request.GET.get('share', False):
-        if request.GET.get('share') == 'public':
+    if request.method == "POST":
+        if request.POST.get('share') == 'public':
             blog.public_analytics = True
         else:
             blog.public_analytics = False

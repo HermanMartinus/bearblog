@@ -146,10 +146,14 @@
             Public analytics available at 
             <a href="{{blog.dynamic_useful_domain}}/public-analytics/" target="_blank">{{ blog.useful_domain }}/public-analytics/</a>
             <br>
-            <button onclick="window.location = '?share=private'">Make analytics private</button>
-            {% else %}
-            <button onclick="window.location = '?share=public'">Make analytics public</button>
             {% endif %}
+
+            <form method="post" action="{% url 'analytics_upgraded' id=blog.subdomain %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="share" value="{% if blog.public_analytics %}private{% else %}public{% endif %}">
+                <button type="submit">Make analytics {% if blog.public_analytics %}private{% else %}public{% endif %}</button>
+            </form>
+            
             <button onclick="window.open('?export=True')">Export all</button>
         </p>
         <hr>
