@@ -39,26 +39,26 @@ def styles(request, id):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST":
-        form = StyleForm(
-            request.POST,
-            instance=blog
-        )
-        if form.is_valid():
-            blog_info = form.save(commit=False)
-            blog_info.save()
+        stylesheet = request.POST.get("stylesheet")
+        if stylesheet:
+            blog.custom_styles = Stylesheet.objects.get(identifier=stylesheet).css
+            blog.overwrite_styles = True
+            if request.POST.get("preview", False):
+                return render(request, 'home.html', {'blog': blog, 'preview': True})
+            blog.save()
+            return redirect('styles', id=blog.subdomain)
+        else:
+            form = StyleForm(
+                request.POST,
+                instance=blog
+            )
+            if form.is_valid():
+                blog_info = form.save(commit=False)
+                blog_info.save()
     else:
         form = StyleForm(
             instance=blog
         )
-
-    if request.GET.get("style", False):
-        style = request.GET.get("style", "default")
-        blog.custom_styles = Stylesheet.objects.get(identifier=style).css
-        blog.overwrite_styles = True
-        if request.GET.get("preview", False):
-            return render(request, 'home.html', {'blog': blog, 'preview': True})
-        blog.save()
-        return redirect('styles', id=blog.subdomain)
 
     return render(request, 'dashboard/styles.html', {
         'blog': blog,
