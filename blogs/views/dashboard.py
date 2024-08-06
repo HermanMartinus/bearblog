@@ -69,8 +69,8 @@ def styles(request, id):
 
 @login_required
 def blog_delete(request, id):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-    blog.delete()
+    # blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    # blog.delete()
     return redirect('account')
 
 

@@ -68,6 +68,5 @@
     <a onclick="if (confirm('Are you sure you would like to delete {{ blog.subdomain }}? This cannot be undone.')) { window.location.href='{% url 'blog_delete' blog.subdomain %}'; }">
         Delete blog
     </a>
-
 </p>
 {% endblock %}
