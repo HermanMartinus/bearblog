@@ -204,49 +204,53 @@ def review_bulk(request):
 
 @staff_member_required
 def approve(request, pk):
-    blog = get_object_or_404(Blog, pk=pk)
-    blog.reviewed = True
-    blog.to_review = False
-    
-    if request.GET.get("hide", False):
-        blog.hidden = True
+    if request.method == "POST":
+        blog = get_object_or_404(Blog, pk=pk)
+        blog.reviewed = True
+        blog.to_review = False
+        
+        if request.POST.get("hide", False):
+            blog.hidden = True
 
-    blog.save()
+        blog.save()
 
-    message = request.GET.get("message", "")
-    
-    if message:
-        send_async_mail(
-            "I've just reviewed your blog",
-            message,
-            'Herman Martinus <herman@bearblog.dev>',
-            [blog.user.email]
-        )
-    return HttpResponse("Approved")
+        message = request.POST.get("message", "")
+        
+        if message:
+            send_async_mail(
+                "I've just reviewed your blog",
+                message,
+                'Herman Martinus <herman@bearblog.dev>',
+                [blog.user.email]
+            )
+        return HttpResponse("Approved")
 
 
 @staff_member_required
 def block(request, pk):
-    blog = get_object_or_404(Blog, pk=pk)
-    blog.user.is_active = not blog.user.is_active
-    blog.user.save()
-    return HttpResponse("Blocked")
+    if request.method == "POST":
+        blog = get_object_or_404(Blog, pk=pk)
+        blog.user.is_active = not blog.user.is_active
+        blog.user.save()
+        return HttpResponse("Blocked")
 
 
 @staff_member_required
 def delete(request, pk):
-    blog = get_object_or_404(Blog, pk=pk)
-    blog.delete()
-    return HttpResponse("Deleted")
+    if request.method == "POST":
+        blog = get_object_or_404(Blog, pk=pk)
+        blog.delete()
+        return HttpResponse("Deleted")
 
 
 @staff_member_required
 def ignore(request, pk):
-    blog = get_object_or_404(Blog, pk=pk)
-    blog.ignored_date = timezone.now()
-    blog.to_review = False
-    blog.save()
-    return HttpResponse("Ignored")
+    if request.method == "POST":
+        blog = get_object_or_404(Blog, pk=pk)
+        blog.ignored_date = timezone.now()
+        blog.to_review = False
+        blog.save()
+        return HttpResponse("Ignored")
 
 
 @staff_member_required
