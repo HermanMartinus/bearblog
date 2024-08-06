@@ -69,8 +69,9 @@ def styles(request, id):
 
 @login_required
 def blog_delete(request, id):
-    # blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-    # blog.delete()
+    if request.method == "POST":
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+        blog.delete()
     return redirect('account')
 
 
@@ -193,9 +194,6 @@ def settings(request, id):
     if request.GET.get("export", ""):
         return djqscsv.render_to_csv_response(blog.posts)
     
-    if request.GET.get("generate"):
-        blog.generate_auth_token()
-        return redirect('settings', subdomain=blog.subdomain)
 
     return render(request, "dashboard/settings.html", {
         "blog": blog,

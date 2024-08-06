@@ -64,9 +64,11 @@
 <p>
     <a href="?export=true" download>Export all blog data</a>
 </p>
-<p>
-    <a onclick="if (confirm('Are you sure you would like to delete {{ blog.subdomain }}? This cannot be undone.')) { window.location.href='{% url 'blog_delete' blog.subdomain %}'; }">
+
+<form method="post" action="{% url 'blog_delete' blog.subdomain %}">
+    {% csrf_token %}
+    <button type="submit" onclick="return confirm('Are you sure you would like to delete {{ blog.subdomain }}? This cannot be undone.');">
         Delete blog
-    </a>
-</p>
+    </button>
+</form>
 {% endblock %}
