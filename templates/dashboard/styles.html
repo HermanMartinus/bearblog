@@ -23,12 +23,18 @@
     <b style="color: #444">{{ style.title }}</b>
     <br>
     <span>
-      <button onclick="preview('{{ style.identifier }}')">Preview</button>
-      <form method="post" action="{% url 'styles' id=blog.subdomain %}" style="display:inline;">
-        {% csrf_token %}
-        <input type="hidden" name="stylesheet" value="{{ style.identifier }}">
-        <button type="submit" onclick="return confirm('This will overwrite your current styles, are you sure?')">Apply {{ style.name }}</button>
+      <form method="get" action="{% url 'styles' id=blog.subdomain %}" style="display:inline;" target="_blank">
+          <input type="hidden" name="stylesheet" value="{{ style.identifier }}">
+          <input type="hidden" name="preview" value="true">
+          <button type="submit">Preview</button>
       </form>
+      <form method="post" action="{% url 'styles' id=blog.subdomain %}" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="stylesheet" value="{{ style.identifier }}">
+          <button type="submit" onclick="return confirm('This will overwrite your current styles, are you sure?')">Apply {{ style.name }}</button>
+      </form>
+    </span>
+    
     </span>
   </div>
   {% endfor %}

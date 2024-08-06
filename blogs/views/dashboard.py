@@ -43,28 +43,30 @@ def styles(request, id):
         if stylesheet:
             blog.custom_styles = Stylesheet.objects.get(identifier=stylesheet).css
             blog.overwrite_styles = True
-            if request.POST.get("preview", False):
-                return render(request, 'home.html', {'blog': blog, 'preview': True})
             blog.save()
             return redirect('styles', id=blog.subdomain)
         else:
-            form = StyleForm(
-                request.POST,
-                instance=blog
-            )
+            form = StyleForm(request.POST, instance=blog)
             if form.is_valid():
-                blog_info = form.save(commit=False)
-                blog_info.save()
+                form.save()
     else:
-        form = StyleForm(
-            instance=blog
-        )
+        form = StyleForm(instance=blog)
+
+    if request.GET.get("preview"):
+        stylesheet = request.GET.get("stylesheet")
+        if stylesheet:
+            blog.custom_styles = Stylesheet.objects.get(identifier=stylesheet).css
+            blog.overwrite_styles = True
+            return render(request, 'home.html', {'blog': blog, 'preview': True})
+
+    
 
     return render(request, 'dashboard/styles.html', {
         'blog': blog,
         'form': form,
         'stylesheets': Stylesheet.objects.all().order_by('pk')
     })
+
 
 
 @login_required
