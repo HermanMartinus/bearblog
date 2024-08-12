@@ -161,7 +161,7 @@ def render_analytics(request, blog, public=False):
         form = AnalyticsForm(instance=blog)
 
     # RSS Subscriber count
-    rss_subscriber_count = RssSubscriber.objects.filter(blog=blog, access_date__gt=now - timedelta(hours=24)).count()
+    rss_subscriber_count = RssSubscriber.objects.filter(blog=blog, access_date__gt=now - timedelta(hours=18)).count()
 
     return render(request, 'studio/analytics.html', {
         'public': public,
@@ -186,49 +186,41 @@ def render_analytics(request, blog, public=False):
 
 
 def post_hit(request, uid):
-    HitThread(request, uid).start()
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    if 'bot' in user_agent.lower():
+        return HttpResponse("Bot traffic")
+    
+    try:
+        user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
+
+        # Prevent duplicates with ip hash + date
+        hash_id = salt_and_hash(request)
+
+        country = get_country(client_ip(request)).get('country_name', '')
+        device = user_agent.get('platform', {}).get('name', '')
+        browser = user_agent.get('browser', {}).get('name', '')
+
+        referrer = request.GET.get('ref', '')
+        if referrer:
+            referrer = urlparse(referrer)
+            referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
+        
+        post_pk = Post.objects.filter(uid=uid).values_list('pk', flat=True).first()
+
+        if post_pk:
+            hit, create = Hit.objects.get_or_create(
+                post_id=post_pk,
+                hash_id=hash_id,
+                referrer=referrer,
+                country=country,
+                device=device,
+                browser=browser)
+            if create:
+                print(hit, 'hit')
+
+    except Hit.MultipleObjectsReturned:
+        print('Duplicate hit')
+    except IntegrityError:
+        print('Post does not exist')
+
     return HttpResponse("Logged")
-
-
-class HitThread(threading.Thread):
-    def __init__(self, request, uid):
-        self.request = request
-        self.uid = uid
-        threading.Thread.__init__(self)
-
-    def run(self):
-        try:
-            user_agent = httpagentparser.detect(self.request.META.get('HTTP_USER_AGENT', None))
-            if user_agent.get('bot', False):
-                print('Bot traffic')
-                return
-
-            # Prevent duplicates with ip hash + date
-            hash_id = salt_and_hash(self.request)
-
-            country = get_country(client_ip(self.request)).get('country_name', '')
-            device = user_agent.get('platform', {}).get('name', '')
-            browser = user_agent.get('browser', {}).get('name', '')
-
-            referrer = self.request.GET.get('ref', '')
-            if referrer:
-                referrer = urlparse(referrer)
-                referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
-            
-            post_pk = Post.objects.filter(uid=self.uid).values_list('pk', flat=True).first()
-
-            if post_pk:
-                hit, create = Hit.objects.get_or_create(
-                    post_id=post_pk,
-                    hash_id=hash_id,
-                    referrer=referrer,
-                    country=country,
-                    device=device,
-                    browser=browser)
-                if create:
-                    print(hit, 'hit')
-
-        except Hit.MultipleObjectsReturned:
-            print('Duplicate hit')
-        except IntegrityError:
-            print('Post does not exist')
