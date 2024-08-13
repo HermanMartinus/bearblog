@@ -272,6 +272,9 @@ def element_replacement(markup, blog, post=None):
     markup = markup.replace('{{ blog_last_modified }}', timesince(blog.last_modified))
     if blog.last_posted:
         markup = markup.replace('{{ blog_last_posted }}', timesince(blog.last_posted))
+    else:
+        markup = markup.replace('{{ blog_last_posted }}', '')
+        
     markup = markup.replace('{{ blog_link }}', f"{blog.useful_domain}")
 
     if post:

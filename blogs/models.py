@@ -41,6 +41,7 @@ class Blog(models.Model):
     title = models.CharField(max_length=200)
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
+    last_posted = models.DateTimeField(blank=True, null=True)
     subdomain = models.SlugField(max_length=100, unique=True)
     domain = models.CharField(max_length=128, blank=True, null=True)
     auth_token = models.CharField(max_length=128, blank=True)
@@ -126,10 +127,6 @@ class Blog(models.Model):
             all_tags.extend(json.loads(post.all_tags))
             all_tags = list(set(all_tags))
         return sorted(all_tags)
-    
-    @property
-    def last_posted(self):
-        return self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
     def generate_auth_token(self):
         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
@@ -160,6 +157,9 @@ class Blog(models.Model):
         # Invalidate feed cache
         CACHE_KEY = f'{self.subdomain}_all_posts'
         cache.delete(CACHE_KEY)
+
+        # Update last posted
+        self.last_posted = self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
         super(Blog, self).save(*args, **kwargs)
 

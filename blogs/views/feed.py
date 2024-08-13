@@ -39,9 +39,8 @@ def feed(request):
     if tag:
         all_posts = all_posts.filter(all_tags__icontains=tag)
 
-    # The annotation is used to prevent an n+1 query
-    all_posts = all_posts.annotate(published_date_field=F('published_date')).order_by('-published_date')[:10]
-    all_posts = sorted(list(all_posts), key=lambda post: post.published_date_field)
+    all_posts = all_posts.order_by('-published_date')[:10]
+    all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain)
