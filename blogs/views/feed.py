@@ -2,6 +2,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import timezone
 from django.core.cache import cache
+from django.db.models import F
 
 from blogs.helpers import salt_and_hash, unmark
 from blogs.models import RssSubscriber
@@ -38,10 +39,9 @@ def feed(request):
     if tag:
         all_posts = all_posts.filter(all_tags__icontains=tag)
 
-    all_posts = all_posts.order_by('-published_date')[:10]
-    all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
-
-    all_posts = all_posts
+    # The annotation is used to prevent an n+1 query
+    all_posts = all_posts.annotate(published_date_field=F('published_date')).order_by('-published_date')[:10]
+    all_posts = sorted(list(all_posts), key=lambda post: post.published_date_field)
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain)
