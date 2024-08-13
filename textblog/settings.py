@@ -1,4 +1,4 @@
-import logging
+import sentry_sdk
 import os
 import dj_database_url
 from django.utils.log import DEFAULT_LOGGING
@@ -20,6 +20,14 @@ DEBUG = (os.getenv('DEBUG') == 'True')
 
 # Logging settings
 if not DEBUG:
+    sentry_sdk.init(
+        dsn=os.getenv('SENTRY_DSN'),
+
+        traces_sample_rate=1.0,
+ 
+        profiles_sample_rate=1.0,
+    )
+    
     def before_send(event, hint):
         """Don't log django.DisallowedHost errors."""
         if 'log_record' in hint:
