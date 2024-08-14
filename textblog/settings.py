@@ -14,51 +14,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET')
 HEROKU_BEARER_TOKEN = os.getenv('HEROKU_BEARER_TOKEN')
 LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
-SLACK_WEBHOOK = os.getenv('SLACK_WEBHOOK')
 
 DEBUG = (os.getenv('DEBUG') == 'True')
 
 # Logging settings
 if not DEBUG:
-    sentry_sdk.init(
-        dsn=os.getenv('SENTRY_DSN'),
-
-        traces_sample_rate=1.0,
- 
-        profiles_sample_rate=1.0,
-    )
-    
     def before_send(event, hint):
         """Don't log django.DisallowedHost errors."""
         if 'log_record' in hint:
             if hint['log_record'].name == 'django.security.DisallowedHost':
                 return None
-
         return event
 
-    DEFAULT_LOGGING['handlers']['console']['filters'] = []
+    sentry_sdk.init(
+        dsn=os.getenv('SENTRY_DSN'),
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+        before_send=before_send,
+    )
 
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'slack': {
-                'class': 'textblog.logger.SlackExceptionHandler',
-                'level': 'ERROR',
-            },
-        },
-        'loggers': {
-            'django.security.DisallowedHost': {
-                'handlers': ['slack'],
-                'level': 'CRITICAL',
-                'propagate': False,
-            },
-        },
-        'root': {
-            'handlers': ['slack'],
-            'level': 'ERROR',
-        },
-    }
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
@@ -162,6 +136,7 @@ if os.getenv('DATABASE_URL'):
     DATABASES['default'].update(db_from_env)
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

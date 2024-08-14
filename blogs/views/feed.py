@@ -11,9 +11,6 @@ from blogs.views.blog import not_found, resolve_address
 
 from feedgen.feed import FeedGenerator
 import re
-import logging
-
-logger = logging.getLogger(__name__)
 
 CACHE_TIMEOUT = 3600  # 1 hour in seconds
 
@@ -85,5 +82,4 @@ def feed(request):
             atomfeed = fg.atom_str(pretty=True)
             return HttpResponse(atomfeed, content_type='application/atom+xml')
     except ValueError as e:
-        # logger.error(f'Error generating feed for {blog}', exc_info=True)
         return HttpResponseServerError("An error occurred while generating the feed.")
