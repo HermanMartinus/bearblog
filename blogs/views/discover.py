@@ -1,13 +1,12 @@
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.utils import timezone
 from django.contrib.sites.models import Site
-from django.db.models.functions import Length
 from django.core.cache import cache
 
-from blogs.models import Post, Upvote
+from blogs.models import Post
 from blogs.helpers import clean_text, sanitise_int
 
 from feedgen.feed import FeedGenerator
@@ -17,12 +16,9 @@ posts_per_page = 20
 
 CACHE_TIMEOUT = 300  # 5 minutes in seconds
 
-def get_base_query():
-    """Returns the base query for fetching posts, with caching."""
-    
-    queryset = Post.objects.annotate(content_length=Length('content')).filter(
+def get_base_query():    
+    queryset = Post.objects.select_related("blog").filter(
         publish=True,
-        content_length__gt=100,
         hidden=False,
         blog__reviewed=True,
         blog__user__is_active=True,
@@ -65,7 +61,6 @@ def discover(request):
 
     page = 0
 
-
     if request.GET.get("page", 0):
         page = sanitise_int(request.GET.get("page"), 7)
 
@@ -74,13 +69,8 @@ def discover(request):
 
     newest = request.GET.get("newest")
 
-    if not newest and not page:
-        pinned_posts = Post.objects.filter(pinned=True).order_by('-published_date')
-    else:
-        pinned_posts = []
-
     # Use the base query function excluding pinned posts
-    base_query = get_base_query().exclude(id__in=pinned_posts)
+    base_query = get_base_query()
 
     lang = request.COOKIES.get('lang')
 
@@ -91,13 +81,11 @@ def discover(request):
         )
 
     if newest:
-        other_posts = base_query.order_by("-published_date")
+        posts = base_query.order_by("-published_date")
     else:
-        other_posts = base_query.order_by("-score", "-published_date")
+        posts = base_query.order_by("-score", "-published_date")
 
-    other_posts = other_posts.select_related("blog")[posts_from:posts_to]
-
-    posts = list(pinned_posts) + list(other_posts)
+    posts = posts[posts_from:posts_to]
 
     return render(request, "discover.html", {
         "site": Site.objects.get_current(),
@@ -112,35 +100,7 @@ def discover(request):
 
 
 def get_available_languages():
-
     return ["cs", "de", "en", "es", "fi", "fr", "hu", "id", "it", "ja", "ko", "nl", "pl", "pt", "ru", "sv", "tr", "zh"]
-    # Try to get the used languages from the cache
-    available_languages = cache.get('available_languages')
-
-    if not available_languages:
-        all_languages = [
-            "af", "ar", "az", "be", "bg", "bs", "ca", "cs", "cy", "da", "de", "dv",
-            "el", "en", "es", "et", "eu", "fa", "fi", "fo", "fr", "gl", "gu", "he",
-            "hi", "hr", "hu", "hy", "id", "is", "it", "ja", "ka", "kk", "kn", "ko",
-            "kok", "ky", "lt", "lv", "mi", "mk", "mn", "mr", "ms", "mt", "nb", "nl",
-            "nn", "no", "ns", "pa", "pl", "pt", "quz", "ro", "ru", "sa", "se", "sk",
-            "sl", "sma", "smj", "smn", "sms", "sq", "sr", "sv", "sw", "syr", "ta",
-            "te", "th", "tn", "tr", "tt", "uk", "ur", "uz", "vi", "xh", "zh", "zu"
-        ]
-
-        # Get distinct languages from posts if not cached
-        used_languages = set(Post.objects.values_list('lang', flat=True).distinct())
-
-        # Filter available_languages to only include those that are in used_languages using startswith
-        available_languages = [
-            lang for lang in all_languages
-            if any(used_lang.startswith(lang) for used_lang in used_languages)
-        ]
-
-        # Cache the used languages for 1 hour (3600 seconds)
-        cache.set('available_languages', available_languages, 3600)
-    
-    return available_languages
 
 
 # RSS/Atom feed
@@ -159,7 +119,7 @@ def feed(request):
         cached_queryset = cache.get(CACHE_KEY)
     
         if cached_queryset is None:
-            all_posts = get_base_query().order_by("-published_date").select_related("blog")[0:posts_per_page]
+            all_posts = get_base_query().order_by("-published_date")[0:posts_per_page]
             all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
             cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
         else:
@@ -173,7 +133,7 @@ def feed(request):
         cached_queryset = cache.get(CACHE_KEY)
     
         if cached_queryset is None:
-            all_posts = get_base_query().order_by("-score", "-published_date").select_related("blog")[0:posts_per_page]
+            all_posts = get_base_query().order_by("-score", "-published_date")[0:posts_per_page]
             all_posts = sorted(list(all_posts), key=lambda post: post.score)
             cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
         else:
@@ -207,7 +167,7 @@ def search(request):
                 Q(content__icontains=search_string) | Q(title__icontains=search_string)
             )
             .order_by('-upvotes', "-published_date")
-            .select_related("blog")[0:50]
+            .select_related("blog")[0:20]
         )
 
     return render(request, "search.html", {

@@ -243,7 +243,7 @@ class Post(models.Model):
         # Update the score for the discover feed
         self.update_score()
 
-        # Save blog to trigger determine_dodginess
+        # Save blog to trigger a few other things
         self.blog.save()
 
         super(Post, self).save(*args, **kwargs)
