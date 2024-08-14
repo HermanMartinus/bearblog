@@ -2,7 +2,6 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import timezone
 from django.core.cache import cache
-from django.db.models import F
 
 from blogs.helpers import salt_and_hash, unmark
 from blogs.models import RssSubscriber

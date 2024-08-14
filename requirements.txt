@@ -33,7 +33,7 @@ openai==0.27.4
 Paperboy==1.0.1
 pillow==10.0.1
 psycopg2==2.8.5
-pygal==3.0.0
+pygal==3.0.5
 python-akismet==0.4.3
 python-dateutil==2.8.1
 python-dotenv==1.0.0
