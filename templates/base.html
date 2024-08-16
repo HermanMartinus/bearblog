@@ -28,7 +28,7 @@
   {% block analytics %}{% endblock %}
 </head>
 
-<body class="{% block page_type %}{% endblock %}">
+<body class="{% block page_type %}{% endblock %}" onload="(function() { document.cookie = `timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone};path=/`; })()">
   {% if 'lh.co' in request.get_host %}
   <p style="background-color: wheat; position: absolute; top:-15px; right:0; left:0; text-align: center;">
     Development server: {{ request.get_host }}

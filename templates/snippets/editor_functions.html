@@ -8,10 +8,6 @@
 	const $textarea = document.querySelector('textarea')
 	const $previewButton = document.getElementById('preview')
 	const $uploadButton = document.querySelector('#upload-image')
-
-	// Set timezone cookie
-	const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-	document.cookie = `timezone=${tz};path=/`
 	
 	// Submitting form with header content
 	const addHeaderContentToFormAndSubmit = () => {
