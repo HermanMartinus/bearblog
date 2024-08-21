@@ -4,13 +4,13 @@ from django.template.loader import render_to_string
 from django.utils import dateformat, translation
 from django.utils.dateformat import format as date_format
 from django.utils.timesince import timesince
+from django.utils.text import slugify
 
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
 from html import escape
-from slugify import slugify
 
 from mistune import HTMLRenderer, create_markdown
 

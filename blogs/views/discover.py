@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 
 from blogs.models import Post
-from blogs.helpers import clean_text, sanitise_int
+from blogs.helpers import clean_text
 
 from feedgen.feed import FeedGenerator
 import mistune
@@ -59,10 +59,10 @@ def admin_actions(request):
 def discover(request):
     admin_actions(request)
 
-    page = 0
-
-    if request.GET.get("page", 0):
-        page = sanitise_int(request.GET.get("page"), 7)
+    try:
+        page = int(request.GET.get("page", 0) or 0)
+    except ValueError:
+        page = 0
 
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page

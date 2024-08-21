@@ -10,7 +10,6 @@ import string
 import os
 import random
 import threading
-import bleach
 from requests.exceptions import ConnectionError, ReadTimeout
 import requests
 import subprocess
@@ -32,16 +31,6 @@ def root(subdomain=''):
 
 def get_posts(all_posts):
     return list(filter(lambda post: not post.is_page, all_posts))
-
-
-def sanitise_int(input, length=10):
-    try:
-        if len(input) < length:
-            return int(bleach.clean(input))
-        else:
-            raise ValueError
-    except ValueError:
-        raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
 
 def is_protected(subdomain):
