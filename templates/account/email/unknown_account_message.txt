@@ -1,0 +1,5 @@
+{% load i18n %}
+
+It looks like this email address does not have a blog associated with it.
+You can sign up for a new blog at https://bearblog.dev
+
