@@ -1,7 +1,5 @@
-import sentry_sdk
 import os
 import dj_database_url
-from django.utils.log import DEFAULT_LOGGING
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -26,15 +24,7 @@ if not DEBUG:
                 return None
         return event
 
-    sentry_sdk.init(
-        dsn=os.getenv('SENTRY_DSN'),
-        traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
-        before_send=before_send,
-    )
-
-
-    # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
+    ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 # Host & proxy
 ALLOWED_HOSTS = ['*']
