@@ -113,7 +113,7 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-CONN_MAX_AGE = 3600
+CONN_MAX_AGE = 600
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
