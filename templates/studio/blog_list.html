@@ -21,14 +21,14 @@
     </li>
 {% endfor %}
 </ul>
-<small>
+{% comment %} <small>
     <details>
         <summary>Have multiple blogs on different accounts?</summary>
         If you would like to migrate an existing blog to this account, send an email to
         <a href="mailto:herman@bearblog.dev">herman@bearblog.dev</a> 
         <b>from the email address associated with the blog to migrate</b>.
     </details>
-</small>
+</small> {% endcomment %}
 {% if request.user.blogs.all|length > 0 and not request.user.settings.upgraded %}
 <p>
     <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs <span class="bear flex"></span></a>
@@ -41,6 +41,7 @@
     {% endfor %}
 </p>
 {% endif %}
+{% if request.user.blogs.all|length < request.user.settings.max_blogs %}
 <h2>Create a new blog</h2>
 <form method="POST" class="post-form full-width">
     {% csrf_token %}
@@ -49,6 +50,14 @@
         <button type="submit">Create</button>
     </p>
 </form>
+{% else %}
+<p>
+    <b>You've reached your maximum number of blogs.</b>
+    <br>
+    If you need additional blogs send an email to <a href="mailto:herman@bearblog.dev">herman@bearblog.dev</a>
+    from the email address associated with your account.
+</p>
+{% endif %}
 
 {% endif %}
 

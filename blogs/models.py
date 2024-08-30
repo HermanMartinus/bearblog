@@ -18,6 +18,7 @@ import hashlib
 class UserSettings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='settings', blank=True)
     upgraded = models.BooleanField(default=False)
+    max_blogs = models.IntegerField(default=10)
     upgraded_date = models.DateTimeField(blank=True, null=True)
     order_id = models.CharField(max_length=100, blank=True, null=True)
 

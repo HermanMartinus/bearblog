@@ -25,7 +25,7 @@ def list(request):
     if request.method == "POST":
         form = BlogForm(request.POST)
         if form.is_valid():
-            if blogs.count() >= 9:
+            if blogs.count() >= request.user.settings.max_blogs:
                 form.add_error('title', 'You have reached the maximum number of blogs.')
             else:
                 subdomain = slugify(form.cleaned_data['subdomain'])
