@@ -240,6 +240,9 @@ class Post(models.Model):
         # Set first_published_at for score calculation
         if self.publish and self.first_published_at is None:
             self.first_published_at = self.published_date or timezone.now()
+        
+        if self.published_date and self.published_date < self.first_published_at:
+            self.first_published_at = self.published_date
 
         # Update the score for the discover feed
         self.update_score()
