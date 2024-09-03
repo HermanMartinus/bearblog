@@ -238,12 +238,10 @@ class Post(models.Model):
             self.uid = ''.join(random.choice(allowed_chars) for _ in range(20))
 
         # Set first_published_at for score calculation
-        if self.publish and self.first_published_at is None:
-            self.first_published_at = self.published_date or timezone.now()
-        
-        # if self.published_date and self.published_date < self.first_published_at:
-        #     self.first_published_at = self.published_date
-
+        if self.publish:
+            if self.first_published_at is None or self.published_date < self.first_published_at:
+                self.first_published_at = self.published_date or timezone.now()
+        print(self.first_published_at)
         # Update the score for the discover feed
         self.update_score()
 
