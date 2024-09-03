@@ -1,4 +1,3 @@
-from django.http import FileResponse
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect

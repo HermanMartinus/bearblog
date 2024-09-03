@@ -17,7 +17,7 @@
 
 <form id="uploadForm" method="post" enctype="multipart/form-data" action="" style="display: inline">
     {% csrf_token %}
-    <input id="fileSelect" type="file" name="file" multiple required style="display: none">
+    <input id="fileSelect" type="file" name="file" multiple required style="display: none" accept="{{ accepted_file_types }}">
 </form>
 
 <form id="deleteForm" method="post" action="{% url 'delete_selected_media' id=blog.subdomain %}">

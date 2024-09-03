@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import StreamingHttpResponse
@@ -18,7 +19,6 @@ import boto3
 import requests
 
 from blogs.models import Blog, Media
-from textblog import settings
 
 bucket_name = 'bear-images'
 
@@ -61,10 +61,13 @@ def media_center(request, id):
 
     documents = blog.media.filter(document_filter).order_by('-created_at')
 
+    accepted_file_types = ','.join([f'.{ext}' for ext in image_types + video_types + audio_types + document_types + font_types])
+
     return render(request, 'dashboard/media.html', {
         'blog': blog,
         'images': images,
-        'documents': documents
+        'documents': documents,
+        'accepted_file_types': accepted_file_types
     })
 
 
@@ -91,7 +94,7 @@ def upload_files(blog, file_list):
             raise ValidationError(f'File type not supported: {file.name}')
         
         extension = file.name.split('.')[-1].lower()
-        file_name = file.name.split('.')[-2].lower()
+        file_name = slugify(file.name.split('.')[-2].lower())
 
         # Strip metadata if the file is an image
         if extension in image_types:
