@@ -12,6 +12,7 @@ gunicorn==20.0.4
 httpagentparser==1.9.2
 latex2mathml==3.77.0
 mistune==3.0.1
+Pillow==10.4.0
 psycopg2==2.8.5
 pygal==3.0.5
 python-akismet==0.4.3

@@ -322,6 +322,10 @@ class Media(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+    @property
+    def name(self):
+        return self.url.split('/')[-1]
+
     def __str__(self):
         return f"{self.blog.subdomain} - {self.url} - {self.created_at}"
     

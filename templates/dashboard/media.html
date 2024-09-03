@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load custom_tags %}
+
 {% block title %}Media | Bear Blog{% endblock %}
 {% block custom_styles %}
 {% include 'styles/blog/default.css' %}
@@ -7,33 +9,60 @@
 {% endblock %}
 
 {% block content %}
-<h1>Media (experimental)</h1>
+<h1>Media</h1>
+<button onclick="history.back()">Back</button>
+
+<button id="uploadMedia" style="margin-bottom: 10px;">Upload media</button>
+<button id="deleteSelected" style="margin-bottom: 10px;">Delete selected</button>
+
+<form id="uploadForm" method="post" enctype="multipart/form-data" action="" style="display: inline">
+    {% csrf_token %}
+    <input id="fileSelect" type="file" name="file" multiple required style="display: none">
+</form>
 
 <form id="deleteForm" method="post" action="{% url 'delete_selected_media' id=blog.subdomain %}">
     {% csrf_token %}
-    <button type="button" id="deleteSelected" style="margin-bottom: 10px;">Delete selected</button>
-
+    <ul style="padding: 0; list-style: none;">
+        {% for document in documents %}
+        <li>
+            <input type="checkbox" name="selected_media" value="{{ document.url }}">
+            <small>{{ document.created_at|date:'d M, Y'}}</small>
+            <a href="{{ document.url }}" target="_blank">{{ document.name }}</a>
+            <button type="button" onclick="navigator.clipboard.writeText('{{ document.url }}').then(() => alert('URL copied to clipboard'));">Copy URL</button>
+        </li>
+        {% endfor %}
+    </ul>
     <div class="media-container">
-    {% for media in blog.media.all %}
+    {% for image in images %}
         <div class="media-item">
-            <input type="checkbox" name="selected_media" value="{{ media.url|cut:'https://bear-images.sfo2.cdn.digitaloceanspaces.com/' }}" class="media-checkbox">
-            <a href="{{ media.url }}" target="_blank">
-                <img style="object-fit: contain;" src="{{ media.url }}" width=190 height=190/>
+            <input type="checkbox" name="selected_media" value="{{ image.url }}" class="media-checkbox">
+            <a href="{{ image.url }}" target="_blank">
+                <img style="object-fit: contain;" src="{{ image.url }}" width=190 height=190 loading="lazy"/>
             </a>
             <br>
-            <small>{{ media.created_at|date:'d M, Y'}}</small>
+            <small>{{ image.created_at|date:'d M, Y'}}</small>
             <br>
-            <button type="button" onclick="navigator.clipboard.writeText('{{ media.url }}').then(() => alert('URL copied to clipboard'));">Copy URL</button>
+            <button type="button" onclick="navigator.clipboard.writeText('{{ image.url }}').then(() => alert('URL copied to clipboard'));">Copy URL</button>
         </div>
     {% endfor %}
     </div>
 </form>
 
 <script>
+document.getElementById('uploadMedia').addEventListener('click', function() {
+    document.getElementById('fileSelect').click();
+});
+
+document.getElementById('fileSelect').addEventListener('change', function() {
+    if (this.files.length > 0) {
+        document.getElementById('uploadForm').submit();
+    }
+});
+
 document.getElementById('deleteSelected').addEventListener('click', function() {
     var selected = document.querySelectorAll('input[name="selected_media"]:checked');
     if (selected.length > 0) {
-        if (confirm(`Are you sure you want to permenantly delete the selected media (${selected.length})? This will break the image link if in use somewhere.`)) {
+        if (confirm(`Are you sure you want to permenantly delete the selected media (${selected.length})? This will break the link if in use somewhere.`)) {
             document.getElementById('deleteForm').submit();
         }
     } else {

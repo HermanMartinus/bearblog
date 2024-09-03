@@ -1,4 +1,4 @@
-<input type="file" id="file" hidden multiple accept="image/*">
+<input type="file" id="file" hidden multiple accept="image/*, video/mp4, audio/mp3, application/pdf">
 
 <script>
 	const $publishedDate = document.getElementById('published-date');
@@ -122,7 +122,7 @@
 		const file = files[index];
 
 		if (file.size > 10000000) {
-			alert(`File over the 10mb limit. Use https://tinypng.com to minimise it.`);
+			alert(`File over the 10mb limit. Consider resizing it or uploading it elsewhere.`);
 			return;
 		}
 
