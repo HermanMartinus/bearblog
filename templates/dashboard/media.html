@@ -15,6 +15,12 @@
 <button id="uploadMedia" style="margin-bottom: 10px;">Upload media</button>
 <button id="deleteSelected" style="margin-bottom: 10px;">Delete selected</button>
 
+<p style="color:lightsalmon">
+    {% for error_message in error_messages %}
+        {{ error_message }}<br>
+    {% endfor %}
+</p>
+
 <form id="uploadForm" method="post" enctype="multipart/form-data" action="" style="display: inline">
     {% csrf_token %}
     <input id="fileSelect" type="file" name="file" multiple required style="display: none" accept="{{ accepted_file_types }}">

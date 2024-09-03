@@ -41,9 +41,13 @@ def media_center(request, id):
     if not blog.user.settings.upgraded:
         return redirect('upgrade')
 
+    error_messages = []
     # Upload media
     if request.method == "POST" and request.FILES.getlist('file') and blog.user.settings.upgraded is True:
         file_links = upload_files(blog, request.FILES.getlist('file'))
+        for link in file_links:
+            if 'Error' in link:
+                error_messages.append(link)
 
     # Prefill blogs with existing images on the bucket
     if not blog.media.exists():
@@ -67,7 +71,8 @@ def media_center(request, id):
         'blog': blog,
         'images': images,
         'documents': documents,
-        'accepted_file_types': accepted_file_types
+        'accepted_file_types': accepted_file_types,
+        'error_messages': error_messages
     })
 
 
@@ -88,10 +93,12 @@ def upload_files(blog, file_list):
     for file in file_list:
         # Upload size limit
         if file.size > file_size_limit:
-            raise ValidationError(f'File {file.name} exceeds 10MB limit')
+            file_links.append(f'Error: File {file.name} exceeds 10MB limit')
+            break
         
         if not file.name.endswith(tuple(file_types)):
-            raise ValidationError(f'File type not supported: {file.name}')
+            file_links.append(f'Error: File type not supported: {file.name}')
+            break
         
         extension = file.name.split('.')[-1].lower()
         file_name = slugify(file.name.split('.')[-2].lower())
