@@ -22,19 +22,33 @@
             {% endfor %}
         </p>
         {% endif %}
-        <label for="slug">Subdomain</label>
-        <br>
-        <div style="display: flex;align-items:end">
-            <input
-                type="text" name="subdomain"
-                value="{{ blog.subdomain }}"
-                required autocorrect="off"
-                autocomplete="off"
-                spellcheck="false"
-                style="max-width:200px; margin-right: 10px;"
-            />
-            <span class="helptext">.bearblog.dev</span>
-        </div>
+        <p>
+            <label for="slug">Subdomain</label>
+            <br>
+            <div style="display: flex;align-items:end">
+                <input
+                    type="text" name="subdomain"
+                    value="{{ blog.subdomain }}"
+                    required autocorrect="off"
+                    autocomplete="off"
+                    spellcheck="false"
+                    style="max-width:200px; margin-right: 10px;"
+                />
+                <span class="helptext">.bearblog.dev</span>
+            </div>
+        </p>
+
+        <p>
+            <label for="lang">Language</label>
+            <br>
+            <input type="text" name="lang" style="max-width:100px" value="{{ blog.lang }}" maxlength=10/>
+            <br>
+            <span class="helptext" style="display: inline;">
+                List of
+                <a href="https://docs.bearblog.dev/language-cheatsheet/" target="_blank">language codes</a>
+            </span>
+        </p>
+
         <button type="submit">Save</button>
     </form>
 </p>
@@ -47,19 +61,6 @@
 <p>
     <a href="{% url 'advanced_settings' id=blog.subdomain %}">Advanced settings</a>
 </p>
-{% comment %} 
-<p>
-    {% if blog.auth_token %}
-    <label for="auth_token">Auth token:</label>
-    <br>
-    <input type="text" readonly style="width:350px" value="{{ blog.auth_token }}">
-    <br>
-    <button onclick="window.location = '?generate=True'" style="font-size:20px;">⟳</button>
-    {% else %}
-    <button onclick="window.location = '?generate=True'">Generate auth token</button>
-    {% endif %}
-</p>
-{% endcomment %}
 
 <p>
     <a href="?export=true" download>Export all blog data</a>

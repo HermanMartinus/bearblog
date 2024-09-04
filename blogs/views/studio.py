@@ -88,8 +88,6 @@ def parse_raw_homepage(blog, header_content, body_content):
     blog.favicon = ''
     blog.meta_description = ''
     blog.meta_image = ''
-    blog.lang = 'en'
-    blog.date_format = ''
 
     error_messages = []
     # Parse and populate header data
@@ -113,10 +111,6 @@ def parse_raw_homepage(blog, header_content, body_content):
             blog.meta_description = value
         elif name == 'meta_image':
             blog.meta_image = value
-        elif name == 'lang':
-            blog.lang = value
-        elif name == 'date_format':
-            blog.date_format = value
         else:
             error_messages.append(f"{name} is an unrecognised header option")
 

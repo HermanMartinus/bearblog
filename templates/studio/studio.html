@@ -36,9 +36,7 @@
             title: Baloo's blog<br>
             favicon: 🐻<br>
             meta_description: Look for the bear necessities.<br>
-            meta_image: https://example.com/image.jpeg<br>
-            lang: en<br>
-            date_format: d M, Y
+            meta_image: https://example.com/image.jpeg
         </p>
         <a href="https://docs.bearblog.dev/home-page" target="_blank">
             More info
@@ -56,9 +54,7 @@
         <b>title:</b> {{ blog.title }}{% if blog.favicon %}<br>
         <b>favicon:</b> {{ blog.favicon }}{% endif %}{% if blog.meta_description %}<br>
         <b>meta_description:</b> {{ blog.meta_description }}{% endif %}{% if blog.meta_image %}<br>
-        <b>meta_image:</b> {{ blog.meta_image }}{% endif %}{% if blog.lang != 'en' %}<br>
-        <b>lang:</b> {{ blog.lang }}{% endif %}{% if blog.date_format != '' %}<br>
-        <b>date_format:</b> {{ blog.date_format }}{% endif %}
+        <b>meta_image:</b> {{ blog.meta_image }}{% endif %}
     </div>
 
     <input type="hidden" id="hidden_header_content" name="header_content">

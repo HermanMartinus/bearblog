@@ -182,11 +182,13 @@ def settings(request, id):
     
     if request.method == "POST":
         subdomain = request.POST.get('subdomain')
+        lang = request.POST.get('lang', 'en')
 
         if subdomain:
             subdomain = slugify(subdomain.split('.')[0]).replace('_', '-')
             if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).exists() and not is_protected(subdomain):
                 blog.subdomain = subdomain
+                blog.lang = lang
                 blog.save()
                 return redirect('settings', id=blog.subdomain)
             else:

@@ -71,7 +71,7 @@ class Blog(models.Model):
         verbose_name='')
     favicon = models.CharField(max_length=100, default="🐼", blank=True)
 
-    date_format = models.CharField(max_length=32, blank=True)
+    date_format = models.CharField(max_length=32, default="d M, Y", blank=True)
 
     analytics_active = models.BooleanField(default=True)
     fathom_site_id = models.CharField(max_length=8, blank=True)
@@ -241,7 +241,7 @@ class Post(models.Model):
         if self.publish:
             if self.first_published_at is None or self.published_date < self.first_published_at:
                 self.first_published_at = self.published_date or timezone.now()
-        print(self.first_published_at)
+
         # Update the score for the discover feed
         self.update_score()
 

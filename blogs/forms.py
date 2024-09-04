@@ -79,10 +79,16 @@ class AdvancedSettingsForm(forms.ModelForm):
         help_text="Disable to not collect read analytics"
     )
 
+    date_format =forms.CharField(
+        max_length=20,
+        required=False,
+        help_text="<span>More date formats <a href='https://docs.bearblog.dev/date-format/' target='_blank'>here</a></span>"
+    )
+
     fathom_site_id = forms.CharField(
         max_length=20,
         required=False,
-        help_text="<span>More in-depth analytics using <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a>.</span>"
+        help_text="<span>More in-depth analytics using <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a></span>"
     )
 
     meta_tag = forms.CharField(
@@ -108,7 +114,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('analytics_active', 'fathom_site_id', 'blog_path', 'rss_alias', 'meta_tag', 'robots_txt')
+        fields = ('analytics_active', 'date_format', 'fathom_site_id', 'blog_path', 'rss_alias', 'meta_tag', 'robots_txt')
 
 
 class AnalyticsForm(forms.ModelForm):
