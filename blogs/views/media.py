@@ -96,7 +96,7 @@ def upload_files(blog, file_list):
             file_links.append(f'Error: File {file.name} exceeds 10MB limit')
             break
         
-        if not file.name.endswith(tuple(file_types)):
+        if not file.name.lower().endswith(tuple(file_types)):
             file_links.append(f'Error: File type not supported: {file.name}')
             break
         
