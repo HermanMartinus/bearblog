@@ -18,6 +18,13 @@ LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
 DEBUG = (os.getenv('DEBUG') == 'True')
 
 # Logging settings
+def exclude_disallowed_host(record):
+    if record.exc_info:
+        exc_type, exc_value, _ = record.exc_info
+        if isinstance(exc_value, DisallowedHost):
+            return False
+    return True
+
 if not DEBUG:
     LOGGING = {
         'version': 1,
@@ -25,7 +32,7 @@ if not DEBUG:
         'filters': {
             'exclude_disallowed_host': {
                 '()': 'django.utils.log.CallbackFilter',
-                'callback': lambda record: not isinstance(getattr(record, 'exc_info', (None, None, None))[1], DisallowedHost),
+                'callback': exclude_disallowed_host,
             },
         },
         'handlers': {
@@ -34,11 +41,21 @@ if not DEBUG:
                 'filters': ['exclude_disallowed_host'],
                 'class': 'django.utils.log.AdminEmailHandler'
             },
+            'console': {
+                'level': 'ERROR',
+                'filters': ['exclude_disallowed_host'],
+                'class': 'logging.StreamHandler',
+            },
         },
         'loggers': {
             'django': {
-                'handlers': ['mail_admins'],
+                'handlers': ['mail_admins', 'console'],
                 'level': 'ERROR',
+                'propagate': True,
+            },
+            'django.security.DisallowedHost': {
+                'handlers': [],
+                'propagate': False,
             },
         }
     }
