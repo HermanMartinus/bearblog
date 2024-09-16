@@ -1,3 +1,5 @@
+from django.core.exceptions import DisallowedHost
+
 import os
 import dj_database_url
 from pathlib import Path
@@ -17,12 +19,29 @@ DEBUG = (os.getenv('DEBUG') == 'True')
 
 # Logging settings
 if not DEBUG:
-    def before_send(event, hint):
-        """Don't log django.DisallowedHost errors."""
-        if 'log_record' in hint:
-            if hint['log_record'].name == 'django.security.DisallowedHost':
-                return None
-        return event
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'filters': {
+            'exclude_disallowed_host': {
+                '()': 'django.utils.log.CallbackFilter',
+                'callback': lambda record: not isinstance(getattr(record, 'exc_info', (None, None, None))[1], DisallowedHost),
+            },
+        },
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'filters': ['exclude_disallowed_host'],
+                'class': 'django.utils.log.AdminEmailHandler'
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+            },
+        }
+    }
 
     ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
