@@ -115,7 +115,7 @@ def post(request, slug):
     if not blog:
         return not_found(request)
     
-     # Check for a custom RSS feed path
+    # Check for a custom RSS feed path
     if slug == blog.rss_alias:
         from blogs.views.feed import feed
         return feed(request)
