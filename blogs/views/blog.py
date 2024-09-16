@@ -27,8 +27,6 @@ def resolve_address(request):
         return None
     elif any(site.domain in http_host for site in sites):
         # Subdomained blog
-        if request.user.is_staff:
-            return get_object_or_404(Blog, subdomain__iexact=tldextract.extract(http_host).subdomain)
         return get_object_or_404(Blog, subdomain__iexact=tldextract.extract(http_host).subdomain, user__is_active=True)
     else:
         # Custom domain blog
