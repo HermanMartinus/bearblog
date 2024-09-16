@@ -47,6 +47,10 @@
 <a href="{% url 'dashboard' id=blog.subdomain %}" target="_blank" style="position: fixed;right: 0;top: 0;padding: 20px;color: lightgrey;text-decoration: none;font-size: 25px;">✎</a>
 {% endif %}
 
+{% if not blog.user.is_active %}
+    <h1 style="color:lightsalmon;text-align:center;">This blog has been blocked</h1>
+{% endif %}
+
 {% if blog.content %}
 {{ blog.content | markdown:blog | safe }}
 
