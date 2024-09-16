@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden

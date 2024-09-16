@@ -25,10 +25,20 @@ admin.site.register(User, UserAdmin)
 
 @admin.register(UserSettings)
 class UserSettingsAdmin(admin.ModelAdmin):
-    list_display = ('email', 'date_joined', 'blogs', 'display_is_active', 'upgraded', 'upgraded_date', 'order_id')
+    list_display = ('email', 'user_link', 'date_joined', 'blogs', 'display_is_active', 'upgraded', 'upgraded_date', 'order_id')
     
     def email(self, obj):
         return obj.user.email
+    
+    def user_link(self, obj):
+        user = obj.user
+        user_model = user.__class__
+        app_label = user_model._meta.app_label
+        model_name = user_model._meta.model_name
+        url_name = f'admin:{app_label}_{model_name}_change'
+        url = reverse(url_name, args=[user.pk])
+        return format_html('<a href="{}">{}</a>', url, user.pk)
+    user_link.short_description = 'User'
     
     def date_joined(self, obj):
         return obj.user.date_joined
@@ -61,6 +71,7 @@ class UserSettingsAdmin(admin.ModelAdmin):
         ('user__is_active', admin.BooleanFieldListFilter),
     )
 
+
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
@@ -89,9 +100,9 @@ class BlogAdmin(admin.ModelAdmin):
     def user_link(self, obj):
         return format_html('<a href="{url}">{username}</a>',
                            url=reverse("admin:blogs_usersettings_change", args=(obj.user.settings.id,)),
-                           username=escape(obj.user))
+                           username=escape(obj.user.email))
     user_link.allow_tags = True
-    user_link.short_description = "User"
+    user_link.short_description = "User Settings"
 
     def user_email(self, obj):
         return obj.user.email
@@ -109,14 +120,13 @@ class BlogAdmin(admin.ModelAdmin):
 
     list_display = (
         'title',
+        'user_link',
+        'subdomain_url',
+        'domain_url',
         'reviewed',
         'display_upgraded',
         'display_is_active',
-        'subdomain_url',
-        'domain_url',
         'post_count',
-        'user_link',
-        'user_email',
         'created_date')
 
     search_fields = ('title', 'subdomain', 'domain', 'user__email')
