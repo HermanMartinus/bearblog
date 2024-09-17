@@ -103,7 +103,7 @@ def parse_raw_homepage(blog, header_content, body_content):
         if name == 'title':
             blog.title = value
         elif name == 'favicon':
-            if len(value) < 20:
+            if len(value) < 100:
                 blog.favicon = value
             else:
                 error_messages.append("Favicon is too long. Use an emoji.")
