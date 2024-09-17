@@ -111,6 +111,10 @@ def posts(request):
 
 @csrf_exempt
 def post(request, slug):
+    # Prevent null characters in path
+    slug = slug.replace('\x00', '')
+
+
     blog = resolve_address(request)
     if not blog:
         return not_found(request)
