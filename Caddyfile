@@ -6,18 +6,6 @@
     }
 }
 
-http://test.com {
-    reverse_proxy 127.0.0.1:8000
-}
-
-http://test.com/static {
-    root * /bearblog/staticfiles
-}
-
-http://*.test.com {
-    reverse_proxy 127.0.0.1:8000
-}
-
 https:// {
     tls {
         on_demand
