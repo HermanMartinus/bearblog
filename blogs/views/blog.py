@@ -16,7 +16,7 @@ import tldextract
 
 def resolve_address(request):
     http_host = request.get_host()
-    print('HTTP_HOST 1:', http_host)
+    print('HTTP_HOST 1:', request.META.get('HTTP_HOST'))
     if http_host == 'bear-blog.herokuapp.com':
         http_host = request.META.get('HTTP_X_FORWARDED_HOST', 'bear-blog.herokuapp.com')
     print('HTTP_HOST 2:', http_host)
