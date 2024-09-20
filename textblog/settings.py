@@ -12,7 +12,6 @@ PROJECT_NAME = "🐼 BEARBLOG 🐼"
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET')
-HEROKU_BEARER_TOKEN = os.getenv('HEROKU_BEARER_TOKEN')
 LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
 
 DEBUG = (os.getenv('DEBUG') == 'True')
@@ -215,8 +214,6 @@ EMAIL_HOST_USER = 'postmaster@mg.bearblog.dev'
 EMAIL_HOST_PASSWORD = os.getenv('MAILGUN_PASSWORD', False)
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-EMAILOCTOPUS_API = os.getenv('EMAILOCTOPUS_API', False)
 
 # Referrer policy
 SECURE_REFERRER_POLICY = "origin-when-cross-origin"

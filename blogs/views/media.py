@@ -103,7 +103,7 @@ def upload_files(blog, file_list):
         file_name = slugify(file.name.split('.')[-2].lower())
 
         # Strip metadata if the file is an image
-        if extension in image_types and not extension.endswith('svg'):
+        if extension in image_types and not extension.endswith('svg') and not extension.endswith('gif'):
             file = strip_metadata_from_image(file)
 
         # Check for duplicate names
