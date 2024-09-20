@@ -61,10 +61,10 @@ if not DEBUG:
 
     ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
-# Host & proxy
+# Host & proxy settings
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_HOST = False
 
 X_FRAME_OPTIONS = 'ALLOWALL'
 
