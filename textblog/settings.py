@@ -62,7 +62,7 @@ if not DEBUG:
     ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 # Host & proxy
-ALLOWED_HOSTS = ['.bearblog.dev', 'bear-blog.herokuapp.com']
+ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
