@@ -154,13 +154,19 @@ class Blog(models.Model):
         
         if not self.reviewed:
             self.determine_dodginess()
+
+        # When custom styles is empty set it to default (legacy overwrite patch)
+        if not self.custom_styles:
+            self.custom_styles = Stylesheet.objects.filter(identifier="default").first().css
+            self.overwrite_styles = True
         
         # Invalidate feed cache
         CACHE_KEY = f'{self.subdomain}_all_posts'
         cache.delete(CACHE_KEY)
 
         # Update last posted
-        self.last_posted = self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
+        if self.pk:
+            self.last_posted = self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
         super(Blog, self).save(*args, **kwargs)
 
@@ -243,7 +249,8 @@ class Post(models.Model):
                 self.first_published_at = self.published_date or timezone.now()
 
         # Update the score for the discover feed
-        self.update_score()
+        if self.pk:
+            self.update_score()
 
         # Save blog to trigger a few other things
         self.blog.save()

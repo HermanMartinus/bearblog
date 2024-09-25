@@ -63,8 +63,7 @@ class StyleForm(forms.ModelForm):
     custom_styles = forms.CharField(
         label="Edit theme CSS",
         widget=forms.Textarea(),
-        required=False,
-        help_text="Ensure styling caters to existing dark mode CSS."
+        required=False
     )
 
     class Meta:
