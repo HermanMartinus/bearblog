@@ -10,7 +10,7 @@ from django.db.models import Q
 
 import io
 from datetime import datetime
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import re
 import json
 import os
@@ -104,7 +104,11 @@ def upload_files(blog, file_list):
 
         # Strip metadata if the file is an image
         if extension in image_types and not extension.endswith('svg') and not extension.endswith('gif'):
-            file = strip_metadata_from_image(file)
+            try:
+                file = strip_metadata_from_image(file)
+            except UnidentifiedImageError:
+                file_links.append(f'Error: The image file cannot be identified or is not a valid image.')
+                break
 
         # Check for duplicate names
         count = 0
