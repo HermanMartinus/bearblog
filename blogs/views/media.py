@@ -22,7 +22,7 @@ from blogs.models import Blog, Media
 bucket_name = 'bear-images'
 
 
-image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico']
+image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic']
 video_types = ['mp4', 'webm']
 audio_types = ['mp3', 'ogg', 'wav']
 document_types = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'rtf']
@@ -95,7 +95,8 @@ def upload_files(blog, file_list):
             file_links.append(f'Error: File {file.name} exceeds 10MB limit')
             break
         
-        if not file.name.lower().endswith(tuple(file_types)):
+        # Only allowed file types but also explicitly excluding heic since Safari auto-converts it otherwise
+        if not file.name.lower().endswith(tuple(file_types)) or file.name.lower().endswith('heic'):
             file_links.append(f'Error: File type not supported: {file.name}')
             break
         
