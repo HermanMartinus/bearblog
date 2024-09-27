@@ -101,15 +101,17 @@ def upload_files(blog, file_list):
             break
         
         extension = file.name.split('.')[-1].lower()
-        file_name = slugify(file.name.split('.')[-2].lower())
-
+        
         # Strip metadata if the file is an image
         if extension in image_types and not extension.endswith('svg') and not extension.endswith('gif'):
             try:
-                file = strip_metadata_from_image(file)
+                file = process_image(file, blog.optimise_images)
             except UnidentifiedImageError:
                 file_links.append(f'Error: The image file cannot be identified or is not a valid image.')
                 break
+
+        file_name = slugify(file.name.split('.')[-2].lower())
+        extension = file.name.split('.')[-1].lower()
 
         # Check for duplicate names
         count = 0
@@ -145,29 +147,46 @@ def upload_files(blog, file_list):
     return sorted(file_links)
 
 
-def strip_metadata_from_image(file):
+def process_image(file, optimise):
     image = Image.open(file)
     data = io.BytesIO()
 
-    # Re-save the image to strip metadata (EXIF, etc.)
-    image.save(data, format=image.format)
+    if optimise:
+        max_width = 1200
+        if image.width > max_width:
+            # Calculate the new height to maintain the aspect ratio
+            ratio = max_width / float(image.width)
+            new_height = int(float(image.height) * ratio)
+            # Resize the image with high-quality resampling
+            image = image.resize((max_width, new_height), resample=Image.LANCZOS)
+
+        image.save(data, format='WEBP')
+        # Update file name and content type for WebP
+        file_name = os.path.splitext(file.name)[0] + '.webp'
+        content_type = 'image/webp'
+    else:
+        # Save the image to strip metadata (EXIF, etc.)
+        image.save(data, format=image.format)
+        file_name = file.name
+        content_type = file.content_type
+
     data.seek(0)
 
     print('Stripped metadata')
 
-    original_size = file.size/100
-    new_size = len(data.getvalue())/100
-    compression_rate = (original_size - new_size) / original_size * 100
+    original_size = file.size / 1024
+    new_size = len(data.getvalue()) / 1024
+    compression_rate = (original_size - new_size) / original_size * 100 if original_size != 0 else 0
 
-    print(f'Original size: {original_size}kb')
-    print(f'New size: {new_size}kb')
+    print(f'Original size: {original_size:.2f} KB')
+    print(f'New size: {new_size:.2f} KB')
     print(f'Compression rate: {compression_rate:.2f}%')
 
     return InMemoryUploadedFile(
         file=data,
         field_name=None,
-        name=file.name,
-        content_type=file.content_type,
+        name=file_name,
+        content_type=content_type,
         size=len(data.getvalue()),
         charset=None
     )
