@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.shortcuts import redirect
 from django.urls import path
 from django.views.generic import RedirectView
 
@@ -10,11 +10,13 @@ import os
 from functools import wraps
 
 
+# Only allow certain urls to reach certain paths
 def main_site_only(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
-        if not request.get_host() in os.getenv('MAIN_SITE_HOSTS'):
-            raise Http404("Page not found")
+        if not request.get_host() in os.getenv('MAIN_SITE_HOSTS').split(','):
+            # If not the main site, redirect to a potential blog post
+            return blog.post(request, slug=request.path)
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
