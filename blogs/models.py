@@ -1,13 +1,13 @@
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.cache import cache
 
 from allauth.account.models import EmailAddress
 
+import os
 import json
 from math import log
 import random
@@ -96,7 +96,8 @@ class Blog(models.Model):
 
     @property
     def blank_bear_domain(self):
-        return f'{self.subdomain}.{Site.objects.get_current().domain}'
+        current_host = os.getenv('MAIN_SITE_HOSTS').split(',')[0]
+        return f'{self.subdomain}.{current_host}'
 
     @property
     def bear_domain(self):

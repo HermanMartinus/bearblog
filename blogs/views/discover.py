@@ -3,7 +3,6 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.utils import timezone
-from django.contrib.sites.models import Site
 from django.core.cache import cache
 
 from blogs.models import Post
@@ -15,6 +14,7 @@ import mistune
 posts_per_page = 20
 
 CACHE_TIMEOUT = 300  # 5 minutes in seconds
+
 
 def get_base_query():    
     queryset = Post.objects.select_related("blog").filter(
@@ -28,6 +28,7 @@ def get_base_query():
     )
 
     return queryset
+
 
 def admin_actions(request):
     # admin actions
@@ -88,7 +89,6 @@ def discover(request):
     posts = posts[posts_from:posts_to]
 
     return render(request, "discover.html", {
-        "site": Site.objects.get_current(),
         "lang": lang,
         "available_languages": get_available_languages(),
         "posts": posts,
@@ -171,7 +171,6 @@ def search(request):
         )
 
     return render(request, "search.html", {
-        "site": Site.objects.get_current(),
         "posts": posts,
         "search_string": search_string,
     })

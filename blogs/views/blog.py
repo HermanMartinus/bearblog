@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.sites.models import Site
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -11,21 +10,22 @@ from blogs.helpers import get_posts, salt_and_hash, unmark
 from blogs.tasks import daily_task
 from blogs.views.analytics import render_analytics
 
+import os
 import tldextract
 
 
 def resolve_address(request):
     http_host = request.get_host()
 
-    # if request.META.get('HTTP_HOST') == 'bear-blog.herokuapp.com':
-        # http_host = request.META.get('HTTP_X_FORWARDED_HOST', 'bear-blog.herokuapp.com')
+    # if request.META.get('HTTP_HOST') == 'bearblog.dev':
+        # http_host = request.META.get('HTTP_X_FORWARDED_HOST', 'bearblog.dev')
 
-    sites = Site.objects.all()
+    sites = os.getenv('MAIN_SITE_HOSTS').split(',')
 
-    if any(http_host == site.domain for site in sites):
+    if any(http_host == site for site in sites):
         # Homepage
         return None
-    elif any(site.domain in http_host for site in sites):
+    elif any(site in http_host for site in sites):
         # Subdomained blog
         return get_object_or_404(Blog, subdomain__iexact=tldextract.extract(http_host).subdomain, user__is_active=True)
     else:

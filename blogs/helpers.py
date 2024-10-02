@@ -1,8 +1,6 @@
 from django.utils import timezone
-from django.contrib.sites.models import Site
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 from django.contrib.gis.geoip2 import GeoIP2
-from django.http import Http404
 from django.conf import settings
 
 import re
@@ -22,7 +20,7 @@ from blogs.models import Post
 
 
 def root(subdomain=''):
-    domain = Site.objects.get_current().domain
+    domain = os.getenv('MAIN_SITE_HOSTS').split(',')[0]
     if subdomain == '':
         return f"{domain}"
     else:
