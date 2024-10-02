@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.urls import path
 from django.views.generic import RedirectView
 
@@ -5,22 +6,33 @@ from blogs.views import blog, dashboard, studio, feed, discover, analytics, emai
 from blogs import subscriptions
 from textblog import logger
 
+from functools import wraps
+
+
+def main_site_only(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.get_host() in ['lh.co', 'bearblog.dev']:
+            raise Http404("Page not found")
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
 urlpatterns = [
     path('', blog.home, name='home'),
     path('logger-test/', logger.logger_test),
 
     # Staff dashboard
-    path('staff/', RedirectView.as_view(pattern_name='staff_dashboard', permanent=False)),
-    path('staff/dashboard/', staff.dashboard, name='staff_dashboard'),
-    path('staff/review/new/', staff.review_bulk, name='review_new'),
-    path('staff/review/opt-in/', staff.review_bulk, name='review_opt_in'),
-    path('staff/review/dodgy/', staff.review_bulk, name='review_dodgy'),
-    path('staff/review/approve/<pk>', staff.approve, name='review_approve'),
-    path('staff/review/block/<pk>', staff.block, name='review_block'),
-    path('staff/review/ignore/<pk>', staff.ignore, name='review_ignore'),
-    path('staff/review/delete/<pk>', staff.delete, name='review_delete'),
-    path('staff/dashboard/delete-empty/', staff.delete_empty, name='delete_empty'),
-    path('staff/dashboard/migrate-blog/', staff.migrate_blog, name='migrate_blog'),
+    # path('staff/', RedirectView.as_view(pattern_name='staff_dashboard', permanent=False)),
+    path('staff/dashboard/', main_site_only(staff.dashboard), name='staff_dashboard'),
+    path('staff/review/new/', main_site_only(staff.review_bulk), name='review_new'),
+    path('staff/review/opt-in/', main_site_only(staff.review_bulk), name='review_opt_in'),
+    path('staff/review/dodgy/', main_site_only(staff.review_bulk), name='review_dodgy'),
+    path('staff/review/approve/<pk>', main_site_only(staff.approve), name='review_approve'),
+    path('staff/review/block/<pk>', main_site_only(staff.block), name='review_block'),
+    path('staff/review/ignore/<pk>', main_site_only(staff.ignore), name='review_ignore'),
+    path('staff/review/delete/<pk>', main_site_only(staff.delete), name='review_delete'),
+    path('staff/dashboard/delete-empty/', main_site_only(staff.delete_empty), name='delete_empty'),
+    path('staff/dashboard/migrate-blog/', main_site_only(staff.migrate_blog), name='migrate_blog'),
 
     # User dashboard
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
