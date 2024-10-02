@@ -77,8 +77,8 @@ urlpatterns = [
 
     # Discover
     path('discover/', discover.discover, name='discover'),
-    path('discover/feed/', discover.feed, name='discover_feed'),
-    path('search/', discover.search, name='search'),
+    path('discover/feed/', main_site_only(discover.feed), name='discover_feed'),
+    path('search/', main_site_only(discover.search), name='search'),
 
     # Blog
     path('ping/', blog.ping, name='ping'),
