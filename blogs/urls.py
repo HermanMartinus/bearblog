@@ -6,13 +6,14 @@ from blogs.views import blog, dashboard, studio, feed, discover, analytics, emai
 from blogs import subscriptions
 from textblog import logger
 
+import os
 from functools import wraps
 
 
 def main_site_only(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
-        if not request.get_host() in ['lh.co', 'bearblog.dev']:
+        if not request.get_host() in os.getenv('MAIN_SITE_HOSTS'):
             raise Http404("Page not found")
         return view_func(request, *args, **kwargs)
     return _wrapped_view
@@ -22,7 +23,6 @@ urlpatterns = [
     path('logger-test/', logger.logger_test),
 
     # Staff dashboard
-    # path('staff/', RedirectView.as_view(pattern_name='staff_dashboard', permanent=False)),
     path('staff/dashboard/', main_site_only(staff.dashboard), name='staff_dashboard'),
     path('staff/review/new/', main_site_only(staff.review_bulk), name='review_new'),
     path('staff/review/opt-in/', main_site_only(staff.review_bulk), name='review_opt_in'),
