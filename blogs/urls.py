@@ -76,9 +76,9 @@ urlpatterns = [
     path('lemon-webhook/', subscriptions.lemon_webhook, name='lemon_webhook'),
 
     # Discover
-    path('discover/', discover.discover, name='discover'),
+    path('discover/', main_site_only(discover.discover), name='discover'),
     path('discover/feed/', main_site_only(discover.feed), name='discover_feed'),
-    path('search/', main_site_only(discover.search), name='search'),
+    path('discover/search/', main_site_only(discover.search), name='search'),
 
     # Blog
     path('ping/', blog.ping, name='ping'),
