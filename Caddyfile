@@ -1,6 +1,6 @@
 {
     on_demand_tls {
-        ask https://bear-blog.herokuapp.com/ping/
+        ask https://bearblog.dev/ping/
         interval 1m
         burst 5
     }
@@ -11,7 +11,7 @@ https:// {
         on_demand
     }
 
-    reverse_proxy https://bear-blog.herokuapp.com {
+    reverse_proxy https://bearblog.dev {
         header_up Host {upstream_hostport}
         header_up X-Forwarded-For {remote_host}
         header_up X-Real-IP {remote_host}
