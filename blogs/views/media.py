@@ -10,7 +10,7 @@ from django.db.models import Q
 
 import io
 from datetime import datetime
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, UnidentifiedImageError, ImageOps
 import re
 import json
 import os
@@ -148,7 +148,10 @@ def upload_files(blog, file_list):
 
 
 def process_image(file, optimise):
-    image = Image.open(file)
+    original_image = Image.open(file)
+    # Keeps orientation information
+    image = ImageOps.exif_transpose(original_image)
+
     data = io.BytesIO()
 
     if optimise:
@@ -166,7 +169,7 @@ def process_image(file, optimise):
         content_type = 'image/webp'
     else:
         # Save the image to strip metadata (EXIF, etc.)
-        image.save(data, format=image.format)
+        image.save(data, format=image.format if image.format else 'JPEG')
         file_name = file.name
         content_type = file.content_type
 
