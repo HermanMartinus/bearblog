@@ -168,6 +168,8 @@ def process_image(file, optimise):
         file_name = os.path.splitext(file.name)[0] + '.webp'
         content_type = 'image/webp'
     else:
+        if image.mode == 'P':
+            image = image.convert('RGB')
         # Save the image to strip metadata (EXIF, etc.)
         image.save(data, format=image.format if image.format else 'JPEG')
         file_name = file.name
