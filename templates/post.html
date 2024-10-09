@@ -67,6 +67,7 @@
 {% block nav %}{{ blog.nav | markdown:post | safe }}{% endblock %}
 
 {% block content %}
+
 {% if preview %}
 <p style="width:100%;padding:10px;background-color:lightsalmon;color:white;display:flex;justify-content:space-between;line-height:15px;">
     PREVIEW
@@ -82,17 +83,15 @@
 {% endif %}
 
 {% if not post.is_page %}
-<h1>
-    {{ post.title }}
-</h1>
+    <h1 class="p-name">{{ post.title }}</h1>
 
-<p>
-    <i>
-        <time datetime="{{ post.published_date|date:'Y-m-d\TH:i\Z' }}">
-            {% format_date post.published_date blog.date_format blog.lang tz %}
-        </time>
-    </i>
-</p>
+    <p>
+        <i>
+            <time class="dt-published" datetime="{{ post.published_date|date:'Y-m-d\TH:i\Z' }}">
+                {% format_date post.published_date blog.date_format blog.lang tz %}
+            </time>
+        </i>
+    </p>
 {% endif %}
 
     {{ content | markdown:post | safe }}
