@@ -83,11 +83,11 @@
 {% endif %}
 
 {% if not post.is_page %}
-    <h1 class="p-name">{{ post.title }}</h1>
+    <h1>{{ post.title }}</h1>
 
     <p>
         <i>
-            <time class="dt-published" datetime="{{ post.published_date|date:'Y-m-d\TH:i\Z' }}">
+            <time datetime="{{ post.published_date|date:'Y-m-d\TH:i\Z' }}">
                 {% format_date post.published_date blog.date_format blog.lang tz %}
             </time>
         </i>
