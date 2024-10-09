@@ -6,9 +6,7 @@
 
 {% block lang %}{{ blog.lang }}{% endblock %}
 
-{% block favicon %}
-{% include 'snippets/favicon.html' with blog=blog %}
-{% endblock %}
+{% block favicon %}{% include 'snippets/favicon.html' with blog=blog %}{% endblock %}
 
 {% block title %}{{ blog.title }}{% endblock %}
 
@@ -26,9 +24,7 @@
 
 {% block imports %}
 
-{% if blog.user.settings.upgraded %}
-{{ blog.header_directive | safe }}
-{% endif %}
+{% if blog.user.settings.upgraded %}{{ blog.header_directive | safe }}{% endif %}
 
 {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
 {% if blog.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}

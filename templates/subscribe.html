@@ -3,9 +3,7 @@
 
 {% block page_type %}subscribe{% endblock %}
 
-{% block favicon %}
-{% include 'snippets/favicon.html' with blog=blog %}
-{% endblock %}
+{% block favicon %}{% include 'snippets/favicon.html' with blog=blog %}{% endblock %}
 
 {% block title %}Subscribe | {{ blog.title }}{% endblock %}
 
