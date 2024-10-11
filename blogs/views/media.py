@@ -171,7 +171,7 @@ def process_image(file, optimise):
         if image.mode == 'P':
             image = image.convert('RGB')
         # Save the image to strip metadata (EXIF, etc.)
-        image.save(data, format=image.format if image.format else 'JPEG')
+        image.save(data, format=original_image.format)
         file_name = file.name
         content_type = file.content_type
 
