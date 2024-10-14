@@ -216,7 +216,7 @@ def post_hit(request, uid):
                 device=device,
                 browser=browser)
             if create:
-                print(hit, 'hit')
+                print('Hit', hit)
 
     except Hit.MultipleObjectsReturned:
         print('Duplicate hit')
