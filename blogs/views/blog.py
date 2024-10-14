@@ -49,13 +49,12 @@ def get_blog_with_domain(domain):
 @csrf_exempt
 def ping(request):
     domain = request.GET.get("domain", None)
-    print(f'Attempting to issue a certificate for {domain}')
-
+    
     if get_blog_with_domain(domain):
-        print('Found correct blog. Issuing certificate.')
+        print('Ping! Found correct blog. Issuing certificate.')
         return HttpResponse('Ping', status=200)
     else:
-        print(f'Could not find blog with domain {domain}')
+        print(f'Ping! Could not find blog with domain {domain}')
         raise Http404('No such blog')
 
 
