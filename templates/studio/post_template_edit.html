@@ -16,6 +16,35 @@
         <button onclick="event.preventDefault(); window.location = '/{{ blog.subdomain }}/dashboard/posts/'">&#8592; Back</button>
         <button type="submit">Update</button>
     </p>
+
+    <details style="font-size: 12px; margin-bottom: 10px;">
+        <summary>
+            Attributes
+        </summary>
+        <p>
+            title: I like Bears<br>
+            link: i-like-bears<br>
+            alias: 2012/01/02/cool-post.html<br>
+            canonical_url: https://example.com/bears<br>
+            published_date: 2022-12-30 08:30<br>
+            is_page: false<br>
+            meta_description: Look for the bear necessities.<br>
+            meta_image: https://example.com/image.jpeg<br>
+            lang: en<br>
+            tags: {% if blog.tags %}{{ blog.tags|join:", " }}{% else %}bears, writing, thoughts{% endif %}<br>
+            make_discoverable: true
+        </p>
+        <a href="https://docs.bearblog.dev/post" target="_blank">
+            More info
+        </a>
+    </details>
+
     {{ form.as_p }}
+
+    <span class="helptext sticky">
+        <span>
+            <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown syntax</a>
+        </span>
+    </span>
 </form>
 {% endblock %}
