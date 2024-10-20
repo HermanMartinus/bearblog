@@ -20,19 +20,21 @@ DEBUG = (os.getenv('DEBUG') == 'True')
 
 if not DEBUG:
     # Logging settings
-    def exclude_disallowed_host(record):
-        if record.exc_info:
-            exc_type, exc_value, _ = record.exc_info
+    def exclude_disallowed_host(event, hint):
+        # Check if it's an exception
+        if 'exc_info' in hint:
+            exc_type, exc_value, _ = hint['exc_info']
+            # Check if the exception is DisallowedHost
             if isinstance(exc_value, DisallowedHost):
-                return False
-        return True
+                return None  # Discard the event
+        return event
     
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
         auto_session_tracking=False,
-        traces_sample_rate=0,
-        # send_default_pii=True,
+        traces_sample_rate=0.005,
+        send_default_pii=True,
         before_send=exclude_disallowed_host
     )
 
