@@ -25,8 +25,10 @@ if not DEBUG:
         if 'exc_info' in hint:
             exc_type, exc_value, _ = hint['exc_info']
             # Check if the exception is DisallowedHost
-            if isinstance(exc_value, DisallowedHost):
-                return None  # Discard the event
+            # if isinstance(exc_value, DisallowedHost):
+            #     return None # Discard the event
+            if isinstance(exc_value, ValueError) and 'Invalid HTTP_HOST' in str(exc_value):
+                return None # Discard the event
         return event
     
     sentry_sdk.init(
