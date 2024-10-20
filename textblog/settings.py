@@ -18,59 +18,24 @@ LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
 
 DEBUG = (os.getenv('DEBUG') == 'True')
 
-# Logging settings
-def exclude_disallowed_host(record):
-    if record.exc_info:
-        exc_type, exc_value, _ = record.exc_info
-        if isinstance(exc_value, DisallowedHost):
-            return False
-    return True
-
-
 if not DEBUG:
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'filters': {
-            'exclude_disallowed_host': {
-                '()': 'django.utils.log.CallbackFilter',
-                'callback': exclude_disallowed_host,
-            },
-        },
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['exclude_disallowed_host'],
-                'class': 'django.utils.log.AdminEmailHandler'
-            },
-            'console': {
-                'level': 'ERROR',
-                'filters': ['exclude_disallowed_host'],
-                'class': 'logging.StreamHandler',
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['mail_admins', 'console'],
-                'level': 'ERROR',
-                'propagate': True,
-            },
-            'django.security.DisallowedHost': {
-                'handlers': [],
-                'propagate': False,
-            },
-        }
-    }
-
+    # Logging settings
+    def exclude_disallowed_host(record):
+        if record.exc_info:
+            exc_type, exc_value, _ = record.exc_info
+            if isinstance(exc_value, DisallowedHost):
+                return False
+        return True
+    
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
         auto_session_tracking=False,
-        traces_sample_rate=0.05
+        traces_sample_rate=0.05,
+        before_send=exclude_disallowed_host
     )
 
-
-    ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
+    # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']

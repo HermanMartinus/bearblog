@@ -1,4 +1,4 @@
-.PHONY: dev prodshell
+.PHONY: dev shell logs
 
 dev:
 	python manage.py runserver
