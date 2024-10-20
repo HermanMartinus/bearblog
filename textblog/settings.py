@@ -1,5 +1,7 @@
 from django.core.exceptions import DisallowedHost
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 import os
 import dj_database_url
 from pathlib import Path
@@ -23,6 +25,7 @@ def exclude_disallowed_host(record):
         if isinstance(exc_value, DisallowedHost):
             return False
     return True
+
 
 if not DEBUG:
     LOGGING = {
@@ -58,6 +61,14 @@ if not DEBUG:
             },
         }
     }
+    
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        integrations=[DjangoIntegration()],
+        auto_session_tracking=False,
+        traces_sample_rate=0
+    )
+
 
     ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
