@@ -3,9 +3,9 @@
 dev:
 	python manage.py runserver
 	
-prodshell:
+shell:
 	sudo heroku run python manage.py shell --app bear-blog
 
-prodlogs:
+logs:
 	sudo heroku logs --tail --app bear-blog | grep "app" | grep -Ev "(GET|POST|HEAD|OPTIONS)"
 
