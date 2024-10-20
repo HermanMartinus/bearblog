@@ -33,7 +33,7 @@ if not DEBUG:
         auto_session_tracking=False,
         traces_sample_rate=0,
         # send_default_pii=True,
-        # before_send=exclude_disallowed_host
+        before_send=exclude_disallowed_host
     )
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
