@@ -31,9 +31,9 @@ if not DEBUG:
         dsn=os.getenv("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
         auto_session_tracking=False,
-        traces_sample_rate=0.01,
-        send_default_pii=True,
-        before_send=exclude_disallowed_host
+        traces_sample_rate=0,
+        # send_default_pii=True,
+        # before_send=exclude_disallowed_host
     )
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
