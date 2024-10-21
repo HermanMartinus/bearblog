@@ -20,22 +20,20 @@ DEBUG = (os.getenv('DEBUG') == 'True')
 
 if not DEBUG:
     # Logging settings
-    def exclude_disallowed_host(event, hint):
-        # Check if it's an exception
-        if 'exc_info' in hint:
-            exc_type, exc_value, _ = hint['exc_info']
-            # Check if the exception is DisallowedHost
-            if isinstance(exc_value, DisallowedHost):
-                return None  # Discard DisallowedHost events
+    def before_send(event, hint):
+        """Don't log django.DisallowedHost errors."""
+        if 'log_record' in hint:
+            if hint['log_record'].name == 'django.security.DisallowedHost':
+                return None
         return event
     
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
         auto_session_tracking=False,
-        traces_sample_rate=0.005,
+        traces_sample_rate=0.002,
         send_default_pii=True,
-        before_send=exclude_disallowed_host
+        before_send=before_send
     )
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
