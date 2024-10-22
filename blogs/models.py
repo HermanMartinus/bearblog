@@ -51,7 +51,7 @@ class Blog(models.Model):
     content = models.TextField(default="Hello World!", blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
-    lang = models.CharField(max_length=10, default='en', blank=True)
+    lang = models.CharField(max_length=10, default='en', blank=True, db_index=True)
     meta_tag = models.CharField(max_length=500, blank=True)
     blog_path = models.CharField(max_length=200, default="blog")
     header_directive = models.TextField(blank=True)
@@ -179,10 +179,10 @@ class Blog(models.Model):
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='posts')
     uid = models.CharField(max_length=200)
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, db_index=True)
     slug = models.SlugField(max_length=200)
     alias = models.CharField(max_length=200, blank=True)
-    published_date = models.DateTimeField(blank=True)
+    published_date = models.DateTimeField(blank=True, db_index=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     all_tags = models.TextField(default='[]')
     publish = models.BooleanField(default=True)
@@ -192,13 +192,13 @@ class Post(models.Model):
     canonical_url = models.CharField(max_length=200, blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
     meta_image = models.CharField(max_length=200, blank=True)
-    lang = models.CharField(max_length=10, blank=True)
+    lang = models.CharField(max_length=10, blank=True, db_index=True)
     class_name = models.CharField(max_length=200, blank=True)
 
     first_published_at = models.DateTimeField(blank=True, null=True)
     upvotes = models.IntegerField(default=0)
     shadow_votes = models.IntegerField(default=0)
-    score = models.FloatField(default=0)
+    score = models.FloatField(default=0, db_index=True)
     hidden = models.BooleanField(default=False)
 
     @property

@@ -67,21 +67,20 @@ def discover(request):
 
     newest = request.GET.get("newest")
 
-    
     base_query = get_base_query()
 
     lang = request.COOKIES.get('lang')
 
     if lang:
         base_query = base_query.filter(
-            (Q(lang__icontains=lang) & ~Q(lang='')) |
-            (Q(lang='') & Q(blog__lang__icontains=lang) & ~Q(blog__lang=''))
+            (Q(lang__iexact=lang) & ~Q(lang='')) |
+            (Q(lang='') & Q(blog__lang__iexact=lang) & ~Q(blog__lang=''))
         )
 
     if newest:
         posts = base_query.order_by("-published_date")
     else:
-        posts = base_query.order_by("-score", "-published_date")
+        posts = base_query.order_by("-score")
 
     posts = posts[posts_from:posts_to]
 
