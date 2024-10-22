@@ -102,41 +102,43 @@ def get_available_languages():
 
 # RSS/Atom feed
 def feed(request):
+    # Determine feed parameters
+    feed_kind = "newest" if request.GET.get("newest") else "trending"
+    feed_type = 'rss' if request.GET.get("type") == "rss" else "atom"
+
+    # Construct a unique cache key
+    CACHE_KEY = f'discover_feed_{feed_kind}_{feed_type}'
+
+    # Attempt to retrieve the cached feed
+    cached_feed = cache.get(CACHE_KEY)
+    if cached_feed is not None:
+        return HttpResponse(cached_feed, content_type=f"application/{feed_type}+xml")
+
     fg = FeedGenerator()
     fg.id("bearblog")
     fg.author({"name": "Bear Blog", "email": "feed@bearblog.dev"})
 
-    days_ago = timezone.now() - timedelta(days=30)
+    if feed_type == 'rss':
+        feed_method = fg.rss_str
+    else:
+        feed_method = fg.atom_str
+    
 
-    newest = request.GET.get("newest")
-    if newest:
+    if feed_kind == 'newest':
         fg.title("Bear Blog Most Recent Posts")
         fg.subtitle("Most recent posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/?newest=True", rel="alternate")
-        
-        CACHE_KEY = 'discover_newest_feed'
-        cached_queryset = cache.get(CACHE_KEY)
-    
-        if cached_queryset is None:
-            all_posts = get_base_query().filter(published_date__gte=days_ago).order_by("-published_date")[0:posts_per_page]
-            all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
-            cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
-        else:
-            all_posts = cached_queryset
+
+        all_posts = get_base_query().order_by("-published_date")[:posts_per_page]
+        all_posts = sorted(all_posts, key=lambda post: post.published_date)
     else:
         fg.title("Bear Blog Trending Posts")
         fg.subtitle("Trending posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/", rel="alternate")
 
-        CACHE_KEY = 'discover_trending_feed'
-        cached_queryset = cache.get(CACHE_KEY)
-    
-        if cached_queryset is None:
-            all_posts = get_base_query().filter(published_date__gte=days_ago).order_by("-score", "-published_date")[0:posts_per_page]
-            all_posts = sorted(list(all_posts), key=lambda post: post.score)
-            cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
-        else:
-            all_posts = cached_queryset
+        all_posts = get_base_query().order_by("-score", "-published_date")[:posts_per_page]
+        all_posts = sorted(all_posts, key=lambda post: post.score)  
+
 
     for post in all_posts:
         fe = fg.add_entry()
@@ -144,16 +146,18 @@ def feed(request):
         fe.title(post.title)
         fe.author({"name": post.blog.subdomain, "email": "hidden"})
         fe.link(href=f"{post.blog.useful_domain}/{post.slug}/")
-        fe.content(clean_text(mistune.html(post.content.replace("{{ email-signup }}", ''))), type="html")
+        fe.content(
+            clean_text(mistune.html(post.content.replace("{{ email-signup }}", ''))),
+            type="html"
+        )
         fe.published(post.published_date)
         fe.updated(post.published_date)
 
-    if request.GET.get("type") == "rss":
-        rssfeed = fg.rss_str(pretty=True)
-        return HttpResponse(rssfeed, content_type="application/rss+xml")
-    else:
-        atomfeed = fg.atom_str(pretty=True)
-        return HttpResponse(atomfeed, content_type="application/atom+xml")
+    # Generate the feed string and cache it
+    feed_str = feed_method(pretty=True)
+    cache.set(CACHE_KEY, feed_str, CACHE_TIMEOUT)
+    return HttpResponse(feed_str, content_type=f"application/{feed_type}+xml")
+
     
 
 def search(request):
