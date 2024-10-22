@@ -6,6 +6,10 @@
 
 Please log all bugs as [GitHub issues](https://github.com/HermanMartinus/bearblog/issues) and all feature requests on the [suggestions board](https://bear.nolt.io).
 
+## Contributions
+
+Bear is not currently accepting contributions. See CONTRIBUTIONS.md for more info. 
+
 ## Markdown
 All the post content is written in [markdown](https://herman.bearblog.dev/markdown-cheatsheet/).
 
