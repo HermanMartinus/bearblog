@@ -200,7 +200,6 @@ class Post(models.Model):
     shadow_votes = models.IntegerField(default=0)
     score = models.FloatField(default=0)
     hidden = models.BooleanField(default=False)
-    pinned = models.BooleanField(default=False)
 
     @property
     def contains_code(self):

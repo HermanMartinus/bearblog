@@ -8,6 +8,7 @@ from django.core.cache import cache
 from blogs.models import Post
 from blogs.helpers import clean_text
 
+from datetime import timedelta
 from feedgen.feed import FeedGenerator
 import mistune
 
@@ -16,7 +17,7 @@ posts_per_page = 20
 CACHE_TIMEOUT = 300  # 5 minutes in seconds
 
 
-def get_base_query():    
+def get_base_query():
     queryset = Post.objects.select_related("blog").filter(
         publish=True,
         hidden=False,
@@ -33,10 +34,6 @@ def get_base_query():
 def admin_actions(request):
     # admin actions
     if request.user.is_staff:
-        if request.POST.get("pin-post", False):
-            post = Post.objects.get(pk=request.POST.get("pin-post"))
-            post.pinned = not post.pinned
-            post.save()
         if request.POST.get("hide-post", False):
             post = Post.objects.get(pk=request.POST.get("hide-post"))
             post.hidden = True
@@ -70,7 +67,7 @@ def discover(request):
 
     newest = request.GET.get("newest")
 
-    # Use the base query function excluding pinned posts
+    
     base_query = get_base_query()
 
     lang = request.COOKIES.get('lang')
@@ -109,6 +106,8 @@ def feed(request):
     fg.id("bearblog")
     fg.author({"name": "Bear Blog", "email": "feed@bearblog.dev"})
 
+    days_ago = timezone.now() - timedelta(days=30)
+
     newest = request.GET.get("newest")
     if newest:
         fg.title("Bear Blog Most Recent Posts")
@@ -119,7 +118,7 @@ def feed(request):
         cached_queryset = cache.get(CACHE_KEY)
     
         if cached_queryset is None:
-            all_posts = get_base_query().order_by("-published_date")[0:posts_per_page]
+            all_posts = get_base_query().filter(published_date__gte=days_ago).order_by("-published_date")[0:posts_per_page]
             all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
             cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
         else:
@@ -133,7 +132,7 @@ def feed(request):
         cached_queryset = cache.get(CACHE_KEY)
     
         if cached_queryset is None:
-            all_posts = get_base_query().order_by("-score", "-published_date")[0:posts_per_page]
+            all_posts = get_base_query().filter(published_date__gte=days_ago).order_by("-score", "-published_date")[0:posts_per_page]
             all_posts = sorted(list(all_posts), key=lambda post: post.score)
             cache.set(CACHE_KEY, all_posts, CACHE_TIMEOUT)
         else:

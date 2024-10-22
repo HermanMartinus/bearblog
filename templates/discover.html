@@ -58,7 +58,6 @@
             <small>
                 <span>(<a href="{{ post.blog.dynamic_useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>
                 <br>
-                {% if post.pinned %}<small style="position: absolute; top:0; right:0;">📍 Pinned</small>{% endif %}
                 <small>Published {{ post.published_date|timesince }} ago</small>
                 <small>
                     <svg style="height:16px;margin: 0 -8px -4px 0;" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>
@@ -67,13 +66,6 @@
                 {% if request.user.is_staff %}
                     <details>
                         <summary></summary>
-                        <form method="POST" style="display:inline">
-                            <input hidden name="pin-post" value="{{ post.pk }}">
-                            <button onclick="event.preventDefault();if(confirm('Toggle pin this post?')){event.target.parentElement.submit()}">
-                                {% if post.pinned %}Un-{% endif %}Pin post
-                            </button>
-                        </form>
-
                         <form method="POST" style="display:inline">
                             <input hidden name="hide-post" value="{{ post.pk }}">
                             <button onclick="event.preventDefault();if(confirm('Hide this post?')){event.target.parentElement.submit()}">Hide post</button>
