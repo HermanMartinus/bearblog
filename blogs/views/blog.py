@@ -6,8 +6,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import get_posts, salt_and_hash, unmark
-from blogs.tasks import daily_task
+from blogs.helpers import salt_and_hash, unmark
 from blogs.views.analytics import render_analytics
 
 import os
@@ -63,7 +62,7 @@ def home(request):
     if not blog:
         return render(request, 'landing.html')
 
-    all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
+    all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
 
@@ -72,7 +71,7 @@ def home(request):
         'home.html',
         {
             'blog': blog,
-            'posts': get_posts(all_posts),
+            'posts': all_posts,
             'root': blog.useful_domain,
             'meta_description': meta_description
         })
@@ -89,8 +88,7 @@ def posts(request):
         posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         blog_posts = [post for post in posts if tag in post.tags]
     else:
-        all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
-        blog_posts = get_posts(all_posts)
+        blog_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
 

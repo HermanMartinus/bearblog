@@ -27,10 +27,6 @@ def root(subdomain=''):
         return f"{subdomain}.{domain}"
 
 
-def get_posts(all_posts):
-    return list(filter(lambda post: not post.is_page, all_posts))
-
-
 def is_protected(subdomain):
     protected_subdomains = [
         'login',

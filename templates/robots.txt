@@ -7,6 +7,31 @@ Disallow: /studio/
 Disallow: /public-analytics/
 Disallow: /subscribe/
 Disallow: /confirm-subscription/
+{% comment %} 
+User-agent: *
+Disallow: /
+
+User-agent: Googlebot
+Disallow:
+
+User-agent: Bingbot
+Disallow:
+
+User-agent: Baiduspider
+Disallow:
+
+User-agent: Yandex
+Disallow:
+
+User-agent: DuckDuckBot
+Disallow:
+
+User-agent: Slurp
+Disallow:
+
+User-agent: KagiBot
+Disallow: {% endcomment %}
+
 
 {% if blog %}{{ blog.robots_txt }}{% endif %}
 

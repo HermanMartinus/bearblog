@@ -43,8 +43,8 @@ class Blog(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     last_posted = models.DateTimeField(blank=True, null=True)
-    subdomain = models.SlugField(max_length=100, unique=True)
-    domain = models.CharField(max_length=128, blank=True, null=True)
+    subdomain = models.SlugField(max_length=100, unique=True, db_index=True)
+    domain = models.CharField(max_length=128, blank=True, null=True, db_index=True)
     auth_token = models.CharField(max_length=128, blank=True)
 
     nav = models.TextField(default="[Home](/) [Blog](/blog/)", blank=True)
@@ -58,11 +58,11 @@ class Blog(models.Model):
     footer_directive = models.TextField(blank=True)
 
     dodginess_score = models.FloatField(default=0)
-    reviewed = models.BooleanField(default=False)
+    reviewed = models.BooleanField(default=False, db_index=True)
     ignored_date = models.DateTimeField(blank=True, null=True)
     to_review = models.BooleanField(default=False)
     reviewer_note = models.TextField(blank=True)
-    hidden = models.BooleanField(default=False)
+    hidden = models.BooleanField(default=False, db_index=True)
 
     custom_styles = models.TextField(blank=True)
     overwrite_styles = models.BooleanField(
@@ -178,16 +178,16 @@ class Blog(models.Model):
 
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='posts')
-    uid = models.CharField(max_length=200)
+    uid = models.CharField(max_length=200, db_index=True)
     title = models.CharField(max_length=200, db_index=True)
-    slug = models.SlugField(max_length=200)
-    alias = models.CharField(max_length=200, blank=True)
+    slug = models.SlugField(max_length=200, db_index=True)
+    alias = models.CharField(max_length=200, blank=True, db_index=True)
     published_date = models.DateTimeField(blank=True, db_index=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     all_tags = models.TextField(default='[]')
-    publish = models.BooleanField(default=True)
-    make_discoverable = models.BooleanField(default=True)
-    is_page = models.BooleanField(default=False)
+    publish = models.BooleanField(default=True, db_index=True)
+    make_discoverable = models.BooleanField(default=True, db_index=True)
+    is_page = models.BooleanField(default=False, db_index=True)
     content = models.TextField()
     canonical_url = models.CharField(max_length=200, blank=True)
     meta_description = models.CharField(max_length=200, blank=True)
@@ -199,7 +199,7 @@ class Post(models.Model):
     upvotes = models.IntegerField(default=0)
     shadow_votes = models.IntegerField(default=0)
     score = models.FloatField(default=0, db_index=True)
-    hidden = models.BooleanField(default=False)
+    hidden = models.BooleanField(default=False, db_index=True)
 
     @property
     def contains_code(self):
@@ -274,18 +274,23 @@ class Upvote(models.Model):
         # Update the post score on post save
         self.post.save()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['post', 'hash_id']),
+        ]
+
     def __str__(self):
         return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.hash_id} - {self.post}"
 
 
 class Hit(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    created_date = models.DateTimeField(auto_now_add=True)
-    hash_id = models.CharField(max_length=200)
-    referrer = models.URLField(default=None, blank=True, null=True)
-    country = models.CharField(max_length=200, blank=True)
-    device = models.CharField(max_length=200, blank=True)
-    browser = models.CharField(max_length=200, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    hash_id = models.CharField(max_length=200, db_index=True)
+    referrer = models.URLField(default=None, blank=True, null=True, db_index=True)
+    country = models.CharField(max_length=200, blank=True, db_index=True)
+    device = models.CharField(max_length=200, blank=True, db_index=True)
+    browser = models.CharField(max_length=200, blank=True, db_index=True)
 
     def __str__(self):
         return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.hash_id} - {self.post}"
