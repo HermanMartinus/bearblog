@@ -14,6 +14,13 @@
 
 <h1>Your blogs</h1>
 
+{% if not request.user.settings.upgraded and request.user.blogs.all|length > 1 %}
+    <p style="color:lightsalmon">
+        You've exceeded the number of blogs for the free plan.
+        Please <a href="{% url 'upgrade' %}" style="color:lightsalmon;text-decoration:underline">upgrade</a> to keep your blogs. 
+    </p>
+{% endif %}
+
 <ul>
 {% for blog in blogs %}
     <li>
@@ -21,14 +28,6 @@
     </li>
 {% endfor %}
 </ul>
-{% comment %} <small>
-    <details>
-        <summary>Have multiple blogs on different accounts?</summary>
-        If you would like to migrate an existing blog to this account, send an email to
-        <a href="mailto:herman@bearblog.dev">herman@bearblog.dev</a> 
-        <b>from the email address associated with the blog to migrate</b>.
-    </details>
-</small> {% endcomment %}
 {% if request.user.blogs.all|length > 0 and not request.user.settings.upgraded %}
 <p>
     <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs <span class="bear flex"></span></a>
