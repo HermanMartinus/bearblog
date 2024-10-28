@@ -151,9 +151,11 @@ class Blog(models.Model):
         self.dodginess_score = dodgy_term_count
 
     def save(self, *args, **kwargs):
+        # Upgraded blogs are auto-reviewed
         if self.user.settings.upgraded:
             self.reviewed = True
         
+        # Determine how dodgy the blog is if it's not reviewed
         if not self.reviewed:
             self.determine_dodginess()
 
@@ -161,6 +163,9 @@ class Blog(models.Model):
         if not self.custom_styles:
             self.custom_styles = Stylesheet.objects.filter(identifier="default").first().css
             self.overwrite_styles = True
+        
+        # Double check subdomains are lowercase
+        self.subdomain = self.subdomain.lower()
         
         # Invalidate feed cache
         CACHE_KEY = f'{self.subdomain}_all_posts'
