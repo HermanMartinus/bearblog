@@ -54,7 +54,7 @@ def ping(request):
         return HttpResponse('Ping', status=200)
     else:
         print(f'Ping! Could not find blog with domain {domain}')
-        raise Http404('No such blog')
+        return HttpResponse('Invalid domain', status=422)
 
 
 def home(request):
