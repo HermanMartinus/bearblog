@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.core.cache import cache
 
-from blogs.helpers import measure_queries, salt_and_hash, unmark
+from blogs.helpers import salt_and_hash, unmark
 from blogs.models import RssSubscriber
 from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
@@ -14,7 +14,7 @@ import re
 def clean_string(s):
     return re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', s)
 
-@measure_queries
+
 def feed(request):
     blog = resolve_address(request)
     if not blog:
@@ -44,7 +44,7 @@ def atom(blog, tag=None):
     CACHE_KEY = f'{blog.subdomain}_atom_feed'
     if tag:
         CACHE_KEY += f'_{tag}'
-    print("CACHE_KEY:", CACHE_KEY)
+
     cached_feed = cache.get(CACHE_KEY)
 
     if cached_feed is None:
@@ -60,7 +60,7 @@ def rss(blog, tag=None):
     CACHE_KEY = f'{blog.subdomain}_rss_feed'
     if tag:
         CACHE_KEY += f'_{tag}'
-    print("CACHE_KEY:", CACHE_KEY)
+
     cached_feed = cache.get(CACHE_KEY)
 
     if cached_feed is None:
