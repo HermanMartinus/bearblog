@@ -10,4 +10,4 @@ logs:
 	sudo heroku logs --tail --app bear-blog --force-colors | grep "app\[web" | grep -Ev "(GET|POST|HEAD|OPTIONS)"
 
 404:
-	sudo heroku logs --tail --app bear-blog --force-colors | grep "app\[web" | grep "404"
+	sudo heroku logs --tail --app bear-blog --force-colors | grep "heroku\[" | grep "404"

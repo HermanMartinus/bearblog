@@ -22,6 +22,9 @@ Disallow:
 User-agent: KagiBot
 Disallow:
 
+User-agent: Buttondown RSS-Feed-Parser
+Disallow:
+
 
 {% if blog %}{{ blog.robots_txt }}{% endif %}
 
