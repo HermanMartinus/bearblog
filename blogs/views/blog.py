@@ -49,12 +49,15 @@ def get_blog_with_domain(domain):
 def ping(request):
     domain = request.GET.get("domain", None)
     
-    if get_blog_with_domain(domain):
-        print('Ping! Found correct blog. Issuing certificate.')
-        return HttpResponse('Ping', status=200)
-    else:
-        print(f'Ping! Could not find blog with domain {domain}')
-        return HttpResponse('Invalid domain', status=422)
+    try:
+        if get_blog_with_domain(domain):
+            print('Ping! Found correct blog. Issuing certificate.')
+            return HttpResponse('Ping', status=200)
+    except:
+        pass
+
+    print(f'Ping! Could not find blog with domain {domain}')
+    return HttpResponse('Invalid domain', status=422)
 
 
 def home(request):
