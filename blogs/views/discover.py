@@ -14,7 +14,7 @@ import mistune
 
 posts_per_page = 20
 
-CACHE_TIMEOUT = 300  # 5 minutes in seconds
+CACHE_TIMEOUT = 600  # 10 minutes in seconds
 
 
 def get_base_query():

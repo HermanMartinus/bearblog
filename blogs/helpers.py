@@ -2,7 +2,9 @@ from django.utils import timezone
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 from django.contrib.gis.geoip2 import GeoIP2
 from django.conf import settings
+from django.db import connection
 
+from functools import wraps
 import re
 import string
 import os
@@ -12,6 +14,7 @@ from requests.exceptions import ConnectionError, ReadTimeout
 import requests
 import subprocess
 from datetime import timedelta
+from time import time
 import geoip2
 from ipaddr import client_ip
 import hashlib
@@ -72,6 +75,38 @@ def is_protected(subdomain):
     ]
 
     return subdomain in protected_subdomains
+
+
+def measure_queries(func):
+    def wrapper(*args, **kwargs):
+        # Start timing and get initial query count
+        start_time = time()
+        initial_queries = len(connection.queries)
+        
+        # Execute the function
+        result = func(*args, **kwargs)
+        
+        # Calculate metrics
+        end_time = time()
+        final_queries = len(connection.queries)
+        
+        # Print metrics
+        execution_time = end_time - start_time
+        query_count = final_queries - initial_queries
+        
+        print(f"\n{'='*50}")
+        print(f"Performance Metrics for {func.__name__}:")
+        print(f"Time: {execution_time:.3f} seconds")
+        print(f"Queries: {query_count}")
+        
+        # if query_count > 0:
+        #     print("\nQueries executed:")
+        #     for query in connection.queries[initial_queries:final_queries]:
+        #         print(f"- {query['sql'][:200]}...")
+        # print(f"{'='*50}\n")
+        
+        return result
+    return wrapper
 
 
 def check_records(domain):

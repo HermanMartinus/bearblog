@@ -93,6 +93,18 @@ urlpatterns = [
     path('subscribe/', emailer.subscribe, name='subscribe'),
     path('email-subscribe/', emailer.email_subscribe, name='email_subscribe'),
     path('confirm-subscription/', emailer.confirm_subscription, name='confirm_subscription'),
-    path("feed/", feed.feed, name="rss_feed"),
+    
+    # Feeds + aliases
+    path("feed/", feed.feed),
+    path("atom/", feed.feed),
+    path("feed/atom/", feed.feed),
+    path("feed/rss/", feed.feed),
+    path("feed/feed.xml", feed.feed),
+    path("feed.xml", feed.feed),
+    path("index.xml", feed.feed),
+    path("rss.xml", feed.feed),
+    path("atom.xml", feed.feed),
+
+    # Generic path endpoint for slugs
     path('<path:slug>/', blog.post, name='post'),
 ]

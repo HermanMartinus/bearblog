@@ -91,7 +91,7 @@
     {% if subscription_link and not subscription_cancelled %}
     <a onclick="alert('Please cancel your subscription before deleting your account.')">Delete account</a>
     {% else %}
-    <a href="{% url 'user_delete' %}">Delete account</a>
+    <a href="{% url 'user_delete' %}" style="color:lightsalmon">Delete account</a>
     {% endif %}
 </p>
 <p>

@@ -17,9 +17,9 @@ import hashlib
 
 class UserSettings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='settings', blank=True)
-    upgraded = models.BooleanField(default=False)
+    upgraded = models.BooleanField(default=False, db_index=True)
     max_blogs = models.IntegerField(default=10)
-    upgraded_date = models.DateTimeField(blank=True, null=True)
+    upgraded_date = models.DateTimeField(blank=True, null=True, db_index=True)
     order_id = models.CharField(max_length=100, blank=True, null=True)
 
     dashboard_styles = models.TextField(blank=True)
@@ -40,9 +40,9 @@ def create_user_settings(sender, instance, **kwargs):
 class Blog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, related_name='blogs')
     title = models.CharField(max_length=200)
-    created_date = models.DateTimeField(auto_now_add=True, blank=True)
-    last_modified = models.DateTimeField(auto_now_add=True, blank=True)
-    last_posted = models.DateTimeField(blank=True, null=True)
+    created_date = models.DateTimeField(auto_now_add=True, blank=True, db_index=True)
+    last_modified = models.DateTimeField(auto_now_add=True, blank=True, db_index=True)
+    last_posted = models.DateTimeField(blank=True, null=True, db_index=True)
     subdomain = models.SlugField(max_length=100, unique=True, db_index=True)
     domain = models.CharField(max_length=128, blank=True, null=True, db_index=True)
     auth_token = models.CharField(max_length=128, blank=True)
@@ -57,10 +57,10 @@ class Blog(models.Model):
     header_directive = models.TextField(blank=True)
     footer_directive = models.TextField(blank=True)
 
-    dodginess_score = models.FloatField(default=0)
+    dodginess_score = models.FloatField(default=0, db_index=True)
     reviewed = models.BooleanField(default=False, db_index=True)
-    ignored_date = models.DateTimeField(blank=True, null=True)
-    to_review = models.BooleanField(default=False)
+    ignored_date = models.DateTimeField(blank=True, null=True, db_index=True)
+    to_review = models.BooleanField(default=False, db_index=True)
     reviewer_note = models.TextField(blank=True)
     hidden = models.BooleanField(default=False, db_index=True)
 
@@ -168,8 +168,9 @@ class Blog(models.Model):
         self.subdomain = self.subdomain.lower()
         
         # Invalidate feed cache
-        CACHE_KEY = f'{self.subdomain}_all_posts'
-        cache.delete(CACHE_KEY)
+        cache.delete(f'{self.subdomain}_all_posts')
+        cache.delete(f'{self.subdomain}_rss_feed')
+        cache.delete(f'{self.subdomain}_atom_feed')
 
         # Update last posted
         if self.pk:
@@ -200,9 +201,9 @@ class Post(models.Model):
     lang = models.CharField(max_length=10, blank=True, db_index=True)
     class_name = models.CharField(max_length=200, blank=True)
 
-    first_published_at = models.DateTimeField(blank=True, null=True)
-    upvotes = models.IntegerField(default=0)
-    shadow_votes = models.IntegerField(default=0)
+    first_published_at = models.DateTimeField(blank=True, null=True, db_index=True)
+    upvotes = models.IntegerField(default=0, db_index=True)
+    shadow_votes = models.IntegerField(default=0, db_index=True)
     score = models.FloatField(default=0, db_index=True)
     hidden = models.BooleanField(default=False, db_index=True)
 
@@ -312,8 +313,8 @@ class Subscriber(models.Model):
 
 class RssSubscriber(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
-    access_date = models.DateTimeField(auto_now_add=True)
-    hash_id = models.CharField(max_length=200)
+    access_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    hash_id = models.CharField(max_length=200, db_index=True)
 
     def __str__(self):
         return f"{self.access_date.strftime('%d %b %Y, %X')} - {self.blog.title} - {self.hash_id}"
