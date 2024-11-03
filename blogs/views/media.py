@@ -41,6 +41,7 @@ def media_center(request, id):
         return redirect('upgrade')
 
     error_messages = []
+
     # Upload media
     if request.method == "POST" and request.FILES.getlist('file') and blog.user.settings.upgraded is True:
         file_links = upload_files(blog, request.FILES.getlist('file'))
@@ -90,6 +91,11 @@ def upload_files(blog, file_list):
     file_links = []
 
     for file in file_list:
+        # Fair use limit
+        if blog.media.count() > 20000:
+            file_links.append('Error: Fair usage limit exceeded. Contact site admin.')
+            return sorted(file_links)
+
         # Upload size limit
         if file.size > file_size_limit:
             file_links.append(f'Error: File {file.name} exceeds 10MB limit')
