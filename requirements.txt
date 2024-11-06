@@ -17,7 +17,6 @@ psycopg2==2.9.9
 pygal==3.0.5
 python-akismet==0.4.3
 python-dotenv==1.0.0
-redis==5.2.0
 requests==2.27.1
 sentry-sdk==2.17.0
 tldextract==2.2.2
