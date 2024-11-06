@@ -1,10 +1,11 @@
 from django.db import connection
+from django.urls import resolve, Resolver404
 import time
 from collections import defaultdict
 from statistics import mean
 from threading import Lock
-from contextlib import contextmanager
 import threading
+from contextlib import contextmanager
 
 # Thread-safe storage for metrics
 request_metrics = defaultdict(list)
@@ -30,6 +31,15 @@ class RequestPerformanceMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
+    def get_pattern_name(self, request):
+        try:
+            resolver_match = resolve(request.path)
+            # Get the URL pattern from the resolver match
+            return f"{request.method} {resolver_match.route}"
+        except Resolver404:
+            # If no URL pattern matches, use a simplified version of the path
+            return f"{request.method} *404*"
+
     def __call__(self, request):
         # Start timing
         start_time = time.time()
@@ -43,8 +53,10 @@ class RequestPerformanceMiddleware:
         total_time = time.time() - start_time
         compute_time = total_time - db_time
 
+        # Get the generic URL pattern instead of the exact path
+        endpoint = self.get_pattern_name(request)
+
         # Store metrics (thread-safe)
-        endpoint = f"{request.method} {request.path}"
         with metrics_lock:
             request_metrics[endpoint].append({
                 'total_time': total_time,
