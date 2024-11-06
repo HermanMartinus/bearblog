@@ -35,7 +35,6 @@ urlpatterns = [
     path('staff/review/delete/<pk>', main_site_only(staff.delete), name='review_delete'),
     path('staff/dashboard/delete-empty/', main_site_only(staff.delete_empty), name='delete_empty'),
     path('staff/dashboard/migrate-blog/', main_site_only(staff.migrate_blog), name='migrate_blog'),
-    path('staff/dashboard/performance/', main_site_only(staff.performance_dashboard), name='performance_dashboard'),
 
     # User dashboard
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
