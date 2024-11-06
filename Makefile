@@ -1,7 +1,8 @@
 .PHONY: dev shell logs 404
 
 dev:
-	python manage.py runserver
+	echo http://lh.co
+	python manage.py runserver 0:80
 	
 shell:
 	sudo heroku run python manage.py shell --app bear-blog

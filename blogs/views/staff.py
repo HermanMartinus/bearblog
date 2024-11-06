@@ -5,10 +5,14 @@ from django.db.models import Q, F, Count
 from django.db.models.functions import Length, TruncDate, Length
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.models import User
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
 
 from blogs.helpers import send_async_mail
-from blogs.models import Blog, PersistentStore, Post
+from blogs.models import Blog, PersistentStore
+from blogs.middleware import request_metrics
 
+from statistics import mean
 from datetime import timedelta
 import pygal
 from pygal.style import LightColorizedStyle
@@ -285,4 +289,19 @@ def migrate_blog(request):
         return HttpResponse(message)
 
 
-
+@staff_member_required
+def performance_dashboard(request):
+    metrics_summary = {}
+    
+    for endpoint, measurements in request_metrics.items():
+        if measurements:
+            metrics_summary[endpoint] = {
+                'count': len(measurements),
+                'avg_total': mean(m['total_time'] for m in measurements) * 1000,
+                'avg_db': mean(m['db_time'] for m in measurements) * 1000,
+                'avg_compute': mean(m['compute_time'] for m in measurements) * 1000,
+            }
+    
+    return render(request, 'staff/performance.html', {
+        'metrics': metrics_summary
+    })
