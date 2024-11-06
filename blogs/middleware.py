@@ -28,18 +28,35 @@ class MetricsStorage:
     """Handles storing metrics in either Redis or memory"""
     def __init__(self):
         self.redis_key = 'django_metrics'
+        # Add local cache to reduce Redis calls
+        self._cache = {}
+        self._last_save = {}
 
     def get_metrics(self, endpoint: str) -> List[dict]:
         if redis_client:
+            # Check local cache first
+            if endpoint in self._cache:
+                return self._cache[endpoint]
+            
             metrics_json = redis_client.hget(self.redis_key, endpoint)
-            return json.loads(metrics_json) if metrics_json else []
+            metrics = json.loads(metrics_json) if metrics_json else []
+            self._cache[endpoint] = metrics
+            return metrics
         else:
             with metrics_lock:
                 return request_metrics[endpoint]
 
     def save_metrics(self, endpoint: str, metrics: List[dict]):
+        now = time.time()
+        
         if redis_client:
-            redis_client.hset(self.redis_key, endpoint, json.dumps(metrics))
+            # Update local cache
+            self._cache[endpoint] = metrics
+            
+            # Only save to Redis every 10 seconds for this endpoint
+            if now - self._last_save.get(endpoint, 0) > 10:
+                redis_client.hset(self.redis_key, endpoint, json.dumps(metrics))
+                self._last_save[endpoint] = now
         else:
             with metrics_lock:
                 request_metrics[endpoint] = metrics
