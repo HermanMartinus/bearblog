@@ -31,7 +31,7 @@ if not DEBUG:
         dsn=os.getenv("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
         auto_session_tracking=False,
-        traces_sample_rate=0.002,
+        traces_sample_rate=0,
         send_default_pii=True,
         before_send=before_send
     )
