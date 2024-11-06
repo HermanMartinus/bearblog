@@ -10,6 +10,7 @@ from django.shortcuts import render
 
 from blogs.helpers import send_async_mail
 from blogs.models import Blog, PersistentStore
+from blogs.middleware import request_metrics
 
 from statistics import mean
 from datetime import timedelta
@@ -286,3 +287,28 @@ def migrate_blog(request):
             message += 'Deleted...\n'
         
         return HttpResponse(message)
+
+
+@staff_member_required
+def performance_dashboard(request):
+    metrics_summary = {}
+    
+    for endpoint, measurements in request_metrics.items():
+        if measurements:
+            metrics_summary[endpoint] = {
+                'count': len(measurements),
+                'avg_total': mean(m['total_time'] for m in measurements) * 1000,
+                'avg_db': mean(m['db_time'] for m in measurements) * 1000,
+                'avg_compute': mean(m['compute_time'] for m in measurements) * 1000,
+            }
+    
+    # Sort metrics by average total time (descending)
+    sorted_metrics = dict(sorted(
+        metrics_summary.items(),
+        key=lambda x: x[1]['avg_total'],
+        reverse=True
+    ))
+    
+    return render(request, 'staff/performance.html', {
+        'metrics': sorted_metrics
+    })

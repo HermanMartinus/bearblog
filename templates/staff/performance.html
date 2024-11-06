@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Performance Dashboard</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Endpoint</th>
+            <th>Request Count</th>
+            <th>Avg Total Time (ms)</th>
+            <th>Avg DB Time (ms)</th>
+            <th>Avg Compute Time (ms)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for endpoint, stats in metrics.items %}
+        <tr>
+            <td>{{ endpoint }}</td>
+            <td>{{ stats.count }}</td>
+            <td>{{ stats.avg_total|floatformat:2 }}</td>
+            <td>{{ stats.avg_db|floatformat:2 }}</td>
+            <td>{{ stats.avg_compute|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<style>body { max-width: 100vw; }</style>
+{% endblock %}
