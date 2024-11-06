@@ -10,7 +10,7 @@ from django.shortcuts import render
 
 from blogs.helpers import send_async_mail
 from blogs.models import Blog, PersistentStore
-from blogs.middleware import MetricsStorage
+from blogs.middleware import request_metrics
 
 from statistics import mean
 from datetime import timedelta
@@ -292,10 +292,8 @@ def migrate_blog(request):
 @staff_member_required
 def performance_dashboard(request):
     metrics_summary = {}
-    metrics_storage = MetricsStorage()
-    all_metrics = metrics_storage.get_all_metrics()
     
-    for endpoint, measurements in all_metrics.items():
+    for endpoint, measurements in request_metrics.items():
         if measurements:
             metrics_summary[endpoint] = {
                 'count': len(measurements),
