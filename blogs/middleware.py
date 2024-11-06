@@ -37,9 +37,8 @@ class RequestPerformanceMiddleware:
             # Get the URL pattern from the resolver match
             return f"{request.method} {resolver_match.route}"
         except Resolver404:
-            # If no URL pattern matches, use a simplified version of the path
-            return f"{request.method} *404*"
-
+            return None
+        
     def __call__(self, request):
         # Start timing
         start_time = time.time()
@@ -49,12 +48,16 @@ class RequestPerformanceMiddleware:
             response = self.get_response(request)
             db_time = getattr(_local, 'db_time', 0.0)
 
+        # Get the generic URL pattern instead of the exact path
+        endpoint = self.get_pattern_name(request)
+        
+        # Skip storing metrics for 404s or unresolvable URLs
+        if endpoint is None:
+            return response
+
         # Calculate timings
         total_time = time.time() - start_time
         compute_time = total_time - db_time
-
-        # Get the generic URL pattern instead of the exact path
-        endpoint = self.get_pattern_name(request)
 
         # Store metrics (thread-safe)
         with metrics_lock:
