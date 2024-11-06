@@ -83,7 +83,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'blogs.middleware.XClacksOverheadMiddleware',
-    'blogs.middleware.RequestPerformanceMiddleware',
+    # 'blogs.middleware.RequestPerformanceMiddleware',
     'allauth.account.middleware.AccountMiddleware'
 ]
 
