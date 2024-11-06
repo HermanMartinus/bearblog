@@ -32,6 +32,10 @@ class RequestPerformanceMiddleware:
         self.get_response = get_response
 
     def get_pattern_name(self, request):
+        # Skip HEAD and OPTIONS requests
+        if request.method in ['HEAD', 'OPTIONS']:
+            return None
+            
         try:
             resolver_match = resolve(request.path)
             # Get the URL pattern from the resolver match

@@ -302,6 +302,13 @@ def performance_dashboard(request):
                 'avg_compute': mean(m['compute_time'] for m in measurements) * 1000,
             }
     
+    # Sort metrics by average total time (descending)
+    sorted_metrics = dict(sorted(
+        metrics_summary.items(),
+        key=lambda x: x[1]['avg_total'],
+        reverse=True
+    ))
+    
     return render(request, 'staff/performance.html', {
-        'metrics': metrics_summary
+        'metrics': sorted_metrics
     })
