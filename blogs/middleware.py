@@ -1,11 +1,9 @@
 from django.db import connection
 from django.urls import resolve, Resolver404
 import time
-from collections import defaultdict, Counter
-from queue import Queue
+from collections import defaultdict
 import threading
 from contextlib import contextmanager
-import queue
 
 
 request_metrics = defaultdict(list)
@@ -36,12 +34,11 @@ class RequestPerformanceMiddleware:
         if request.method in self.skip_methods:
             return None
             
-        resolver_match = getattr(request, 'resolver_match', None)
-        if resolver_match is not None:
-            return f"{request.method} {resolver_match.route}"
-            
         try:
-            resolver_match = resolve(request.path)
+            resolver_match = getattr(request, 'resolver_match', None) or resolve(request.path)
+            # Normalize all feed endpoints to a single path
+            if resolver_match.func.__name__ == 'feed':
+                return f"{request.method} feed/"
             return f"{request.method} {resolver_match.route}"
         except Resolver404:
             return None
