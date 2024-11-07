@@ -52,7 +52,6 @@
 body { max-width: 100vw; }
 .split-bar {
     height: 20px;
-    margin-right: 10px;
     background: transparent;
     border-radius: 4px;
     overflow: hidden;
@@ -71,6 +70,19 @@ body { max-width: 100vw; }
 }
 .text-muted {
     color: #6c757d;
+}
+.table {
+    border: none !important;
+    border-collapse: collapse !important;
+}
+
+.table tbody tr:nth-child(4n+1),
+.table tbody tr:nth-child(4n+2) {
+    background-color: #e9eaeb;
+}
+
+.table td, .table th {
+    padding: 5px;
 }
 </style>
 {% endblock %}
