@@ -300,6 +300,11 @@ def performance_dashboard(request):
                 'avg_total': mean(m['total_time'] for m in measurements) * 1000,
                 'avg_db': mean(m['db_time'] for m in measurements) * 1000,
                 'avg_compute': mean(m['compute_time'] for m in measurements) * 1000,
+                'max_total': max(m['total_time'] for m in measurements) * 1000,
+                'max_db': max(m['db_time'] for m in measurements) * 1000,
+                'max_compute': max(m['compute_time'] for m in measurements) * 1000,
+                'db_percent': (mean(m['db_time'] for m in measurements)) / (mean(m['total_time'] for m in measurements)) * 100,
+                'compute_percent': 100 - (mean(m['db_time'] for m in measurements)) / (mean(m['total_time'] for m in measurements)) * 100,
             }
     
     # Sort metrics by average total time (descending)

@@ -9,23 +9,68 @@
     <thead>
         <tr>
             <th>Endpoint</th>
-            <th>Request Count</th>
-            <th>Avg Total Time (ms)</th>
-            <th>Avg DB Time (ms)</th>
-            <th>Avg Compute Time (ms)</th>
+            <th>Average Time (ms)</th>
+            <th>Max Time (ms)</th>
         </tr>
     </thead>
     <tbody>
         {% for endpoint, stats in metrics.items %}
         <tr>
-            <td>{{ endpoint }}</td>
-            <td>{{ stats.count }}</td>
-            <td>{{ stats.avg_total|floatformat:2 }}</td>
-            <td>{{ stats.avg_db|floatformat:2 }}</td>
-            <td>{{ stats.avg_compute|floatformat:2 }}</td>
+            <td>
+                {{ endpoint }}
+                <div class="small text-muted">{{ stats.count }}/50 requests</div>
+            </td>
+            <td>
+                {{ stats.avg_total|floatformat:2 }}
+                <div class="small text-muted">
+                    DB: {{ stats.avg_db|floatformat:2 }} / Compute: {{ stats.avg_compute|floatformat:2 }}
+                </div>
+            </td>
+            <td>
+                {{ stats.max_total|floatformat:2 }}
+                <div class="small text-muted">
+                    DB: {{ stats.max_db|floatformat:2 }} / Compute: {{ stats.max_compute|floatformat:2 }}
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td colspan="2">
+                <div class="split-bar">
+                    <div class="db-time" style="width: {{ stats.db_percent|floatformat:2 }}%" 
+                         title="DB: {{ stats.db_percent|floatformat:2 }}%"></div>
+                    <div class="compute-time" style="width: {{ stats.compute_percent|floatformat:2 }}%" 
+                         title="Compute: {{ stats.compute_percent|floatformat:2 }}%"></div>
+                </div>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<style>body { max-width: 100vw; }</style>
+
+<style>
+body { max-width: 100vw; }
+.split-bar {
+    height: 20px;
+    margin-right: 10px;
+    background: transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+}
+.db-time {
+    height: 100%;
+    background: #007bff;
+}
+.compute-time {
+    height: 100%;
+    background: #c3c1c1;
+}
+.small {
+    font-size: 0.875em;
+}
+.text-muted {
+    color: #6c757d;
+}
+</style>
 {% endblock %}
