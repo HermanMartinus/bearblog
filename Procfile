@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn textblog.wsgi --log-file - --timeout 20
+web: gunicorn conf.wsgi --log-file - --timeout 20

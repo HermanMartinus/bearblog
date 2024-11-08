@@ -1,10 +1,8 @@
-from django.shortcuts import redirect
 from django.urls import path
-from django.views.generic import RedirectView
 
 from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media
 from blogs import subscriptions
-from textblog import logger
+from conf import logger
 
 import os
 from functools import wraps

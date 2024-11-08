@@ -87,7 +87,7 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware'
 ]
 
-ROOT_URLCONF = 'textblog.urls'
+ROOT_URLCONF = 'conf.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -109,7 +109,7 @@ TEMPLATES = [
 ]
 
 
-WSGI_APPLICATION = 'textblog.wsgi.application'
+WSGI_APPLICATION = 'conf.wsgi.application'
 
 # All-auth setup
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
