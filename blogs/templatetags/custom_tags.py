@@ -16,9 +16,12 @@ from mistune import HTMLRenderer, create_markdown
 
 import latex2mathml.converter
 import re
+import json
 
 from blogs.helpers import unmark
 from blogs.models import Post
+
+
 
 register = template.Library()
 
@@ -207,8 +210,10 @@ def excluding_pre(markup, func, blog=None, post=None):
 
 def apply_filters(posts, tag=None, limit=None, order=None):
     if tag:
-        tag = tag.replace('"', '').strip()
-        posts = posts.filter(all_tags__contains=tag)
+        # Split tags by comma and strip whitespace
+        tags = [t.strip() for t in tag.replace('"', '').split(',')]
+        for tag in tags:
+            posts = posts.filter(all_tags__icontains=tag)
     if order == 'asc':
         posts = posts.order_by('published_date')
     else:
@@ -231,7 +236,7 @@ def element_replacement(markup, blog, post=None):
         tag, limit, order, description, content = None, None, None, False, False
         
         # Extract and process parameters one by one
-        param_pattern = r'(tag:"([^"]+)"|limit:(\d+)|order:(asc|desc)|description:(True)|content:(True))'
+        param_pattern = r'(tag:([^"\s]+|"[^"]+")|limit:(\d+)|order:(asc|desc)|description:(True)|content:(True))'
         params = re.findall(param_pattern, params_str)
         for param in params:
             if 'tag:' in param[0]:
