@@ -58,7 +58,7 @@
 <small>
     <div class="tags">
         {% for tag in blog.tags %}
-            {% if tag not in active_tags %}
+            {% if tag not in active_tags and tag in available_tags %}
                 <a href="/blog/?q={% if active_tags %}{{ active_tags|join:',' }},{% endif %}{{ tag }}">#{{ tag }}</a>
             {% endif %}
         {% endfor %}

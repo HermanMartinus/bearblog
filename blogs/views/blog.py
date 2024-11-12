@@ -93,8 +93,13 @@ def posts(request):
         posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         # Filter posts that contain ALL specified tags
         blog_posts = [post for post in posts if all(tag in post.tags for tag in tags)]
+        
+        available_tags = set()
+        for post in blog_posts:
+            available_tags.update(post.tags)
     else:
         blog_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
+        available_tags = set(blog.tags)
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
 
@@ -107,7 +112,8 @@ def posts(request):
             'root': blog.useful_domain,
             'meta_description': meta_description,
             'query': tag_param,
-            'active_tags': tags
+            'active_tags': tags,
+            'available_tags': available_tags
         }
     )
 
