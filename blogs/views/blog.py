@@ -85,11 +85,14 @@ def posts(request):
     if not blog:
         return not_found(request)
 
-    tag = request.GET.get('q', '')
+    tag_param = request.GET.get('q', '')
+    tags = [t.strip() for t in tag_param.split(',')] if tag_param else []
+    tags = [t for t in tags if t]  # Remove empty strings
 
-    if tag:
+    if tags:
         posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
-        blog_posts = [post for post in posts if tag in post.tags]
+        # Filter posts that contain ALL specified tags
+        blog_posts = [post for post in posts if all(tag in post.tags for tag in tags)]
     else:
         blog_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
 
@@ -102,8 +105,9 @@ def posts(request):
             'blog': blog,
             'posts': blog_posts,
             'root': blog.useful_domain,
-            'meta_description':  meta_description,
-            'query': tag
+            'meta_description': meta_description,
+            'query': tag_param,
+            'active_tags': tags
         }
     )
 

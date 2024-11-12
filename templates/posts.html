@@ -36,24 +36,35 @@
 
 {% block content %}
 
-{% if query %}
-<h3 style="margin-bottom:0">Filtering for "{{ query }}"</h3>
+{% if active_tags %}
+<h3 style="margin-bottom:0">Filtering for: 
+    {% for tag in active_tags %}
+    <span class="tag">
+        #{{ tag }}
+        {% with remaining_tags=active_tags|remove_tag:tag %}
+        <a href="{% if remaining_tags %}/blog/?q={{ remaining_tags|join:',' }}{% else %}/blog/{% endif %}" title="Remove tag" style="text-decoration:none;">✕</a>
+        {% endwith %}
+    </span>
+    {% endfor %}
+</h3>
 <small>
-<a href="/blog/">Remove filter</a>
+    <a href="/blog/">Remove all filters</a>
 </small>
 {% endif %}
 
 {% include "snippets/post_list.html" %}
 
-{% if not query %}
+
 <small>
     <div class="tags">
         {% for tag in blog.tags %}
-            <a href="/blog/?q={{ tag }}">#{{ tag }}</a>
+            {% if tag not in active_tags %}
+                <a href="/blog/?q={% if active_tags %}{{ active_tags|join:',' }},{% endif %}{{ tag }}">#{{ tag }}</a>
+            {% endif %}
         {% endfor %}
     </div>
 </small>
-{% endif %}
+
 
 {% endblock %}
 

@@ -339,3 +339,8 @@ def format_date(date, format_string, lang=None, tz='UTC'):
         translation.activate(current_lang)
         return formatted_date
     return dateformat.format(date, format_string)
+
+
+@register.filter
+def remove_tag(list_obj, item):
+    return [x for x in list_obj if x != item]
