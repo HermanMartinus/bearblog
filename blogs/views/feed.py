@@ -2,6 +2,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponse
 from django.utils import timezone
 from django.core.cache import cache
+from django.utils.text import slugify
 
 from blogs.helpers import salt_and_hash, unmark
 from blogs.models import RssSubscriber
@@ -43,7 +44,7 @@ def feed(request):
 def atom(blog, tag=None):
     CACHE_KEY = f'{blog.subdomain}_atom_feed'
     if tag:
-        CACHE_KEY += f'_{tag}'
+        CACHE_KEY += "_" + slugify(tag).replace('-', '_')
 
     cached_feed = cache.get(CACHE_KEY)
 
@@ -59,7 +60,7 @@ def atom(blog, tag=None):
 def rss(blog, tag=None):
     CACHE_KEY = f'{blog.subdomain}_rss_feed'
     if tag:
-        CACHE_KEY += f'_{tag}'
+        CACHE_KEY += "_" + slugify(tag).replace('-', '_')
 
     cached_feed = cache.get(CACHE_KEY)
 

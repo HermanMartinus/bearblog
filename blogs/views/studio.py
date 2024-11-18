@@ -22,6 +22,7 @@ from blogs.subscriptions import get_subscriptions
 @login_required
 def list(request):
     blogs = Blog.objects.filter(user=request.user)
+
     if request.method == "POST":
         form = BlogForm(request.POST)
         if form.is_valid():
@@ -58,7 +59,10 @@ def list(request):
 
 @login_required
 def studio(request, id):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    if request.user.is_superuser:
+        blog = get_object_or_404(Blog, subdomain=id)
+    else:
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     error_messages = []
     header_content = request.POST.get('header_content', '')
@@ -127,7 +131,11 @@ def parse_raw_homepage(blog, header_content, body_content):
 
 @login_required
 def post(request, id, uid=None):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    if request.user.is_superuser:
+        blog = get_object_or_404(Blog, subdomain=id)
+    else:
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+
     is_page = request.GET.get('is_page', '')
     tags = []
     post = None
@@ -287,11 +295,13 @@ def unique_slug(blog, post, new_slug):
     return slug
 
 
-
 @csrf_exempt
 @login_required
 def preview(request, id):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    if request.user.is_superuser:
+        blog = get_object_or_404(Blog, subdomain=id)
+    else:
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     post = Post(blog=blog)
 
@@ -392,7 +402,10 @@ def preview(request, id):
 
 @login_required
 def post_template(request, id):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    if request.user.is_superuser:
+        blog = get_object_or_404(Blog, subdomain=id)
+    else:
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST":
         form = PostTemplateForm(request.POST, instance=blog)
@@ -409,7 +422,10 @@ def post_template(request, id):
 
 @login_required
 def custom_domain_edit(request, id):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    if request.user.is_superuser:
+        blog = get_object_or_404(Blog, subdomain=id)
+    else:
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if not blog.user.settings.upgraded:
         return redirect('upgrade')
@@ -446,7 +462,10 @@ def custom_domain_edit(request, id):
 
 @login_required
 def directive_edit(request, id):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    if request.user.is_superuser:
+        blog = get_object_or_404(Blog, subdomain=id)
+    else:
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if not blog.user.settings.upgraded:
         return redirect('upgrade')
@@ -466,7 +485,10 @@ def directive_edit(request, id):
 
 @login_required
 def advanced_settings(request, id):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    if request.user.is_superuser:
+        blog = get_object_or_404(Blog, subdomain=id)
+    else:
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST":
         form = AdvancedSettingsForm(request.POST, instance=blog)

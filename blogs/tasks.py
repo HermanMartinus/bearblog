@@ -21,7 +21,7 @@ def daily_task():
         t.start()
 
 
-# Scrub all hash_ids that are over 24 hours old
+# Scrub all hash_ids and RSS Subscribers that are over 24 hours old
 def scrub_hash_ids():
     current_time = timezone.now()
     time_24_hours_ago = current_time - timedelta(hours=24)
