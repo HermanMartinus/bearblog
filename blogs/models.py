@@ -291,12 +291,19 @@ class Upvote(models.Model):
 
 class Hit(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
-    hash_id = models.CharField(max_length=200, db_index=True)
-    referrer = models.URLField(default=None, blank=True, null=True, db_index=True)
-    country = models.CharField(max_length=200, blank=True, db_index=True)
-    device = models.CharField(max_length=200, blank=True, db_index=True)
-    browser = models.CharField(max_length=200, blank=True, db_index=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    hash_id = models.CharField(max_length=200)
+    referrer = models.URLField(default=None, blank=True, null=True)
+    country = models.CharField(max_length=200, blank=True)
+    device = models.CharField(max_length=200, blank=True)
+    browser = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['post', 'created_date']),
+            models.Index(fields=['post', 'hash_id']),
+            models.Index(fields=['post', 'referrer']),
+        ]
 
     def __str__(self):
         return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.hash_id} - {self.post}"
@@ -313,8 +320,13 @@ class Subscriber(models.Model):
 
 class RssSubscriber(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
-    access_date = models.DateTimeField(auto_now_add=True, db_index=True)
-    hash_id = models.CharField(max_length=200, db_index=True)
+    access_date = models.DateTimeField(auto_now_add=True)
+    hash_id = models.CharField(max_length=200)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['blog', 'access_date']),
+        ]
 
     def __str__(self):
         return f"{self.access_date.strftime('%d %b %Y, %X')} - {self.blog.title} - {self.hash_id}"
