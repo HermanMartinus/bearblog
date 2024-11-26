@@ -73,8 +73,8 @@ def discover(request):
 
     if lang:
         base_query = base_query.filter(
-            (Q(lang__iexact=lang) & ~Q(lang='')) |
-            (Q(lang='') & Q(blog__lang__iexact=lang) & ~Q(blog__lang=''))
+            (Q(lang__startswith=lang) & ~Q(lang='')) |
+            (Q(lang='') & Q(blog__lang__startswith=lang) & ~Q(blog__lang=''))
         )
 
     if newest:
