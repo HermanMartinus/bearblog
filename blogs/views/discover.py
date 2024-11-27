@@ -104,9 +104,13 @@ def feed(request):
     # Determine feed parameters
     feed_kind = "newest" if request.GET.get("newest") else "trending"
     feed_type = 'rss' if request.GET.get("type") == "rss" else "atom"
+    lang = request.GET.get("lang")
 
     # Construct a unique cache key
-    CACHE_KEY = f'discover_feed_{feed_kind}_{feed_type}'
+    if lang:
+        CACHE_KEY = f'discover_feed_{feed_kind}_{feed_type}_{lang}'
+    else:
+        CACHE_KEY = f'discover_feed_{feed_kind}_{feed_type}'
 
     # Attempt to retrieve the cached feed
     cached_feed = cache.get(CACHE_KEY)
@@ -122,20 +126,25 @@ def feed(request):
     else:
         feed_method = fg.atom_str
     
-
+    base_query = get_base_query()
+    if lang:
+        base_query = base_query.filter(
+            (Q(lang__startswith=lang) & ~Q(lang='')) |
+            (Q(lang='') & Q(blog__lang__startswith=lang) & ~Q(blog__lang=''))
+        )
     if feed_kind == 'newest':
         fg.title("Bear Blog Most Recent Posts")
         fg.subtitle("Most recent posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/?newest=True", rel="alternate")
 
-        all_posts = get_base_query().order_by("-published_date")[:posts_per_page]
+        all_posts = base_query.order_by("-published_date")[:posts_per_page]
         all_posts = sorted(all_posts, key=lambda post: post.published_date)
     else:
         fg.title("Bear Blog Trending Posts")
         fg.subtitle("Trending posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/", rel="alternate")
 
-        all_posts = get_base_query().order_by("-score", "-published_date")[:posts_per_page]
+        all_posts = base_query.order_by("-score", "-published_date")[:posts_per_page]
         all_posts = sorted(all_posts, key=lambda post: post.score)  
 
 
