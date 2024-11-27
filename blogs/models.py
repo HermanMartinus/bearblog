@@ -81,6 +81,7 @@ class Blog(models.Model):
     post_template = models.TextField(blank=True)
     robots_txt = models.TextField(blank=True)
     rss_alias = models.CharField(max_length=100, blank=True)
+    codemirror_enabled = models.BooleanField(default=True)
     
     @property
     def older_than_one_day(self):
