@@ -109,6 +109,9 @@ def generate_feed(blog, feed_type="atom", tag=None):
             fe.content(markdown(clean_string(post.content.replace('{{ email-signup }}', '')), post), type="html")
         fe.published(post.published_date)
         fe.updated(post.last_modified)
+        
+        for tag in post.tags:
+            fe.category(term=tag)
 
     if feed_type == "atom":
         fg.link(href=f"{blog.useful_domain}/atom/", rel='self')
