@@ -607,18 +607,6 @@
 #djDebug .djdt-highlighted {
     background-color: lightgrey;
 }
-@keyframes djdt-flash-new {
-    from {
-        background-color: green;
-    }
-    to {
-        background-color: inherit;
-    }
-}
-#djDebug .flash-new {
-    animation: djdt-flash-new 1s;
-}
-
 .djdt-hidden {
     display: none;
 }

@@ -175,6 +175,9 @@ USE_TZ = True
 # Static files
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = "static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 GEOIP_PATH = "geoip/"
 
 # Enable WhiteNoise's GZip compression of static assets.

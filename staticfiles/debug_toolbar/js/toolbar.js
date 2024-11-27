@@ -1,4 +1,4 @@
-import { $$, ajax, replaceToolbarState, debounce } from "./utils.js";
+import { $$, ajax } from "./utils.js";
 
 function onKeyDown(event) {
     if (event.keyCode === 27) {
@@ -200,9 +200,6 @@ const djdt = {
         } else {
             djdt.hide_toolbar();
         }
-        if (djDebug.dataset.sidebarUrl !== undefined) {
-            djdt.update_on_ajax();
-        }
     },
     hide_panels() {
         const djDebug = document.getElementById("djDebug");
@@ -255,26 +252,6 @@ const djdt = {
         $$.show(document.getElementById("djDebugToolbar"));
         localStorage.setItem("djdt.show", "true");
         window.removeEventListener("resize", djdt.ensure_handle_visibility);
-    },
-    update_on_ajax() {
-        const sidebar_url =
-            document.getElementById("djDebug").dataset.sidebarUrl;
-        const slowjax = debounce(ajax, 200);
-
-        const origOpen = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function () {
-            this.addEventListener("load", function () {
-                let store_id = this.getResponseHeader("djdt-store-id");
-                if (store_id !== null) {
-                    store_id = encodeURIComponent(store_id);
-                    const dest = `${sidebar_url}?store_id=${store_id}`;
-                    slowjax(dest).then(function (data) {
-                        replaceToolbarState(store_id, data);
-                    });
-                }
-            });
-            origOpen.apply(this, arguments);
-        };
     },
     cookie: {
         get(key) {

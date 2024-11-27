@@ -60,10 +60,13 @@
 }
 
 .main.shifted > #nav-sidebar {
+    left: 24px;
     margin-left: 0;
 }
 
 [dir="rtl"] .main.shifted > #nav-sidebar {
+    left: 0;
+    right: 24px;
     margin-right: 0;
 }
 
@@ -114,26 +117,4 @@
     .main.shifted > #nav-sidebar + .content {
         max-width: 100%;
     }
-}
-
-#nav-filter {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 2px 5px;
-    margin: 5px 0;
-    border: 1px solid var(--border-color);
-    background-color: var(--darkened-bg);
-    color: var(--body-fg);
-}
-
-#nav-filter:focus {
-    border-color: var(--body-quiet-color);
-}
-
-#nav-filter.no-results {
-    background: var(--message-error-bg);
-}
-
-#nav-sidebar table {
-    width: 100%;
 }
