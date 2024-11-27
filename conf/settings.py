@@ -1,7 +1,7 @@
 from django.core.exceptions import DisallowedHost
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
+# import sentry_sdk
+# from sentry_sdk.integrations.django import DjangoIntegration
 import os
 import dj_database_url
 from pathlib import Path
@@ -20,23 +20,23 @@ DEBUG = (os.getenv('DEBUG') == 'True')
 
 if not DEBUG:
     # Logging settings
-    def before_send(event, hint):
-        """Don't log django.DisallowedHost errors."""
-        if 'log_record' in hint:
-            if hint['log_record'].name == 'django.security.DisallowedHost':
-                return None
-        return event
+    # def before_send(event, hint):
+    #     """Don't log django.DisallowedHost errors."""
+    #     if 'log_record' in hint:
+    #         if hint['log_record'].name == 'django.security.DisallowedHost':
+    #             return None
+    #     return event
     
-    sentry_sdk.init(
-        dsn=os.getenv("SENTRY_DSN"),
-        integrations=[DjangoIntegration()],
-        auto_session_tracking=False,
-        traces_sample_rate=0,
-        send_default_pii=True,
-        before_send=before_send
-    )
+    # sentry_sdk.init(
+    #     dsn=os.getenv("SENTRY_DSN"),
+    #     integrations=[DjangoIntegration()],
+    #     auto_session_tracking=False,
+    #     traces_sample_rate=0,
+    #     send_default_pii=True,
+    #     before_send=before_send
+    # )
 
-    # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
+    ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']
