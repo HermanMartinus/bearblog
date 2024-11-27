@@ -109,7 +109,17 @@
 <p>
     <i>
         Subscribe to the
-        <a href="feed/{% if newest %}?newest=True{% endif %}">RSS feed</a>
+        {% if newest %}
+        <a
+            href="feed/?newest=True{% if lang %}&lang={{ lang }}{% endif %}"
+            title="https://bearblog.dev/discover/feed/?newest=True{% if lang %}&lang={{ lang }}{% endif %}"
+        >RSS feed</a>
+        {% else %}
+        <a 
+            href="feed/{% if lang %}?lang={{ lang }}{% endif %}" 
+            title="https://bearblog.dev/discover/feed/{% if lang %}?lang={{ lang }}{% endif %}"
+        >RSS feed</a>
+        {% endif %}
     </i>
 </p>
 {% if not newest %}
