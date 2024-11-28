@@ -51,7 +51,7 @@ def list(request):
             if subscription:
                 subscription_cancelled = subscription['data'][0]['attributes']['cancelled']
                 subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal']
-        except KeyError and IndexError:
+        except (KeyError, IndexError, TypeError):
             print('No sub found')
 
     return render(request, 'studio/blog_list.html', {'blogs': blogs, 'form': form, 'subscription_cancelled': subscription_cancelled, 'subscription_link': subscription_link})
