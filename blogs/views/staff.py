@@ -128,6 +128,31 @@ def dashboard(request):
 
 
 @staff_member_required
+def check_spam(request):
+    if request.method == "POST":
+        query = request.POST.get('query')
+
+        if not query:
+            return HttpResponse("Either email or subdomain must be provided.")
+        
+        user = User.objects.filter(email=query).first()
+        if user:
+            blog = user.blogs.first()
+        else:
+            blog = Blog.objects.filter(subdomain=query).first()
+        
+        if not user and not blog:
+            return HttpResponse("User or blog not found.")
+        
+        if request.POST.get('unblock'):
+            blog.user.is_active = True
+            blog.user.save()
+            return redirect(blog.useful_domain)
+
+        return redirect(f"{blog.useful_domain}?reviewer=herman")
+
+
+@staff_member_required
 def delete_empty(request):
     for blog in empty_blogs():
         blog.delete()

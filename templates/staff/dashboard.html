@@ -58,6 +58,17 @@ Staff Dashboard  ʕง•ᴥ•ʔง
         <span>{{ end_date|date:"j F Y" }}</span> 
     </span>
 
+    <h2>Check spam blog</h2>
+    <form method="post" action="{% url 'check_spam' %}" target="_blank" class="full-width">
+        {% csrf_token %}
+        <input type="text" name="query" placeholder="Blog subdomain or email address...">
+        <label>
+            <input type="checkbox" name="unblock"> Unblock
+        </label>
+        <br>
+        <button>Check</button>
+    </form>
+
     <h2>Migrate blog</h2>
 
     <form method="post" action="{% url 'migrate_blog' %}" target="_blank" class="full-width">
@@ -76,20 +87,17 @@ Staff Dashboard  ʕง•ᴥ•ʔง
     </pre>
     <ul>
         {% for blog in empty_blogs %}
-        <li>
-            <b>{{ blog.title }} </b><a href="{{ blog.useful_domain }}" target="_blank">{{ blog.useful_domain }}</a>
+        <li style="margin-bottom: 1rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
+            <b>{{ blog.title }} </b>
+            <br>
+            <a href="{{ blog.useful_domain }}" target="_blank">{{ blog.useful_domain }}</a>
             <br>
             <small>Created date: {{ blog.created_date }}</small>
             <br>
             <small>Last modified: <b>{{ blog.last_modified }}</b></small>
             <br>
-            <i>
-                {{ blog.user.email }}
-            </i>
-            <br>
             {{ blog.content }}
             <br>
-            {{ blog.num_posts }}
         </li>
         {% endfor %}
     </ul>
