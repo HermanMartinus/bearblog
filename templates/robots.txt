@@ -25,6 +25,25 @@ Disallow:
 User-agent: Buttondown RSS-Feed-Parser
 Disallow:
 
+# Reddit
+User-agent: Mediaembed
+Disallow:
+
+# Facebook
+User-agent: facebookexternalhit
+Disallow:
+
+# Twitter/X
+User-agent: Twitterbot
+Disallow:
+
+# Discord
+User-agent: Discord-Bot
+Disallow:
+
+# LinkedIn
+User-agent: LinkedIn
+Disallow:
 
 {% if blog %}{{ blog.robots_txt }}{% endif %}
 
