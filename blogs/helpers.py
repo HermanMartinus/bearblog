@@ -22,14 +22,6 @@ import hashlib
 from blogs.models import Post
 
 
-def root(subdomain=''):
-    domain = os.getenv('MAIN_SITE_HOSTS').split(',')[0]
-    if subdomain == '':
-        return f"{domain}"
-    else:
-        return f"{subdomain}.{domain}"
-
-
 def is_protected(subdomain):
     protected_subdomains = [
         'login',

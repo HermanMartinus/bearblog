@@ -60,7 +60,7 @@ body {
                     - {{ post.published_date|date:'d M, Y' }}
                 </time>
             </i>
-            <h3><a href="{{ root }}/{{ post.slug }}/" target="_blank">{{ post.title }}</a></h3>
+            <h3><a href="{{ blog.useful_domain }}/{{ post.slug }}/" target="_blank">{{ post.title }}</a></h3>
             <p>
                 {{ post.content | linebreaksbr }}
             </p>

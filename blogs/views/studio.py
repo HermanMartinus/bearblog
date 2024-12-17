@@ -275,7 +275,6 @@ def post(request, id, uid=None):
 
     return render(request, 'studio/post_edit.html', {
         'blog': blog,
-        'root': blog.useful_domain,
         'post': post,
         'error_messages': error_messages,
         'template_header': template_header,
@@ -379,8 +378,7 @@ def preview(request, id):
     except DataError as error:
         return HttpResponseBadRequest(error)
 
-    root = blog.useful_domain
-    full_path = f'{root}/{post.slug}/'
+    full_path = f'{blog.useful_domain}/{post.slug}/'
     canonical_url = full_path
     if post.canonical_url and post.canonical_url.startswith('https://'):
         canonical_url = post.canonical_url
@@ -391,7 +389,6 @@ def preview(request, id):
             'blog': blog,
             'content': post.content,
             'post': post,
-            'root': blog.useful_domain,
             'full_path': full_path,
             'canonical_url': canonical_url,
             'meta_image': post.meta_image or blog.meta_image,

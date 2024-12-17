@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from blogs.models import Blog, PersistentStore, Post, RssSubscriber, Stylesheet, Upvote, Hit, Subscriber, UserSettings, Media
-from blogs.helpers import root
 
 
 admin.autodiscover()
@@ -94,7 +93,7 @@ class BlogAdmin(admin.ModelAdmin):
     def subdomain_url(self, obj):
         return format_html(
             "<a href='http://{url}' target='_blank'>{url}</a>",
-            url=root(obj.subdomain))
+            url=obj.blank_bear_domain)
     subdomain_url.short_description = "Subdomain"
 
     def user_link(self, obj):

@@ -81,7 +81,6 @@ def home(request):
         {
             'blog': blog,
             'posts': all_posts,
-            'root': blog.useful_domain,
             'meta_description': meta_description
         })
 
@@ -115,7 +114,6 @@ def posts(request):
         {
             'blog': blog,
             'posts': blog_posts,
-            'root': blog.useful_domain,
             'meta_description': meta_description,
             'query': tag_param,
             'active_tags': tags,
@@ -128,7 +126,6 @@ def posts(request):
 def post(request, slug):
     # Prevent null characters in path
     slug = slug.replace('\x00', '')
-
 
     blog = resolve_address(request)
     if not blog:
@@ -156,9 +153,8 @@ def post(request, slug):
     hash_id = salt_and_hash(request, 'year')
     upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
 
-    root = blog.useful_domain
     meta_description = post.meta_description or unmark(post.content)[:157] + '...'
-    full_path = f'{root}/{post.slug}/'
+    full_path = f'{blog.useful_domain}/{post.slug}/'
     canonical_url = full_path
     if post.canonical_url and post.canonical_url.startswith('https://'):
         canonical_url = post.canonical_url
@@ -173,7 +169,6 @@ def post(request, slug):
             'blog': blog,
             'content': post.content,
             'post': post,
-            'root': blog.useful_domain,
             'full_path': full_path,
             'canonical_url': canonical_url,
             'meta_description': meta_description,
@@ -218,6 +213,9 @@ def not_found(request, *args, **kwargs):
 
 def sitemap(request):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+
     posts = []
     try:
         posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
@@ -229,4 +227,7 @@ def sitemap(request):
 
 def robots(request):
     blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+
     return render(request, 'robots.txt',  {'blog': blog}, content_type="text/plain")

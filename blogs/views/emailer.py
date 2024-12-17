@@ -71,8 +71,7 @@ def subscribe(request):
         request,
         'subscribe.html',
         {
-            'blog': blog,
-            'root': blog.useful_domain,
+            'blog': blog
         }
     )
 

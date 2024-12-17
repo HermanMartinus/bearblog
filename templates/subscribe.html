@@ -7,9 +7,9 @@
 
 {% block title %}Subscribe | {{ blog.title }}{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ root }}/blog/">{% endblock %}
+ {% block canonical %}<link rel="canonical" href="{{ blog.useful_domain }}/subscribe/">{% endblock %}
 
-{% block imports %}
+ {% block imports %}
 {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
 {% endblock %}
 
