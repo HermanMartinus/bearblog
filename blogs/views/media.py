@@ -22,7 +22,7 @@ from blogs.models import Blog, Media
 bucket_name = 'bear-images'
 
 
-image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic']
+image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic', 'css']
 video_types = ['mp4', 'webm', 'mkv']
 audio_types = ['mp3', 'ogg', 'wav', 'opus', 'flac']
 document_types = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'rtf', 'epub', 'ps', 'odt', 'ods', 'odp', 'odg', 'odf', 'mml', 'odb', 'uot', 'uos', 'uop']
