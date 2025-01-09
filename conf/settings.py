@@ -80,7 +80,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'blogs.middleware.RequestPerformanceMiddleware',
-    'allauth.account.middleware.AccountMiddleware'
+    'allauth.account.middleware.AccountMiddleware',
+    'blogs.middleware.TimeoutMiddleware',
 ]
 
 ROOT_URLCONF = 'conf.urls'
