@@ -126,21 +126,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'dev.db'),
-        'OPTIONS': {
-            'timeout': 5,  # 5 seconds to establish connection
-        },
     }
 }
 
 if os.getenv('DATABASE_URL'):
     db_from_env = dj_database_url.config(conn_max_age=300)
     DATABASES['default'].update(db_from_env)
-    DATABASES['default']['OPTIONS'] = {
-        'connect_timeout': 5,  # 5 seconds to establish connection
-    }
-    
-    # Set session parameters after connection
-    DATABASES['default']['OPTIONS']['options'] = '-c statement_timeout=20000 -c idle_in_transaction_session_timeout=60000'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
