@@ -4,10 +4,15 @@ import traceback
 import sys
 from django.conf import settings
 from datetime import datetime
+import time
 
 
 def logger_test(request):
     x = 100/0
+
+
+def timout_test(request):
+    time.sleep(31)
 
 
 class SlackExceptionHandler(logging.Handler):
