@@ -1,13 +1,13 @@
 from django.db import connection
+from django.shortcuts import render
 from django.urls import resolve, Resolver404
-import time
-from collections import defaultdict
-import threading
-from contextlib import contextmanager
-import signal
-from django.http import HttpResponseServerError
-from functools import wraps
 from django.conf import settings
+
+import time
+import threading
+from collections import defaultdict
+from contextlib import contextmanager
+from concurrent.futures import ThreadPoolExecutor
 
 
 request_metrics = defaultdict(list)
@@ -74,3 +74,21 @@ class RequestPerformanceMiddleware:
             del metrics[:-50]
 
         return response
+    
+
+class TimeoutMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.timeout = getattr(settings, 'REQUEST_TIMEOUT', 19)
+        self.executor = ThreadPoolExecutor(max_workers=1)
+
+    def __call__(self, request):
+        try:
+            future = self.executor.submit(self.get_response, request)
+            response = future.result(timeout=self.timeout)
+            return response
+        except TimeoutError:
+            future.cancel()
+            return render(request, '503.html', status=503)
+        except Exception:
+            return render(request, '503.html', status=503)
