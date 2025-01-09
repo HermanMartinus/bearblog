@@ -122,7 +122,6 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-CONN_MAX_AGE = 600
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -131,8 +130,13 @@ DATABASES = {
 }
 
 if os.getenv('DATABASE_URL'):
-    db_from_env = dj_database_url.config(conn_max_age=CONN_MAX_AGE)
+    db_from_env = dj_database_url.config(conn_max_age=300)
     DATABASES['default'].update(db_from_env)
+    DATABASES['default']['OPTIONS'] = {
+        'connect_timeout': 5,  # 5 seconds to establish connection
+        'statement_timeout': 20000,  # 20 seconds max query time (in milliseconds)
+        'idle_in_transaction_session_timeout': 60000,  # 60 seconds (in milliseconds)
+    }
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
