@@ -74,35 +74,3 @@ class RequestPerformanceMiddleware:
             del metrics[:-50]
 
         return response
-
-
-class TimeoutException(Exception):
-    pass
-
-
-class TimeoutMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        response_container = []
-        exception_container = []
-        
-        def process_request():
-            try:
-                response_container.append(self.get_response(request))
-            except Exception as e:
-                exception_container.append(e)
-        
-        thread = threading.Thread(target=process_request)
-        thread.daemon = True
-        thread.start()
-        thread.join(timeout=25)
-        
-        if thread.is_alive():
-            return HttpResponseServerError("Request timed out")
-            
-        if exception_container:
-            raise exception_container[0]
-            
-        return response_container[0]
