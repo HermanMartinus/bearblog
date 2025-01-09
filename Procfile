@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn conf.wsgi --timeout 15 --graceful-timeout 5 --max-requests 1200
+web: gunicorn conf.wsgi --log-file - --timeout 10 --graceful-timeout 1 --max-requests 1200
