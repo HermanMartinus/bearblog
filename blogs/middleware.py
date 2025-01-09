@@ -7,7 +7,7 @@ import time
 import threading
 from collections import defaultdict
 from contextlib import contextmanager
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
 
 request_metrics = defaultdict(list)
@@ -79,15 +79,24 @@ class RequestPerformanceMiddleware:
 class TimeoutMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
-        self.timeout = getattr(settings, 'REQUEST_TIMEOUT', 19)
-        self.executor = ThreadPoolExecutor(max_workers=1)
+        # Set lower than Gunicorn's timeout to ensure we respond first
+        self.timeout = 20
+        # Share executor across requests instead of creating per instance
+        self._executor = None
+
+    @property
+    def executor(self):
+        if self._executor is None:
+            # Use more workers to handle concurrent requests
+            self._executor = ThreadPoolExecutor(max_workers=4)
+        return self._executor
 
     def __call__(self, request):
         try:
             future = self.executor.submit(self.get_response, request)
             response = future.result(timeout=self.timeout)
             return response
-        except TimeoutError:
+        except (TimeoutError, FuturesTimeoutError):
             future.cancel()
             return render(request, '503.html', status=503)
         except Exception:
