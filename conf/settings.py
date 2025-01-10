@@ -53,7 +53,7 @@ SITE_ID = 1
 
 INSTALLED_APPS = [
     'scout_apm.django',
-    "judoscale.django"
+    'judoscale.django',
     'django.contrib.admin',
     'django.contrib.sites',
     'django.contrib.auth',
