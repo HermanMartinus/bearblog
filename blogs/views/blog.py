@@ -27,11 +27,15 @@ def resolve_address(request):
         return None
     elif any(site in http_host for site in sites):
         # Subdomained blog
+        subdomain = tldextract.extract(http_host).subdomain
+        
         if request.GET.get('reviewer') == "herman":
-            return get_object_or_404(Blog, subdomain__iexact=tldextract.extract(http_host).subdomain)
+            return get_object_or_404(Blog.objects.select_related('user'), subdomain__iexact=subdomain)
         else:
-            return get_object_or_404(Blog, subdomain__iexact=tldextract.extract(http_host).subdomain, user__is_active=True)
-
+            return get_object_or_404(Blog.objects.select_related('user'), subdomain__iexact=subdomain, user__is_active=True)
+            
+        # Use select_related to fetch user in same query
+        
     else:
         # Custom domain blog
         return get_blog_with_domain(http_host)
