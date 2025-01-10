@@ -18,6 +18,7 @@ pygal==3.0.5
 python-akismet==0.4.3
 python-dotenv==1.0.0
 requests==2.27.1
+scout-apm==3.2.1
 sentry-sdk==2.19.0
 tldextract==2.2.2
 whitenoise==5.0.1

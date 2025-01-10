@@ -35,6 +35,10 @@ if not DEBUG:
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
+    SCOUT_MONITOR = os.getenv('SCOUT_MONITOR') == 'True'
+    SCOUT_KEY = os.getenv('SCOUT_KEY')
+    SCOUT_NAME = PROJECT_NAME
+
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -48,6 +52,7 @@ INTERNAL_IPS = ['127.0.0.1']
 SITE_ID = 1
 
 INSTALLED_APPS = [
+    'scout_apm.django',
     'django.contrib.admin',
     'django.contrib.sites',
     'django.contrib.auth',
