@@ -140,11 +140,25 @@ def post(request, slug):
         from blogs.views.feed import feed
         return feed(request)
 
-    # Find by post slug
-    post = Post.objects.filter(blog=blog, slug__iexact=slugify(slug)).first()
+    # Find by post slug with select_related to avoid additional queries
+    post = (Post.objects
+           .select_related('blog')
+           .filter(
+               blog=blog,
+               slug__iexact=slugify(slug)
+           )
+           .first())
+    
     if not post:
         # Find by post alias
-        post = Post.objects.filter(blog=blog, alias__iexact=slug).first()
+        post = (Post.objects
+               .select_related('blog')
+               .filter(
+                   blog=blog,
+                   alias__iexact=slug
+               )
+               .first())
+        
         if post:
             return redirect('post', slug=post.slug)
         else:
