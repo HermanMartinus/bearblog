@@ -27,8 +27,8 @@ if not DEBUG:
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
         auto_session_tracking=False,
-        traces_sample_rate=0.1,
-        profiles_sample_rate=0.1,
+        traces_sample_rate=0,
+        profiles_sample_rate=0,
         send_default_pii=True,
         before_send=before_send
     )

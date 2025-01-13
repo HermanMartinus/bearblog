@@ -152,7 +152,6 @@ def post(request, slug):
         post = (Post.objects
                .select_related('blog')
                .select_related('blog__user__settings')
-               .select_related('blog__upvotes')
                .filter(
                    blog=blog,
                    alias__iexact=slug
