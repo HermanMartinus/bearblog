@@ -30,12 +30,9 @@ def resolve_address(request):
         subdomain = tldextract.extract(http_host).subdomain
         
         if request.GET.get('reviewer') == "herman":
-            return get_object_or_404(Blog.objects.select_related('user'), subdomain__iexact=subdomain)
+            return get_object_or_404(Blog.objects.select_related('user').select_related('user__settings'), subdomain__iexact=subdomain)
         else:
-            return get_object_or_404(Blog.objects.select_related('user'), subdomain__iexact=subdomain, user__is_active=True)
-            
-        # Use select_related to fetch user in same query
-        
+            return get_object_or_404(Blog.objects.select_related('user').select_related('user__settings'), subdomain__iexact=subdomain, user__is_active=True)
     else:
         # Custom domain blog
         return get_blog_with_domain(http_host)
@@ -143,6 +140,7 @@ def post(request, slug):
     # Find by post slug with select_related to avoid additional queries
     post = (Post.objects
            .select_related('blog')
+           .select_related('blog__user__settings')
            .filter(
                blog=blog,
                slug__iexact=slugify(slug)
@@ -153,6 +151,8 @@ def post(request, slug):
         # Find by post alias
         post = (Post.objects
                .select_related('blog')
+               .select_related('blog__user__settings')
+               .select_related('blog__upvotes')
                .filter(
                    blog=blog,
                    alias__iexact=slug
