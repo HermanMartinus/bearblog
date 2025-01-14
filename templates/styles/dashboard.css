@@ -217,12 +217,14 @@ ul.discover-posts {
 
 ul.discover-posts li {
     display: flex;
+    flex-flow: row no-wrap;
+    gap: 10px;
     line-height: 1.2;
     position: relative;
 }
 
 ul.discover-posts li span {
-    flex: 0 0 40px;
+    flex: 0 0 30px;
 }
 
 ul.discover-posts li a:visited {
