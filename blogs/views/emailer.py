@@ -24,7 +24,7 @@ def email_list(request, id):
     if not blog.user.settings.upgraded:
         return redirect('upgrade')
 
-    subscribers = Subscriber.objects.filter(blog=blog)
+    subscribers = Subscriber.objects.filter(blog=blog).order_by('subscribed_date')
 
     if request.GET.get("export-csv", ""):
         subscribers = subscribers.values('email_address', 'subscribed_date')
