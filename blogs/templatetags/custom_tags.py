@@ -169,7 +169,7 @@ def markdown(content, blog_or_post=False):
     content = fix_links(content)
 
     try:
-        processed_markup = markdown_renderer(content)
+        processed_markup = excluding_script(content)
     except TypeError:
         return ''
 
@@ -179,12 +179,33 @@ def markdown(content, blog_or_post=False):
 
     # Replace {{ xyz }} elements
     if blog:
-        processed_markup = excluding_pre(processed_markup, element_replacement, blog, post)
+        processed_markup = excluding_pre(processed_markup, blog, post)
 
     return processed_markup
 
 
-def excluding_pre(markup, func, blog=None, post=None):
+# Exclude script and style tags from markdown rendering
+def excluding_script(markup):
+    placeholders = {}
+
+    def placeholder_div(match):
+        key = f"PLACEHOLDER_{len(placeholders)}"
+        print(placeholders)
+        placeholders[key] = match.group(0)
+        return key
+
+    markup = re.sub(r'(<script.*?>.*?</script>|<style.*?>.*?</style>)', placeholder_div, markup, flags=re.DOTALL)
+
+    markup = markdown_renderer(markup)
+
+    for key in sorted(placeholders.keys(), reverse=True):
+        markup = markup.replace(key, placeholders[key])
+
+    return markup
+
+
+# Replace elements in all but pre and code tags
+def excluding_pre(markup, blog=None, post=None):
     placeholders = {}
 
     def placeholder_div(match):
@@ -196,11 +217,11 @@ def excluding_pre(markup, func, blog=None, post=None):
 
     if blog:
         if post: 
-            markup = func(markup, blog, post)
+            markup = element_replacement(markup, blog, post)
         else:
-            markup = func(markup, blog)
+            markup = element_replacement(markup, blog)
     else:
-        markup = func(markup)
+        markup = element_replacement(markup)
 
     for key in sorted(placeholders.keys(), reverse=True):
         markup = markup.replace(key, placeholders[key])
