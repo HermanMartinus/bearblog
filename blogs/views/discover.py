@@ -1,4 +1,3 @@
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -167,24 +166,21 @@ def feed(request):
     cache.set(CACHE_KEY, feed_str, CACHE_TIMEOUT)
     return HttpResponse(feed_str, content_type=f"application/{feed_type}+xml")
 
+    
 
 def search(request):
     search_string = request.GET.get('query', "")
     posts = None
-    
+
     if search_string:
-        search_vector = SearchVector('title', weight='A') + SearchVector('content', weight='B')
-        search_query = SearchQuery(search_string)
-        
         posts = (
-            get_base_query()
-            .annotate(search=search_vector)
-            .annotate(rank=SearchRank('search', search_query))
-            .filter(rank__gt=0.01)
-            .order_by('-upvotes', '-published_date')
+            get_base_query().filter(
+                Q(content__icontains=search_string) | Q(title__icontains=search_string)
+            )
+            .order_by('-upvotes', "-published_date")
             .select_related("blog")[0:20]
         )
-        
+
     return render(request, "search.html", {
         "posts": posts,
         "search_string": search_string,
