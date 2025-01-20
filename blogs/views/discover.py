@@ -172,14 +172,14 @@ def search(request):
     search_string = request.GET.get('query', "")
     posts = None
 
-    if search_string:
-        posts = (
-            get_base_query().filter(
-                Q(content__icontains=search_string) | Q(title__icontains=search_string)
-            )
-            .order_by('-upvotes', "-published_date")
-            .select_related("blog")[0:20]
-        )
+    # if search_string:
+    #     posts = (
+    #         get_base_query().filter(
+    #             Q(content__icontains=search_string) | Q(title__icontains=search_string)
+    #         )
+    #         .order_by('-upvotes', "-published_date")
+    #         .select_related("blog")[0:20]
+    #     )
 
     return render(request, "search.html", {
         "posts": posts,
