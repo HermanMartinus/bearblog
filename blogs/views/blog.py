@@ -91,7 +91,7 @@ def posts(request):
     if not blog:
         return not_found(request)
 
-    tag_param = '' #request.GET.get('q', '')
+    tag_param = request.GET.get('q', '')
     tags = [t.strip() for t in tag_param.split(',')] if tag_param else []
     tags = [t for t in tags if t]  # Remove empty strings
 
