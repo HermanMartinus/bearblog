@@ -169,7 +169,7 @@ def feed(request):
     
 
 def search(request):
-    search_string = request.GET.get('query', "")
+    search_string = ''#request.GET.get('query', "")
     posts = None
 
     if search_string:
