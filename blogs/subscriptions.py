@@ -80,7 +80,7 @@ def get_subscriptions(order_id=None, user_email=None):
         'Authorization': f'Bearer {os.getenv("LEMON_SQUEEZY_KEY")}'
     }
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
 
     if response.status_code == 200:
         return response.json()

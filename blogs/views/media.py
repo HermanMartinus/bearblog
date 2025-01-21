@@ -293,7 +293,7 @@ def image_proxy(request, img):
     remote_url = f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/{img}'
     
     # Stream the content from the remote URL
-    response = requests.get(remote_url, stream=True)
+    response = requests.get(remote_url, stream=True, timeout=10)
     
     # Define a generator to yield chunks of the response content
     def generate():
