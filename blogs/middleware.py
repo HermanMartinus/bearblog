@@ -1,13 +1,11 @@
 from django.db import connection
-from django.shortcuts import render
 from django.urls import resolve, Resolver404
-from django.conf import settings
 
 import time
 import threading
 from collections import defaultdict
 from contextlib import contextmanager
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+import sentry_sdk
 
 
 request_metrics = defaultdict(list)
@@ -76,28 +74,26 @@ class RequestPerformanceMiddleware:
         return response
     
 
-class TimeoutMiddleware:
+class LongRequestMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
-        # Set lower than Gunicorn's timeout to ensure we respond first
-        self.timeout = 20
-        # Share executor across requests instead of creating per instance
-        self._executor = None
-
-    @property
-    def executor(self):
-        if self._executor is None:
-            # Use more workers to handle concurrent requests
-            self._executor = ThreadPoolExecutor(max_workers=4)
-        return self._executor
+        self.threshold = 30  # seconds
 
     def __call__(self, request):
-        try:
-            future = self.executor.submit(self.get_response, request)
-            response = future.result(timeout=self.timeout)
-            return response
-        except (TimeoutError, FuturesTimeoutError):
-            future.cancel()
-            return render(request, '503.html', status=503)
-        except Exception:
-            return render(request, '503.html', status=503)
+        start_time = time.time()
+        response = self.get_response(request)
+        duration = time.time() - start_time
+        
+        if duration > self.threshold:
+            # Capture the long-running request in Sentry
+            with sentry_sdk.push_scope() as scope:
+                scope.set_extra("request_duration", duration)
+                scope.set_extra("path", request.path)
+                scope.set_extra("method", request.method)
+                sentry_sdk.capture_message(
+                    f"Long running request detected: {duration:.2f}s",
+                    level="warning"
+                )
+        
+        return response
+

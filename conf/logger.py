@@ -1,8 +1,11 @@
+from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.conf import settings
+
 import logging
 import requests
 import traceback
 import sys
-from django.conf import settings
 from datetime import datetime
 import time
 
@@ -11,8 +14,10 @@ def logger_test(request):
     x = 100/0
 
 
+@staff_member_required
 def timout_test(request):
     time.sleep(31)
+    return HttpResponse("Hello, world. You're at the timeout test.")
 
 
 class SlackExceptionHandler(logging.Handler):

@@ -21,7 +21,7 @@ def main_site_only(view_func):
 urlpatterns = [
     path('', blog.home, name='home'),
     path('logger-test/', logger.logger_test),
-    # path('timeout-test/', logger.timout_test),
+    path('timeout-test/', logger.timout_test),
 
     # Staff dashboard
     path('staff/dashboard/', main_site_only(staff.dashboard), name='staff_dashboard'),
