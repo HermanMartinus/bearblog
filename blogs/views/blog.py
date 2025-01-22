@@ -87,18 +87,21 @@ def home(request):
 
 
 def posts(request):
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
-
     tag_param = request.GET.get('q', '')
     tags = [t.strip() for t in tag_param.split(',')] if tag_param else []
     tags = [t for t in tags if t]  # Remove empty strings
 
+    if len(tags) > 3:
+        print(f"Too many tags: {blog.useful_domain}")
+        return not_found(request)
+
+    blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+
+    
+
     if tags:
-        if len(tags) > 3:
-            print(f"Too many tags: {blog.useful_domain}")
-            
         posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         # Filter posts that contain ALL specified tags
         blog_posts = [post for post in posts if all(tag in post.tags for tag in tags)]
