@@ -143,11 +143,11 @@ if os.getenv('DATABASE_URL'):
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-if os.getenv('REDIS_URL'):
+if os.getenv('REDISCLOUD_URL'):
     CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': os.getenv('REDIS_URL'),
+            'LOCATION': os.getenv('REDISCLOUD_URL'),
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
                 'CONNECTION_POOL_KWARGS': {'ssl_cert_reqs': None},
