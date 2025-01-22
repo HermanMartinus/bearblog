@@ -14,4 +14,4 @@ logs:
 	sudo heroku logs --tail --app bear-blog --force-colors | grep "heroku\[" | grep "404"
 
 router:
-	sudo heroku logs --tail --app bear-blog --force-colors | grep "heroku\[router"
+	sudo heroku logs --tail --app bear-blog --force-colors | grep "heroku\[router" | grep "/blog/?q="
