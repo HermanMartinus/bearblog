@@ -87,8 +87,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'blogs.middleware.LongRequestMiddleware',
     # 'blogs.middleware.RequestPerformanceMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-    'blogs.middleware.RateLimitMiddleware',
+    # 'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'conf.urls'
