@@ -22,8 +22,9 @@ def lemon_webhook(request):
 
     data = json.loads(request.body, strict=False)
     print('Received webhook call')
+    
     # Account upgrade
-    if 'order_created' in request.META.get('HTTP_X_EVENT_NAME', ''):
+    if any(event in request.META.get('HTTP_X_EVENT_NAME', '') for event in ('order_created', 'subscription_resumed', 'subscription_unpaused')):
         user = None
         try:
             user_id = str(data['meta']['custom_data']['user_id'])
@@ -45,7 +46,7 @@ def lemon_webhook(request):
             return HttpResponse(f'Upgraded {user}')
 
     # Account downgrade
-    elif 'subscription_expired' in request.META.get('HTTP_X_EVENT_NAME', ''):
+    elif any(event in request.META.get('HTTP_X_EVENT_NAME', '') for event in ('subscription_expired', 'subscription_paused')):
         user_settings = None
         try:
             order_id = data['data']['attributes']['order_id']
