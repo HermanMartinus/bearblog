@@ -92,7 +92,6 @@ def posts(request):
     tags = [t for t in tags if t]  # Remove empty strings
 
     if len(tags) > 3:
-        print(f"Too many tags: {blog.useful_domain}")
         return not_found(request)
 
     blog = resolve_address(request)
