@@ -47,7 +47,7 @@ def atom(blog, tag=None):
         CACHE_KEY += "_" + slugify(tag).replace('-', '_')
 
     cached_feed = cache.get(CACHE_KEY)
-
+    
     if cached_feed is None:
         atom_feed = generate_feed(blog, "atom", tag)
         cache.set(CACHE_KEY, atom_feed, timeout=None)
@@ -65,9 +65,9 @@ def rss(blog, tag=None):
         CACHE_KEY += "_" + slugify(tag).replace('-', '_')
 
     cached_feed = cache.get(CACHE_KEY)
-
+    
     if cached_feed is None:
-        rss_feed = generate_feed(blog, "rss")
+        rss_feed = generate_feed(blog, "rss", tag)
         cache.set(CACHE_KEY, rss_feed, timeout=None)
         print(f"Generated feed for {blog.useful_domain}")
     else:
@@ -87,6 +87,7 @@ def log_feed_subscriber(request, blog):
 
 def generate_feed(blog, feed_type="atom", tag=None):
     all_posts = blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now())
+
     if tag:
         all_posts = all_posts.filter(all_tags__icontains=tag)
     all_posts = all_posts.order_by('-published_date')[:10]
