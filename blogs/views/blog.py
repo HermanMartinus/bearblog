@@ -98,8 +98,6 @@ def posts(request):
     if not blog:
         return not_found(request)
 
-    
-
     if tags:
         posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         # Filter posts that contain ALL specified tags

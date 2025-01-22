@@ -51,8 +51,10 @@ def atom(blog, tag=None):
     if cached_feed is None:
         atom_feed = generate_feed(blog, "atom", tag)
         cache.set(CACHE_KEY, atom_feed, timeout=None)
+        print(f"Generated feed for {blog.useful_domain}")
     else:
         atom_feed = cached_feed
+        print(f"Using cached feed for {blog.useful_domain}")
 
     return HttpResponse(atom_feed, content_type='application/atom+xml')
 
@@ -67,8 +69,10 @@ def rss(blog, tag=None):
     if cached_feed is None:
         rss_feed = generate_feed(blog, "rss")
         cache.set(CACHE_KEY, rss_feed, timeout=None)
+        print(f"Generated feed for {blog.useful_domain}")
     else:
         rss_feed = cached_feed
+        print(f"Using cached feed for {blog.useful_domain}")
 
     return HttpResponse(rss_feed, content_type='application/rss+xml')
 
