@@ -150,11 +150,6 @@ if os.getenv('REDISCLOUD_URL'):
             'LOCATION': os.getenv('REDISCLOUD_URL'),
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                'CONNECTION_POOL_KWARGS': {'ssl_cert_reqs': None},
-                'SOCKET_CONNECT_TIMEOUT': 5,  # in seconds
-                'SOCKET_TIMEOUT': 5,  # in seconds
-                'RETRY_ON_TIMEOUT': True,
-                'MAX_CONNECTIONS': 50,
             }
         }
     }
