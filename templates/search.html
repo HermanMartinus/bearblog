@@ -22,7 +22,8 @@
     
 </nav>
 <p>
-    <form method="GET">
+    <form method="POST">
+        {% csrf_token %}
         <input type="text" name="query" placeholder="Search..." value="{{ search_string }}">
         <input type="submit">
     </form>

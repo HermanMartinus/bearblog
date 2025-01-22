@@ -166,10 +166,9 @@ def feed(request):
     cache.set(CACHE_KEY, feed_str, CACHE_TIMEOUT)
     return HttpResponse(feed_str, content_type=f"application/{feed_type}+xml")
 
-    
 
 def search(request):
-    search_string = request.GET.get('query', "")
+    search_string = request.POST.get('query', "") if request.method == "POST" else ""
     posts = None
 
     if search_string:
