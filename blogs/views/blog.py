@@ -87,27 +87,24 @@ def home(request):
 
 
 def posts(request):
+    blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+    
     tag_param = request.GET.get('q', '')
     tags = [t.strip() for t in tag_param.split(',')] if tag_param else []
     tags = [t for t in tags if t]  # Remove empty strings
 
-    if len(tags) > 3:
-        return not_found(request)
-
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
-
+    posts = blog.posts.filter(blog=blog, publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
     if tags:
-        posts = Post.objects.filter(blog=blog, publish=True, published_date__lte=timezone.now()).order_by('-published_date')
         # Filter posts that contain ALL specified tags
-        blog_posts = [post for post in posts if all(tag in post.tags for tag in tags)]
+        posts = [post for post in posts if all(tag in post.tags for tag in tags)]
         
         available_tags = set()
-        for post in blog_posts:
+        for post in posts:
             available_tags.update(post.tags)
     else:
-        blog_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
+        # blog_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
         available_tags = set(blog.tags)
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
@@ -117,7 +114,7 @@ def posts(request):
         'posts.html',
         {
             'blog': blog,
-            'posts': blog_posts,
+            'posts': posts,
             'meta_description': meta_description,
             'query': tag_param,
             'active_tags': tags,
@@ -142,8 +139,6 @@ def post(request, slug):
 
     # Find by post slug with select_related to avoid additional queries
     post = (Post.objects
-           .select_related('blog')
-           .select_related('blog__user__settings')
            .filter(
                blog=blog,
                slug__iexact=slugify(slug)
@@ -153,8 +148,6 @@ def post(request, slug):
     if not post:
         # Find by post alias
         post = (Post.objects
-               .select_related('blog')
-               .select_related('blog__user__settings')
                .filter(
                    blog=blog,
                    alias__iexact=slug
