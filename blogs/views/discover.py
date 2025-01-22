@@ -172,13 +172,26 @@ def search(request):
     posts = None
 
     if search_string:
-        posts = (
-            get_base_query().filter(
-                Q(content__icontains=search_string) | Q(title__icontains=search_string)
+        # Create cache key based on the search query
+        cache_key = f'search_results_{search_string}'
+        posts = cache.get(cache_key)
+
+        if posts is None:
+            from django.contrib.postgres.search import SearchVector, SearchQuery
+            # If using PostgreSQL, use full-text search
+            search_query = SearchQuery(search_string)
+            search_vector = SearchVector('title', weight='A') + SearchVector('content', weight='B')
+            
+            posts = (
+                get_base_query()
+                .annotate(search=search_vector)
+                .filter(search=search_query)
+                .order_by('-upvotes', "-published_date")
+                .select_related("blog")[:20]
             )
-            .order_by('-upvotes', "-published_date")
-            .select_related("blog")[0:20]
-        )
+            
+            # Cache results for 10 minutes
+            cache.set(cache_key, posts, 600)
 
     return render(request, "search.html", {
         "posts": posts,
