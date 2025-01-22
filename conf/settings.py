@@ -143,6 +143,22 @@ if os.getenv('DATABASE_URL'):
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+if os.getenv('REDIS_URL'):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': os.getenv('REDIS_URL'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'CONNECTION_POOL_KWARGS': {'ssl_cert_reqs': None},
+                'SOCKET_CONNECT_TIMEOUT': 5,  # in seconds
+                'SOCKET_TIMEOUT': 5,  # in seconds
+                'RETRY_ON_TIMEOUT': True,
+                'MAX_CONNECTIONS': 50,
+            }
+        }
+    }
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 

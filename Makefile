@@ -12,3 +12,6 @@ logs:
 
 404:
 	sudo heroku logs --tail --app bear-blog --force-colors | grep "heroku\[" | grep "404"
+
+router:
+	sudo heroku logs --tail --app bear-blog --force-colors | grep "heroku\[router"
