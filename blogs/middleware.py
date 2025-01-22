@@ -103,8 +103,8 @@ from django.http import JsonResponse
 from django.core.cache import cache
 
 class RateLimitMiddleware(MiddlewareMixin):
-    RATE_LIMIT = 60  # Number of allowed requests
-    TIME_PERIOD = 60  # Time period in seconds
+    RATE_LIMIT = 10  # Number of allowed requests
+    TIME_PERIOD = 10  # Time period in seconds
 
     def process_request(self, request):
         ip = self.get_client_ip(request)
@@ -116,6 +116,7 @@ class RateLimitMiddleware(MiddlewareMixin):
             request_count = 0
         
         if request_count >= self.RATE_LIMIT:
+            print(f"Rate limit exceeded for IP: {ip}")
             return JsonResponse({'error': 'Rate limit exceeded'}, status=429)
         
         cache.incr(key)
