@@ -88,6 +88,7 @@ MIDDLEWARE = [
     'blogs.middleware.LongRequestMiddleware',
     # 'blogs.middleware.RequestPerformanceMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'blogs.middleware.BearPassportMiddleware',
 ]
 
 ROOT_URLCONF = 'conf.urls'

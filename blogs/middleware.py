@@ -1,5 +1,7 @@
 from django.db import connection
+from django.shortcuts import redirect
 from django.urls import resolve, Resolver404
+from django.http import HttpResponseForbidden
 
 import time
 import threading
@@ -96,3 +98,29 @@ class LongRequestMiddleware:
                 )
         
         return response
+
+
+class BearPassportMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.passport_cookie = 'bear_passport'
+        self.protected_paths = ['/managed-challenge-test/']
+
+    def __call__(self, request):
+        if not any(request.path.startswith(protected) for protected in self.protected_paths):
+            return self.get_response(request)
+
+        # Check if this is a redirect attempt
+        is_passport_check = request.GET.get('passport_check')
+        
+        if not request.COOKIES.get(self.passport_cookie):
+            if is_passport_check:
+                # We already tried setting a cookie and failed
+                return HttpResponseForbidden('This site requires cookies to be enabled.')
+            
+            # First visit - try setting the cookie
+            response = redirect(f"{request.path}?passport_check=grrr")
+            response.set_cookie(self.passport_cookie, 'true', max_age=365*24*60*60)
+            return response
+
+        return self.get_response(request)
