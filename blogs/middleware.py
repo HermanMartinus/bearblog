@@ -115,8 +115,8 @@ class BearPassportMiddleware:
         
         if not request.COOKIES.get(self.passport_cookie):
             if is_passport_check:
-                # We already tried setting a cookie and failed
-                return HttpResponseForbidden('This site requires cookies to be enabled.')
+                # Setting a cookie failed after the redirect
+                return HttpResponseForbidden('Bad bot! ʕ•ᴥ•ʔﾉ')
             
             # First visit - try setting the cookie
             response = redirect(f"{request.path}?passport_check=grrr")

@@ -22,6 +22,7 @@ def resolve_address(request):
 
     sites = os.getenv('MAIN_SITE_HOSTS').split(',')
 
+    print("Full path: ", http_host+request.path)
     if any(http_host == site for site in sites):
         # Homepage
         return None
