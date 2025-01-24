@@ -129,6 +129,9 @@ def posts(request):
 
 @csrf_exempt
 def post(request, slug):
+    if request.GET.get('tagquery'):
+        return not_found(request)
+
     # Prevent null characters in path
     slug = slug.replace('\x00', '')
 
