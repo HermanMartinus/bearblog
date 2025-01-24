@@ -22,7 +22,10 @@ def resolve_address(request):
 
     sites = os.getenv('MAIN_SITE_HOSTS').split(',')
 
-    print("Full path: ", http_host+request.path)
+    ip_address = request.META.get('REMOTE_ADDR')
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    print(f"Full path: {http_host}{request.path} - IP: {ip_address} - X-Forwarded-For: {forwarded_for}")
+
     if any(http_host == site for site in sites):
         # Homepage
         return None
