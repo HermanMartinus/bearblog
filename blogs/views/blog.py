@@ -22,9 +22,9 @@ def resolve_address(request):
 
     sites = os.getenv('MAIN_SITE_HOSTS').split(',')
 
-    ip_address = request.META.get('REMOTE_ADDR')
-    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
-    print(f"Full path: {http_host}{request.path} - IP: {ip_address} - X-Forwarded-For: {forwarded_for}")
+    # ip_address = request.META.get('IP_ADDRESS')
+    # forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    # print(f"Full path: {http_host}{request.path} - IP: {ip_address} - X-Forwarded-For: {forwarded_for}")
 
     if any(http_host == site for site in sites):
         # Homepage
@@ -61,12 +61,12 @@ def ping(request):
     
     try:
         if get_blog_with_domain(domain):
-            # print('Ping! Found correct blog. Issuing certificate.')
+            print('Ping! Found correct blog. Issuing certificate.')
             return HttpResponse('Ping', status=200)
     except:
         pass
 
-    # print(f'Ping! Could not find blog with domain {domain}')
+    print(f'Ping! Could not find blog with domain {domain}')
     return HttpResponse('Invalid domain', status=422)
 
 
