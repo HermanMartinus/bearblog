@@ -22,8 +22,10 @@ def resolve_address(request):
 
     sites = os.getenv('MAIN_SITE_HOSTS').split(',')
 
-    # ip_address = request.META.get('IP_ADDRESS')
-    # forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    ip_address = request.META.get('IP_ADDRESS')
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    if "/blog/" in request.path and forwarded_for:
+        print('X-Forwarded-For: ', forwarded_for)
     # print(f"Full path: {http_host}{request.path} - IP: {ip_address} - X-Forwarded-For: {forwarded_for}")
 
     if any(http_host == site for site in sites):
