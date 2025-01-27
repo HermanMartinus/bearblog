@@ -24,7 +24,7 @@ def lemon_webhook(request):
     print('Received webhook call')
     
     # Account upgrade
-    if any(event in request.META.get('HTTP_X_EVENT_NAME', '') for event in ('order_created', 'subscription_resumed', 'subscription_unpaused')):
+    if request.META.get('HTTP_X_EVENT_NAME') in ('order_created', 'subscription_resumed', 'subscription_unpaused'):
         user = None
         try:
             user_id = str(data['meta']['custom_data']['user_id'])
@@ -38,7 +38,12 @@ def lemon_webhook(request):
         if user:
             user.settings.upgraded = True
             user.settings.upgraded_date = timezone.now()
-            user.settings.order_id = data['data']['id']
+            if 'order_id' in data['data']['attributes']:
+                # If subscription object get order_id
+                user.settings.order_id = data['data']['attributes']['order_id']
+            else:
+                # If order object get id
+                user.settings.order_id = data['data']['id']
             user.settings.save()
             for blog in user.blogs.all():
                 blog.reviewed = True
@@ -46,7 +51,7 @@ def lemon_webhook(request):
             return HttpResponse(f'Upgraded {user}')
 
     # Account downgrade
-    elif any(event in request.META.get('HTTP_X_EVENT_NAME', '') for event in ('subscription_expired', 'subscription_paused')):
+    elif request.META.get('HTTP_X_EVENT_NAME') in ('subscription_expired', 'subscription_paused'):
         user_settings = None
         try:
             order_id = data['data']['attributes']['order_id']
