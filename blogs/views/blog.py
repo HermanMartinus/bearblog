@@ -17,15 +17,11 @@ import tldextract
 def resolve_address(request):
     http_host = request.get_host()
 
-    # if request.META.get('HTTP_HOST') == 'bearblog.dev':
-        # http_host = request.META.get('HTTP_X_FORWARDED_HOST', 'bearblog.dev')
-
     sites = os.getenv('MAIN_SITE_HOSTS').split(',')
 
-    ip_address = request.META.get('IP_ADDRESS')
-    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
-    if "blog" in request.path and forwarded_for:
-        print('X-Forwarded-For: ', forwarded_for.split(',')[0], 'Full URL: ', request.build_absolute_uri())
+    # forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    # if forwarded_for:
+    #     print('X-Forwarded-For: ', forwarded_for.split(',')[0], 'Full URL: ', request.build_absolute_uri())
 
     if any(http_host == site for site in sites):
         # Homepage
@@ -91,10 +87,11 @@ def home(request):
         })
 
 
-def posts(request):
-    blog = resolve_address(request)
+def posts(request, blog):
     if not blog:
-        return not_found(request)
+        blog = resolve_address(request)
+        if not blog:
+            return not_found(request)
     
     tag_param = request.GET.get('q', '')
     tags = [t.strip() for t in tag_param.split(',')] if tag_param else []
@@ -141,7 +138,7 @@ def post(request, slug):
     if slug == blog.rss_alias:
         from blogs.views.feed import feed
         return feed(request)
-
+    
     # Find by post slug with select_related to avoid additional queries
     post = (Post.objects
            .filter(
@@ -162,9 +159,10 @@ def post(request, slug):
         if post:
             return redirect('post', slug=post.slug)
         else:
-            # Check for a custom blogreel path and render the blog page
+            # Check for a custom blogreel or /blog path and render the blog page
             if slug == blog.blog_path or slug == 'blog':
-                return posts(request)
+                return posts(request, blog)
+
             return render(request, '404.html', {'blog': blog}, status=404)
     
     # Check if upvoted

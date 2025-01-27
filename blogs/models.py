@@ -56,6 +56,7 @@ class Blog(models.Model):
     blog_path = models.CharField(max_length=200, default="blog")
     header_directive = models.TextField(blank=True)
     footer_directive = models.TextField(blank=True)
+    all_tags = models.TextField(default='[]')
 
     dodginess_score = models.FloatField(default=0, db_index=True)
     reviewed = models.BooleanField(default=False, db_index=True)
@@ -126,11 +127,7 @@ class Blog(models.Model):
     
     @property
     def tags(self):
-        all_tags = []
-        for post in Post.objects.filter(blog=self, publish=True, is_page=False, published_date__lt=timezone.now()):
-            all_tags.extend(json.loads(post.all_tags))
-            all_tags = list(set(all_tags))
-        return sorted(all_tags)
+        return sorted(json.loads(self.all_tags))
 
     def generate_auth_token(self):
         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
@@ -151,7 +148,17 @@ class Blog(models.Model):
 
         self.dodginess_score = dodgy_term_count
 
+    def update_all_tags(self):
+        all_tags = []
+        for post in Post.objects.filter(blog=self, publish=True, is_page=False, published_date__lt=timezone.now()):
+            all_tags.extend(json.loads(post.all_tags))
+            all_tags = list(set(all_tags))
+        self.all_tags = json.dumps(all_tags)
+
     def save(self, *args, **kwargs):
+        # Handle all tags
+        self.update_all_tags()
+
         # Upgraded blogs are auto-reviewed
         if self.user.settings.upgraded:
             self.reviewed = True
