@@ -135,43 +135,6 @@
         </ul>
     </div>
 </div>
-{% if not public %}
-<hr>
-<small>
-    <details>
-        <summary>Analytics settings</summary>
-    
-        <p>
-            {% if blog.public_analytics %}
-            Public analytics available at 
-            <a href="{{blog.dynamic_useful_domain}}/public-analytics/" target="_blank">{{ blog.useful_domain }}/public-analytics/</a>
-            <br>
-            {% endif %}
-
-            <form method="post" action="{% url 'analytics_upgraded' id=blog.subdomain %}" style="display:inline;">
-                {% csrf_token %}
-                <input type="hidden" name="share" value="{% if blog.public_analytics %}private{% else %}public{% endif %}">
-                <button type="submit">Make analytics {% if blog.public_analytics %}private{% else %}public{% endif %}</button>
-            </form>
-            
-            <button onclick="window.open('?export=True')">Export all</button>
-        </p>
-        <hr>
-        <p>
-            <b>Need more in-depth analytics with minute-by-minute logs, time-on-site, and granular referrers?</b>
-            <br>
-            <a href='https://usefathom.com/ref/GMAGWL' target='_blank'>Fathom</a> is a great, privacy respecting analytics tool.
-            <br>
-            Sign up with the above link to get $10 off.
-            <form method="POST" class="post-form">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="save btn btn-default">Save</button>
-            </form>    
-        </p>
-    </details>
-</small>
-{% endif %}
 {% endblock %}
 
 

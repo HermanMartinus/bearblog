@@ -105,8 +105,8 @@ def posts(request, blog):
         available_tags = set()
         for post in posts:
             available_tags.update(post.tags)
+
     else:
-        # blog_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
         available_tags = set(blog.tags)
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'

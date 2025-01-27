@@ -5,7 +5,6 @@ from django.db import IntegrityError
 from datetime import timedelta
 from django.db.models.functions import TruncDate
 
-from blogs.forms import AnalyticsForm
 from blogs.models import Blog, Hit, Post, RssSubscriber
 from blogs.helpers import daterange, get_country, salt_and_hash
 from django.db.models import Count, Sum, Q
@@ -158,14 +157,6 @@ def render_analytics(request, blog, public=False):
     chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
     chart_render = chart.render_data_uri()
 
-    if request.method == "POST":
-        form = AnalyticsForm(request.POST, instance=blog)
-        if form.is_valid():
-            blog_info = form.save(commit=False)
-            blog_info.save()
-    else:
-        form = AnalyticsForm(instance=blog)
-
     # RSS Subscriber count
     rss_subscriber_count = RssSubscriber.objects.filter(blog=blog, access_date__gt=now - timedelta(hours=18)).count()
 
@@ -187,7 +178,6 @@ def render_analytics(request, blog, public=False):
         'days_filter': days_filter,
         'post_filter': post_filter,
         'referrer_filter': referrer_filter,
-        'form': form
     })
 
 
