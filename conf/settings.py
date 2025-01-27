@@ -48,7 +48,6 @@ INTERNAL_IPS = ['127.0.0.1']
 SITE_ID = 1
 
 INSTALLED_APPS = [
-    'scout_apm.django',
     'judoscale.django',
     'django.contrib.admin',
     'django.contrib.sites',
