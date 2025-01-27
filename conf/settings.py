@@ -27,17 +27,13 @@ if not DEBUG:
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
         auto_session_tracking=False,
-        traces_sample_rate=0,
-        profiles_sample_rate=0,
+        traces_sample_rate=0.001,
+        profiles_sample_rate=0.001,
         send_default_pii=True,
         before_send=before_send
     )
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
-
-    SCOUT_MONITOR = os.getenv('SCOUT_MONITOR') == 'True'
-    SCOUT_KEY = os.getenv('SCOUT_KEY')
-    SCOUT_NAME = PROJECT_NAME
 
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']
@@ -88,7 +84,6 @@ MIDDLEWARE = [
     'blogs.middleware.LongRequestMiddleware',
     # 'blogs.middleware.RequestPerformanceMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'blogs.middleware.BearPassportMiddleware',
 ]
 
 ROOT_URLCONF = 'conf.urls'
