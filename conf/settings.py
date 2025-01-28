@@ -35,13 +35,6 @@ if not DEBUG:
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
-def show_toolbar(request):
-    return request.COOKIES.get('admin_passport') == os.getenv('ADMIN_PASSPORT')
-
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
-}
-
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

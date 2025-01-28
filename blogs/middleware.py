@@ -1,5 +1,5 @@
 import time
-import sentry_sdk    
+import sentry_sdk
 
 class LongRequestMiddleware:
     def __init__(self, get_response):
@@ -23,4 +23,3 @@ class LongRequestMiddleware:
                 )
         
         return response
-
