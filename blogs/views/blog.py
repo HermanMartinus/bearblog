@@ -30,7 +30,7 @@ def resolve_address(request):
         # Subdomained blog
         subdomain = tldextract.extract(http_host).subdomain
         
-        if request.GET.get('reviewer') == "herman":
+        if request.COOKIES.get('admin_passport') == os.getenv('ADMIN_PASSPORT'):
             return get_object_or_404(Blog.objects.select_related('user').select_related('user__settings'), subdomain__iexact=subdomain)
         else:
             return get_object_or_404(Blog.objects.select_related('user').select_related('user__settings'), subdomain__iexact=subdomain, user__is_active=True)
