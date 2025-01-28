@@ -268,10 +268,11 @@ class Post(models.Model):
         if self.pk:
             self.update_score()
 
+        # Save the post
+        super(Post, self).save(*args, **kwargs)
+
         # Save blog to trigger a few other things
         self.blog.save()
-
-        super(Post, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title

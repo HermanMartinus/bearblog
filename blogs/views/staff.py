@@ -147,7 +147,7 @@ def check_spam(request):
             blog.user.save()
             return redirect(blog.useful_domain)
 
-        return redirect(f"{blog.useful_domain}?reviewer=herman")
+        return redirect(f"{blog.useful_domain}")
 
 
 @staff_member_required
