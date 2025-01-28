@@ -12,6 +12,7 @@ from blogs.views.blog import not_found, resolve_address
 from feedgen.feed import FeedGenerator
 import re
 
+
 def clean_string(s):
     return re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', s)
 
@@ -54,7 +55,7 @@ def atom(blog, tag=None):
     else:
         atom_feed = cached_feed
 
-    return HttpResponse(atom_feed, content_type='application/atom+xml')
+    return HttpResponse(atom_feed, content_type='application/xml')
 
 
 def rss(blog, tag=None):
@@ -70,7 +71,7 @@ def rss(blog, tag=None):
     else:
         rss_feed = cached_feed
 
-    return HttpResponse(rss_feed, content_type='application/rss+xml')
+    return HttpResponse(rss_feed, content_type='application/xml')
 
 
 def log_feed_subscriber(request, blog):
@@ -86,8 +87,10 @@ def generate_feed(blog, feed_type="atom", tag=None):
 
     if tag:
         all_posts = all_posts.filter(all_tags__icontains=tag)
+
     all_posts = all_posts.order_by('-published_date')[:10]
-    all_posts = sorted(list(all_posts), key=lambda post: post.published_date)
+    # Reverse the most recent posts
+    all_posts = list(all_posts)[::-1] 
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain)

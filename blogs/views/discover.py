@@ -136,17 +136,18 @@ def feed(request):
         fg.title("Bear Blog Most Recent Posts")
         fg.subtitle("Most recent posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/?newest=True", rel="alternate")
-
+        # Sort by published date
         all_posts = base_query.order_by("-published_date")[:posts_per_page]
-        all_posts = sorted(all_posts, key=lambda post: post.published_date)
+        
     else:
         fg.title("Bear Blog Trending Posts")
         fg.subtitle("Trending posts on Bear Blog")
         fg.link(href="https://bearblog.dev/discover/", rel="alternate")
-
+        # Sort by score and then by published date
         all_posts = base_query.order_by("-score", "-published_date")[:posts_per_page]
-        all_posts = sorted(all_posts, key=lambda post: post.score)  
 
+    # Reverse the most recent posts
+    all_posts = list(all_posts)[::-1]
 
     for post in all_posts:
         fe = fg.add_entry()
@@ -164,7 +165,8 @@ def feed(request):
     # Generate the feed string and cache it
     feed_str = feed_method(pretty=True)
     cache.set(CACHE_KEY, feed_str, CACHE_TIMEOUT)
-    return HttpResponse(feed_str, content_type=f"application/{feed_type}+xml")
+    
+    return HttpResponse(feed_str, content_type=f"application/xml")
 
 
 def search(request):
