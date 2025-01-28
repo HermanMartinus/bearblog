@@ -162,7 +162,7 @@ def empty_blogs():
     # Not used in the last year
     timeperiod = timezone.now() - timedelta(days=365)
     blogs = Blog.objects.annotate(num_posts=Count('posts')).annotate(content_length=Length('content')).filter(
-        last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=60, user__settings__upgraded=False, custom_styles="").order_by('-created_date')[:100]
+        last_modified__lte=timeperiod, num_posts__lte=0, content_length__lt=60, user__settings__upgraded=False).order_by('-created_date')[:100]
 
     return blogs
 
