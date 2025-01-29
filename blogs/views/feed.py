@@ -1,8 +1,10 @@
 from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponse
+from django.http.response import Http404
 from django.utils import timezone
 from django.core.cache import cache
 from django.utils.text import slugify
+from django.db.models import Q
 
 from blogs.helpers import salt_and_hash, unmark
 from blogs.models import Blog, RssSubscriber
@@ -10,7 +12,9 @@ from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
 
 from feedgen.feed import FeedGenerator
+import os
 import re
+import tldextract
 
 
 def clean_string(s):
@@ -48,18 +52,43 @@ def feed(request):
 
 
     # TODO: Have this happen async or more performantly
-    # log_feed_subscriber(request)
+    log_feed_subscriber(request)
  
-    # return HttpResponse("<html><body><h1>Hello</h1></body></html>", content_type='text/html')
     return HttpResponse(feed, content_type='application/xml')
 
 
+def quick_resolve(request):
+    # Gets only the id of the blog with no checking if active
+    http_host = request.get_host()
+    sites = os.getenv('MAIN_SITE_HOSTS').split(',')
+    
+    if any(site in http_host for site in sites):
+        # Subdomained blog
+        subdomain = tldextract.extract(http_host).subdomain
+        blog = Blog.objects.filter(subdomain__iexact=subdomain).only('id').first()
+    else:
+        # Custom domain blog - handle both www and non-www
+        domain_no_www = http_host.replace('www.', '')
+        blog = Blog.objects.filter(
+            Q(domain__iexact=domain_no_www) |
+            Q(domain__iexact=f'www.{domain_no_www}')
+        ).only('id').first()
+
+    if blog:
+        print(f'Feeds: Quick resolve found for logging subscriber')
+        return blog
+    print(f'Feeds: Quick resolve did not find a blog')
+    raise Http404()
+ 
+    
 def log_feed_subscriber(request):
     try:
         hash_id = salt_and_hash(request)
-        blog = resolve_address(request)
-        RssSubscriber.objects.get_or_create(blog=blog, hash_id=hash_id)
-    except MultipleObjectsReturned:
+        blog = quick_resolve(request)
+
+        RssSubscriber.objects.only('id').get_or_create(blog=blog, hash_id=hash_id)
+    except Exception as e:
+        print(f'Feeds: Error logging feed subscriber: {e}')
         pass
 
 
@@ -70,7 +99,7 @@ def generate_feed(blog, feed_type="atom", tag=None):
         all_posts = all_posts.filter(all_tags__icontains=tag)
 
     all_posts = all_posts.order_by('-published_date')[:10]
-    # Reverse the most recent posts
+    # Reverse the most recent posts 
     all_posts = list(all_posts)[::-1] 
 
     fg = FeedGenerator()
