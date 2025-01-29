@@ -186,6 +186,10 @@ def post_hit(request, uid):
     if 'bot' in user_agent.lower():
         return HttpResponse("Bot traffic")
     
+    print("Hit: client_ip(request)", client_ip(request))
+    print("Hit: request.remote_addr", request.remote_addr)
+    print("Hit: HTTP_X_FORWARDED_FOR", request.META.get('HTTP_X_FORWARDED_FOR', ''))
+
     try:
         user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
 

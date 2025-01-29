@@ -115,8 +115,8 @@ def feed(request):
     # Attempt to retrieve the cached feed
     cached_feed = cache.get(CACHE_KEY)
     if cached_feed is not None:
-        return HttpResponse(cached_feed, content_type=f"application/{feed_type}+xml")
-
+        return HttpResponse(cached_feed, content_type=f"application/xml")
+    
     fg = FeedGenerator()
     fg.id("bearblog")
     fg.author({"name": "Bear Blog", "email": "feed@bearblog.dev"})
