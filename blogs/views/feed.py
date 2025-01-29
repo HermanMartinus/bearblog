@@ -54,7 +54,7 @@ def feed(request):
         print(f'Feeds: Cache hit for {CACHE_KEY}')
 
         # TODO: Have this happen async or more performantly
-        log_feed_subscriber(request)
+        # log_feed_subscriber(request)
  
     return HttpResponse(feed, content_type='application/xml')
  
