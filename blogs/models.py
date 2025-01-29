@@ -156,6 +156,37 @@ class Blog(models.Model):
             all_tags = list(set(all_tags))
         self.all_tags = json.dumps(all_tags)
 
+    def invalidate_caches(self):
+        cache_keys = []
+        main_host = os.getenv("MAIN_SITE_HOSTS").split(",")[0]
+        
+        # Bear domain cache keys
+        bear_domain = f'{self.subdomain}.{main_host}'
+        cache_keys.extend([
+            f'{bear_domain}_rss_feed',
+            f'{bear_domain}_atom_feed'
+        ])
+        for tag in self.tags:
+            cache_keys.extend([
+                f'{bear_domain}_rss_feed_{tag}',
+                f'{bear_domain}_atom_feed_{tag}'
+            ])
+
+        # Custom domain cache keys
+        if self.domain:
+            cache_keys.extend([
+                f'{self.domain}_rss_feed',
+                f'{self.domain}_atom_feed'
+            ])
+            for tag in self.tags:
+                cache_keys.extend([
+                    f'{self.domain}_rss_feed_{tag}',
+                    f'{self.domain}_atom_feed_{tag}'
+                ])
+
+        print(f'Invalidating cache keys for {bear_domain} (Domain: {self.domain})')
+        cache.delete_many(cache_keys)
+
     def save(self, *args, **kwargs):
         # Handle all tags
         self.update_all_tags()
@@ -176,10 +207,8 @@ class Blog(models.Model):
         # Double check subdomains are lowercase
         self.subdomain = self.subdomain.lower()
         
-        # Invalidate feed cache
-        cache.delete(f'{self.subdomain}_all_posts')
-        cache.delete(f'{self.subdomain}_rss_feed')
-        cache.delete(f'{self.subdomain}_atom_feed')
+        # Invalidate caches
+        self.invalidate_caches()
 
         # Update last posted
         if self.pk:

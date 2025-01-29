@@ -5,7 +5,7 @@ from django.core.cache import cache
 from django.utils.text import slugify
 
 from blogs.helpers import salt_and_hash, unmark
-from blogs.models import RssSubscriber
+from blogs.models import Blog, RssSubscriber
 from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
 
@@ -18,10 +18,6 @@ def clean_string(s):
 
 
 def feed(request):
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
-
     tag = request.GET.get('q')
 
     if "rss" in request.GET.get('type', 'atom') or "rss" in request.path:
@@ -29,54 +25,40 @@ def feed(request):
     else:
         feed_type = "atom"
 
-    
-    log_feed_subscriber(request, blog)
-
-    try:
-        if feed_type == "atom":
-            return atom(blog, tag)
-        elif feed_type == "rss":
-            return rss(blog, tag)
-    
-    except ValueError as e:
-        return HttpResponse(f"An error occurred while generating the feed: {e}")
-
-
-def atom(blog, tag=None):
-    CACHE_KEY = f'{blog.subdomain}_atom_feed'
+    CACHE_KEY = f'{request.get_host()}_{feed_type}_feed'
     if tag:
         CACHE_KEY += "_" + slugify(tag).replace('-', '_')
 
     cached_feed = cache.get(CACHE_KEY)
-    
+
     if cached_feed is None:
-        atom_feed = generate_feed(blog, "atom", tag)
-        cache.set(CACHE_KEY, atom_feed, timeout=None)
+        blog = resolve_address(request)
+        if not blog:
+            return not_found(request)
+        try:
+            feed = generate_feed(blog, feed_type, tag)
+            cache.set(CACHE_KEY, feed, timeout=None)
+            print(f'Feed cache miss for {CACHE_KEY}')
+        except Exception as e:
+            print(f'Error generating feed for {CACHE_KEY}: {e}')
+
+        
     else:
-        atom_feed = cached_feed
-
-    return HttpResponse(atom_feed, content_type='application/xml')
-
-
-def rss(blog, tag=None):
-    CACHE_KEY = f'{blog.subdomain}_rss_feed'
-    if tag:
-        CACHE_KEY += "_" + slugify(tag).replace('-', '_')
-
-    cached_feed = cache.get(CACHE_KEY)
-    
-    if cached_feed is None:
-        rss_feed = generate_feed(blog, "rss", tag)
-        cache.set(CACHE_KEY, rss_feed, timeout=None)
-    else:
-        rss_feed = cached_feed
-
-    return HttpResponse(rss_feed, content_type='application/xml')
+        feed = cached_feed
+        print(f'Feed cache hit for {CACHE_KEY}')
 
 
-def log_feed_subscriber(request, blog):
+    # TODO: Have this happen async or more performantly
+    # log_feed_subscriber(request)
+ 
+    return HttpResponse("<html><body><h1>Hello</h1></body></html>", content_type='text/html')
+    # return HttpResponse(feed, content_type='application/xml')
+
+
+def log_feed_subscriber(request):
     try:
         hash_id = salt_and_hash(request)
+        blog = resolve_address(request)
         RssSubscriber.objects.get_or_create(blog=blog, hash_id=hash_id)
     except MultipleObjectsReturned:
         pass
