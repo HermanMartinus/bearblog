@@ -184,7 +184,7 @@ class Blog(models.Model):
                     f'{self.domain}_atom_feed_{tag}'
                 ])
 
-        print(f'Invalidating cache keys for {bear_domain} (Domain: {self.domain})')
+        print(f'Feeds: Invalidating cache keys for {bear_domain} (Domain: {self.domain})')
         cache.delete_many(cache_keys)
 
     def save(self, *args, **kwargs):

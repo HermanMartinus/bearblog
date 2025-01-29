@@ -38,14 +38,13 @@ def feed(request):
         try:
             feed = generate_feed(blog, feed_type, tag)
             cache.set(CACHE_KEY, feed, timeout=None)
-            print(f'Feed cache miss for {CACHE_KEY}')
+            print(f'Feeds: Cache miss for {CACHE_KEY}')
         except Exception as e:
-            print(f'Error generating feed for {CACHE_KEY}: {e}')
+            print(f'Feeds: Error generating feed for {CACHE_KEY}: {e}')
 
-        
     else:
         feed = cached_feed
-        print(f'Feed cache hit for {CACHE_KEY}')
+        print(f'Feeds: Cache hit for {CACHE_KEY}')
 
 
     # TODO: Have this happen async or more performantly
