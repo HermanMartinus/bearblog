@@ -46,45 +46,26 @@ def feed(request):
         except Exception as e:
             print(f'Feeds: Error generating feed for {CACHE_KEY}: {e}')
 
+        # TODO: Have this happen async or more performantly
+        log_feed_subscriber(request, blog)
+
     else:
         feed = cached_feed
         print(f'Feeds: Cache hit for {CACHE_KEY}')
 
-
-    # TODO: Have this happen async or more performantly
-    log_feed_subscriber(request)
+        # TODO: Have this happen async or more performantly
+        log_feed_subscriber(request)
  
     return HttpResponse(feed, content_type='application/xml')
-
-
-def quick_resolve(request):
-    # Gets only the id of the blog with no checking if active
-    http_host = request.get_host()
-    sites = os.getenv('MAIN_SITE_HOSTS').split(',')
-    
-    if any(site in http_host for site in sites):
-        # Subdomained blog
-        subdomain = tldextract.extract(http_host).subdomain
-        blog = Blog.objects.filter(subdomain__iexact=subdomain).only('id').first()
-    else:
-        # Custom domain blog - handle both www and non-www
-        domain_no_www = http_host.replace('www.', '')
-        blog = Blog.objects.filter(
-            Q(domain__iexact=domain_no_www) |
-            Q(domain__iexact=f'www.{domain_no_www}')
-        ).only('id').first()
-
-    if blog:
-        return blog
-
-    raise Http404()
  
     
-def log_feed_subscriber(request):
+def log_feed_subscriber(request, blog=None):
     try:
         hash_id = salt_and_hash(request)
-        blog = quick_resolve(request)
 
+        if not blog:
+            blog = resolve_address(request)
+        
         RssSubscriber.objects.only('id').get_or_create(blog=blog, hash_id=hash_id)
     except Exception as e:
         print(f'Feeds: Error logging feed subscriber: {e}')
