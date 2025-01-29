@@ -51,8 +51,8 @@ def feed(request):
     # TODO: Have this happen async or more performantly
     # log_feed_subscriber(request)
  
-    return HttpResponse("<html><body><h1>Hello</h1></body></html>", content_type='text/html')
-    # return HttpResponse(feed, content_type='application/xml')
+    # return HttpResponse("<html><body><h1>Hello</h1></body></html>", content_type='text/html')
+    return HttpResponse(feed, content_type='application/xml')
 
 
 def log_feed_subscriber(request):
