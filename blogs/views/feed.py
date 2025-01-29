@@ -75,9 +75,8 @@ def quick_resolve(request):
         ).only('id').first()
 
     if blog:
-        print(f'Feeds: Quick resolve found for logging subscriber')
         return blog
-    print(f'Feeds: Quick resolve did not find a blog')
+
     raise Http404()
  
     
