@@ -9,7 +9,7 @@ from silk import urls as silk_urls
 urlpatterns = [
     path('mothership/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('silk/', include((silk_urls.urlpatterns, 'silk'), namespace='silk')),
+    # path('silk/', staff_member_required(include((silk_urls.urlpatterns, 'silk'), namespace='silk'))),
     path('', include('blogs.urls')),
     path("favicon.ico", RedirectView.as_view(url='/static/favicon.ico', permanent=True)),
     path("logo.png", RedirectView.as_view(url='/static/logo.png', permanent=True)),
