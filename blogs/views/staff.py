@@ -316,43 +316,16 @@ def migrate_blog(request):
 
 # Playground for testing
 from blogs.views.discover import get_base_query
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
-from django.core.cache import cache
-
-# Create thread pool at module level
-executor = ThreadPoolExecutor(max_workers=4)
-
-def perform_search(search_string):
-    from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
-
-    vector = SearchVector('title')
-    query = SearchQuery(search_string)
-    
-    return list(get_base_query()
-        .annotate(rank=SearchRank(vector, query))
-        .filter(rank__gte=0.4)
-        .order_by('-rank', '-published_date')
-        .select_related("blog")[:20])
 
 def playground(request):
     search_string = request.POST.get('query', "") if request.method == "POST" else ""
     posts = None
 
     if search_string:
-        # Check cache first
-        cache_key = f'search_results_{search_string}'
-        posts = cache.get(cache_key)
-        
-        if posts is None:
-            # Get immediate basic results
-            # posts = (get_base_query()
-            #     .filter(title__icontains=search_string)
-            #     .order_by('-published_date')
-            #     .select_related("blog")[:20])
-            posts = perform_search(search_string)
-            # cache.set(cache_key, posts, 3600)
-
+        posts = (get_base_query()
+            .filter(title__icontains=search_string)
+            .order_by('-published_date')
+            .select_related("blog")[:20])
 
     return render(request, "search.html", {
         "posts": posts,
