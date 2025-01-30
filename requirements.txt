@@ -7,7 +7,6 @@ django-ip==1.0.2
 django-pygmentify==0.3.7
 django-queryset-csv==1.1.0
 # django-redis==5.4.0
-django-silk==5.0.3
 feedgen==0.9.0
 geoip2==4.6.0
 gunicorn==20.0.4

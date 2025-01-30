@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'debug_toolbar',
     'pygmentify',
-    'silk'
 ]
 
 AUTHENTICATION_BACKENDS = (
