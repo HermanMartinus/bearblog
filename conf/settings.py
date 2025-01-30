@@ -35,8 +35,6 @@ if not DEBUG:
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
-SILKY_AUTHENTICATION = True
-SILKY_AUTHORISATION = True
 
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']
@@ -75,7 +73,6 @@ AUTHENTICATION_BACKENDS = (
 
 MIDDLEWARE = [
     'django.middleware.gzip.GZipMiddleware',
-    'silk.middleware.SilkyMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
