@@ -45,6 +45,7 @@ def feed(request):
             print(f'Feeds: Cache miss for {CACHE_KEY}')
         except Exception as e:
             print(f'Feeds: Error generating feed for {CACHE_KEY}: {e}')
+            feed = ''
 
         # TODO: Have this happen async or more performantly
         log_feed_subscriber(request, blog)

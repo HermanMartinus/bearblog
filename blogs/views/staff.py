@@ -310,3 +310,56 @@ def migrate_blog(request):
             message += 'Deleted...\n'
         
         return HttpResponse(message)
+    
+
+
+# Playground for testing
+
+from blogs.views.discover import get_base_query
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from django.core.cache import cache
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+
+# Create thread pool at module level
+executor = ThreadPoolExecutor(max_workers=4)
+
+def perform_search(search_string):
+    vector = SearchVector('title', weight='A') + SearchVector('content', weight='B')
+    query = SearchQuery(search_string)
+    
+    return list(get_base_query()
+        .annotate(rank=SearchRank(vector, query))
+        .filter(rank__gte=0.01)
+        .order_by('-rank', '-published_date')
+        .select_related("blog")[:20])
+
+def search(request):
+    search_string = request.POST.get('query', "") if request.method == "POST" else ""
+    posts = None
+
+    if search_string:
+        # Check cache first
+        cache_key = f'search_results_{search_string}'
+        posts = cache.get(cache_key)
+        
+        if posts is None:
+            # Get immediate basic results
+            posts = (get_base_query()
+                .filter(title__icontains=search_string)
+                .order_by('-published_date')
+                .select_related("blog")[:20])
+            
+            # Submit full-text search to thread pool
+            def on_search_complete(future):
+                better_results = future.result()
+                if better_results:
+                    cache.set(cache_key, better_results, 3600)
+
+            future = executor.submit(perform_search, search_string)
+            future.add_done_callback(on_search_complete)
+
+    return render(request, "search.html", {
+        "posts": posts,
+        "search_string": search_string,
+    })
