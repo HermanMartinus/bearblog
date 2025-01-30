@@ -334,7 +334,7 @@ def perform_search(search_string):
         .order_by('-rank', '-published_date')
         .select_related("blog")[:20])
 
-def search(request):
+def playground(request):
     search_string = request.POST.get('query', "") if request.method == "POST" else ""
     posts = None
 
