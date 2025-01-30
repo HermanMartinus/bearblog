@@ -326,12 +326,12 @@ executor = ThreadPoolExecutor(max_workers=4)
 def perform_search(search_string):
     from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
-    vector = SearchVector('title', weight='A') + SearchVector('content', weight='B')
+    vector = SearchVector('title')
     query = SearchQuery(search_string)
     
     return list(get_base_query()
         .annotate(rank=SearchRank(vector, query))
-        .filter(rank__gte=0.01)
+        .filter(rank__gte=0.4)
         .order_by('-rank', '-published_date')
         .select_related("blog")[:20])
 
@@ -351,15 +351,8 @@ def playground(request):
             #     .order_by('-published_date')
             #     .select_related("blog")[:20])
             posts = perform_search(search_string)
-            
-            # Submit full-text search to thread pool
-            # def on_search_complete(future):
-            #     better_results = future.result()
-            #     if better_results:
-            #         cache.set(cache_key, better_results, 3600)
+            # cache.set(cache_key, posts, 3600)
 
-            # future = executor.submit(perform_search, search_string)
-            # future.add_done_callback(on_search_complete)
 
     return render(request, "search.html", {
         "posts": posts,
