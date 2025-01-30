@@ -164,7 +164,9 @@ class Blog(models.Model):
         bear_domain = f'{self.subdomain}.{main_host}'
         cache_keys.extend([
             f'{bear_domain}_rss_feed',
-            f'{bear_domain}_atom_feed'
+            f'{bear_domain}_atom_feed',
+            f'{bear_domain}_robots',
+            f'{bear_domain}_sitemap'
         ])
         for tag in self.tags:
             cache_keys.extend([
@@ -176,7 +178,9 @@ class Blog(models.Model):
         if self.domain:
             cache_keys.extend([
                 f'{self.domain}_rss_feed',
-                f'{self.domain}_atom_feed'
+                f'{self.domain}_atom_feed',
+                f'{self.domain}_robots',
+                f'{self.domain}_sitemap'
             ])
             for tag in self.tags:
                 cache_keys.extend([

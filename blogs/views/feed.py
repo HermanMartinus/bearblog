@@ -1,20 +1,15 @@
-from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponse
-from django.http.response import Http404
 from django.utils import timezone
 from django.core.cache import cache
 from django.utils.text import slugify
-from django.db.models import Q
 
 from blogs.helpers import salt_and_hash, unmark
-from blogs.models import Blog, RssSubscriber
+from blogs.models import RssSubscriber
 from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
 
 from feedgen.feed import FeedGenerator
-import os
 import re
-import tldextract
 
 
 def clean_string(s):

@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.cache import cache
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import salt_and_hash, unmark
@@ -228,22 +229,33 @@ def not_found(request, *args, **kwargs):
 
 
 def sitemap(request):
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
+    CACHE_KEY = f'{request.get_host()}_sitemap'
+    cached_data = cache.get(CACHE_KEY)
 
-    posts = []
-    try:
-        posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).order_by('-published_date')
-    except AttributeError:
-        posts = []
+    if cached_data is None:
+        blog = resolve_address(request)
+        if not blog:
+            return not_found(request)
+        
+        try:
+            posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).only('slug', 'last_modified').order_by('-published_date')
+        except AttributeError:
+            posts = []
+            
+        cached_data = {'blog': blog, 'posts': posts}
+        cache.set(CACHE_KEY, cached_data, timeout=None)
 
-    return render(request, 'sitemap.xml', {'blog': blog, 'posts': posts}, content_type='text/xml')
+    return render(request, 'sitemap.xml', cached_data, content_type='text/xml')
 
 
 def robots(request):
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
+    CACHE_KEY = f'{request.get_host()}_robots'
+    blog = cache.get(CACHE_KEY)
+
+    if blog is None:
+        blog = resolve_address(request)
+        if not blog:
+            return not_found(request)
+        cache.set(CACHE_KEY, blog, timeout=None)
 
     return render(request, 'robots.txt',  {'blog': blog}, content_type="text/plain")
