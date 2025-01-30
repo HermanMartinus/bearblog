@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
@@ -314,17 +315,17 @@ def migrate_blog(request):
 
 
 # Playground for testing
-
 from blogs.views.discover import get_base_query
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from django.core.cache import cache
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
 # Create thread pool at module level
 executor = ThreadPoolExecutor(max_workers=4)
 
 def perform_search(search_string):
+    from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+
     vector = SearchVector('title', weight='A') + SearchVector('content', weight='B')
     query = SearchQuery(search_string)
     
@@ -345,19 +346,20 @@ def playground(request):
         
         if posts is None:
             # Get immediate basic results
-            posts = (get_base_query()
-                .filter(title__icontains=search_string)
-                .order_by('-published_date')
-                .select_related("blog")[:20])
+            # posts = (get_base_query()
+            #     .filter(title__icontains=search_string)
+            #     .order_by('-published_date')
+            #     .select_related("blog")[:20])
+            posts = perform_search(search_string)
             
             # Submit full-text search to thread pool
-            def on_search_complete(future):
-                better_results = future.result()
-                if better_results:
-                    cache.set(cache_key, better_results, 3600)
+            # def on_search_complete(future):
+            #     better_results = future.result()
+            #     if better_results:
+            #         cache.set(cache_key, better_results, 3600)
 
-            future = executor.submit(perform_search, search_string)
-            future.add_done_callback(on_search_complete)
+            # future = executor.submit(perform_search, search_string)
+            # future.add_done_callback(on_search_complete)
 
     return render(request, "search.html", {
         "posts": posts,
