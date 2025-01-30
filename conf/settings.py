@@ -35,6 +35,9 @@ if not DEBUG:
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
+SILKY_AUTHENTICATION = True
+SILKY_AUTHORISATION = True
+
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
