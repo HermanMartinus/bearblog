@@ -36,4 +36,7 @@
 {% empty %}No emails yet{% endfor %}{% endif %}</textarea>
     <small>One email address per line</small>
 </form>
+
+{{ request.user.settings.dashboard_footer | safe }}
+
 {% endblock %}

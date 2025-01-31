@@ -26,4 +26,7 @@
 <p>
     <a href="{% url 'upgrade' %}">Upgrade</a> to get access to in-depth, long-term analytics (<a href="https://herman.bearblog.dev/public-analytics/" target="_blank">example</a>).
 </p>
+
+{{ request.user.settings.dashboard_footer | safe }}
+
 {% endblock %}
