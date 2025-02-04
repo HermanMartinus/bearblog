@@ -76,4 +76,7 @@ document.getElementById('deleteSelected').addEventListener('click', function() {
     }
 });
 </script>
+
+{{ request.user.settings.dashboard_footer | safe }}
+
 {% endblock %}

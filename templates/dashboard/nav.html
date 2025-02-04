@@ -26,4 +26,6 @@ textarea {
 }
 </style>
 
+{{ request.user.settings.dashboard_footer | safe }}
+
 {% endblock %}

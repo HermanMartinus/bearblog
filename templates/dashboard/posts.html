@@ -51,4 +51,7 @@
     </li>
     {% endfor %}
 </ul>
+
+{{ request.user.settings.dashboard_footer | safe }}
+
 {% endblock %}

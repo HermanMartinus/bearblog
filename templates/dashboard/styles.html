@@ -85,4 +85,7 @@
   }
 </script>
 {% endif %}
+
+{{ request.user.settings.dashboard_footer | safe }}
+
 {% endblock %}
