@@ -45,7 +45,8 @@ HOST_WHITELIST = [
     'open.spotify.com',
     'umap.openstreetmap.fr',
     'music.163.com',
-    'sheevcharan.substack.com'
+    'sheevcharan.substack.com',
+    'guestbooks.meadow.cafe'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
