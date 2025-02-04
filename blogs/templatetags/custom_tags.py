@@ -259,11 +259,12 @@ def element_replacement(markup, blog, post=None):
         tag, limit, order, description, content = None, None, None, False, False
         
         # Extract and process parameters one by one
-        param_pattern = r'(tag:([^"\s]+|"[^"]+")|limit:(\d+)|order:(asc|desc)|description:(True)|content:(True))'
+        param_pattern = r'(tag:([^|}\s][^|}]*)|limit:(\d+)|order:(asc|desc)|description:(True)|content:(True))'
         params = re.findall(param_pattern, params_str)
         for param in params:
             if 'tag:' in param[0]:
-                tag = param[1]
+                tag = param[1].strip()
+                print(tag)
             elif 'limit:' in param[0]:
                 limit = int(param[2])
             elif 'order:' in param[0]:
