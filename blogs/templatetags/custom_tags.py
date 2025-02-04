@@ -119,6 +119,9 @@ class MyRenderer(HTMLRenderer):
         return html
     
     def inline_math(self, text):
+        # Skip rendering if there's a space before the closing dollar sign
+        if text.endswith(' '):
+            return f'${text}$'
         try:
             return latex2mathml.converter.convert(text)
         except Exception as e:
@@ -127,6 +130,7 @@ class MyRenderer(HTMLRenderer):
     
     def block_math(self, text):
         try:
+            
             return latex2mathml.converter.convert(text).replace('display="inline"', 'display="block"')
         except Exception as e:
             print("LaTeX rendering error")
