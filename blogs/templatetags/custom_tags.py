@@ -264,7 +264,6 @@ def element_replacement(markup, blog, post=None):
         for param in params:
             if 'tag:' in param[0]:
                 tag = param[1].strip()
-                print(tag)
             elif 'limit:' in param[0]:
                 limit = int(param[2])
             elif 'order:' in param[0]:
