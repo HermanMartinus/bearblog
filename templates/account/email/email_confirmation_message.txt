@@ -1,4 +1,4 @@
-Click the link below to activate your new blog.
+Use the link below to confirm your email address.
 
 {{ activate_url }}
 
