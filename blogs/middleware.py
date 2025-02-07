@@ -109,15 +109,4 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
 
         if request.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
             # Only check token for unsafe methods
-            try:
-                result = self._check_token(request)
-                if result is not None:
-                    # If there's an error, log the details
-                    print(f"CSRF Failed: {request.method} {request.path}")
-                    print(f"Referer: {request.META.get('HTTP_REFERER')}")
-                    print(f"Origin: {request.META.get('HTTP_ORIGIN')}")
-                    print(f"Host: {request.META.get('HTTP_HOST')}")
-                return result
-            except Exception as e:
-                print(f"CSRF Exception: {str(e)}")
-                raise
+            return self._check_token(request)
