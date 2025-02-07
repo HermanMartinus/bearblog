@@ -1,6 +1,7 @@
 from django.db import connection
 from django.urls import resolve, Resolver404
 from django.conf import settings
+from django.middleware.csrf import CsrfViewMiddleware
 
 from blogs.models import Blog
 
@@ -101,21 +102,9 @@ class LongRequestMiddleware:
         return response
     
 
-class CSRFTrustedOriginsMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        if not hasattr(settings, '_csrf_trusted_origins_cache') or settings._csrf_trusted_origins_cache is None:
-            print('Setting up CSRF trusted origins')
-            # Initial setup of trusted origins if not yet set
-            custom_domains = Blog.objects.values_list('domain', flat=True).exclude(domain='')
-            trusted_origins = list(settings.CSRF_TRUSTED_ORIGINS)
-            for domain in custom_domains:
-                if domain:
-                    trusted_origins.append(f'https://{domain}')
-            settings._csrf_trusted_origins_cache = trusted_origins
-        
-        request.csrf_trusted_origins = settings._csrf_trusted_origins_cache
-        # print('Trusted origins:', len(request.csrf_trusted_origins))
-        return self.get_response(request)
+class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
+    def process_view(self, request, callback, callback_args, callback_kwargs):
+        if request.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
+            # Only check token for unsafe methods
+            return self._check_token(request)
+        return None
