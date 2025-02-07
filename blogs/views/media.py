@@ -223,7 +223,7 @@ def extract_date_from_url(url):
     match = re.search(pattern, url)
     if match:
         timestamp = int(match.group(1))
-        dt = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+        dt = datetime.fromtimestamp(timestamp, tz=timezone.UTC)
         return dt
     else:
         raise ValueError("Invalid URL format")
