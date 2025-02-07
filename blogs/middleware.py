@@ -106,7 +106,7 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if getattr(callback, 'csrf_exempt', False):
             return None
-            
+        print('Hi!')
         if request.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
             # Only check token for unsafe methods
             try:
