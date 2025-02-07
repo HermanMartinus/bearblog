@@ -299,7 +299,7 @@ def element_replacement(markup, blog, post=None):
 
     markup = markup.replace('{{ blog_title }}', escape(blog.title))
     markup = markup.replace('{{ blog_description }}', escape(blog.meta_description))
-    markup = markup.replace('{{ blog_created_date }}', format_date(blog.created_date, blog.date_format, blog.lang))
+    markup = markup.replace('{{ blog_created_date }}', format_date(blog.created_date, blog.date_format, blog.lang, 'UTC'))
     markup = markup.replace('{{ blog_last_modified }}', timesince(blog.last_modified))
     if blog.last_posted:
         markup = markup.replace('{{ blog_last_posted }}', timesince(blog.last_posted))
@@ -311,7 +311,7 @@ def element_replacement(markup, blog, post=None):
     if post:
         markup = markup.replace('{{ post_title }}', escape(post.title))
         markup = markup.replace('{{ post_description }}', escape(post.meta_description))
-        markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang))
+        markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang, 'UTC'))
         last_modified = post.last_modified or timezone.now()
         markup = markup.replace('{{ post_last_modified }}', timesince(last_modified))
         markup = markup.replace('{{ post_link }}', f"{blog.useful_domain}/{post.slug}")
@@ -354,6 +354,8 @@ def format_date(date, format_string, lang=None, tz='UTC'):
         return ''
     if not format_string:
         format_string = 'd M, Y'
+    if not tz:
+        tz = 'UTC'
 
     try:
         user_tz = ZoneInfo(tz)
