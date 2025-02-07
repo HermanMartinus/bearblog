@@ -7,7 +7,7 @@ from django.utils.text import slugify
 from django.core.cache import cache
 
 from blogs.models import Blog, Post, Upvote
-from blogs.helpers import salt_and_hash, unmark
+from blogs.helpers import create_cache_key, salt_and_hash, unmark
 from blogs.tasks import daily_task
 from blogs.views.analytics import render_analytics
 
@@ -229,7 +229,7 @@ def not_found(request, *args, **kwargs):
 
 
 def sitemap(request):
-    CACHE_KEY = f'{request.get_host()}_sitemap'
+    CACHE_KEY = create_cache_key(request.get_host(), 'sitemap')
     cached_data = cache.get(CACHE_KEY)
 
     if cached_data is None:
@@ -249,7 +249,7 @@ def sitemap(request):
 
 
 def robots(request):
-    CACHE_KEY = f'{request.get_host()}_robots'
+    CACHE_KEY = create_cache_key(request.get_host(), 'robots')
     blog = cache.get(CACHE_KEY)
 
     if blog is None:

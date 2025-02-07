@@ -1,9 +1,8 @@
 from django.http import HttpResponse
 from django.utils import timezone
 from django.core.cache import cache
-from django.utils.text import slugify
 
-from blogs.helpers import salt_and_hash, unmark
+from blogs.helpers import create_cache_key, salt_and_hash, unmark
 from blogs.models import RssSubscriber
 from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
@@ -24,10 +23,7 @@ def feed(request):
     else:
         feed_type = "atom"
 
-    CACHE_KEY = f'{request.get_host()}_{feed_type}_feed'
-    if tag:
-        CACHE_KEY += "_" + slugify(tag).replace('-', '_')
-
+    CACHE_KEY = create_cache_key(request.get_host(), f'{feed_type}_feed', tag)
     cached_feed = cache.get(CACHE_KEY)
 
     if cached_feed is None:

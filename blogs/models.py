@@ -163,7 +163,7 @@ class Blog(models.Model):
         main_host = os.getenv("MAIN_SITE_HOSTS").split(",")[0]
         
         # Bear domain cache keys
-        bear_domain = f'{self.subdomain}.{main_host}'
+        bear_domain = f'{self.subdomain}_{main_host}'.replace('.', '_').replace('-', '_')
         cache_keys.extend([
             f'{bear_domain}_rss_feed',
             f'{bear_domain}_atom_feed',
@@ -172,22 +172,23 @@ class Blog(models.Model):
         ])
         for tag in self.tags:
             cache_keys.extend([
-                f'{bear_domain}_rss_feed_{tag}',
-                f'{bear_domain}_atom_feed_{tag}'
+                f"{bear_domain}_rss_feed_{tag.replace(' ', '_').replace('-', '_')}",
+                f"{bear_domain}_atom_feed_{tag.replace(' ', '_').replace('-', '_')}"
             ])
 
         # Custom domain cache keys
         if self.domain:
+            domain = self.domain.replace('.', '_').replace('-', '_')
             cache_keys.extend([
-                f'{self.domain}_rss_feed',
-                f'{self.domain}_atom_feed',
-                f'{self.domain}_robots',
-                f'{self.domain}_sitemap'
+                f'{domain}_rss_feed',
+                f'{domain}_atom_feed',
+                f'{domain}_robots',
+                f'{domain}_sitemap'
             ])
             for tag in self.tags:
                 cache_keys.extend([
-                    f'{self.domain}_rss_feed_{tag}',
-                    f'{self.domain}_atom_feed_{tag}'
+                    f"{domain}_rss_feed_{tag.replace(' ', '_').replace('-', '_')}",
+                    f"{domain}_atom_feed_{tag.replace(' ', '_').replace('-', '_')}"
                 ])
 
         print(f'Feeds: Invalidating cache keys for {bear_domain} (Domain: {self.domain})')

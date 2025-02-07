@@ -3,8 +3,8 @@ from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 from django.contrib.gis.geoip2 import GeoIP2
 from django.conf import settings
 from django.db import connection
+from django.utils.text import slugify
 
-from functools import wraps
 import re
 import string
 import os
@@ -69,38 +69,6 @@ def is_protected(subdomain):
     return subdomain in protected_subdomains
 
 
-def measure_queries(func):
-    def wrapper(*args, **kwargs):
-        # Start timing and get initial query count
-        start_time = time()
-        initial_queries = len(connection.queries)
-        
-        # Execute the function
-        result = func(*args, **kwargs)
-        
-        # Calculate metrics
-        end_time = time()
-        final_queries = len(connection.queries)
-        
-        # Print metrics
-        execution_time = end_time - start_time
-        query_count = final_queries - initial_queries
-        
-        print(f"\n{'='*50}")
-        print(f"Performance Metrics for {func.__name__}:")
-        print(f"Time: {execution_time:.3f} seconds")
-        print(f"Queries: {query_count}")
-        
-        # if query_count > 0:
-        #     print("\nQueries executed:")
-        #     for query in connection.queries[initial_queries:final_queries]:
-        #         print(f"- {query['sql'][:200]}...")
-        # print(f"{'='*50}\n")
-        
-        return result
-    return wrapper
-
-
 def check_records(domain):
     if not domain:
         return
@@ -121,6 +89,17 @@ def check_connection(blog):
             return False
         except SystemExit:
             return False
+
+
+def create_cache_key(host, path=None, tag=None):
+    cache_key = host.replace('.', '_')
+    if path:
+        cache_key += f"_{path}"
+    if tag:
+        cache_key += f"_{tag}" 
+    cache_key = slugify(cache_key).replace('-', '_')
+
+    return cache_key
 
 
 def pseudo_word(length=5):
