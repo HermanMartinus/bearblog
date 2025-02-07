@@ -140,9 +140,10 @@ class Blog(models.Model):
         dodgy_term_count = 0
         all_content = f"{self.title} {self.content}"
         
-        post = self.posts.first()
-        if post:
-            all_content += f"{post.title} {post.content}"
+        if self.pk:
+            post = self.posts.first()
+            if post:
+                all_content += f"{post.title} {post.content}"
 
         for term in persistent_store.highlight_terms:
             dodgy_term_count += all_content.lower().count(term.lower())
