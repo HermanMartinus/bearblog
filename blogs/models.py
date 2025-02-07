@@ -151,9 +151,10 @@ class Blog(models.Model):
 
     def update_all_tags(self):
         all_tags = []
-        for post in Post.objects.filter(blog=self, publish=True, is_page=False, published_date__lt=timezone.now()):
-            all_tags.extend(json.loads(post.all_tags))
-            all_tags = list(set(all_tags))
+        if self.pk:
+            for post in Post.objects.filter(blog=self, publish=True, is_page=False, published_date__lt=timezone.now()):
+                all_tags.extend(json.loads(post.all_tags))
+                all_tags = list(set(all_tags))
         self.all_tags = json.dumps(all_tags)
 
     def invalidate_caches(self):

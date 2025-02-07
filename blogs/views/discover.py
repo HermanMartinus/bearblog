@@ -71,7 +71,7 @@ def discover(request):
 
     hide_list = request.COOKIES.get('hide_list', '')
     hide_list = hide_list.split(',')
-    print(hide_list)
+    # print(hide_list)
     if hide_list:
         base_query = base_query.exclude(blog__subdomain__in=hide_list)
 
