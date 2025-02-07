@@ -1,8 +1,8 @@
 boto3==1.21.44
 dj-database-url==0.5.0
-Django==3.2.23
+Django==5.1.6
 django-allauth==0.57.0
-django-debug-toolbar==3.2.4
+django-debug-toolbar==5.0.1
 django-ip==1.0.2
 django-pygmentify==0.3.7
 django-queryset-csv==1.1.0

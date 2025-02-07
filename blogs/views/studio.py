@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import DataError
 from django.forms import ValidationError
@@ -8,6 +9,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import URLValidator
 
+from zoneinfo import ZoneInfo
 from datetime import datetime
 import json
 import random
@@ -199,9 +201,9 @@ def post(request, id, uid=None):
                             # Convert given date/time from local timezone to UTC
                             naive_datetime = datetime.fromisoformat(value)
                             user_timezone = request.COOKIES.get('timezone', 'UTC')
-                            user_tz = timezone.get_default_timezone() if user_timezone == 'UTC' else timezone.pytz.timezone(user_timezone)
+                            user_tz = ZoneInfo('UTC') if user_timezone == 'UTC' else ZoneInfo(user_timezone)
                             aware_datetime = timezone.make_aware(naive_datetime, user_tz)
-                            utc_datetime = aware_datetime.astimezone(timezone.utc)
+                            utc_datetime = aware_datetime.astimezone(ZoneInfo('UTC'))
                             post.published_date = utc_datetime
                         except Exception as e:
                             error_messages.append('Bad date format. Use YYYY-MM-DD HH:MM')
@@ -446,6 +448,9 @@ def custom_domain_edit(request, id):
         else:
             error_messages.append(f"{custom_domain} is already registered with another blog")
 
+        # Invalidate CSRF trusted origins cache
+        settings._csrf_trusted_origins_cache = None
+        print('Invalidated CSRF trusted origins cache')
     # If records not set correctly
     if blog.domain and not check_connection(blog):
         error_messages.append(f"The DNS records for { blog.domain } have not been set.")

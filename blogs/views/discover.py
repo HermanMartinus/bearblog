@@ -61,13 +61,19 @@ def discover(request):
         page = int(request.GET.get("page", 0) or 0)
     except ValueError:
         page = 0
-
+    
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page
 
     newest = request.GET.get("newest")
 
     base_query = get_base_query()
+
+    hide_list = request.COOKIES.get('hide_list', '')
+    hide_list = hide_list.split(',')
+    print(hide_list)
+    if hide_list:
+        base_query = base_query.exclude(blog__subdomain__in=hide_list)
 
     lang = request.COOKIES.get('lang')
 

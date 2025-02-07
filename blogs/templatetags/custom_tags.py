@@ -13,14 +13,13 @@ from pygments.formatters import HtmlFormatter
 from html import escape
 
 from mistune import HTMLRenderer, create_markdown
+from zoneinfo import ZoneInfo
 
 import latex2mathml.converter
 import re
-import json
 
 from blogs.helpers import unmark
 from blogs.models import Post
-
 
 
 register = template.Library()
@@ -357,12 +356,13 @@ def format_date(date, format_string, lang=None, tz='UTC'):
         format_string = 'd M, Y'
 
     try:
-        timezone.activate(tz)
-        date = timezone.localtime(date)
+        print(tz, date)
+        user_tz = ZoneInfo(tz)
+        # Convert to user timezone
+        date = date.astimezone(user_tz)
     except Exception as e:
+        print(e)
         pass
-
-    timezone.deactivate()
 
     if lang:
         current_lang = translation.get_language()
@@ -370,6 +370,7 @@ def format_date(date, format_string, lang=None, tz='UTC'):
         formatted_date = date_format(date, format_string)
         translation.activate(current_lang)
         return formatted_date
+    
     return dateformat.format(date, format_string)
 
 

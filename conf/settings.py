@@ -38,6 +38,7 @@ if not DEBUG:
 
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://*.bearblog.dev', 'https://bearblog.dev']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
@@ -84,6 +85,7 @@ MIDDLEWARE = [
     'blogs.middleware.LongRequestMiddleware',
     'blogs.middleware.RequestPerformanceMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'blogs.middleware.CSRFTrustedOriginsMiddleware',
 ]
 
 ROOT_URLCONF = 'conf.urls'
