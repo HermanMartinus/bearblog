@@ -1,7 +1,13 @@
 from django.db import connection
 from django.urls import resolve, Resolver404
 from django.conf import settings
-from django.middleware.csrf import CsrfViewMiddleware
+from django.middleware.csrf import (
+    CsrfViewMiddleware,
+    REASON_NO_CSRF_COOKIE,
+    REASON_CSRF_TOKEN_MISSING,
+    REASON_BAD_ORIGIN
+)
+from django.utils.deprecation import MiddlewareMixin
 
 from blogs.models import Blog
 
@@ -109,4 +115,15 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
 
         if request.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
             # Only check token for unsafe methods
-            return self._check_token(request)
+            try:
+                return self._check_token(request)
+            except Exception as e:
+                # Determine the appropriate reason based on the error message
+                if 'CSRF cookie not set' in str(e):
+                    reason = REASON_NO_CSRF_COOKIE
+                elif 'CSRF token missing' in str(e):
+                    reason = REASON_CSRF_TOKEN_MISSING
+                else:
+                    reason = REASON_BAD_ORIGIN
+                
+                return self._reject(request, reason)
