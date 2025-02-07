@@ -356,9 +356,7 @@ def format_date(date, format_string, lang=None, tz='UTC'):
         format_string = 'd M, Y'
 
     try:
-        print(tz, date)
         user_tz = ZoneInfo(tz)
-        # Convert to user timezone
         date = date.astimezone(user_tz)
     except Exception as e:
         print(e)
