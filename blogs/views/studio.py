@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import URLValidator
 
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from datetime import datetime
 import json
 import random
@@ -201,7 +201,20 @@ def post(request, id, uid=None):
                             # Convert given date/time from local timezone to UTC
                             naive_datetime = datetime.fromisoformat(value)
                             user_timezone = request.COOKIES.get('timezone', 'UTC')
-                            user_tz = ZoneInfo('UTC') if user_timezone == 'UTC' else ZoneInfo(user_timezone)
+
+                            tz_map = {
+                                    'Asia/Calcutta': 'Asia/Kolkata'
+                                }
+                            fallback_tz = tz_map.get(user_timezone, None)
+
+                            try:
+                                if fallback_tz:
+                                    user_tz = ZoneInfo(fallback_tz)
+                                else:
+                                    user_tz = ZoneInfo(user_timezone)
+                            except Exception as e:
+                                user_tz = ZoneInfo('UTC')
+
                             aware_datetime = timezone.make_aware(naive_datetime, user_tz)
                             utc_datetime = aware_datetime.astimezone(ZoneInfo('UTC'))
                             post.published_date = utc_datetime
