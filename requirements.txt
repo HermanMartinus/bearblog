@@ -22,4 +22,5 @@ python-dotenv==1.0.0
 requests==2.27.1
 sentry-sdk==2.19.0
 tldextract==2.2.2
+tzdata>=2025.1
 whitenoise==5.0.1

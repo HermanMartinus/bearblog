@@ -202,16 +202,8 @@ def post(request, id, uid=None):
                             naive_datetime = datetime.fromisoformat(value)
                             user_timezone = request.COOKIES.get('timezone', 'UTC')
 
-                            tz_map = {
-                                    'Asia/Calcutta': 'Asia/Kolkata'
-                                }
-                            fallback_tz = tz_map.get(user_timezone, None)
-
                             try:
-                                if fallback_tz:
-                                    user_tz = ZoneInfo(fallback_tz)
-                                else:
-                                    user_tz = ZoneInfo(user_timezone)
+                                user_tz = ZoneInfo(user_timezone)
                             except Exception as e:
                                 user_tz = ZoneInfo('UTC')
 
