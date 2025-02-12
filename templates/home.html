@@ -59,7 +59,7 @@
 {% block footer %}
 {% if blog.user.settings.upgraded and blog.footer_directive %}
 <span id="footer-directive">
-{% comment %} {{ blog.footer_directive | markdown:blog,None,tz }} {% endcomment %}
+    {% markdown content=blog.footer_directive blog=blog post=None tz=tz %}
 </span>
 {% endif %}
 <span>
