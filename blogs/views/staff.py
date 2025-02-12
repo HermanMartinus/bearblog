@@ -189,7 +189,7 @@ def new_blogs():
 
 
 def opt_in_blogs():
-    to_review = Blog.objects.filter(reviewed=False, to_review=True).order_by('created_date')
+    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True).order_by('created_date')
     
     return to_review
 
