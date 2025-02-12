@@ -30,17 +30,40 @@
 
 <p>
     <details style="font-size: small; color: grey;">
-        <summary>Language ({% if lang %}{{ lang }}{% else %}No filter{% endif %})</summary>
-        <a href="{{ request.path }}" onclick="document.cookie='lang=; path=/;';">None</a>
+        <summary>
+            Filters:  Language ({% if lang %}{{ lang }}{% else %}None{% endif %})  Hidden blogs ({{ hide_list_cookie|length }})
+        </summary>
+        <hr>
+        Language:
+        <br>
+        <a href="{{ request.path }}" onclick="document.cookie='lang=; path=/discover/; expires=Fri, 31 Dec 9999 23:59:59 GMT';">None</a>
         {% for language in available_languages %}
-            {% if language %}
-            <a href="{{ request.path }}" onclick="document.cookie='lang={{ language }}; path=/;';">{{ language }}</a>
-            {% endif %}
+        {% if language %}
+        <a href="{{ request.path }}" onclick="document.cookie='lang={{ language }}; path=/discover/; expires=Fri, 31 Dec 9999 23:59:59 GMT';">{{ language }}</a>
+        {% endif %}
         {% endfor %}
+    
+        <br><br>
+        Hidden blogs:
+        <br>
+        <textarea id="hidden-blogs" style="width: calc(100% - 20px); height: 100px; padding: 10px;">{% for domain in hide_list_cookie %}{{ domain }}
+{% endfor %}</textarea>
+        <br>
+        
+        <button onclick="document.cookie='hide_list=' + document.getElementById('hidden-blogs').value.split('\n').join(',') + '; path=/discover/; expires=Fri, 31 Dec 9999 23:59:59 GMT'; location.reload();">Save</button>
+        <br>
+        Not everyone likes everything. Some people like programming posts, others like slices of life.
+        <br>
+        Hide blogs from your discovery feed by adding their domains above.
+        <br>
+        In order to keep the discovery feed account-agnostic, these settings are saved in your browser's cookies.
+        <br>
+        If a blog is particularly inappropriate, please report it to Herman.
+        <hr>
     </details>
 </p>
 
-{% if newest %}
+{% if newest and request.user.is_authenticated %}
 <p>
     <small><i><a target="_blank" href="https://docs.bearblog.dev/review-process/">Not seeing your post?</a></i></small>
 </p>

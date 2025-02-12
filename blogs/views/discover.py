@@ -8,9 +8,9 @@ from django.core.cache import cache
 from blogs.models import Post
 from blogs.helpers import clean_text
 
-from datetime import timedelta
 from feedgen.feed import FeedGenerator
 import mistune
+import os
 
 posts_per_page = 20
 
@@ -69,11 +69,18 @@ def discover(request):
 
     base_query = get_base_query()
 
-    hide_list = request.COOKIES.get('hide_list', '')
-    hide_list = hide_list.split(',')
-    # print(hide_list)
-    if hide_list:
-        base_query = base_query.exclude(blog__subdomain__in=hide_list)
+    hide_list_raw = request.COOKIES.get('hide_list', '').strip()
+
+    if hide_list_raw:
+        hide_list_raw = ','.join(x for x in hide_list_raw.split(',') if x.strip())
+        hide_list_raw = hide_list_raw.replace(' ', ',').replace('https://', '').replace('http://', '')
+        
+        hide_list = hide_list_raw.replace(f".{os.getenv('MAIN_SITE_HOSTS').split(',')[0]}", '').split(',')
+        hide_list = [x.split('/')[0] for x in hide_list if x.strip()]
+        print("Hide list:", hide_list)
+        hide_list_raw = ','.join(hide_list)
+
+        base_query = base_query.exclude(blog__subdomain__in=hide_list).exclude(blog__domain__in=hide_list)
 
     lang = request.COOKIES.get('lang')
 
@@ -98,6 +105,7 @@ def discover(request):
         "next_page": page + 1,
         "posts_from": posts_from,
         "newest": newest,
+        "hide_list_cookie": hide_list_raw.split(',') if hide_list_raw else None,
     })
 
 
