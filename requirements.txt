@@ -22,5 +22,5 @@ python-dotenv==1.0.0
 requests==2.27.1
 sentry-sdk==2.19.0
 tldextract==2.2.2
-tzdata>=2025.1
+tzdata>=2025.1 # Keeps the timezone data up to date
 whitenoise==5.0.1

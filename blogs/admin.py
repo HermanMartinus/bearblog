@@ -24,6 +24,7 @@ admin.site.register(User, UserAdmin)
 
 @admin.register(UserSettings)
 class UserSettingsAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user',)
     list_display = ('email', 'user_link', 'date_joined', 'blogs', 'display_is_active', 'upgraded', 'upgraded_date', 'order_id')
     
     def email(self, obj):
@@ -73,6 +74,7 @@ class UserSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user',)
     def get_queryset(self, request):
         return Blog.objects.annotate(posts_count=Count('posts'))
 
@@ -149,19 +151,29 @@ class BlogAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
+    raw_id_fields = ('blog',)
     list_display = ('title', 'blog', 'upvotes', 'published_date')
     search_fields = ('title', 'blog__title')
     ordering = ('-published_date',)
 
 
-admin.site.register(Upvote)
-admin.site.register(Stylesheet)
-admin.site.register(RssSubscriber)
-admin.site.register(Media)
+@admin.register(Upvote)
+class UpvoteAdmin(admin.ModelAdmin):
+    raw_id_fields = ('post',)
 
+
+@admin.register(RssSubscriber)
+class RssSubscriberAdmin(admin.ModelAdmin):
+    raw_id_fields = ('blog',)
+
+
+@admin.register(Media)
+class MediaAdmin(admin.ModelAdmin):
+    raw_id_fields = ('blog',)
 
 @admin.register(Hit)
 class HitAdmin(admin.ModelAdmin):
+    raw_id_fields = ('post',)
     def post_link(self, obj):
         return format_html('<a href="/mothership/blogs/post/{id}/change/">{post}</a>',
                            id=obj.post.pk,
@@ -174,7 +186,10 @@ class HitAdmin(admin.ModelAdmin):
 
 @admin.register(Subscriber)
 class SubscriberAdmin(admin.ModelAdmin):
+    raw_id_fields = ('blog',)
     list_display = ('subscribed_date', 'blog', 'email_address')
 
 
+admin.site.register(Stylesheet)
 admin.site.register(PersistentStore)
+
