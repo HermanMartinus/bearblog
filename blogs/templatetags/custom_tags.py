@@ -5,6 +5,7 @@ from django.utils import dateformat, translation
 from django.utils.dateformat import format as date_format
 from django.utils.timesince import timesince
 from django.utils.text import slugify
+from django.utils.safestring import mark_safe
 
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
@@ -152,20 +153,12 @@ markdown_renderer = create_markdown(
     plugins=['math', 'strikethrough', 'footnotes', 'table', 'superscript', 'subscript', 'mark', 'task_lists', 'abbr'],
     escape=False)
 
-@register.filter
-def markdown(content, blog_or_post=False):
+
+@register.simple_tag(takes_context=False)
+def markdown(content, blog=None, post=None, tz=None):
     content = str(content)
     if not content:
         return ''
-
-    post = None
-    blog = None
-    if blog_or_post:
-        if isinstance(blog_or_post, Post):
-            post = blog_or_post
-            blog = post.blog
-        else:
-            blog = blog_or_post
 
     # Removes old formatted inline LaTeX
     content = replace_inline_latex(content)
@@ -173,6 +166,7 @@ def markdown(content, blog_or_post=False):
     content = fix_links(content)
 
     try:
+        # TODO: Implement excluding_script to not parse script tags
         # processed_markup = excluding_script(content)
         processed_markup = markdown_renderer(content)
     except TypeError:
@@ -184,9 +178,9 @@ def markdown(content, blog_or_post=False):
 
     # Replace {{ xyz }} elements
     if blog:
-        processed_markup = excluding_pre(processed_markup, blog, post)
+        processed_markup = excluding_pre(processed_markup, blog, post, tz=tz)
 
-    return processed_markup
+    return mark_safe(processed_markup)
 
 
 # Exclude script and style tags from markdown rendering
@@ -210,7 +204,7 @@ def excluding_script(markup):
 
 
 # Replace elements in all but pre and code tags
-def excluding_pre(markup, blog=None, post=None):
+def excluding_pre(markup, blog=None, post=None, tz=None):
     placeholders = {}
 
     def placeholder_div(match):
@@ -222,11 +216,11 @@ def excluding_pre(markup, blog=None, post=None):
 
     if blog:
         if post: 
-            markup = element_replacement(markup, blog, post)
+            markup = element_replacement(markup, blog, post, tz=tz)
         else:
-            markup = element_replacement(markup, blog)
+            markup = element_replacement(markup, blog, tz=tz)
     else:
-        markup = element_replacement(markup)
+        markup = element_replacement(markup, tz=tz)
 
     for key in sorted(placeholders.keys(), reverse=True):
         markup = markup.replace(key, placeholders[key])
@@ -253,7 +247,7 @@ def apply_filters(posts, tag=None, limit=None, order=None):
     return posts
 
 
-def element_replacement(markup, blog, post=None):
+def element_replacement(markup, blog, post=None, tz=None):
     # Match the entire {{ posts ... }} directive, including parameters
     pattern = r'\{\{\s*posts([^}]*)\}\}'
     
@@ -278,7 +272,7 @@ def element_replacement(markup, blog, post=None):
                 content = param[5] == 'True'
 
         filtered_posts = apply_filters(blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now()), tag, limit, order)
-        context = {'blog': blog, 'posts': filtered_posts, 'embed': True, 'show_description': description, 'show_content': content}
+        context = {'blog': blog, 'posts': filtered_posts, 'embed': True, 'show_description': description, 'show_content': content, 'tz': tz}
         return render_to_string('snippets/post_list.html', context)
 
     # Replace each matched directive with rendered content
@@ -299,7 +293,7 @@ def element_replacement(markup, blog, post=None):
 
     markup = markup.replace('{{ blog_title }}', escape(blog.title))
     markup = markup.replace('{{ blog_description }}', escape(blog.meta_description))
-    markup = markup.replace('{{ blog_created_date }}', format_date(blog.created_date, blog.date_format, blog.lang, 'UTC'))
+    markup = markup.replace('{{ blog_created_date }}', format_date(blog.created_date, blog.date_format, blog.lang, tz))
     markup = markup.replace('{{ blog_last_modified }}', timesince(blog.last_modified))
     if blog.last_posted:
         markup = markup.replace('{{ blog_last_posted }}', timesince(blog.last_posted))
@@ -311,7 +305,7 @@ def element_replacement(markup, blog, post=None):
     if post:
         markup = markup.replace('{{ post_title }}', escape(post.title))
         markup = markup.replace('{{ post_description }}', escape(post.meta_description))
-        markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang, 'UTC'))
+        markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang, tz))
         last_modified = post.last_modified or timezone.now()
         markup = markup.replace('{{ post_last_modified }}', timesince(last_modified))
         markup = markup.replace('{{ post_link }}', f"{blog.useful_domain}/{post.slug}")

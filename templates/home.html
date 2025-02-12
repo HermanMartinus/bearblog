@@ -34,7 +34,7 @@
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}{{ blog.nav | markdown:blog | safe }}{% endblock %}
+{% block nav %}{% markdown content=blog.nav blog=blog post=None tz=tz %}{% endblock %}
 
 {% block content %}
 {% if request.user == blog.user and not preview %}
@@ -42,7 +42,7 @@
 {% endif %}
 
 {% if blog.content %}
-{{ blog.content | markdown:blog | safe }}
+{% markdown content=blog.content blog=blog post=None tz=tz %}
 
 {% else %}
 {% include "snippets/post_list.html" %}
@@ -59,7 +59,7 @@
 {% block footer %}
 {% if blog.user.settings.upgraded and blog.footer_directive %}
 <span id="footer-directive">
-{{ blog.footer_directive | markdown:blog | safe }}
+{% comment %} {{ blog.footer_directive | markdown:blog,None,tz }} {% endcomment %}
 </span>
 {% endif %}
 <span>

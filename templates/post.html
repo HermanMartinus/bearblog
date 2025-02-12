@@ -60,7 +60,7 @@
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
-{% block nav %}{{ blog.nav | markdown:post | safe }}{% endblock %}
+{% block nav %}{% markdown content=blog.nav blog=blog post=post tz=tz %}{% endblock %}
 
 {% block content %}
 
@@ -90,7 +90,7 @@
         </p>
     {% endif %}
 
-    {{ content | markdown:post | safe }}
+    {% markdown content=post.content blog=blog post=post tz=tz %}
 
     {% if canonical_url != full_path %}
         <p>
@@ -120,7 +120,7 @@
 {% block footer %}
     {% if blog.user.settings.upgraded and blog.footer_directive %}
         <span id="footer-directive">
-            {{ blog.footer_directive | markdown:post | safe }}
+            {% markdown content=blog.footer_directive blog=blog post=post tz=tz %}
         </span>
     {% endif %}
     <span>

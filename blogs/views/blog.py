@@ -184,7 +184,6 @@ def post(request, slug):
         'post.html',
         {
             'blog': blog,
-            'content': post.content,
             'post': post,
             'full_path': full_path,
             'canonical_url': canonical_url,

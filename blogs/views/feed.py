@@ -90,9 +90,9 @@ def generate_feed(blog, feed_type="atom", tag=None):
         if post.meta_description:
             fe.summary(post.meta_description)
         try:
-            fe.content(markdown(post.content.replace('{{ email-signup }}', ''), post), type="html")
+            fe.content(markdown(post.content.replace('{{ email-signup }}', ''), blog, post), type="html")
         except ValueError:
-            fe.content(markdown(clean_string(post.content.replace('{{ email-signup }}', '')), post), type="html")
+            fe.content(markdown(clean_string(post.content.replace('{{ email-signup }}', '')), blog, post), type="html")
         fe.published(post.published_date)
         fe.updated(post.last_modified)
         

@@ -15,7 +15,7 @@
         <p>{{ post.meta_description }}</p>
         {% endif %}
         {% if show_content %}
-        <div>{{ post.content | markdown:post | safe }}</div>
+        <div>{% markdown content=post.content blog=blog post=post tz=tz %}</div>
         {% endif %}
     </li>
     {% empty %}
