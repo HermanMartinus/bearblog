@@ -25,9 +25,9 @@ def dashboard(request):
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
 
-    opt_in_blogs_count = opt_in_blogs().count()
-    dodgy_blogs_count = dodgy_blogs().count()
-    new_blogs_count = new_blogs().count()
+    opt_in_blogs_count = len(opt_in_blogs().values_list('id', flat=True))
+    dodgy_blogs_count = len(dodgy_blogs().values_list('id', flat=True))
+    new_blogs_count = len(new_blogs().values_list('id', flat=True))
 
     all_empty_blogs = empty_blogs()
 
@@ -189,7 +189,7 @@ def new_blogs():
 
 
 def opt_in_blogs():
-    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True).order_by('created_date')
+    to_review = Blog.objects.filter(reviewed=False, to_review=True).order_by('created_date')
     
     return to_review
 
