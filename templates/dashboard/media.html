@@ -43,7 +43,14 @@
         <div class="media-item">
             <input type="checkbox" name="selected_media" value="{{ image.url }}" class="media-checkbox">
             <a href="{{ image.url }}" target="_blank">
-                <img style="object-fit: contain;" src="{{ image.url }}" width=190 height=190 loading="lazy"/>
+                <img style="object-fit: contain;" 
+                     src="{{ image.url }}" 
+                     width=190 
+                     height=190 
+                     loading="lazy"
+                     title="Still uploading..."
+                     onerror="handleImageError(this)"
+                     onload="this.title=''"/>
             </a>
             <br>
             <small>{{ image.created_at|date:'d M, Y'}}</small>
@@ -75,6 +82,14 @@ document.getElementById('deleteSelected').addEventListener('click', function() {
         alert('No media selected');
     }
 });
+
+function handleImageError(img) {
+    if (img.title === "Still uploading...") {
+        setTimeout(() => {
+            img.src = img.src + '?' + new Date().getTime();
+        }, 2000); // Retry after 2 seconds
+    }
+}
 </script>
 
 {{ request.user.settings.dashboard_footer | safe }}

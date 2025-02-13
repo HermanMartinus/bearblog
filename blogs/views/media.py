@@ -16,6 +16,7 @@ import json
 import os
 import boto3
 import requests
+import threading
 
 from blogs.models import Blog, Media
 
@@ -137,26 +138,43 @@ def upload_files(blog, file_list):
         url = f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/{filepath}'
         file_links.append(url)
 
-        session = boto3.session.Session()
-        client = session.client(
-            's3',
-            endpoint_url='https://sfo2.digitaloceanspaces.com',
-            region_name='sfo2',
-            aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
-            aws_secret_access_key=os.getenv('SPACES_SECRET'))
+        # Create Media object first
+        Media.objects.create(blog=blog, url=url)
 
+        # Read file data before starting thread
+        file_data = file.read()
+        content_type = file.content_type
+
+        # Move S3 upload to a thread
+        thread = threading.Thread(
+            target=upload_to_s3,
+            args=(filepath, file_data, content_type)
+        )
+        thread.start()
+    
+    return sorted(file_links)
+
+
+def upload_to_s3(filepath, file_data, content_type):
+    session = boto3.session.Session()
+    client = session.client(
+        's3',
+        endpoint_url='https://sfo2.digitaloceanspaces.com',
+        region_name='sfo2',
+        aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('SPACES_SECRET'))
+
+    try:
         response = client.put_object(
             Bucket=bucket_name,
             Key=filepath,
-            Body=file,
-            ContentType=file.content_type,
+            Body=file_data,
+            ContentType=content_type,
             ACL='public-read',
         )
-
-        # Create Media object
-        Media.objects.create(blog=blog, url=url)
-    
-    return sorted(file_links)
+    except Exception as e:
+        print(f"Error uploading to S3: {str(e)}")
+        raise e
 
 
 def process_image(file, optimise):
