@@ -16,9 +16,18 @@ import threading
 from collections import defaultdict
 from contextlib import contextmanager
 import sentry_sdk
+import redis
+import json
+import os
 
 
-request_metrics = defaultdict(list)
+# Replace the in-memory metrics with Redis connection handling
+redis_client = None
+if os.environ.get('REDISCLOUD_URL'):
+    redis_client = redis.from_url(os.environ.get('REDISCLOUD_URL'))
+else:
+    # Fallback to in-memory when Redis is not available
+    request_metrics = defaultdict(list)
 
 # Thread-local storage for query times
 _local = threading.local()
@@ -41,6 +50,8 @@ class RequestPerformanceMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         self.skip_methods = {'HEAD', 'OPTIONS'}
+        self.max_metrics = 50
+        self.metrics_ttl = 3600  # 1 hour TTL for Redis metrics
 
     def get_pattern_name(self, request):
         if request.method in self.skip_methods:
@@ -68,18 +79,47 @@ class RequestPerformanceMiddleware:
 
         total_time = time.time() - start_time
         
-        # Direct write to shared dictionary without locks
-        metrics = request_metrics[endpoint]
-        metrics.append({
+        metric_data = {
             'total_time': total_time,
             'db_time': db_time,
             'compute_time': total_time - db_time,
             'timestamp': start_time
-        })
-        
-        # Non-thread-safe list trimming
-        if len(metrics) > 50:
-            del metrics[:-50]
+        }
+
+        if redis_client:
+            # Use Redis for storage
+            try:
+                redis_key = f"request_metrics:{endpoint}"
+                # Get existing metrics
+                metrics = redis_client.get(redis_key)
+                if metrics:
+                    metrics = json.loads(metrics)
+                else:
+                    metrics = []
+                
+                # Add new metric
+                metrics.append(metric_data)
+                # Keep only last 50 metrics
+                metrics = metrics[-self.max_metrics:]
+                
+                # Store back in Redis with TTL
+                redis_client.setex(
+                    redis_key,
+                    self.metrics_ttl,
+                    json.dumps(metrics)
+                )
+            except redis.RedisError:
+                # Fallback to in-memory if Redis fails
+                metrics = request_metrics[endpoint]
+                metrics.append(metric_data)
+                if len(metrics) > self.max_metrics:
+                    del metrics[:-self.max_metrics]
+        else:
+            # Use in-memory storage
+            metrics = request_metrics[endpoint]
+            metrics.append(metric_data)
+            if len(metrics) > self.max_metrics:
+                del metrics[:-self.max_metrics]
 
         return response
 
