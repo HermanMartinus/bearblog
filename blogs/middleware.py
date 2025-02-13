@@ -52,7 +52,6 @@ class RequestPerformanceMiddleware:
         self.get_response = get_response
         self.skip_methods = {'HEAD', 'OPTIONS'}
         self.max_metrics = 50
-        self.metrics_ttl = 3600  # 1 hour TTL for Redis metrics
 
     def get_pattern_name(self, request):
         if request.method in self.skip_methods:
@@ -103,10 +102,9 @@ class RequestPerformanceMiddleware:
                 # Keep only last 50 metrics
                 metrics = metrics[-self.max_metrics:]
                 
-                # Store back in Redis with TTL
-                redis_client.setex(
+                # Store back in Redis without TTL
+                redis_client.set(
                     redis_key,
-                    self.metrics_ttl,
                     json.dumps(metrics)
                 )
             except redis.RedisError:
