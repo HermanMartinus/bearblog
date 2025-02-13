@@ -81,16 +81,10 @@ def analytics_upgraded(request, id):
     if not blog.user.settings.upgraded:
         return redirect('analytics', id=blog.subdomain)
 
-    if request.method == "POST":
-        if request.POST.get('share') == 'public':
-            blog.public_analytics = True
-        else:
-            blog.public_analytics = False
-        blog.save()
-
     if request.GET.get('export', False):
         hits = Hit.objects.filter(post__blog=blog).order_by('created_date')
         return djqscsv.render_to_csv_response(hits)
+    
     return render_analytics(request, blog)
 
 
