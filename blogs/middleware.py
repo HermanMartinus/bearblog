@@ -25,9 +25,10 @@ import os
 redis_client = None
 if os.environ.get('REDISCLOUD_URL'):
     redis_client = redis.from_url(os.environ.get('REDISCLOUD_URL'))
-else:
-    # Fallback to in-memory when Redis is not available
-    request_metrics = defaultdict(list)
+
+# Fallback to in-memory when Redis is not available
+request_metrics = defaultdict(list)
+    
 
 # Thread-local storage for query times
 _local = threading.local()
