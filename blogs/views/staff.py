@@ -210,13 +210,13 @@ def dodgy_blogs():
 @staff_member_required
 def review_bulk(request):
     if 'opt-in' in request.path:
-        blogs = opt_in_blogs()[:100]
+        blogs = opt_in_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
     elif 'new' in request.path:
-        blogs = new_blogs()[:100]
+        blogs = new_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
     elif 'dodgy' in request.path:
-        blogs = dodgy_blogs()[:100]
+        blogs = dodgy_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
 
-    still_to_go = blogs.count()
+    still_to_go = len(blogs)
     persistent_store = PersistentStore.load()
 
     if blogs:
