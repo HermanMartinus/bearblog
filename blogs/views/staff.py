@@ -172,8 +172,8 @@ def empty_blogs():
 
 
 def new_blogs():
-    persistent_store = PersistentStore.load()
-    ignore_terms = persistent_store.ignore_terms
+    # persistent_store = PersistentStore.load()
+    # ignore_terms = persistent_store.ignore_terms
 
     to_review = Blog.objects.filter(
         Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True),
