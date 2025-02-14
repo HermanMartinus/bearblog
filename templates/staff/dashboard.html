@@ -78,7 +78,7 @@ Staff Dashboard  ʕง•ᴥ•ʔง
         <button>Migrate</button>
     </form>
 
-    <h2>Empty blogs</h2>
+    {% comment %} <h2>Empty blogs</h2>
     <pre>
         - Over one year since last modified
         - Content under 60 characters
@@ -101,7 +101,7 @@ Staff Dashboard  ʕง•ᴥ•ʔง
         </li>
         {% endfor %}
     </ul>
-    <button onclick="if (confirm('Are you sure?')) {window.location = '{% url 'delete_empty' %}'}">Delete empty</button>
+    <button onclick="if (confirm('Are you sure?')) {window.location = '{% url 'delete_empty' %}'}">Delete empty</button> {% endcomment %}
 </main>
 {% endblock %}
 

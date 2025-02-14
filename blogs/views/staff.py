@@ -183,8 +183,8 @@ def new_blogs():
         created_date__lte=timezone.now() - timedelta(days=2)
     ).order_by('created_date')
 
-    for term in ignore_terms:
-        to_review = to_review.exclude(content__icontains=term)
+    # for term in ignore_terms:
+    #     to_review = to_review.exclude(content__icontains=term)
     
     return to_review
 
