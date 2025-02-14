@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import Q
+from zoneinfo import ZoneInfo
 
 import io
 from datetime import datetime
@@ -241,7 +242,7 @@ def extract_date_from_url(url):
     match = re.search(pattern, url)
     if match:
         timestamp = int(match.group(1))
-        dt = datetime.fromtimestamp(timestamp, tz=timezone.UTC)
+        dt = datetime.fromtimestamp(timestamp, tz=ZoneInfo("UTC"))
         return dt
     else:
         raise ValueError("Invalid URL format")
