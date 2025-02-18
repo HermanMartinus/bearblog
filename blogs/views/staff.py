@@ -172,6 +172,7 @@ def empty_blogs():
 
 
 def new_blogs():
+    # TODO: Clean up ingore terms
     # persistent_store = PersistentStore.load()
     # ignore_terms = persistent_store.ignore_terms
 

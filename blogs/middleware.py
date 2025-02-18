@@ -147,6 +147,7 @@ class LongRequestMiddleware:
         return response
     
 
+# This is a workaround to handle custom domains from Django 5.0 there's an explicit CSRF_TRUSTED_ORIGINS list
 class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
     def process_view(self, request, callback, callback_args, callback_kwargs):
         if getattr(callback, 'csrf_exempt', False):

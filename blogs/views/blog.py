@@ -178,20 +178,24 @@ def post(request, slug):
 
     if post.publish is False and not request.GET.get('token') == post.token:
         return not_found(request)
+    
+    context = {
+        'blog': blog,
+        'post': post,
+        'full_path': full_path,
+        'canonical_url': canonical_url,
+        'meta_description': meta_description,
+        'meta_image': post.meta_image or blog.meta_image,
+        'upvoted': upvoted
+    }
 
-    return render(
-        request,
-        'post.html',
-        {
-            'blog': blog,
-            'post': post,
-            'full_path': full_path,
-            'canonical_url': canonical_url,
-            'meta_description': meta_description,
-            'meta_image': post.meta_image or blog.meta_image,
-            'upvoted': upvoted
-        }
-    )
+    response = render(request, 'post.html', context)
+
+    if post.publish and not request.GET.get('token'):
+        response['CDN-Cache-Control'] = 'public, max-age=1800'  # CDN cache for 30 minutes
+        response['Cache-Tag'] = blog.subdomain # Tag for selective purging
+
+    return response
 
 
 @csrf_exempt

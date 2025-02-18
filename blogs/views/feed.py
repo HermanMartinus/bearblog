@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.core.cache import cache
 
-from blogs.helpers import create_cache_key, salt_and_hash, unmark
+from blogs.helpers import salt_and_hash, unmark
 from blogs.models import RssSubscriber
 from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
@@ -23,30 +23,17 @@ def feed(request):
     else:
         feed_type = "atom"
 
-    CACHE_KEY = create_cache_key(request.get_host(), f'{feed_type}_feed', tag)
-    cached_feed = cache.get(CACHE_KEY)
+    blog = resolve_address(request)
+    if not blog:
+        return not_found(request)
+    try:
+        feed = generate_feed(blog, feed_type, tag)
+    except Exception as e:
+        print(f'Feeds: Error generating feed for {blog.subdomain}: {e}')
+        feed = ''
 
-    if cached_feed is None:
-        blog = resolve_address(request)
-        if not blog:
-            return not_found(request)
-        try:
-            feed = generate_feed(blog, feed_type, tag)
-            cache.set(CACHE_KEY, feed, timeout=None)
-            print(f'Feeds: Cache miss for {CACHE_KEY}')
-        except Exception as e:
-            print(f'Feeds: Error generating feed for {CACHE_KEY}: {e}')
-            feed = ''
-
-        # TODO: Have this happen async or more performantly
-        log_feed_subscriber(request, blog)
-
-    else:
-        feed = cached_feed
-        print(f'Feeds: Cache hit for {CACHE_KEY}')
-
-        # TODO: Have this happen async or more performantly
-        log_feed_subscriber(request)
+    # TODO: Have this happen async or more performantly
+    log_feed_subscriber(request, blog)
  
     return HttpResponse(feed, content_type='application/xml')
  
