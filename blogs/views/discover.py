@@ -3,7 +3,6 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.utils import timezone
-from django.core.cache import cache
 
 from blogs.models import Post
 from blogs.helpers import clean_text
@@ -13,8 +12,6 @@ import mistune
 import os
 
 posts_per_page = 20
-
-CACHE_TIMEOUT = 600  # 10 minutes in seconds
 
 
 def get_base_query():
@@ -119,17 +116,6 @@ def feed(request):
     feed_kind = "newest" if request.GET.get("newest") else "trending"
     feed_type = 'rss' if request.GET.get("type") == "rss" else "atom"
     lang = request.GET.get("lang")
-
-    # Construct a unique cache key
-    if lang:
-        CACHE_KEY = f'discover_feed_{feed_kind}_{feed_type}_{lang}'
-    else:
-        CACHE_KEY = f'discover_feed_{feed_kind}_{feed_type}'
-
-    # Attempt to retrieve the cached feed
-    cached_feed = cache.get(CACHE_KEY)
-    if cached_feed is not None:
-        return HttpResponse(cached_feed, content_type=f"application/xml")
     
     fg = FeedGenerator()
     fg.id("bearblog")
@@ -176,10 +162,9 @@ def feed(request):
         fe.published(post.published_date)
         fe.updated(post.published_date)
 
-    # Generate the feed string and cache it
+    # Generate the feed string
     feed_str = feed_method(pretty=True)
-    cache.set(CACHE_KEY, feed_str, CACHE_TIMEOUT)
-    
+
     return HttpResponse(feed_str, content_type=f"application/xml")
 
 

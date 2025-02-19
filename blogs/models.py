@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.cache import cache
 
 from allauth.account.models import EmailAddress
 
@@ -158,42 +157,6 @@ class Blog(models.Model):
                 all_tags = list(set(all_tags))
         self.all_tags = json.dumps(all_tags)
 
-    def invalidate_caches(self):
-        cache_keys = []
-        main_host = os.getenv("MAIN_SITE_HOSTS").split(",")[0]
-        
-        # Bear domain cache keys
-        bear_domain = f'{self.subdomain}_{main_host}'.replace('.', '_').replace('-', '_')
-        cache_keys.extend([
-            f'{bear_domain}_rss_feed',
-            f'{bear_domain}_atom_feed',
-            f'{bear_domain}_robots',
-            f'{bear_domain}_sitemap'
-        ])
-        for tag in self.tags:
-            cache_keys.extend([
-                f"{bear_domain}_rss_feed_{tag.replace(' ', '_').replace('-', '_')}",
-                f"{bear_domain}_atom_feed_{tag.replace(' ', '_').replace('-', '_')}"
-            ])
-
-        # Custom domain cache keys
-        if self.domain:
-            domain = self.domain.replace('.', '_').replace('-', '_')
-            cache_keys.extend([
-                f'{domain}_rss_feed',
-                f'{domain}_atom_feed',
-                f'{domain}_robots',
-                f'{domain}_sitemap'
-            ])
-            for tag in self.tags:
-                cache_keys.extend([
-                    f"{domain}_rss_feed_{tag.replace(' ', '_').replace('-', '_')}",
-                    f"{domain}_atom_feed_{tag.replace(' ', '_').replace('-', '_')}"
-                ])
-
-        print(f'Feeds: Invalidating cache keys for {bear_domain} (Domain: {self.domain})')
-        cache.delete_many(cache_keys)
-
     def save(self, *args, **kwargs):
         # Handle all tags
         self.update_all_tags()
@@ -213,9 +176,6 @@ class Blog(models.Model):
         
         # Double check subdomains are lowercase
         self.subdomain = self.subdomain.lower()
-        
-        # Invalidate caches
-        self.invalidate_caches()
 
         # Update last posted
         if self.pk:

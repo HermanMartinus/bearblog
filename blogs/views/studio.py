@@ -453,9 +453,6 @@ def custom_domain_edit(request, id):
         else:
             error_messages.append(f"{custom_domain} is already registered with another blog")
 
-        # Invalidate CSRF trusted origins cache
-        settings._csrf_trusted_origins_cache = None
-        print('Invalidated CSRF trusted origins cache')
     # If records not set correctly
     if blog.domain and not check_connection(blog):
         error_messages.append(f"The DNS records for { blog.domain } have not been set.")
