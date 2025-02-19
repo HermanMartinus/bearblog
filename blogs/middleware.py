@@ -7,9 +7,6 @@ from django.middleware.csrf import (
     REASON_CSRF_TOKEN_MISSING,
     REASON_BAD_ORIGIN
 )
-from django.utils.deprecation import MiddlewareMixin
-
-from blogs.models import Blog
 
 import time
 import threading

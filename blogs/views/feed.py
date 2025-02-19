@@ -14,7 +14,6 @@ def clean_string(s):
 
 
 def feed(request):
-    print('User agent:', request.META.get('HTTP_USER_AGENT'))
     tag = request.GET.get('q')
 
     if "rss" in request.GET.get('type', 'atom') or "rss" in request.path:
