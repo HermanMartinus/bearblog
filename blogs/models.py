@@ -324,6 +324,7 @@ class Subscriber(models.Model):
         return f"{self.blog.title} - {self.email_address}"
 
 
+# TODO: Completely remove rss subscribers and functions
 class RssSubscriber(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     access_date = models.DateTimeField(auto_now_add=True)
