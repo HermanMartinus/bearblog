@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from datetime import timedelta
 from django.db.models.functions import TruncDate
 
-from blogs.models import Blog, Hit, Post, RssSubscriber
+from blogs.models import Blog, Hit, Post
 from blogs.helpers import daterange, get_country, salt_and_hash
 from django.db.models import Count, Sum, Q
 from django.http import HttpResponse
@@ -14,7 +14,6 @@ from ipaddr import client_ip
 from urllib.parse import urlparse
 import httpagentparser
 import pygal
-import threading
 
 import pygal
 from pygal.style import LightColorizedStyle
@@ -151,8 +150,6 @@ def render_analytics(request, blog, public=False):
     chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
     chart_render = chart.render_data_uri()
 
-    # RSS Subscriber count
-    rss_subscriber_count = RssSubscriber.objects.filter(blog=blog, access_date__gt=now - timedelta(hours=18)).count()
 
     return render(request, 'studio/analytics.html', {
         'public': public,
@@ -163,7 +160,6 @@ def render_analytics(request, blog, public=False):
         'unique_reads': unique_reads,
         'unique_visitors': unique_visitors,
         'on_site': on_site,
-        'rss_subscriber_count': rss_subscriber_count,
         'chart': chart_render,
         'referrers': referrers,
         'devices': devices,

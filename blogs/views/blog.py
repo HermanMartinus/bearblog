@@ -7,7 +7,6 @@ from django.utils.text import slugify
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import salt_and_hash, unmark
-from blogs.tasks import daily_task
 from blogs.views.analytics import render_analytics
 
 import os
@@ -70,7 +69,6 @@ def ping(request):
 def home(request):
     blog = resolve_address(request)
     if not blog:
-        daily_task()
         return render(request, 'landing.html')
 
     all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')

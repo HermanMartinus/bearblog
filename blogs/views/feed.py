@@ -1,8 +1,7 @@
 from django.http import HttpResponse
 from django.utils import timezone
 
-from blogs.helpers import salt_and_hash, unmark
-from blogs.models import RssSubscriber
+from blogs.helpers import unmark
 from blogs.templatetags.custom_tags import markdown
 from blogs.views.blog import not_found, resolve_address
 
@@ -30,24 +29,7 @@ def feed(request):
     except Exception as e:
         print(f'Feeds: Error generating feed for {blog.subdomain}: {e}')
         feed = ''
-
-    # TODO: Have this happen async or more performantly
-    log_feed_subscriber(request, blog)
- 
     return HttpResponse(feed, content_type='application/xml')
- 
-    
-def log_feed_subscriber(request, blog=None):
-    try:
-        hash_id = salt_and_hash(request)
-
-        if not blog:
-            blog = resolve_address(request)
-        
-        RssSubscriber.objects.only('id').get_or_create(blog=blog, hash_id=hash_id)
-    except Exception as e:
-        print(f'Feeds: Error logging feed subscriber: {e}')
-        pass
 
 
 def generate_feed(blog, feed_type="atom", tag=None):
