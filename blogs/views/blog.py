@@ -11,7 +11,6 @@ from blogs.views.analytics import render_analytics
 
 import os
 import tldextract
-from ipaddr import client_ip
 
 def resolve_address(request):
     http_host = request.get_host()
@@ -74,7 +73,7 @@ def home(request):
     all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
-    print("IP Address:", client_ip(request))
+    
     return render(
         request,
         'home.html',
