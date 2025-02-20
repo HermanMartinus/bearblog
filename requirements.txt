@@ -1,5 +1,5 @@
-boto3==1.21.44
-dj-database-url==0.5.0
+boto3==1.36.24
+dj-database-url==2.3.0
 Django==5.1.6
 django-allauth==0.57.0
 django-debug-toolbar==5.0.1

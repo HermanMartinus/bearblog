@@ -12,6 +12,7 @@ import time
 import threading
 from collections import defaultdict
 from contextlib import contextmanager
+from ipaddr import client_ip
 import sentry_sdk
 import redis
 import json
@@ -126,6 +127,7 @@ class LongRequestMiddleware:
         self.threshold = 15  # seconds
 
     def __call__(self, request):
+        # print("IP Address:", client_ip(request))
         start_time = time.time()
         response = self.get_response(request)
         duration = time.time() - start_time
