@@ -169,7 +169,7 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
    
 class RateLimitMiddleware:
     RATE_LIMIT = 10  # max requests
-    TIME_WINDOW = 60  # seconds
+    TIME_WINDOW = 30  # seconds
 
     def __init__(self, get_response):
         self.get_response = get_response
