@@ -185,17 +185,14 @@ class RateLimitMiddleware:
             if current_time - timestamp < self.TIME_WINDOW
         ]
         
-
-        # Check if the IP has exceeded the rate limit
-        if len(self.ip_request_counts[client_ip_address]) >= self.RATE_LIMIT:
-            print(f"Rate limit exceeded for {client_ip_address} at {request.path} with user agent {request.META.get('HTTP_USER_AGENT')}")
-            return self._reject(request, "Rate limit exceeded")
-        
         # Record the current request
         self.ip_request_counts[client_ip_address].append(current_time)
 
-        # if len(self.ip_request_counts[client_ip_address]) >= 5:
-        #     print(f"IP Request Counts for {client_ip_address}: {len(self.ip_request_counts[client_ip_address])}")
+        # Check if the IP has exceeded the rate limit
+        if len(self.ip_request_counts[client_ip_address]) > self.RATE_LIMIT:
+            print(f"Rate limit: Exceeded for {client_ip_address} at {request.path}")
+            print(f"Rate limit: User agent{request.META.get('HTTP_USER_AGENT')}")
+            return self._reject(request, "Rate limit exceeded")
 
         return self.get_response(request)
     
