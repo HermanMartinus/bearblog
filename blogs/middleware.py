@@ -1,6 +1,6 @@
 from django.db import connection
 from django.urls import resolve, Resolver404
-from django.conf import settings
+from django.http import JsonResponse
 from django.middleware.csrf import (
     CsrfViewMiddleware,
     REASON_NO_CSRF_COOKIE,
@@ -127,7 +127,6 @@ class LongRequestMiddleware:
         self.threshold = 15  # seconds
 
     def __call__(self, request):
-        # print("IP Address:", client_ip(request))
         start_time = time.time()
         response = self.get_response(request)
         duration = time.time() - start_time
@@ -166,3 +165,39 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
                     reason = REASON_BAD_ORIGIN
                 
                 return self._reject(request, reason)
+
+   
+class RateLimitMiddleware:
+    RATE_LIMIT = 30  # max requests
+    TIME_WINDOW = 30  # seconds
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.ip_request_counts = defaultdict(list)
+
+    def __call__(self, request):
+        client_ip_address = client_ip(request)
+        current_time = time.time()
+
+        # Clean up old requests
+        self.ip_request_counts[client_ip_address] = [
+            timestamp for timestamp in self.ip_request_counts[client_ip_address]
+            if current_time - timestamp < self.TIME_WINDOW
+        ]
+        
+        print(f"IP Request Counts for {client_ip_address}: {len(self.ip_request_counts[client_ip_address])}")
+
+        # Check if the IP has exceeded the rate limit
+        # if len(self.ip_request_counts[client_ip_address]) >= self.RATE_LIMIT:
+        #     return self._reject(request, "Rate limit exceeded")
+        
+        # Record the current request
+        self.ip_request_counts[client_ip_address].append(current_time)
+
+        return self.get_response(request)
+    
+    def _reject(self, request, reason):
+        return JsonResponse(
+            {'error': reason},
+            status=429
+        )
