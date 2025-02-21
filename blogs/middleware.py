@@ -191,8 +191,8 @@ class RateLimitMiddleware:
         # Check if the IP has exceeded the rate limit
         if len(self.ip_request_counts[client_ip_address]) > self.RATE_LIMIT:
             print(f"Rate limit: Exceeded for {client_ip_address} at {request.path}")
-            print(f"Rate limit: User agent{request.META.get('HTTP_USER_AGENT')}")
-            return self._reject(request, "Rate limit exceeded")
+            print(f"Rate limit: User agent {request.META.get('HTTP_USER_AGENT')}")
+            # return self._reject(request, "Rate limit exceeded")
 
         return self.get_response(request)
     
