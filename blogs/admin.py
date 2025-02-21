@@ -6,7 +6,7 @@ from django.utils.html import escape, format_html, format_html_join
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from blogs.models import Blog, PersistentStore, Post, RssSubscriber, Stylesheet, Upvote, Hit, Subscriber, UserSettings, Media
+from blogs.models import Blog, PersistentStore, Post, Stylesheet, Upvote, Hit, Subscriber, UserSettings, Media
 
 
 admin.autodiscover()
@@ -160,11 +160,6 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Upvote)
 class UpvoteAdmin(admin.ModelAdmin):
     raw_id_fields = ('post',)
-
-
-@admin.register(RssSubscriber)
-class RssSubscriberAdmin(admin.ModelAdmin):
-    raw_id_fields = ('blog',)
 
 
 @admin.register(Media)
