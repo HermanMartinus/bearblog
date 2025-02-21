@@ -169,7 +169,7 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
    
 class RateLimitMiddleware:
     RATE_LIMIT = 10  # max requests
-    TIME_WINDOW = 30  # seconds
+    TIME_WINDOW = 60  # seconds
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -188,14 +188,14 @@ class RateLimitMiddleware:
 
         # Check if the IP has exceeded the rate limit
         if len(self.ip_request_counts[client_ip_address]) >= self.RATE_LIMIT:
-            print(f"Rate limit exceeded for {client_ip_address} with user agent {request.META.get('HTTP_USER_AGENT')}")
+            print(f"Rate limit exceeded for {client_ip_address} at {request.path} with user agent {request.META.get('HTTP_USER_AGENT')}")
             return self._reject(request, "Rate limit exceeded")
         
         # Record the current request
         self.ip_request_counts[client_ip_address].append(current_time)
 
-        if len(self.ip_request_counts[client_ip_address]) >= 5:
-            print(f"IP Request Counts for {client_ip_address}: {len(self.ip_request_counts[client_ip_address])}", request.path, request.META.get('HTTP_USER_AGENT'))
+        # if len(self.ip_request_counts[client_ip_address]) >= 5:
+        #     print(f"IP Request Counts for {client_ip_address}: {len(self.ip_request_counts[client_ip_address])}")
 
         return self.get_response(request)
     
