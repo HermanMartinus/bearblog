@@ -80,7 +80,7 @@ class Blog(models.Model):
     public_analytics = models.BooleanField(default=False)
 
     post_template = models.TextField(blank=True)
-    robots_txt = models.TextField(blank=True)
+    robots_txt = models.TextField(blank=True, default="User-agent: *\nAllow: /")
     rss_alias = models.CharField(max_length=100, blank=True)
     codemirror_enabled = models.BooleanField(default=True)
     

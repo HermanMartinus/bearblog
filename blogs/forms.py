@@ -105,7 +105,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         widget=forms.Textarea(),
         label="robots.txt content",
         required=False,
-        help_text="This will be appended to the mandatory robots.txt content. View yours at example.bearblog.dev/robots.txt"
+        help_text="Set the content of your robots.txt file"
     )
 
     def clean_meta_tag(self):
