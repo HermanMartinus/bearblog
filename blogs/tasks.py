@@ -5,6 +5,7 @@ import threading
 from blogs.models import Hit, PersistentStore, RssSubscriber
 
 
+# TODO: Remove tasks
 def daily_task():
     current_time = timezone.now()
     time_24_hours_ago = current_time - timedelta(hours=24)
