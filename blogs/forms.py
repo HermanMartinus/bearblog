@@ -105,7 +105,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         widget=forms.Textarea(),
         label="robots.txt content",
         required=False,
-        help_text="Set the content of your robots.txt file"
+        help_text="Set the content of your robots.txt file. Cache updates every 20 minutes."
     )
 
     def clean_meta_tag(self):
