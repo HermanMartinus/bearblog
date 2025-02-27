@@ -72,6 +72,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE = [
+    'blogs.middleware.RateLimitMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -85,7 +86,6 @@ MIDDLEWARE = [
     'blogs.middleware.LongRequestMiddleware',
     'blogs.middleware.RequestPerformanceMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'blogs.middleware.RateLimitMiddleware',
 ]
 
 ROOT_URLCONF = 'conf.urls'
