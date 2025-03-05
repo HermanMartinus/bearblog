@@ -10,7 +10,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 
 from blogs.helpers import send_async_mail
-from blogs.models import Blog, PersistentStore
+from blogs.models import Blog, PersistentStore, Post
 from blogs.middleware import request_metrics, redis_client
 
 from statistics import mean
@@ -152,6 +152,137 @@ def check_spam(request):
             return redirect(blog.useful_domain)
 
         return redirect(f"{blog.useful_domain}")
+
+
+@staff_member_required  
+def import_posts(request):
+    error_messages = []
+    if request.method == "POST":
+        subdomain = request.POST.get('subdomain')
+        csv_file = request.FILES['csv_file']
+        success, message, stats = import_posts_from_csv(subdomain, csv_file)
+        error_messages.append(message)
+    
+    return HttpResponse(error_messages)
+
+
+def import_posts_from_csv(subdomain, csv_file):
+    if not csv_file.name.endswith('.csv'):
+        return False, 'Please upload a CSV file', {}
+    
+    blog = Blog.objects.filter(subdomain=subdomain).first()
+    if not blog:
+        return False, 'Blog not found', {}
+    
+    try:
+        import csv
+        from io import StringIO
+        import datetime
+        
+        decoded_file = csv_file.read().decode('utf-8-sig')  # Use utf-8-sig to handle BOM character
+        csv_reader = csv.DictReader(StringIO(decoded_file))
+        
+        # Fix field names by replacing spaces with underscores and handle BOM character
+        csv_data = []
+        for row in csv_reader:
+            fixed_row = {}
+            for key, value in row.items():
+                # Remove BOM character if present and fix spaces
+                fixed_key = key.replace('\ufeff', '').replace(' ', '_')
+                fixed_row[fixed_key] = value
+            csv_data.append(fixed_row)
+        
+        # Track import stats
+        imported = 0
+        skipped = 0
+        
+        for row in csv_data:
+            # Check if post already exists by UID
+            uid_key = 'uid'
+            # Check both normal and BOM-prefixed keys
+            if uid_key not in row and '\ufeffuid' in row:
+                uid_key = '\ufeffuid'
+                
+            if uid_key in row and row[uid_key]:
+                existing = Post.objects.filter(blog=blog, uid=row[uid_key]).first()
+                if existing:
+                    # Skip existing posts
+                    skipped += 1
+                    continue
+                
+            # Create new post
+            post = Post(blog=blog)
+            
+            # Only map specified CSV fields to Post model fields
+            # Define field mapping to handle potential BOM character
+            field_mapping = {
+                'uid': ['uid', '\ufeffuid'],
+                'title': ['title', '\ufefftitle'],
+                'slug': ['slug', '\ufeffslug'],
+                'alias': ['alias', '\ufeffalias'],
+                'content': ['content', '\ufeffcontent'],
+                'canonical_url': ['canonical_url', '\ufeffcanonical_url'],
+                'meta_description': ['meta_description', '\ufeffmeta_description'],
+                'meta_image': ['meta_image', '\ufeffmeta_image'],
+                'lang': ['lang', '\ufefflang'],
+                'class_name': ['class_name', '\ufeffclass_name']
+            }
+            
+            # Set fields based on mapping
+            for field, possible_keys in field_mapping.items():
+                for key in possible_keys:
+                    if key in row and row[key]:
+                        setattr(post, field, row[key])
+                        break
+            
+            # Handle boolean fields with potential BOM
+            boolean_fields = {
+                'is_page': ['is_page', '\ufeffis_page'],
+                'publish': ['publish', '\ufeffpublish'],
+                'make_discoverable': ['make_discoverable', '\ufeffmake_discoverable']
+            }
+            
+            for field, possible_keys in boolean_fields.items():
+                for key in possible_keys:
+                    if key in row:
+                        value = row[key].lower() == 'true'
+                        setattr(post, field, value)
+                        break
+            
+            # Handle date fields with potential BOM
+            date_fields = {
+                'published_date': ['published_date', '\ufeffpublished_date'],
+                'first_published_at': ['first_published_at', '\ufefffirst_published_at']
+            }
+            
+            for field, possible_keys in date_fields.items():
+                for key in possible_keys:
+                    if key in row and row[key]:
+                        try:
+                            setattr(post, field, datetime.datetime.fromisoformat(row[key]))
+                            break
+                        except ValueError:
+                            pass  # Skip invalid date format
+            
+            # Handle tags with potential BOM
+            tag_keys = ['all_tags', '\ufeffall_tags']
+            for key in tag_keys:
+                if key in row and row[key]:
+                    post.all_tags = row[key]
+                    break
+            
+            post.save()
+            imported += 1
+        
+        stats = {'imported': imported, 'skipped': skipped}
+        
+        if imported > 0:
+            return True, f'Successfully imported {imported} posts. Skipped {skipped} existing posts.', stats
+        else:
+            return False, f'No new posts were imported. Skipped {skipped} existing posts.', stats
+            
+    except Exception as e:
+        return False, f'Error importing posts: {str(e)}', {}
 
 
 @staff_member_required

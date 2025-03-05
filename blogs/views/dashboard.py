@@ -1,4 +1,3 @@
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import get_user_model
@@ -215,12 +214,14 @@ def settings(request, id):
             else:
                 error_messages.append(f'The subdomain "{subdomain}" is reserved')
 
-
-
     if request.GET.get("export", ""):
-        return djqscsv.render_to_csv_response(blog.posts)
+        # Only export specified fields
+        fields = ['uid', 'title', 'slug', 'alias', 'published_date', 'all_tags', 
+                  'publish', 'make_discoverable', 'is_page', 'content', 
+                  'canonical_url', 'meta_description', 'meta_image', 'lang', 
+                  'class_name', 'first_published_at']
+        return djqscsv.render_to_csv_response(blog.posts.values(*fields))
     
-
     return render(request, "dashboard/settings.html", {
         "blog": blog,
         "error_messages": error_messages

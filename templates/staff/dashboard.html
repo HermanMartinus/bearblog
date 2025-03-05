@@ -69,6 +69,14 @@ Staff Dashboard  ʕง•ᴥ•ʔง
         <button>Check</button>
     </form>
 
+    <h2>Import posts from CSV backup</h2>
+    <form method="post" action="{% url 'import_posts' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="text" name="subdomain" placeholder="Blog subdomain..." required>
+        <input type="file" name="csv_file" accept=".csv" required>
+        <button type="submit">Import</button>
+    </form>
+
     <h2>Migrate blog</h2>
 
     <form method="post" action="{% url 'migrate_blog' %}" target="_blank" class="full-width">

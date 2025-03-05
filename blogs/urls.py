@@ -34,6 +34,7 @@ urlpatterns = [
     path('staff/review/delete/<pk>', main_site_only(staff.delete), name='review_delete'),
     path('staff/dashboard/delete-empty/', main_site_only(staff.delete_empty), name='delete_empty'),
     path('staff/dashboard/migrate-blog/', main_site_only(staff.migrate_blog), name='migrate_blog'),
+    path('staff/dashboard/import-posts/', main_site_only(staff.import_posts), name='import_posts'),
     path('staff/dashboard/check-spam/', main_site_only(staff.check_spam), name='check_spam'),
     path('staff/playground/', main_site_only(staff.playground), name='playground'),
     path('staff/dashboard/performance/', main_site_only(staff.performance_dashboard), name='performance_dashboard'),
