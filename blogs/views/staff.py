@@ -329,11 +329,8 @@ def opt_in_blogs():
 
 def dodgy_blogs():
     to_review = Blog.objects.filter(
-        reviewed=False,
-        user__is_active=True,
-        to_review=False,
-        dodginess_score__gt=2,
-        ignored_date__isnull=True
+        Q(reviewed=False, user__is_active=True, to_review=False, dodginess_score__gt=2, ignored_date__isnull=True) |
+        Q(flagged=True)
     ).prefetch_related('posts').order_by('-dodginess_score')
 
     return to_review
@@ -371,7 +368,7 @@ def approve(request, pk):
         blog = get_object_or_404(Blog, pk=pk)
         blog.reviewed = True
         blog.to_review = False
-        
+        blog.flagged = False
         if request.POST.get("hide", False):
             blog.hidden = True
 
@@ -394,6 +391,7 @@ def block(request, pk):
     if request.method == "POST":
         blog = get_object_or_404(Blog, pk=pk)
         blog.user.is_active = not blog.user.is_active
+        blog.flagged = False
         blog.user.save()
         return HttpResponse("Blocked")
 
@@ -411,9 +409,19 @@ def ignore(request, pk):
     if request.method == "POST":
         blog = get_object_or_404(Blog, pk=pk)
         blog.ignored_date = timezone.now()
+        blog.flagged = False
         blog.to_review = False
         blog.save()
         return HttpResponse("Ignored")
+    
+
+@staff_member_required
+def flag(request, pk):
+    if request.method == "POST":
+        blog = get_object_or_404(Blog, pk=pk)
+        blog.flagged = True
+        blog.save()
+        return HttpResponse("Flagged")
 
 
 @staff_member_required

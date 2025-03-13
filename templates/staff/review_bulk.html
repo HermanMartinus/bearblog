@@ -93,9 +93,10 @@ Herman
     <div class="controls">
         <button onclick="approveBlogWithEmail({{ blog.pk }})">Approve and email</button>
         <button onclick="approveBlog({{ blog.pk }})">Approve</button>
-        <button onclick="ignoreBlog({{ blog.pk }})">Ignore</button>
         <button onclick="blockBlog({{ blog.pk }})">Block</button>
-        <button onclick="deleteBlog({{ blog.pk }})">Delete</button>
+        <button onclick="flagBlog({{ blog.pk }})">Flag</button>
+        <button onclick="ignoreBlog({{ blog.pk }})">Ignore</button>
+        {% comment %} <button onclick="deleteBlog({{ blog.pk }})">Delete</button> {% endcomment %}
     </div>
 
     <hr>
@@ -161,6 +162,11 @@ Herman
     function blockBlog(pk) {
         document.querySelector(`#blog-${pk}`).style.background = "orange";
         sendPostRequest(`/staff/review/block/${pk}`, {});
+    }
+
+    function flagBlog(pk) {
+        document.querySelector(`#blog-${pk}`).style.background = "salmon";
+        sendPostRequest(`/staff/review/flag/${pk}`, {});
     }
 
     function deleteBlog(pk) {

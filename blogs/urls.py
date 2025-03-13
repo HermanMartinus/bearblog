@@ -31,6 +31,7 @@ urlpatterns = [
     path('staff/review/approve/<pk>', main_site_only(staff.approve), name='review_approve'),
     path('staff/review/block/<pk>', main_site_only(staff.block), name='review_block'),
     path('staff/review/ignore/<pk>', main_site_only(staff.ignore), name='review_ignore'),
+    path('staff/review/flag/<pk>', main_site_only(staff.flag), name='review_flag'),
     path('staff/review/delete/<pk>', main_site_only(staff.delete), name='review_delete'),
     path('staff/dashboard/delete-empty/', main_site_only(staff.delete_empty), name='delete_empty'),
     path('staff/dashboard/migrate-blog/', main_site_only(staff.migrate_blog), name='migrate_blog'),

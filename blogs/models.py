@@ -63,6 +63,7 @@ class Blog(models.Model):
     to_review = models.BooleanField(default=False, db_index=True)
     reviewer_note = models.TextField(blank=True)
     hidden = models.BooleanField(default=False, db_index=True)
+    flagged = models.BooleanField(default=False, db_index=True)
 
     custom_styles = models.TextField(blank=True)
     overwrite_styles = models.BooleanField(
