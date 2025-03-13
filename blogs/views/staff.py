@@ -313,7 +313,7 @@ def new_blogs():
         user__is_active=True,
         to_review=False,
         created_date__lte=timezone.now() - timedelta(days=2)
-    ).order_by('created_date')
+    ).order_by('-created_date')
 
     # for term in ignore_terms:
     #     to_review = to_review.exclude(content__icontains=term)
