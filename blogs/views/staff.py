@@ -313,7 +313,7 @@ def new_blogs():
         user__is_active=True,
         to_review=False,
         created_date__lte=timezone.now() - timedelta(days=2)
-    ).order_by('-created_date')
+    )
 
     # for term in ignore_terms:
     #     to_review = to_review.exclude(content__icontains=term)
@@ -322,7 +322,7 @@ def new_blogs():
 
 
 def opt_in_blogs():
-    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True).order_by('created_date')
+    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True)
     
     return to_review
 
@@ -331,7 +331,7 @@ def dodgy_blogs():
     to_review = Blog.objects.filter(
         Q(reviewed=False, user__is_active=True, to_review=False, dodginess_score__gt=2, ignored_date__isnull=True) |
         Q(flagged=True)
-    ).prefetch_related('posts').order_by('-dodginess_score')
+    ).prefetch_related('posts')
 
     return to_review
 
@@ -341,9 +341,9 @@ def review_bulk(request):
     if 'opt-in' in request.path:
         blogs = opt_in_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
     elif 'new' in request.path:
-        blogs = new_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
+        blogs = new_blogs().select_related('user').prefetch_related('posts').order_by('-created_date')[:100]
     elif 'dodgy' in request.path:
-        blogs = dodgy_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
+        blogs = dodgy_blogs().select_related('user').prefetch_related('posts').order_by('-dodginess_score')[:100]
 
     still_to_go = len(blogs)
     persistent_store = PersistentStore.load()
