@@ -230,9 +230,9 @@ class Post(models.Model):
         upvotes = self.upvotes
 
         if upvotes > 1: 
-            # Cap upvotes at 40 so they don't stick to the top forever
-            if upvotes > 40:
-                upvotes = 40
+            # Cap upvotes at 38 so they don't stick to the top forever
+            if upvotes > 38:
+                upvotes = 38
 
             upvotes += self.shadow_votes
 
@@ -242,8 +242,9 @@ class Post(models.Model):
 
             seconds = posted_at.timestamp()
             if seconds > 0:
-                gravity = 14
-                score = (log_of_upvotes) + ((seconds - 1577811600) / (gravity * 86400))
+                # Lower buoyancy means posts sink faster with time
+                buoyancy = 14
+                score = (log_of_upvotes) + ((seconds - 1577811600) / (buoyancy * 86400))
                 self.score = score
     
     def save(self, *args, **kwargs):

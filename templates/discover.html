@@ -151,15 +151,15 @@
         <pre class="code">
 
 This page is ranked according to the following algorithm:
-Score = log10(U) + (S / D * 86,400)
+Score = log10(U) + (S / B * 86,400)
 
 Where,
 U = Upvotes of a post
 S = Seconds since Jan 1st, 2020
-D = Days modifier (currently at 14)
+B = Buoyancy modifier (currently at 14)
 
 --
-D values is used to modify the effect of time on the score. The higher D, the more time gravity influences post score.
+B values is used to modify the effect of time on the score. A lower B causes posts to sink faster with time.
         </pre>
     </small>
 </p>
