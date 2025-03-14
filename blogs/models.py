@@ -243,7 +243,7 @@ class Post(models.Model):
             seconds = posted_at.timestamp()
             if seconds > 0:
                 # Lower buoyancy means posts sink faster with time
-                buoyancy = 15
+                buoyancy = 14
                 score = (log_of_upvotes) + ((seconds - 1577811600) / (buoyancy * 86400))
                 self.score = score
     
