@@ -60,6 +60,7 @@ class Blog(models.Model):
     dodginess_score = models.FloatField(default=0, db_index=True)
     reviewed = models.BooleanField(default=False, db_index=True)
     ignored_date = models.DateTimeField(blank=True, null=True, db_index=True)
+    permanent_ignore = models.BooleanField(default=False, db_index=True)
     to_review = models.BooleanField(default=False, db_index=True)
     reviewer_note = models.TextField(blank=True)
     hidden = models.BooleanField(default=False, db_index=True)

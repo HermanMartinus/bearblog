@@ -309,6 +309,7 @@ def new_blogs():
 
     to_review = Blog.objects.filter(
         Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True),
+        permanent_ignore=False,
         reviewed=False,
         user__is_active=True,
         to_review=False,
@@ -409,6 +410,8 @@ def delete(request, pk):
 def ignore(request, pk):
     if request.method == "POST":
         blog = get_object_or_404(Blog, pk=pk)
+        if blog.ignored_date:
+            blog.permanent_ignore = True
         blog.ignored_date = timezone.now()
         blog.flagged = False
         blog.to_review = False
