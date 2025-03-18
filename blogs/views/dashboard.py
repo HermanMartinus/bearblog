@@ -201,7 +201,7 @@ def settings(request, id):
     error_messages = []
     
     if request.method == "POST":
-        subdomain = request.POST.get('subdomain')
+        subdomain = request.POST.get('subdomain').lower().strip()
         lang = request.POST.get('lang', 'en')
 
         if subdomain:
