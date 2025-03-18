@@ -18,6 +18,7 @@ from datetime import timedelta
 import pygal
 from pygal.style import LightColorizedStyle
 import json
+import os
 
 
 @staff_member_required
@@ -124,7 +125,9 @@ def dashboard(request):
             'dodgy_blogs_count': dodgy_blogs_count,
             'new_blogs_count': new_blogs_count,
             'empty_blogs': all_empty_blogs,
-            'days_filter': days_filter
+            'days_filter': days_filter,
+            'heroku_slug_description': os.getenv('HEROKU_SLUG_DESCRIPTION'),
+            'heroku_release_created_at': os.getenv('HEROKU_RELEASE_CREATED_AT')
         }
     )
 

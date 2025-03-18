@@ -14,6 +14,10 @@ Staff Dashboard  ʕง•ᴥ•ʔง
 {% endblock %}
 
 {% block nav %}
+<small>
+    {{ heroku_slug_description }} created {{ heroku_release_created_at|timesince }} ago
+</small>
+<br>
 {% endblock %}
 
 {% block content %}
