@@ -231,9 +231,9 @@ class Post(models.Model):
         upvotes = self.upvotes
 
         if upvotes > 1: 
-            # Cap upvotes at 34 so they don't stick to the top forever
-            if upvotes > 34:
-                upvotes = 34
+            # Cap upvotes at 32 so they don't stick to the top forever
+            if upvotes > 32:
+                upvotes = 32
 
             upvotes += self.shadow_votes
 

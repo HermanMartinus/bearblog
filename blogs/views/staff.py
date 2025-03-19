@@ -127,7 +127,7 @@ def dashboard(request):
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
             'heroku_slug_description': os.getenv('HEROKU_SLUG_DESCRIPTION'),
-            'heroku_release_created_at': datetime.fromisoformat(os.getenv('HEROKU_RELEASE_CREATED_AT').replace('Z', '+00:00'))
+            'heroku_release_created_at': datetime.fromisoformat(os.getenv('HEROKU_RELEASE_CREATED_AT', timezone.now().isoformat()).replace('Z', '+00:00'))
         }
     )
 
