@@ -9,7 +9,7 @@ django-queryset-csv==1.1.0
 django-redis==5.4.0
 feedgen==0.9.0
 geoip2==4.6.0
-gunicorn==20.0.4
+gunicorn==23.0.0
 httpagentparser==1.9.2
 judoscale==1.7.5
 latex2mathml==3.77.0
