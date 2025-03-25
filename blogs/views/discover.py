@@ -175,7 +175,8 @@ def search(request):
     if search_string:
         posts = (
             get_base_query().filter(
-                title__icontains=search_string
+                Q(title__icontains=search_string) |
+                Q(all_tags__icontains=search_string)
             )
             .order_by('-upvotes')
             .select_related("blog")[0:20]
