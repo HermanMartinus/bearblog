@@ -7,9 +7,9 @@
 
 {% block favicon %}{% include 'snippets/favicon.html' with blog=blog %}{% endblock %}
 
-{% block title %}Blog | {{ blog.title }}{% endblock %}
+{% block title %}{{ blog.blog_path|capfirst }} | {{ blog.title }}{% endblock %}
 
-{% block canonical %}<link rel="canonical" href="{{ blog.useful_domain }}/blog/">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ blog.useful_domain }}/{{ blog.blog_path }}/">{% endblock %}
 
 {% block seo %}
 {% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
@@ -42,13 +42,13 @@
     <span class="tag">
         #{{ tag }}
         {% with remaining_tags=active_tags|remove_tag:tag %}
-        <a href="{% if remaining_tags %}/blog/?q={{ remaining_tags|join:',' }}{% else %}/blog/{% endif %}" title="Remove tag" style="text-decoration:none;">✕</a>
+        <a href="{% if remaining_tags %}/{{ blog.blog_path }}/?q={{ remaining_tags|join:',' }}{% else %}/{{ blog.blog_path }}/{% endif %}" title="Remove tag" style="text-decoration:none;">✕</a>
         {% endwith %}
     </span>
     {% endfor %}
 </h3>
 <small>
-    <a href="/blog/">Remove all filters</a>
+    <a href="/{{ blog.blog_path }}/">Remove all filters</a>
 </small>
 {% endif %}
 
@@ -59,7 +59,7 @@
     <div class="tags" id="tags">
         {% for tag in blog.tags %}
             {% if tag not in active_tags and tag in available_tags %}
-                <a href="/blog/?q={% if active_tags %}{{ active_tags|join:',' }},{% endif %}{{ tag }}">#{{ tag }}</a>
+                <a href="/{{ blog.blog_path }}/?q={% if active_tags %}{{ active_tags|join:',' }},{% endif %}{{ tag }}">#{{ tag }}</a>
             {% endif %}
         {% endfor %}
     </div>

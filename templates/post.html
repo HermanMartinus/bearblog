@@ -104,7 +104,7 @@
         {% if post.tags|length > 0 %}
             <p class="tags">
                 {% for tag in post.tags %}
-                    <a href="/blog/?q={{tag}}">#{{ tag }}</a>
+                    <a href="/{{ blog.blog_path }}/?q={{tag}}">#{{ tag }}</a>
                 {% endfor %}
             </p>
         {% endif %}
