@@ -193,7 +193,7 @@ class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='posts')
     uid = models.CharField(max_length=200, db_index=True)
     title = models.CharField(max_length=200, db_index=True)
-    slug = models.SlugField(max_length=200, db_index=True)
+    slug = models.CharField(max_length=200, db_index=True)
     alias = models.CharField(max_length=200, blank=True, db_index=True)
     published_date = models.DateTimeField(blank=True, db_index=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)

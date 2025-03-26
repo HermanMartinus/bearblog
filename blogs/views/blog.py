@@ -136,11 +136,11 @@ def post(request, slug):
         from blogs.views.feed import feed
         return feed(request)
     
-    # Find by post slug with select_related to avoid additional queries
+    # Find by post slug
     post = (Post.objects
            .filter(
                blog=blog,
-               slug__iexact=slugify(slug)
+               slug__iexact=slug
            )
            .first())
     
