@@ -86,13 +86,13 @@
                     <svg style="height:16px;margin: 0 -8px -4px 0;" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>
                     {{ post.upvotes }}
                 </small>
-                <small>
+                {% comment %} <small>
                     {% for tag in post.tags|slice:":3" %}
                     <span style="background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px; margin-right: 4px;">
                         #{{ tag }}
                     </span>
                     {% endfor %}
-                </small>
+                </small> {% endcomment %}
                 {% if request.user.is_staff %}
                     <details>
                         <summary></summary>
