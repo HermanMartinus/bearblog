@@ -46,7 +46,8 @@ HOST_WHITELIST = [
     'umap.openstreetmap.fr',
     'music.163.com',
     'sheevcharan.substack.com',
-    'guestbooks.meadow.cafe'
+    'guestbooks.meadow.cafe',
+    'supercut.video'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [

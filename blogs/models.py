@@ -28,7 +28,7 @@ class UserSettings(models.Model):
         return f'{self.user} - Settings'
 
 
-# On User save, create UserSettigs
+# On User save, create UserSettings
 @receiver(post_save, sender=User)
 def create_user_settings(sender, instance, **kwargs):
     user_settings, created = UserSettings.objects.get_or_create(user=instance)
