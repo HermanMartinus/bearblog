@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import DataError
 from django.forms import ValidationError
@@ -9,12 +8,13 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import URLValidator
 
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+from zoneinfo import ZoneInfo
 from datetime import datetime
 import json
 import random
 import string
 
+from blogs.backup import backup_in_thread
 from blogs.forms import AdvancedSettingsForm, BlogForm, DashboardCustomisationForm, PostTemplateForm
 from blogs.helpers import check_connection, is_protected, salt_and_hash
 from blogs.models import Blog, Post, Upvote
@@ -259,6 +259,9 @@ def post(request, id, uid=None):
                 return post
             else:
                 post.save()
+                
+                # Backup blog
+                backup_in_thread(blog)
                 
                 if is_new:
                     # Self-upvote
