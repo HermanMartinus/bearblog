@@ -507,19 +507,16 @@ def calculate_metrics_summary(measurements):
     }
 
 # Playground for testing
-from blogs.views.discover import get_base_query
 
+@staff_member_required
 def playground(request):
-    search_string = request.POST.get('query', "") if request.method == "POST" else ""
-    posts = None
-
-    if search_string:
-        posts = (get_base_query()
-            .filter(title__icontains=search_string)
-            .order_by('-published_date')
-            .select_related("blog")[:20])
-
-    return render(request, "search.html", {
-        "posts": posts,
-        "search_string": search_string,
-    })
+    file_path = f'blog_backups.zip'
+    
+    # Serve the file
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='application/zip')
+            response['Content-Disposition'] = f'attachment; filename="blog_backups.zip"'
+            return response
+    else:
+        return HttpResponse("Backup file not found", status=404)

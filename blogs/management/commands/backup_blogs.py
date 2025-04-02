@@ -4,7 +4,6 @@ from blogs.models import Blog
 import djqscsv
 import zipfile
 from io import BytesIO
-import os
 from datetime import timedelta
 
 class Command(BaseCommand):
