@@ -1,35 +1,49 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+
 from blogs.models import Blog
+
 import djqscsv
 import zipfile
 from io import BytesIO
+import os
 from datetime import timedelta
+import boto3
+from botocore.exceptions import NoCredentialsError
+import uuid
 
 class Command(BaseCommand):
-    help = 'Backup all active blogs to a zip file of CSVs'
+    help = 'Backup all active blogs to a zip file of CSVs and upload to S3'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--days',
+            type=int,
+            default=365,
+            help='Number of days to look back for active blogs',
+        )
 
     def handle(self, *args, **options):
-        # Get blogs that have been active in the last year
+        date_str = timezone.now().strftime('%Y%m%d')
+        
+        # Get blogs that have been active recently
         self.stdout.write('Finding active blogs...')
-        blogs_to_backup = Blog.objects.filter(last_posted__gte=timezone.now() - timedelta(days=180))
+        blogs_to_backup = Blog.objects.filter(last_posted__gte=timezone.now() - timedelta(days=options['days']))
         total_blogs = blogs_to_backup.count()
-        self.stdout.write(f'Found {total_blogs} blogs with activity recently')
+        self.stdout.write(f'Found {total_blogs} blogs with recent activity')
         
-        zip_path = f'blog_backups.zip'
-        
-        # Create a zip file
-        self.stdout.write(f'Creating backup at {zip_path}')
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        # Create a zip file in memory
+        self.stdout.write('Creating backup in memory')
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             processed = 0
             skipped = 0
             
             for blog in blogs_to_backup:
-                # Define fields to export
                 fields = ['uid', 'title', 'slug', 'alias', 'published_date', 'all_tags', 
-                          'publish', 'make_discoverable', 'is_page', 'content', 
-                          'canonical_url', 'meta_description', 'meta_image', 'lang', 
-                          'class_name', 'first_published_at']
+                            'publish', 'make_discoverable', 'is_page', 'content', 
+                            'canonical_url', 'meta_description', 'meta_image', 'lang', 
+                            'class_name', 'first_published_at']
                 
                 # Skip blogs with no posts
                 if blog.posts.count() == 0:
@@ -53,4 +67,39 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f'Backup complete! Processed {processed} blogs, skipped {skipped} empty blogs.'
         ))
-        self.stdout.write(self.style.SUCCESS(f'Backup saved to {zip_path}')) 
+        
+        # Upload to S3
+        self.stdout.write('Uploading backup to S3...')
+        try:
+            aws_access_key = os.environ.get('SPACES_ACCESS_KEY_ID')
+            aws_secret_key = os.environ.get('SPACES_SECRET')
+            s3_bucket = 'bear-backup'
+            
+            if not all([aws_access_key, aws_secret_key, s3_bucket]):
+                self.stdout.write(self.style.ERROR(
+                    'AWS credentials not found. Set SPACES_ACCESS_KEY_ID, and SPACES_SECRET environment variables.'
+                ))
+                return
+            
+            # Create a unique object name
+            unique_id = str(uuid.uuid4())[:8]
+            object_name = f'content/blog_backups_{date_str}_{unique_id}.zip'
+            
+            s3_client = boto3.client(
+                's3',
+                region_name='fra1',
+                endpoint_url='https://fra1.digitaloceanspaces.com',
+                aws_access_key_id=aws_access_key,
+                aws_secret_access_key=aws_secret_key
+            )
+            
+            # Reset buffer position to beginning before upload
+            zip_buffer.seek(0)
+            s3_client.upload_fileobj(zip_buffer, s3_bucket, object_name)
+            
+            self.stdout.write(self.style.SUCCESS(f'Backup uploaded to S3!'))
+            
+        except NoCredentialsError:
+            self.stdout.write(self.style.ERROR('AWS credentials not found or invalid'))
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f'Error uploading to S3: {str(e)}')) 

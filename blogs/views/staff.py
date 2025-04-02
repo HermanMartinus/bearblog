@@ -510,13 +510,4 @@ def calculate_metrics_summary(measurements):
 
 @staff_member_required
 def playground(request):
-    file_path = f'blog_backups.zip'
-    
-    # Serve the file
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type='application/zip')
-            response['Content-Disposition'] = f'attachment; filename="blog_backups.zip"'
-            return response
-    else:
-        return HttpResponse("Backup file not found", status=404)
+    return HttpResponse("Hello")
