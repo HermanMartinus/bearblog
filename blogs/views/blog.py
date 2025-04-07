@@ -108,7 +108,7 @@ def posts(request, blog):
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
 
-    blog_path_title = blog.blog_path.replace('-', ' ').capitalize()
+    blog_path_title = blog.blog_path.replace('-', ' ').capitalize() or 'Blog'
 
     return render(
         request,
