@@ -57,15 +57,6 @@ class Blog(models.Model):
     footer_directive = models.TextField(blank=True)
     all_tags = models.TextField(default='[]')
 
-    dodginess_score = models.FloatField(default=0, db_index=True)
-    reviewed = models.BooleanField(default=False, db_index=True)
-    ignored_date = models.DateTimeField(blank=True, null=True, db_index=True)
-    permanent_ignore = models.BooleanField(default=False, db_index=True)
-    to_review = models.BooleanField(default=False, db_index=True)
-    reviewer_note = models.TextField(blank=True)
-    hidden = models.BooleanField(default=False, db_index=True)
-    flagged = models.BooleanField(default=False, db_index=True)
-
     custom_styles = models.TextField(blank=True)
     overwrite_styles = models.BooleanField(
         default=False,
@@ -86,6 +77,17 @@ class Blog(models.Model):
     rss_alias = models.CharField(max_length=100, blank=True)
     codemirror_enabled = models.BooleanField(default=True)
     
+    # Discovery feed settings
+    dodginess_score = models.FloatField(default=0, db_index=True)
+    reviewed = models.BooleanField(default=False, db_index=True)
+    ignored_date = models.DateTimeField(blank=True, null=True, db_index=True)
+    permanent_ignore = models.BooleanField(default=False, db_index=True)
+    to_review = models.BooleanField(default=False, db_index=True)
+    reviewer_note = models.TextField(blank=True)
+    hidden = models.BooleanField(default=False, db_index=True)
+    flagged = models.BooleanField(default=False, db_index=True)
+    posts_in_last_24_hours = models.IntegerField(default=0, db_index=True)
+
     @property
     def older_than_one_day(self):
         return (timezone.now() - self.created_date).days > 1
@@ -130,7 +132,7 @@ class Blog(models.Model):
     @property
     def tags(self):
         return sorted(json.loads(self.all_tags))
-
+    
     def generate_auth_token(self):
         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
         self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(30))
@@ -182,6 +184,9 @@ class Blog(models.Model):
         # Update last posted
         if self.pk:
             self.last_posted = self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
+
+        # Update posts in last 24 hours
+        self.posts_in_last_24_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=24), publish=True, make_discoverable=True).count()
 
         super(Blog, self).save(*args, **kwargs)
 
