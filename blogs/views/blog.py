@@ -108,6 +108,8 @@ def posts(request, blog):
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
 
+    blog_path_title = blog.blog_path.replace('-', ' ').capitalize()
+
     return render(
         request,
         'posts.html',
@@ -117,7 +119,8 @@ def posts(request, blog):
             'meta_description': meta_description,
             'query': tag_param,
             'active_tags': tags,
-            'available_tags': available_tags
+            'available_tags': available_tags,
+            'blog_path_title': blog_path_title
         }
     )
 
@@ -174,7 +177,7 @@ def post(request, slug):
 
     if post.publish is False and not request.GET.get('token') == post.token:
         return not_found(request)
-    
+
     context = {
         'blog': blog,
         'post': post,
@@ -182,7 +185,7 @@ def post(request, slug):
         'canonical_url': canonical_url,
         'meta_description': meta_description,
         'meta_image': post.meta_image or blog.meta_image,
-        'upvoted': upvoted
+        'upvoted': upvoted,
     }
 
     response = render(request, 'post.html', context)
