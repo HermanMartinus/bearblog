@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.utils import timezone
+from django.db.models.functions import Length
 
 from blogs.models import Post
 from blogs.helpers import clean_text
@@ -23,6 +24,10 @@ def get_base_query():
         blog__hidden=False,
         make_discoverable=True,
         published_date__lte=timezone.now()
+    ).annotate(
+        content_length=Length('content')
+    ).filter(
+        content_length__gte=100
     )
 
     return queryset
