@@ -181,12 +181,12 @@ class Blog(models.Model):
         # Double check subdomains are lowercase
         self.subdomain = self.subdomain.lower()
 
-        # Update last posted
         if self.pk:
+            # Update last posted
             self.last_posted = self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
-        # Update posts in last 24 hours
-        self.posts_in_last_24_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=24), publish=True, make_discoverable=True).count()
+            # Update posts in last 24 hours
+            self.posts_in_last_24_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=24), publish=True, make_discoverable=True).count()
 
         super(Blog, self).save(*args, **kwargs)
 
