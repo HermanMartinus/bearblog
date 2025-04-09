@@ -120,6 +120,8 @@
                         <a href="/mothership/blogs/blog/{{ post.blog.id }}/change/" target="_blank">Admin Blog</a>
                         | <a href="/mothership/blogs/post/{{ post.id }}/change/" target="_blank">Admin Post</a>
                         | <a href="/mothership/blogs/usersettings/{{ post.blog.user.settings.id }}/change/" target="_blank">Admin User Settings</a>
+                        <br>
+                        <div style="font-size: 12px; color: #666; border: 1px solid #ccc; padding: 10px;">{{ post.content|truncatechars:300|safe }}</div>
                     </details>
                 {% endif %}
             </small>
