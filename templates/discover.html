@@ -116,6 +116,10 @@
                             <input type="number" name="shadow-votes" value="{{ post.shadow_votes }}" style="width:45px; padding: 0;">
                             <button>Set</button>
                         </form>
+                        <br>
+                        <a href="/mothership/blogs/blog/{{ post.blog.id }}/change/" target="_blank">Admin Blog</a>
+                        | <a href="/mothership/blogs/post/{{ post.id }}/change/" target="_blank">Admin Post</a>
+                        | <a href="/mothership/blogs/usersettings/{{ post.blog.user.settings.id }}/change/" target="_blank">Admin User Settings</a>
                     </details>
                 {% endif %}
             </small>
