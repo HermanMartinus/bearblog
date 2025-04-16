@@ -12,6 +12,7 @@ from math import log
 import random
 import string
 import hashlib
+import requests
 
 
 class UserSettings(models.Model):
@@ -161,6 +162,36 @@ class Blog(models.Model):
                 all_tags = list(set(all_tags))
         self.all_tags = json.dumps(all_tags)
 
+    def invalidate_cloudflare_cache(self):
+        cloudflare_api_key = os.getenv('CLOUDFLARE_API_KEY')
+        cloudflare_email = os.getenv('CLOUDFLARE_EMAIL')
+        cloudflare_zone_id = os.getenv('CLOUDFLARE_ZONE_ID')
+        
+        if not all([cloudflare_api_key, cloudflare_email, cloudflare_zone_id]):
+            return
+            
+        headers = {
+            'X-Auth-Email': cloudflare_email,
+            'Authorization': f'Bearer {cloudflare_api_key}',
+            'Content-Type': 'application/json',
+        }
+        
+        url = f"https://api.cloudflare.com/client/v4/zones/{cloudflare_zone_id}/purge_cache"
+        
+        data = {
+            "tags": [self.subdomain]
+        }
+        
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            print("Invalidated Cloudflare cache for", self.subdomain, response.json())
+            return response.json()
+        except Exception as e:
+            # Log the error but don't prevent the save operation
+            print(f"Error invalidating Cloudflare cache for {self.subdomain}: {str(e)}")
+            return None
+
     def save(self, *args, **kwargs):
         # Handle all tags
         self.update_all_tags()
@@ -188,7 +219,12 @@ class Blog(models.Model):
             # Update posts in last 24 hours
             self.posts_in_last_24_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=24), publish=True, make_discoverable=True).count()
 
+        # Save the blog
         super(Blog, self).save(*args, **kwargs)
+        
+        # Invalidate Cloudflare cache after saving
+        if self.pk:
+            self.invalidate_cloudflare_cache()
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain})'
@@ -277,6 +313,9 @@ class Post(models.Model):
 
         # Save blog to trigger a few other things
         self.blog.save()
+        
+        # Invalidate Cloudflare cache for the blog's feeds
+        self.blog.invalidate_cloudflare_cache()
 
     def __str__(self):
         return self.title

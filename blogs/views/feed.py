@@ -29,7 +29,15 @@ def feed(request):
     except Exception as e:
         print(f'Feeds: Error generating feed for {blog.subdomain}: {e}')
         feed = ''
-    return HttpResponse(feed, content_type='application/xml')
+    
+    # Create the response with the feed content
+    response = HttpResponse(feed, content_type='application/xml')
+    
+    # Add Cloudflare cache tag header based on blog subdomain
+    cache_tag = blog.subdomain
+    response.headers['Cache-Tag'] = cache_tag
+    
+    return response
 
 
 def generate_feed(blog, feed_type="atom", tag=None):
