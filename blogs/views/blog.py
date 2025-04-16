@@ -192,8 +192,10 @@ def post(request, slug):
     response = render(request, 'post.html', context)
 
     if post.publish and not request.GET.get('token'):
-        response['Cache-Control'] = 'public, max-age=1800'  # CDN cache for 30 minutes
-        response['Cache-Tag'] = blog.subdomain # Tag for selective purging
+        # Set cache headers for Cloudflare
+        response['Cache-Control'] = 'public, max-age=1800'
+        response['CDN-Cache-Control'] = 'public, max-age=1800'
+        response['Cloudflare-CDN-Cache-Control'] = 'public, max-age=1800'
 
     return response
 
