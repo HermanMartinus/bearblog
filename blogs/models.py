@@ -223,8 +223,8 @@ class Blog(models.Model):
         super(Blog, self).save(*args, **kwargs)
         
         # Invalidate Cloudflare cache after saving
-        # if self.pk:
-        #     self.invalidate_cloudflare_cache()
+        if self.pk:
+            self.invalidate_cloudflare_cache()
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain})'
@@ -313,9 +313,6 @@ class Post(models.Model):
 
         # Save blog to trigger a few other things
         self.blog.save()
-        
-        # Invalidate Cloudflare cache for the blog's feeds
-        self.blog.invalidate_cloudflare_cache()
 
     def __str__(self):
         return self.title
