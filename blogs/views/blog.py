@@ -74,7 +74,7 @@ def home(request):
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
     
-    response = render(
+    return render(
         request,
         'home.html',
         {
@@ -83,9 +83,6 @@ def home(request):
             'meta_description': meta_description
         }
     )
-
-    response['Cache-Tag'] = blog.subdomain
-    return response
 
 
 def posts(request, blog):

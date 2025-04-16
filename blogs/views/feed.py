@@ -30,13 +30,7 @@ def feed(request):
         print(f'Feeds: Error generating feed for {blog.subdomain}: {e}')
         feed = ''
     
-    # Create the response with the feed content
-    response = HttpResponse(feed, content_type='application/xml')
-    
-    # Add Cloudflare cache tag header based on blog subdomain
-    response.headers['Cache-Tag'] = blog.subdomain
-    
-    return response
+    return HttpResponse(feed, content_type='application/xml')
 
 
 def generate_feed(blog, feed_type="atom", tag=None):
