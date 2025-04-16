@@ -34,8 +34,7 @@ def feed(request):
     response = HttpResponse(feed, content_type='application/xml')
     
     # Add Cloudflare cache tag header based on blog subdomain
-    cache_tag = blog.subdomain
-    response.headers['Cache-Tag'] = cache_tag
+    response.headers['Cache-Tag'] = blog.subdomain
     
     return response
 
