@@ -1,5 +1,7 @@
+from django.utils import timezone
 from django.db import connection
 from django.urls import resolve, Resolver404
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.middleware.csrf import (
     CsrfViewMiddleware,
@@ -8,6 +10,7 @@ from django.middleware.csrf import (
     REASON_BAD_ORIGIN
 )
 
+import hashlib
 import time
 import threading
 from collections import defaultdict
@@ -203,3 +206,23 @@ class RateLimitMiddleware:
             )
 
         return self.get_response(request)
+
+
+class UrsaMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.protected_paths = ['/discover', '/discover/']
+
+    def __call__(self, request):
+        if request.path in self.protected_paths:
+            request_ursa_token = request.COOKIES.get('ursa_token')
+            ursa_token = hashlib.sha256(client_ip(request).encode() + os.getenv('SALT').encode() + timezone.now().strftime('%Y-%m-%d').encode()).hexdigest()
+            
+            if request_ursa_token == ursa_token:
+                pass
+            else:
+                # Token is incorrect or missing, serve the verification page
+                return render(request, 'ursa.html', {'ursa_token': ursa_token})
+
+        response = self.get_response(request)
+        return response

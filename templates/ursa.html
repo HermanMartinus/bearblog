@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bot check</title>
+</head>
+<body style="text-align: center;">
+    <script>
+        window.onload = function() {
+            const hasWebDriver = !!navigator.webdriver;
+            const hasNoLanguages = (navigator.languages?.length || 0) === 0;
+            const hasDomManipulation = document.documentElement
+                                            .getAttributeNames()
+                                            .some((attr) => ["selenium", "webdriver", "driver", "phantomjs", "playwright", "puppeteer"].includes(attr));
+            
+            if (hasWebDriver || hasNoLanguages || hasDomManipulation) {
+                document.body.innerHTML += '<h2>ʕ ᕤ•ᴥ•ʔᕤ Automated browser detected</h2>';
+                document.body.innerHTML += '<p>Are you a robot? If not, please let <a href="https://herman.bearblog.dev">me</a> know.</p>';
+
+            } else {
+                document.body.innerHTML += '<p>Welcome, human visitor!</p>';
+                document.cookie = `ursa_token={{ ursa_token }};path=/`; 
+                window.location.reload();
+            }
+        };
+    </script>
+</body>
+</html> 
