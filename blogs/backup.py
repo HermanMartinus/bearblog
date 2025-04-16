@@ -21,7 +21,7 @@ def backup_in_thread(blog):
 
 
 def backup_blog(blog):
-    date_str = timezone.now().strftime('%Y-%m-%d-%H-%M')
+    date_str = timezone.now().strftime('%Y-%m-%d')
     base_path = f'content/{blog.subdomain}/{date_str}'
     
     aws_access_key = os.environ.get('SPACES_ACCESS_KEY_ID')
