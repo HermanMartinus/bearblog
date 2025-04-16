@@ -195,6 +195,7 @@ def post(request, slug):
         # Set cache headers for Cloudflare Posts
         response['Cache-Control'] = 'public, max-age=1800'
         response['CDN-Cache-Control'] = 'public, max-age=1800'
+        response['Cloudflare-Cache-Control'] = 'public, max-age=1800'
 
     return response
 
