@@ -223,8 +223,8 @@ class Blog(models.Model):
         super(Blog, self).save(*args, **kwargs)
         
         # Invalidate Cloudflare cache after saving
-        if self.pk:
-            self.invalidate_cloudflare_cache()
+        # if self.pk:
+        #     self.invalidate_cloudflare_cache()
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain})'
