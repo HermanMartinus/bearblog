@@ -64,6 +64,7 @@ def is_protected(subdomain):
         'router.bearblog.dev',
         'www.bearblog.dev',
         '_dmarc',
+        'domain-proxy'
     ]
 
     return subdomain in protected_subdomains
