@@ -191,12 +191,9 @@ def post(request, slug):
 
     response = render(request, 'post.html', context)
 
-    if post.publish and not request.GET.get('token'):
+    #if post.publish and not request.GET.get('token'):
         # Set cache headers for Cloudflare Posts
-        response['Cache-Control'] = 'public, max-age=1800, s-maxage=1800'
-        response['CDN-Cache-Control'] = 'public, max-age=1800'
-        response['Cloudflare-Cache-Control'] = 'public, max-age=1800'
-
+        
     return response
 
 
