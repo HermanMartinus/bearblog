@@ -95,7 +95,7 @@
                 </small> {% endcomment %}
                 {% if request.user.is_staff %}
                     <details>
-                        <summary style="font-size: 0.7rem;">{% if post.blog.user.settings.upgraded %}🟢{% else %}🔴{% endif %}</summary>
+                        <summary style="font-size: 0.7rem;">{% if post.blog.user.settings.upgraded %}🚀{% endif %}</summary>
                         <form method="POST" style="display:inline">
                             <input hidden name="hide-post" value="{{ post.pk }}">
                             <button onclick="event.preventDefault();if(confirm('Hide this post?')){event.target.parentElement.submit()}">Hide post</button>

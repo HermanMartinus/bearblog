@@ -6,6 +6,7 @@ from django.dispatch import receiver
 
 from allauth.account.models import EmailAddress
 
+from zoneinfo import ZoneInfo
 import os
 import json
 from math import log
@@ -93,6 +94,11 @@ class Blog(models.Model):
     def older_than_one_day(self):
         return (timezone.now() - self.created_date).days > 1
 
+    @property
+    def is_after_cutoff(self):
+        cutoff_date = timezone.datetime(2025, 4, 20, tzinfo=ZoneInfo('UTC'))
+        return self.created_date > cutoff_date
+    
     @property
     def user_email_verified(self):
         return EmailAddress.objects.filter(user=self.user, verified=True).exists()

@@ -28,8 +28,13 @@
 <p class="notification">
     <small>
     🐼 Your blog is currently hidden from search engines and the
-    <a href="https://bearblog.dev/discover/" target="_blank">discovery feed</a>.
-    <a href="{% url 'opt_in_review' id=blog.subdomain %}">Submit your blog for review</a>.
+    <a href="https://bearblog.dev/discover/" target="_blank">discover feed</a>.
+
+    {% if blog.is_after_cutoff %}
+        Upgrade to get discovered.
+    {% else %}
+        <a href="{% url 'opt_in_review' id=blog.subdomain %}">Submit your blog for review</a>.
+    {% endif %}
     </small>
 </p>
 {% endif %}
