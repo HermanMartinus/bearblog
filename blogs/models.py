@@ -169,6 +169,10 @@ class Blog(models.Model):
         self.all_tags = json.dumps(all_tags)
 
     def invalidate_cloudflare_cache(self):
+        if os.getenv('ENVIRONMENT') == 'dev':
+            print("Invalidating cache for", self.subdomain)
+            return
+
         cloudflare_api_key = os.getenv('CLOUDFLARE_API_KEY')
         cloudflare_email = os.getenv('CLOUDFLARE_EMAIL')
         cloudflare_zone_id = os.getenv('CLOUDFLARE_ZONE_ID')
@@ -184,21 +188,14 @@ class Blog(models.Model):
         
         url = f"https://api.cloudflare.com/client/v4/zones/{cloudflare_zone_id}/purge_cache"
         
-        # Create prefixes list with subdomain.bearblog.dev and custom domain
-        current_host = os.getenv('MAIN_SITE_HOSTS', '').split(',')[0]
-        prefixes = [f"{self.subdomain}.{current_host}"]
-        
-        if self.domain:
-            prefixes.append(self.domain)
-        
         data = {
-            "prefixes": prefixes
+            "tags": [self.subdomain]
         }
         
         try:
             response = requests.post(url, headers=headers, json=data)
             response.raise_for_status()
-            print(f"Invalidated Cloudflare cache for prefixes: {prefixes}, response: {response.json()}")
+            print(f"Invalidated Cloudflare cache for tag: {self.subdomain}, response: {response.json()}")
             return response.json()
         except Exception as e:
             # Log the error but don't prevent the save operation

@@ -30,7 +30,9 @@ def feed(request):
         print(f'Feeds: Error generating feed for {blog.subdomain}: {e}')
         feed = ''
     
-    return HttpResponse(feed, content_type='application/xml')
+    response = HttpResponse(feed, content_type='application/xml')
+    response['Cache-Tag'] = blog.subdomain
+    return response
 
 
 def generate_feed(blog, feed_type="atom", tag=None):
