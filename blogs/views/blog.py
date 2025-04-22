@@ -131,6 +131,9 @@ def post(request, slug):
     # Prevent null characters in path
     slug = slug.replace('\x00', '')
 
+    if slug[0] == '/' and slug[-1] == '/':
+        slug = slug[1:-1]
+
     blog = resolve_address(request)
     if not blog:
         return not_found(request)
@@ -139,23 +142,13 @@ def post(request, slug):
     if slug == blog.rss_alias:
         from blogs.views.feed import feed
         return feed(request)
-    
+
     # Find by post slug
-    post = (Post.objects
-           .filter(
-               blog=blog,
-               slug__iexact=slug
-           )
-           .first())
-    
+    post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
+
     if not post:
         # Find by post alias
-        post = (Post.objects
-               .filter(
-                   blog=blog,
-                   alias__iexact=slug
-               )
-               .first())
+        post = Post.objects.filter(blog=blog, alias__iexact=slug).first()
         
         if post:
             return redirect('post', slug=post.slug)
