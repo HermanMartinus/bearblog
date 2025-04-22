@@ -184,8 +184,8 @@ def post(request, slug):
 
     response = render(request, 'post.html', context)
 
-    #if post.publish and not request.GET.get('token'):
-        # Set cache headers for Cloudflare Posts
+    if post.publish and not request.GET.get('token'):
+        response['Cache-Tag'] = blog.subdomain
         
     return response
 
