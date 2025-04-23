@@ -138,6 +138,66 @@ class BlogAdmin(admin.ModelAdmin):
         ('user__is_active', admin.BooleanFieldListFilter),
     )
 
+    # Method to display posts in the admin change view
+    def display_posts(self, obj):
+        posts = obj.posts.all().order_by('-published_date')
+        if not posts.exists():
+            return "No posts yet."
+
+        # Start the table
+        table_header = format_html(
+            '<thead><tr>'
+            '<th>{}</th>'
+            '<th>{}</th>'
+            '<th>{}</th>'
+            '<th>{}</th>'
+            '</tr></thead>',
+            'Post title (Admin)',
+            'Post link (Public)',
+            'Is page',
+            'Published date'
+        )
+
+        table_rows = []
+        for post in posts:
+            admin_url = reverse('admin:blogs_post_change', args=[post.pk])
+            public_url = f"{obj.dynamic_useful_domain}/{post.slug}/"
+            post_title = escape(post.title or "Untitled")
+            
+            # Create links
+            admin_link = format_html('<a href="{}" target="_blank">{}</a>', admin_url, post_title)
+            public_link = format_html('<a href="{}" target="_blank">{}</a>', public_url, public_url)
+            is_page_display = 'Yes' if post.is_page else 'No'
+            published_date_display = post.published_date.strftime("%Y-%m-%d %H:%M") if post.published_date else '-'
+
+            # Append table row
+            table_rows.append(format_html(
+                '<tr>'
+                '<td>{}</td>'
+                '<td>{}</td>'
+                '<td>{}</td>'
+                '<td>{}</td>'
+                '</tr>',
+                admin_link,
+                public_link,
+                is_page_display,
+                published_date_display
+            ))
+
+        # Combine header and body within table tags
+        table_html = format_html(
+            '<table style="width: 100%; border-collapse: collapse;" border="1">{}<tbody>{}</tbody></table>',
+            table_header,
+            mark_safe('\n'.join(table_rows))
+        )
+
+        return table_html
+
+    display_posts.short_description = 'Posts'
+
+    # Add computed and display fields to readonly_fields
+    readonly_fields = ('user_link', 'subdomain_url', 'domain_url', 'post_count', 'display_posts')
+
     def block_blog(self, request, queryset):
         for blog in queryset:
             blog.user.is_active = False
