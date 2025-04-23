@@ -64,7 +64,7 @@ class UserSettingsAdmin(admin.ModelAdmin):
         )
         return blogs_links or 'No blogs'
 
-    search_fields = ('user__email', 'user__blogs__title', 'user__blogs__subdomain')
+    search_fields = ('user__email', 'order_email', 'order_id', 'user__blogs__title', 'user__blogs__subdomain')
 
     list_filter = (
         ('upgraded', admin.BooleanFieldListFilter),
@@ -130,7 +130,7 @@ class BlogAdmin(admin.ModelAdmin):
         'post_count',
         'created_date')
 
-    search_fields = ('title', 'subdomain', 'domain', 'user__email')
+    search_fields = ('title', 'subdomain', 'domain', 'user__email', 'user__settings__order_email')
     ordering = ('-created_date',)
     list_filter = (
         ('domain', admin.EmptyFieldListFilter),
