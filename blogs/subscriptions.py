@@ -44,6 +44,8 @@ def lemon_webhook(request):
             else:
                 # If order object get id
                 user.settings.order_id = data['data']['id']
+            if 'user_email' in data['data']['attributes']:
+                user.settings.order_email = data['data']['attributes']['user_email']
             user.settings.save()
             for blog in user.blogs.all():
                 blog.reviewed = True

@@ -164,13 +164,11 @@ class BlogAdmin(admin.ModelAdmin):
             public_url = f"{obj.dynamic_useful_domain}/{post.slug}/"
             post_title = escape(post.title or "Untitled")
             
-            # Create links
             admin_link = format_html('<a href="{}" target="_blank">{}</a>', admin_url, post_title)
             public_link = format_html('<a href="{}" target="_blank">{}</a>', public_url, public_url)
             is_page_display = 'Yes' if post.is_page else 'No'
             published_date_display = post.published_date.strftime("%Y-%m-%d %H:%M") if post.published_date else '-'
 
-            # Append table row
             table_rows.append(format_html(
                 '<tr>'
                 '<td>{}</td>'
@@ -195,7 +193,6 @@ class BlogAdmin(admin.ModelAdmin):
 
     display_posts.short_description = 'Posts'
 
-    # Add computed and display fields to readonly_fields
     readonly_fields = ('user_link', 'subdomain_url', 'domain_url', 'post_count', 'display_posts')
 
     def block_blog(self, request, queryset):

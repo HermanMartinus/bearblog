@@ -22,6 +22,7 @@ class UserSettings(models.Model):
     max_blogs = models.IntegerField(default=10)
     upgraded_date = models.DateTimeField(blank=True, null=True, db_index=True)
     order_id = models.CharField(max_length=100, blank=True, null=True)
+    order_email = models.CharField(max_length=100, blank=True, null=True)
 
     dashboard_styles = models.TextField(blank=True)
     dashboard_footer = models.TextField(blank=True)
