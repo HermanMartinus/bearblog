@@ -47,7 +47,9 @@ HOST_WHITELIST = [
     'music.163.com',
     'sheevcharan.substack.com',
     'guestbooks.meadow.cafe',
-    'supercut.video'
+    'supercut.video',
+    'listenbrainz.org',
+    'api.listenbrainz.org'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
