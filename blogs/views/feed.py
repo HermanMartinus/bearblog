@@ -29,6 +29,7 @@ def feed(request):
     except Exception as e:
         print(f'Feeds: Error generating feed for {blog.subdomain}: {e}')
         feed = ''
+        raise e
     
     response = HttpResponse(feed, content_type='application/xml')
     response['Cache-Tag'] = blog.subdomain
@@ -60,10 +61,11 @@ def generate_feed(blog, feed_type="atom", tag=None):
         fe.link(href=f"{blog.useful_domain}/{post.slug}/")
         if post.meta_description:
             fe.summary(post.meta_description)
-        try:
-            fe.content(markdown(post.content.replace('{{ email-signup }}', ''), blog, post), type="html")
-        except ValueError:
-            fe.content(markdown(clean_string(post.content.replace('{{ email-signup }}', '')), blog, post), type="html")
+        
+        post_content = post.content.replace('{{ email-signup }}', '')
+
+        fe.content(clean_string(markdown(post_content, blog, post)), type="html")
+        
         fe.published(post.published_date)
         fe.updated(post.last_modified)
         
