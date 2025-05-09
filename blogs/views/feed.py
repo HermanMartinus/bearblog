@@ -56,11 +56,11 @@ def generate_feed(blog, feed_type="atom", tag=None):
     for post in all_posts:
         fe = fg.add_entry()
         fe.id(f"{blog.useful_domain}/{post.slug}/")
-        fe.title(post.title)
+        fe.title(clean_string(post.title))
         fe.author({'name': blog.subdomain, 'email': 'hidden'})
         fe.link(href=f"{blog.useful_domain}/{post.slug}/")
         if post.meta_description:
-            fe.summary(post.meta_description)
+            fe.summary(clean_string(post.meta_description))
         
         post_content = post.content.replace('{{ email-signup }}', '')
 
