@@ -49,7 +49,8 @@ HOST_WHITELIST = [
     'guestbooks.meadow.cafe',
     'supercut.video',
     'listenbrainz.org',
-    'api.listenbrainz.org'
+    'api.listenbrainz.org',
+    'archive.org'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
