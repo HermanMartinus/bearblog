@@ -15,13 +15,11 @@ import os
 posts_per_page = 20
 
 
-def get_base_query():
+def get_base_query(user=None):
     queryset = Post.objects.select_related("blog").filter(
         publish=True,
-        hidden=False,
         blog__reviewed=True,
         blog__user__is_active=True,
-        blog__hidden=False,
         make_discoverable=True,
         published_date__lte=timezone.now(),
         blog__posts_in_last_24_hours__lte=3
@@ -30,6 +28,14 @@ def get_base_query():
     ).filter(
         content_length__gte=100
     )
+
+    if user and user.is_authenticated:
+        queryset = queryset.filter(
+            Q(hidden=False, blog__hidden=False) |
+            Q(blog__user=user)
+        )
+    else:
+        queryset = queryset.filter(hidden=False, blog__hidden=False)
 
     return queryset
 
@@ -70,7 +76,7 @@ def discover(request):
 
     newest = request.GET.get("newest")
 
-    base_query = get_base_query()
+    base_query = get_base_query(request.user)
 
     hide_list_raw = request.COOKIES.get('hide_list', '').strip()
 
