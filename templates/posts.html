@@ -17,8 +17,8 @@
 <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
 
 {% include 'snippets/seo_tags.html' with site_name=blog.title title="{{ blog_path_title }}" type="website" url=blog.useful_domain description=blog.meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
-<link rel="alternate" type="application/atom+xml" href="/feed/{% if query %}?q={{ query }}{% endif %}">
-<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss{% if query %}&q={{ query }}{% endif %}">
+<link rel="alternate" type="application/atom+xml" href="/feed/{% if query %}?q={{ query }}{% endif %}" title="{{ blog.title }}">
+<link rel="alternate" type="application/rss+xml" href="/feed/?type=rss{% if query %}&q={{ query }}{% endif %}" title="{{ blog.title }}">
 {% endblock %}
 
 {% block imports %}
