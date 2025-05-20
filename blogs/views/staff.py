@@ -316,6 +316,7 @@ def new_blogs():
         reviewed=False,
         user__is_active=True,
         to_review=False,
+        flagged=False,
         created_date__lte=timezone.now() - timedelta(days=2)
     )
 
