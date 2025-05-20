@@ -294,7 +294,7 @@ def post(request, id, uid=None):
 
 def unique_slug(blog, post, new_slug):
     # Clean the new_slug to be alphanumeric lowercase with only '/' and '-' allowed
-    cleaned_slug = ''.join(c for c in new_slug.lower() if c.isalnum() or c == '/' or c == '-')
+    cleaned_slug = ''.join(c for c in new_slug.lower() if c.isalnum() or c == '/' or c == '-' or c == '_')
 
     # Remove trailing and leading slashes
     if len(cleaned_slug) > 0 and cleaned_slug[-1] == '/':
