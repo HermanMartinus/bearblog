@@ -228,7 +228,7 @@ class Blog(models.Model):
             self.last_posted = self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
             # Update posts in last 24 hours
-            self.posts_in_last_24_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=24), published_date__lte=timezone.now(), publish=True, make_discoverable=True).count()
+            self.posts_in_last_24_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=24), published_date__lte=timezone.now(), publish=True, make_discoverable=True, is_page=False).count()
 
         # Save the blog
         super(Blog, self).save(*args, **kwargs)
