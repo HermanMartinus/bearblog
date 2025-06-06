@@ -453,7 +453,7 @@ def custom_domain_edit(request, id):
     error_messages = []
 
     if request.method == "POST":
-        custom_domain = request.POST.get("custom-domain", "").lower().strip()
+        custom_domain = request.POST.get("custom-domain", "").lower().strip().replace('https://', '').replace('http://', '')
 
         if Blog.objects.filter(domain__iexact=custom_domain).exclude(pk=blog.pk).count() == 0:
             try:
