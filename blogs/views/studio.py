@@ -87,6 +87,9 @@ def studio(request, id):
 
 
 def parse_raw_homepage(blog, header_content, body_content):
+    if len(body_content) > 100000:
+        return ["Your content is too long. This is a safety feature to prevent abuse. If you're sure you need more, please contact support."]
+    
     raw_header = [item for item in header_content.split('\r\n') if item]
     
     # Clear out data
@@ -152,6 +155,13 @@ def post(request, id, uid=None):
     if request.method == "POST" and header_content:
         if blog.posts.count() >= 3000:
             error_messages.append("You have reached the maximum number of posts. This is a safety feature to prevent abuse. If you're sure you need more, please contact support.")
+            return render(request, 'studio/post_edit.html', {
+                'blog': blog,
+                'post': post,
+                'error_messages': error_messages,
+            })
+        if len(body_content) > 100000:
+            error_messages.append("Your content is too long. This is a safety feature to prevent abuse. If you're sure you need more, please contact support.")
             return render(request, 'studio/post_edit.html', {
                 'blog': blog,
                 'post': post,
