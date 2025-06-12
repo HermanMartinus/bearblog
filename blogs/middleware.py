@@ -122,43 +122,6 @@ class RequestPerformanceMiddleware:
         return response
 
 
-class LongRequestMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-        self.threshold = 23  # seconds
-
-    def __call__(self, request):
-        result = [None]
-        exception = [None]
-        
-        def target():
-            try:
-                result[0] = self.get_response(request)
-            except Exception as e:
-                exception[0] = e
-        
-        thread = threading.Thread(target=target)
-        thread.start()
-        thread.join(timeout=self.threshold)
-        
-        if thread.is_alive():
-            with sentry_sdk.push_scope() as scope:
-                scope.set_extra("request_duration", 23)
-                scope.set_extra("path", request.path)
-                scope.set_extra("method", request.method)
-                sentry_sdk.capture_message(
-                    f"Request timed out",
-                    level="warning"
-                )
-            # Request is still running, return 503
-            return render(request, '503.html', status=503)
-        
-        if exception[0]:
-            raise exception[0]
-            
-        return result[0]
-    
-
 # This is a workaround to handle custom domains from Django 5.0 there's an explicit CSRF_TRUSTED_ORIGINS list
 class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
     def process_view(self, request, callback, callback_args, callback_kwargs):
