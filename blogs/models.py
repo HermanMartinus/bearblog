@@ -149,6 +149,7 @@ class Blog(models.Model):
     def determine_dodginess(self):
         persistent_store = PersistentStore.load()
         dodgy_term_count = 0
+        blacklisted_term_count = 0
         all_content = f"{self.title} {self.content}"
         
         if self.pk:
@@ -159,7 +160,10 @@ class Blog(models.Model):
         for term in persistent_store.highlight_terms:
             dodgy_term_count += all_content.lower().count(term.lower())
 
-        self.dodginess_score = dodgy_term_count
+        for term in persistent_store.blacklist_terms:
+            blacklisted_term_count += all_content.lower().count(term.lower())
+
+        self.dodginess_score = dodgy_term_count + blacklisted_term_count * 10
 
     def update_all_tags(self):
         all_tags = []
@@ -212,8 +216,8 @@ class Blog(models.Model):
             self.reviewed = True
         
         # Determine how dodgy the blog is if it's not reviewed
-        if not self.reviewed:
-            self.determine_dodginess()
+        # if not self.reviewed:
+        self.determine_dodginess()
 
         # When custom styles is empty set it to default (legacy overwrite patch)
         if not self.custom_styles:
@@ -411,6 +415,7 @@ class PersistentStore(models.Model):
     last_executed = models.DateTimeField(default=timezone.now)
     review_ignore_terms = models.TextField(blank=True, default='[]')
     review_highlight_terms = models.TextField(blank=True, default='[]')
+    review_blacklist_terms = models.TextField(blank=True, default='[]')
 
     @property
     def ignore_terms(self):
@@ -419,6 +424,10 @@ class PersistentStore(models.Model):
     @property
     def highlight_terms(self):
         return sorted(json.loads(self.review_highlight_terms))
+    
+    @property
+    def blacklist_terms(self):
+        return sorted(json.loads(self.review_blacklist_terms))
     
     @classmethod
     def load(cls):
