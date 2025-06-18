@@ -216,8 +216,8 @@ class Blog(models.Model):
             self.reviewed = True
         
         # Determine how dodgy the blog is if it's not reviewed
-        # if not self.reviewed:
-        self.determine_dodginess()
+        if not self.reviewed:
+            self.determine_dodginess()
 
         # When custom styles is empty set it to default (legacy overwrite patch)
         if not self.custom_styles:
