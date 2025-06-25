@@ -160,7 +160,7 @@ def post(request, id, uid=None):
                 'post': post,
                 'error_messages': error_messages,
             })
-        if len(body_content) > 100000:
+        if len(body_content) > 1000000:
             error_messages.append("Your content is too long. This is a safety feature to prevent abuse. If you're sure you need more, please contact support.")
             return render(request, 'studio/post_edit.html', {
                 'blog': blog,
