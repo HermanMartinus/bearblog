@@ -80,7 +80,8 @@ def home(request):
         {
             'blog': blog,
             'posts': all_posts,
-            'meta_description': meta_description
+            'meta_description': meta_description,
+            'admin_passport': request.COOKIES.get('admin_passport') == os.getenv('ADMIN_PASSPORT')
         }
     )
 
