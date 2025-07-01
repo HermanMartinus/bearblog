@@ -87,6 +87,9 @@ def studio(request, id):
 
 
 def parse_raw_homepage(blog, header_content, body_content):
+    if len(body_content) > 100000:
+        return ["Your content is too long. This is a safety feature to prevent abuse. If you're sure you need more, please contact support."]
+    
     raw_header = [item for item in header_content.split('\r\n') if item]
     
     # Clear out data
@@ -150,6 +153,21 @@ def post(request, id, uid=None):
     preview = request.POST.get("preview", False) == "true"
 
     if request.method == "POST" and header_content:
+        if blog.posts.count() >= 3000:
+            error_messages.append("You have reached the maximum number of posts. This is a safety feature to prevent abuse. If you're sure you need more, please contact support.")
+            return render(request, 'studio/post_edit.html', {
+                'blog': blog,
+                'post': post,
+                'error_messages': error_messages,
+            })
+        if len(body_content) > 1000000:
+            error_messages.append("Your content is too long. This is a safety feature to prevent abuse. If you're sure you need more, please contact support.")
+            return render(request, 'studio/post_edit.html', {
+                'blog': blog,
+                'post': post,
+                'error_messages': error_messages,
+            })
+        
         raw_header = [item for item in header_content.split('\r\n') if item]
         is_new = False
 
@@ -453,7 +471,7 @@ def custom_domain_edit(request, id):
     error_messages = []
 
     if request.method == "POST":
-        custom_domain = request.POST.get("custom-domain", "").lower().strip()
+        custom_domain = request.POST.get("custom-domain", "").lower().strip().replace('https://', '').replace('http://', '')
 
         if Blog.objects.filter(domain__iexact=custom_domain).exclude(pk=blog.pk).count() == 0:
             try:

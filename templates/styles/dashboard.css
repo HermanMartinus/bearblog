@@ -180,10 +180,6 @@ ul.post-list li span.number {
     flex: 0 0 50px;
 }
 
-ul.post-list li a {
-    flex: max-content;
-}
-
 ul.post-list li small {
     text-align: right;
     flex: 0 0 115px;
