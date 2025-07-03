@@ -306,10 +306,6 @@ def empty_blogs():
 
 
 def new_blogs():
-    # TODO: Clean up ingore terms
-    # persistent_store = PersistentStore.load()
-    # ignore_terms = persistent_store.ignore_terms
-
     to_review = Blog.objects.filter(
         Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True),
         permanent_ignore=False,
@@ -322,12 +318,8 @@ def new_blogs():
 
     # Avoid showing empty blogs
     to_review = to_review.annotate(num_posts=Count('posts')).annotate(content_length=Length('content')).exclude(
-        num_posts__lte=0,
-        content_length__lt=60
+       Q(num_posts__lte=0, content_length__lt=200) & ~Q(content__icontains="http")
     )
-
-    # for term in ignore_terms:
-    #     to_review = to_review.exclude(content__icontains=term)
     
     return to_review
 
