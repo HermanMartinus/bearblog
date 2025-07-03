@@ -320,6 +320,12 @@ def new_blogs():
         created_date__lte=timezone.now() - timedelta(days=2)
     )
 
+    # Avoid showing empty blogs
+    to_review = to_review.annotate(num_posts=Count('posts')).annotate(content_length=Length('content')).exclude(
+        num_posts__lte=0,
+        content_length__lt=60
+    )
+
     # for term in ignore_terms:
     #     to_review = to_review.exclude(content__icontains=term)
     
