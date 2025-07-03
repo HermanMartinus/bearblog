@@ -95,7 +95,7 @@
                 </small> {% endcomment %}
                 {% if request.user.is_staff %}
                     <details>
-                        <summary style="font-size: 0.7rem;">{% if post.blog.user.settings.upgraded %}🚀{% endif %}</summary>
+                        <summary style="font-size: 0.7rem;">{% if post.blog.user.settings.upgraded %}🐻{% else %}🌱{% endif %} {{ post.blog.lang }} {{ post.lang }}</summary>
                         <form method="POST" style="display:inline">
                             <input hidden name="hide-post" value="{{ post.pk }}">
                             <button onclick="event.preventDefault();if(confirm('Hide this post?')){event.target.parentElement.submit()}">Hide post</button>
@@ -117,7 +117,7 @@
                             <button>Set</button>
                         </form>
                         <br><br>
-                        Admin ({{ post.blog.lang }} {{ post.lang }}):
+                        Admin:
                         <a href="/mothership/blogs/blog/{{ post.blog.id }}/change/" target="_blank">Blog</a>
                         | <a href="/mothership/blogs/post/{{ post.id }}/change/" target="_blank">Post</a>
                         | <a href="/mothership/blogs/usersettings/{{ post.blog.user.settings.id }}/change/" target="_blank">User</a>
