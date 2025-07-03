@@ -23,7 +23,7 @@ from blogs.subscriptions import get_subscriptions
 
 @login_required
 def list(request):
-    blogs = Blog.objects.filter(user=request.user)
+    blogs = Blog.objects.filter(user=request.user).order_by("created_date")
 
     if request.method == "POST":
         form = BlogForm(request.POST)
