@@ -229,7 +229,7 @@ def sitemap(request):
         return not_found(request)
     
     try:
-        posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).only('slug', 'last_modified').order_by('-published_date')
+        posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).only('slug', 'last_modified', 'blog_id').order_by('-published_date')
     except AttributeError:
         posts = []
 
