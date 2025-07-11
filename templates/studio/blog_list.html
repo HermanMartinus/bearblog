@@ -47,7 +47,7 @@
 </p>
 {% endif %}
 {% if request.user.blogs.all|length < request.user.settings.max_blogs %}
-<h2>Create a new blog</h2>
+<h3>Create a new blog</h3>
 <form method="POST" class="post-form full-width">
     {% csrf_token %}
     {{ form.as_p }}
