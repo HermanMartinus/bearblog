@@ -21,10 +21,16 @@
     </p>
 {% endif %}
 
-<ul>
+<ul style="list-style:none; padding:0; margin:0;">
 {% for blog in blogs %}
-    <li>
-        <a href="{% url 'dashboard' id=blog.subdomain %}">{{ blog.title }}</a>
+    <li style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; padding:8px 0; border-bottom:1px solid #eee;">
+        <a href="{% url 'dashboard' id=blog.subdomain %}" style="flex:1; min-width:150px;">{{ blog.title }}</a>
+        <small style="white-space:nowrap;">
+            <a href="{% url 'dashboard' id=blog.subdomain %}posts/">Posts</a>
+            | <a href="{% url 'dashboard' id=blog.subdomain %}pages/">Pages</a>
+            | <a href="{% url 'dashboard' id=blog.subdomain %}analytics/">Analytics</a>
+            | <a href="{% url 'dashboard' id=blog.subdomain %}settings/">Settings</a>
+        </small>
     </li>
 {% endfor %}
 </ul>
@@ -80,10 +86,17 @@
 
 {% if subscription_link %}
 <p>
-    <a href="{{ subscription_link }}" target="_blank">Manage subscription</a>
+    You're currently on a <b>{{ variant }}</b> subscription.
+    <br>
+    Upgrade to
+    {% if variant == "Monthly" and upgrade_subscription_link %}
+    <a href="{{ upgrade_subscription_link }}" target="_blank">Yearly</a>
+    (2 months free) or {% endif %}
+    <a href="https://docs.bearblog.dev/upgrading-from-subscription-to-lifetime/" target="_blank">Lifetime</a>
+    (once-off purchase).  
 </p>
 <p>
-    <a href="https://docs.bearblog.dev/upgrading-from-subscription-to-lifetime/" target="_blank">Upgrade to lifetime</a>
+    <a href="{{ subscription_link }}" target="_blank">Manage subscription</a>
 </p>
 {% endif %}
 
@@ -91,14 +104,8 @@
     {% if subscription_link and not subscription_cancelled %}
     <a onclick="alert('Please cancel your subscription before deleting your account.')">Delete account</a>
     {% else %}
-    <a href="{% url 'user_delete' %}" style="color:lightsalmon">Delete account</a>
+    <a href="{% url 'user_delete' %}">Delete account</a>
     {% endif %}
 </p>
-<p>
-    If you have any requests use the
-    <a href="https://bear.nolt.io" target="_blank">suggestions board</a>,
-    or if you've found a bug pop <a href="https://herman.bearblog.dev/contact/">me</a> an email.
-</p>
-
 
 {% endblock %}
