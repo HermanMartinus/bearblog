@@ -45,28 +45,17 @@ def list(request):
 
     subscription_cancelled = None
     subscription_link = None
-    variant = None
 
     if request.user.settings.order_id:
         try:
             subscription = get_subscriptions(request.user.settings.order_id)
             if subscription:
-                print(subscription)
                 subscription_cancelled = subscription['data'][0]['attributes']['cancelled']
                 subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal']
-                upgrade_subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal_update_subscription']
-                variant = subscription['data'][0]['attributes']['variant_name']
         except Exception as e:
             print('No sub found ', e)
 
-    return render(request, 'studio/blog_list.html', {
-        'blogs': blogs,
-        'form': form,
-        'subscription_cancelled': subscription_cancelled,
-        'subscription_link': subscription_link,
-        'upgrade_subscription_link': upgrade_subscription_link,
-        'variant': variant
-    })
+    return render(request, 'studio/blog_list.html', {'blogs': blogs, 'form': form, 'subscription_cancelled': subscription_cancelled, 'subscription_link': subscription_link})
 
 
 @login_required
