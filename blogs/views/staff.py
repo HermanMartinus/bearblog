@@ -29,6 +29,7 @@ def dashboard(request):
 
     opt_in_blogs_count = len(opt_in_blogs().values_list('id', flat=True))
     dodgy_blogs_count = len(dodgy_blogs().values_list('id', flat=True))
+    dodgy_blogs_count = len(flagged_blogs().values_list('id', flat=True))
     new_blogs_count = len(new_blogs().values_list('id', flat=True))
 
     all_empty_blogs = empty_blogs()

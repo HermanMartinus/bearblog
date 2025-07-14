@@ -22,6 +22,7 @@ Staff dashboard  ʕง•ᴥ•ʔง
 
 {% block content %}
 <a href="{% url 'review_opt_in' %}">Review {{ opt_in_blogs_count }} opt-in blogs</a>
+| <a href="{% url 'review_flagged' %}">Review {{ flagged_blogs_count }} flagged blogs</a>
 | <a href="{% url 'review_dodgy' %}">Review {{ dodgy_blogs_count }} dodgy blogs</a>
 | <a href="{% url 'review_new' %}">Review {{ new_blogs_count }} new blogs</a>
 <main>
