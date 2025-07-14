@@ -332,10 +332,13 @@ def opt_in_blogs():
 
 def dodgy_blogs():
     to_review = Blog.objects.filter(
-        Q(reviewed=False, user__is_active=True, to_review=False, dodginess_score__gt=2, ignored_date__isnull=True) |
-        Q(flagged=True)
+        reviewed=False, user__is_active=True, to_review=False, flagged=False, dodginess_score__gt=2, ignored_date__isnull=True
     ).prefetch_related('posts')
 
+    return to_review
+
+def flagged_blogs():
+    to_review = Blog.objects.filter(flagged=True).prefetch_related('posts')
     return to_review
 
 
@@ -347,6 +350,8 @@ def review_bulk(request):
         blogs = new_blogs().select_related('user').prefetch_related('posts').order_by('-created_date')[:100]
     elif 'dodgy' in request.path:
         blogs = dodgy_blogs().select_related('user').prefetch_related('posts').order_by('-dodginess_score')[:100]
+    elif 'flagged' in request.path:
+        blogs = flagged_blogs().select_related('user')
 
     still_to_go = len(blogs)
     persistent_store = PersistentStore.load()

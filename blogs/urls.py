@@ -28,6 +28,7 @@ urlpatterns = [
     path('staff/review/new/', main_site_only(staff.review_bulk), name='review_new'),
     path('staff/review/opt-in/', main_site_only(staff.review_bulk), name='review_opt_in'),
     path('staff/review/dodgy/', main_site_only(staff.review_bulk), name='review_dodgy'),
+    path('staff/review/flagged/', main_site_only(staff.review_bulk), name='review_flagged'),
     path('staff/review/approve/<pk>', main_site_only(staff.approve), name='review_approve'),
     path('staff/review/block/<pk>', main_site_only(staff.block), name='review_block'),
     path('staff/review/ignore/<pk>', main_site_only(staff.ignore), name='review_ignore'),
