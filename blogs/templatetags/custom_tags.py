@@ -14,6 +14,8 @@ from pygments.formatters import HtmlFormatter
 from html import escape
 
 from mistune import HTMLRenderer, create_markdown
+from mistune.directives import FencedDirective, RSTDirective
+from mistune.directives import Admonition, TableOfContents
 from zoneinfo import ZoneInfo
 
 import latex2mathml.converter
@@ -150,11 +152,13 @@ class MyRenderer(HTMLRenderer):
         formatter = HtmlFormatter(style='friendly')
         highlighted_code = highlight(code, lexer, formatter)
         return highlighted_code
-    
-    
+
 markdown_renderer = create_markdown(
     renderer=MyRenderer(),
-    plugins=['math', 'strikethrough', 'footnotes', 'table', 'superscript', 'subscript', 'mark', 'task_lists', 'abbr'],
+    plugins=['math', 'strikethrough', 'footnotes', 'table', 'superscript', 'subscript', 'mark', 'task_lists', 'abbr', RSTDirective([
+        Admonition(),
+        TableOfContents(),
+    ]),],
     escape=False)
 
 
