@@ -114,6 +114,7 @@ def dashboard(request):
         {
             'signups': signups,
             'upgrades': upgrades,
+            'recent_upgrades': recent_upgrades(),
             'total_signups': total_signups,
             'total_upgrades': total_upgrades,
             'conversion_rate': formatted_conversion_rate,
@@ -296,6 +297,14 @@ def delete_empty(request):
         blog.delete()
 
     return redirect('staff_dashboard')
+
+def recent_upgrades():
+    timeperiod = timezone.now() - timedelta(days=1)
+    blogs = blogs = Blog.objects.filter(
+        user__settings__upgraded=True,
+        user__settings__upgraded_date__gt=timeperiod
+    ).prefetch_related('user__settings')
+    return blogs
 
 
 def empty_blogs():

@@ -63,6 +63,28 @@ Staff dashboard  ʕง•ᴥ•ʔง
         <span>{{ end_date|date:"j F Y" }}</span> 
     </span>
 
+    <h2>Recent upgrades</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Domain</th>
+                <th>User Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for blog in recent_upgrades %}
+            <tr>
+                <td>{{ blog.title }}</td>
+                <td><a href="{{ blog.useful_domain }}" target="_blank">{{ blog.useful_domain }}</a></td>
+                <td>{{ blog.user.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+
     <h2>Check spam blog</h2>
     <form method="post" action="{% url 'check_spam' %}" target="_blank" class="full-width">
         {% csrf_token %}
