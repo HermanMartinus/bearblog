@@ -56,10 +56,12 @@ def admin_actions(request):
             post.blog.user.is_active = False
             post.blog.user.save()
         
-        if request.POST.get("set-votes", False):
-            post = Post.objects.get(pk=request.POST.get("set-votes"))
+        if request.POST.get("set-values", False):
+            post = Post.objects.get(pk=request.POST.get("set-values"))
             post.shadow_votes = int(request.POST.get("shadow-votes"))
+            post.lang = request.POST.get('lang')
             post.save()
+        
 
 
 @csrf_exempt

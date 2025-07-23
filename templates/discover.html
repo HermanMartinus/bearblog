@@ -112,8 +112,9 @@
 
                         <form method="POST" style="display:inline">
                             <span>Shadow votes:</span>
-                            <input hidden name="set-votes" value="{{ post.pk }}">
+                            <input hidden name="set-values" value="{{ post.pk }}">
                             <input type="number" name="shadow-votes" value="{{ post.shadow_votes }}" style="width:45px; padding: 0;">
+                            <input type="text" name="lang" value="{% if post.lang %}{{ post.lang }}{% else %}{{ post.blog.lang }}{% endif %}">
                             <button>Set</button>
                         </form>
                         <br><br>
