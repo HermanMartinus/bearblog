@@ -1,5 +1,4 @@
 from django.db import connection
-from django.shortcuts import render
 from django.urls import resolve, Resolver404
 from django.http import JsonResponse
 from django.middleware.csrf import (
@@ -14,7 +13,6 @@ import threading
 from collections import defaultdict
 from contextlib import contextmanager
 from ipaddr import client_ip
-import sentry_sdk
 import redis
 import json
 import os
@@ -180,3 +178,19 @@ class RateLimitMiddleware:
             )
 
         return self.get_response(request)
+
+
+# Prevent clickjacking on root domiains
+class ConditionalXFrameOptionsMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        host = request.get_host().lower()
+        main_domains = {'bearblog.dev', 'www.bearblog.dev', 'lh.co'}
+        
+        if host in main_domains:
+            response['X-Frame-Options'] = 'DENY'
+        
+        return response
