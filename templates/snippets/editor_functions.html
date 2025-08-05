@@ -57,14 +57,11 @@
 				
 				const linkMarkdown = `[${selection}](${pastedText})`;
 				
-				// Use execCommand to preserve undo behavior (cmd+z will work)
-				if (document.execCommand && document.queryCommandSupported('insertText')) {
+				if (document.queryCommandSupported('insertText')) {
 					document.execCommand('insertText', false, linkMarkdown);
 				} else {
-					// Fallback for browsers that don't support execCommand
 					const start = $textarea.selectionStart;
 					const end = $textarea.selectionEnd;
-					// Replace selected text with markdown link syntax
 					$textarea.value = $textarea.value.substring(0, start) + linkMarkdown + $textarea.value.substring(end);
 					// Position cursor after the inserted link
 					$textarea.selectionStart = $textarea.selectionEnd = start + linkMarkdown.length;
@@ -74,12 +71,7 @@
 	});
 
 	function isUrl(string) {
-		try {
-			new URL(string);
-			return string.startsWith('http://') || string.startsWith('https://');
-		} catch {
-			return false;
-		}
+		return string.startsWith('http://') || string.startsWith('https://');
 	}
 
 	// Handle saving scroll position
