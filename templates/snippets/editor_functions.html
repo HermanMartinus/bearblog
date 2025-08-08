@@ -46,6 +46,34 @@
         }
     });
 
+	$textarea.addEventListener('paste', function(e) {
+		const selection = $textarea.value.substring($textarea.selectionStart, $textarea.selectionEnd);
+		
+		if (selection.length > 0) {
+			const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+			
+			if (isUrl(pastedText)) {
+				e.preventDefault();
+				
+				const linkMarkdown = `[${selection}](${pastedText})`;
+				
+				if (document.queryCommandSupported('insertText')) {
+					document.execCommand('insertText', false, linkMarkdown);
+				} else {
+					const start = $textarea.selectionStart;
+					const end = $textarea.selectionEnd;
+					$textarea.value = $textarea.value.substring(0, start) + linkMarkdown + $textarea.value.substring(end);
+					// Position cursor after the inserted link
+					$textarea.selectionStart = $textarea.selectionEnd = start + linkMarkdown.length;
+				}
+			}
+		}
+	});
+
+	function isUrl(string) {
+		return string.startsWith('http://') || string.startsWith('https://');
+	}
+
 	// Handle saving scroll position
 	$textarea.scrollTop = sessionStorage.getItem('textareaY') || 0
 	$textarea.addEventListener("scroll", function(event) {
