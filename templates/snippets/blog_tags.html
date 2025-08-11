@@ -1,0 +1,9 @@
+{% if tags %}
+<small>
+    <div class="tags">
+    {% for tag in tags %}
+        <a rel="nofollow" href="/{{ blog_path }}/?q={{ tag }}">#{{ tag }}</a>
+    {% endfor %}
+    </div>
+</small>
+{% endif %}

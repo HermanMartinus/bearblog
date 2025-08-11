@@ -307,6 +307,8 @@ def element_replacement(markup, blog, post=None, tz=None):
         markup = markup.replace('{{ blog_last_posted }}', timesince(blog.last_posted))
     else:
         markup = markup.replace('{{ blog_last_posted }}', '')
+
+    markup = markup.replace('{{ tags }}', render_to_string('snippets/blog_tags.html', {"tags": blog.tags, "blog_path": blog.blog_path or "blog"}))
         
     markup = markup.replace('{{ blog_link }}', f"{blog.useful_domain}")
 
