@@ -416,6 +416,7 @@ class PersistentStore(models.Model):
     review_ignore_terms = models.TextField(blank=True, default='[]')
     review_highlight_terms = models.TextField(blank=True, default='[]')
     review_blacklist_terms = models.TextField(blank=True, default='[]')
+    reviewed_blogs = models.JSONField(default=dict)
 
     @property
     def ignore_terms(self):

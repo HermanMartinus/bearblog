@@ -108,6 +108,8 @@ def dashboard(request):
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
 
+    persistent_store = PersistentStore.load()
+
     return render(
         request,
         'staff/dashboard.html',
@@ -129,6 +131,7 @@ def dashboard(request):
             'new_blogs_count': new_blogs_count,
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
+            'reviewed_blogs': persistent_store.reviewed_blogs,
             'heroku_slug_description': os.getenv('HEROKU_SLUG_DESCRIPTION'),
             'heroku_release_created_at': datetime.fromisoformat(os.getenv('HEROKU_RELEASE_CREATED_AT', timezone.now().isoformat()).replace('Z', '+00:00'))
         }
@@ -381,6 +384,17 @@ def review_bulk(request):
         return redirect('staff_dashboard')
 
 
+def increment_reviewed():
+    persistent_store = PersistentStore.load()
+    today = timezone.now().date().isoformat()
+    
+    reviewed_blogs = persistent_store.reviewed_blogs
+    reviewed_blogs[today] = reviewed_blogs.get(today, 0) + 1
+    
+    persistent_store.reviewed_blogs = reviewed_blogs
+    persistent_store.save()
+
+
 @staff_member_required
 def approve(request, pk):
     if request.method == "POST":
@@ -413,6 +427,9 @@ def block(request, pk):
         blog.flagged = False
         blog.save()
         blog.user.save()
+
+        increment_reviewed()
+
         return HttpResponse("Blocked")
 
 
@@ -434,6 +451,9 @@ def ignore(request, pk):
         blog.flagged = False
         blog.to_review = False
         blog.save()
+
+        increment_reviewed()
+
         return HttpResponse("Ignored")
     
 
@@ -443,6 +463,9 @@ def flag(request, pk):
         blog = get_object_or_404(Blog, pk=pk)
         blog.flagged = True
         blog.save()
+
+        increment_reviewed()
+
         return HttpResponse("Flagged")
 
 

@@ -27,7 +27,17 @@ Staff dashboard  ʕง•ᴥ•ʔง
 | <a href="{% url 'review_new' %}">Review {{ new_blogs_count }} new blogs</a>
 <main>
     <p>
-        <h2>All time</h2>
+        <h2>Blog review counter</h2>
+        <ul>
+            {% for day, count in reviewed_blogs.items %}
+            <li><b>{{ day }}</b>: {{ count }}</li>
+            {% endfor %}
+        </ul>
+    </p>
+
+    {% if request.user.is_superuser %}
+    <p>
+        <h2>All time stats</h2>
         <ul>
             <li>Signups: {{ total_signups }}</li>
             <li>Upgrades: {{ total_upgrades }}</li>
@@ -137,6 +147,8 @@ Staff dashboard  ʕง•ᴥ•ʔง
         {% endfor %}
     </ul>
     <button onclick="if (confirm('Are you sure?')) {window.location = '{% url 'delete_empty' %}'}">Delete empty</button> {% endcomment %}
+
+    {% endif %}
 </main>
 {% endblock %}
 
