@@ -14,6 +14,11 @@
         {% if show_description %}
         <p>{{ post.meta_description }}</p>
         {% endif %}
+
+        {% if show_image and post.meta_image %}
+        <img src="{{ post.meta_image }}" alt="{{ post.title }}">
+        {% endif %}
+
         {% if show_content %}
         <div>{% markdown content=post.content blog=blog post=post tz=tz %}</div>
         {% endif %}
