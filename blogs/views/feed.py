@@ -76,5 +76,6 @@ def generate_feed(blog, feed_type="atom", tag=None):
         fg.link(href=f"{blog.useful_domain}/feed/", rel='self')
         return fg.atom_str(pretty=True)
     elif feed_type == "rss":
-        fg.link(href=f"{blog.useful_domain}/feed/?type=rss", rel='self')
+        fg.link(href=f"{blog.useful_domain}/feed/?type=rss", rel='self', type='application/rss+xml')
+        fg.link(href=f"{blog.useful_domain}", rel='self')
         return fg.rss_str(pretty=True)
