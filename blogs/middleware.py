@@ -143,7 +143,7 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
 
    
 class RateLimitMiddleware:
-    RATE_LIMIT = 20  # max requests
+    RATE_LIMIT = 10  # max requests
     TIME_WINDOW = 10  # seconds
     BAN_DURATION = 60  # seconds
 
