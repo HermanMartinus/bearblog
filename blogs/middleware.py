@@ -143,39 +143,46 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
 
    
 class RateLimitMiddleware:
-    RATE_LIMIT = 60  # max requests
-    TIME_WINDOW = 60  # seconds
+    RATE_LIMIT = 20  # max requests
+    TIME_WINDOW = 10  # seconds
+    BAN_DURATION = 60  # seconds
 
     def __init__(self, get_response):
         self.get_response = get_response
         self.ip_request_counts = defaultdict(list)
+        self.banned_ips = {}
 
     def __call__(self, request):
         # Skip rate limiting for ping and feed endpoints
-        if  'ping' in request.path or 'feed' in request.path:
+        if 'ping' in request.path or 'feed' in request.path:
             return self.get_response(request)
 
         client_ip_address = client_ip(request)
         current_time = time.time()
+
+        # Check ban
+        if client_ip_address in self.banned_ips and current_time < self.banned_ips[client_ip_address]:
+            full_path = request.build_absolute_uri()
+            print(f"Banned: {client_ip_address} at {full_path}")
+            print(f"Banned: User agent {request.META.get('HTTP_USER_AGENT')}")
+            return JsonResponse({'error': 'Rate limit exceeded'}, status=429)
 
         # Clean up old requests
         self.ip_request_counts[client_ip_address] = [
             timestamp for timestamp in self.ip_request_counts[client_ip_address]
             if current_time - timestamp < self.TIME_WINDOW
         ]
-        
-        # Record the current request
+
+        # Record current request
         self.ip_request_counts[client_ip_address].append(current_time)
 
-        # Check if the IP has exceeded the rate limit
-        if len(self.ip_request_counts[client_ip_address]) > self.RATE_LIMIT: 
+        # Check rate limit
+        if len(self.ip_request_counts[client_ip_address]) > self.RATE_LIMIT:
+            self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
             full_path = request.build_absolute_uri()
             print(f"Rate limit: Exceeded for {client_ip_address} at {full_path}")
             print(f"Rate limit: User agent {request.META.get('HTTP_USER_AGENT')}")
-            return JsonResponse(
-                {'error': 'Rate limit exceeded'},
-                status=429
-            )
+            return JsonResponse({'error': 'Rate limit exceeded'}, status=429)
 
         return self.get_response(request)
 
