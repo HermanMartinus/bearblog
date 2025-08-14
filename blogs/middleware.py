@@ -16,6 +16,7 @@ from ipaddr import client_ip
 import redis
 import json
 import os
+import random
 
 
 # Replace the in-memory metrics with Redis connection handling
@@ -29,6 +30,8 @@ request_metrics = defaultdict(list)
 
 # Thread-local storage for query times
 _local = threading.local()
+
+thread_id = random.randrange(1000,9999)
 
 @contextmanager
 def track_db_time():
@@ -147,6 +150,7 @@ class RateLimitMiddleware:
     TIME_WINDOW = 10  # seconds
     BAN_DURATION = 60  # seconds
 
+    print("Rate limit thread id:", thread_id)
     def __init__(self, get_response):
         self.get_response = get_response
         self.ip_request_counts = defaultdict(list)
