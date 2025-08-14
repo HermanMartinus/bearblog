@@ -146,11 +146,10 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
 
    
 class RateLimitMiddleware:
-    RATE_LIMIT = 10  # max requests
+    RATE_LIMIT = 5  # max requests per thread
     TIME_WINDOW = 10  # seconds
     BAN_DURATION = 60  # seconds
 
-    print("Rate limit thread id:", thread_id)
     def __init__(self, get_response):
         self.get_response = get_response
         self.ip_request_counts = defaultdict(list)
@@ -168,7 +167,6 @@ class RateLimitMiddleware:
         if client_ip_address in self.banned_ips and current_time < self.banned_ips[client_ip_address]:
             full_path = request.build_absolute_uri()
             print(f"Banned: {client_ip_address} at {full_path}")
-            print(f"Banned: User agent {request.META.get('HTTP_USER_AGENT')}")
             return JsonResponse({'error': 'Rate limit exceeded'}, status=429)
 
         # Clean up old requests
