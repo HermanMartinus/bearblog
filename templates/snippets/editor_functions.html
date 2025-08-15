@@ -150,7 +150,10 @@
 		const file = files[index];
 
 		if (file.size > 10000000) {
-			alert(`File over the 10mb limit. Consider resizing it or uploading it elsewhere.`);
+			alert(`File ${file.name} over the 10mb limit. Consider resizing it or uploading it elsewhere.`);
+			if (index < files.length - 1) {
+				uploadNextFile(index + 1, files);
+			}
 			return;
 		}
 
@@ -188,8 +191,6 @@
 						$textarea.selectionStart = $textarea.selectionEnd = $textarea.value.length;
 					}
 				});
-
-				uploadNextFile(index + 1, files);
 			} else {
 				// Handle error, replace placeholder with error message
 				const currentText = $textarea.value;
@@ -198,7 +199,9 @@
 					$textarea.value = currentText.substring(0, start) + `![Upload of ${file.name} failed]\n` + currentText.substring(start + placeholder.length);
 					$textarea.selectionStart = $textarea.selectionEnd = start + `![Upload of ${file.name} failed]\n`.length;
 				}
+			}
 
+			if (index < files.length - 1) {
 				uploadNextFile(index + 1, files);
 			}
 		};

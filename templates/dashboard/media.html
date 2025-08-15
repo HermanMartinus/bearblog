@@ -15,15 +15,13 @@
 <button id="deleteSelected" style="margin-bottom: 10px;">Delete selected</button>
 
 <p style="color:lightsalmon">
+    <span id="loading">Uploading</span>
     {% for error_message in error_messages %}
         {{ error_message }}<br>
     {% endfor %}
 </p>
 
-<form id="uploadForm" method="post" enctype="multipart/form-data" action="" style="display: inline">
-    {% csrf_token %}
-    <input id="fileSelect" type="file" name="file" multiple required style="display: none" accept="{{ accepted_file_types }}">
-</form>
+<input id="fileSelect" type="file" name="file" multiple required style="display: none" accept="{{ accepted_file_types }}">
 
 <form id="deleteForm" method="post" action="{% url 'delete_selected_media' id=blog.subdomain %}">
     {% csrf_token %}
@@ -61,17 +59,74 @@
 </form>
 
 <script>
-document.getElementById('uploadMedia').addEventListener('click', function() {
-    document.getElementById('fileSelect').click();
+const $fileInput = document.getElementById("fileSelect");
+const $uploadButton = document.getElementById('uploadMedia');
+const $deleteButton = document.getElementById('deleteSelected');
+const $loadingDotty = document.getElementById('loading');
+
+$uploadButton.addEventListener('click', function() {
+    $fileInput.click();
 });
+
+function upload() {
+    const files = $fileInput.files;
+
+    if (!files.length) return;
+
+    $uploadButton.disabled = true;
+    $deleteButton.disabled = true;
+    $loadingDotty.style.display = 'inline-block';
+
+    uploadNextFile(0, files);
+}
+
+function uploadNextFile(index, files) {
+    const file = files[index];
+    console.log(file.name)
+    if (file.size > 10000000) {
+        alert(`File ${file.name} over the 10mb limit. Consider resizing it or uploading it elsewhere.`);
+        if (index < files.length - 1) {
+            uploadNextFile(index + 1, files);
+        } else {
+            location.reload()
+        }
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const target = "{% url 'upload_image' id=blog.subdomain %}";
+
+    const xhr = new XMLHttpRequest();
+    const eventSource = xhr.upload || xhr;
+
+    xhr.open("POST", target, true);
+    xhr.send(formData);
+
+    xhr.onload = function() {
+        if (this.status === 200) {
+            console.log('uploaded')
+        }
+        else {
+            console.log('failed')
+        }
+
+        if (index < files.length - 1) {
+            uploadNextFile(index + 1, files);
+        } else {
+            location.reload()
+        }
+    }
+}
 
 document.getElementById('fileSelect').addEventListener('change', function() {
     if (this.files.length > 0) {
-        document.getElementById('uploadForm').submit();
+        upload()
     }
 });
 
-document.getElementById('deleteSelected').addEventListener('click', function() {
+$deleteButton.addEventListener('click', function() {
     var selected = document.querySelectorAll('input[name="selected_media"]:checked');
     if (selected.length > 0) {
         if (confirm(`Are you sure you want to permenantly delete the selected media (${selected.length})? This will break the link if in use somewhere.`)) {
@@ -90,6 +145,26 @@ function handleImageError(img) {
     }
 }
 </script>
+
+<style>
+    #loading {
+        display: none;
+    }
+
+    #loading::after {
+      display: inline-block;
+      animation: dotty steps(1,end) 1s infinite;
+      content: '';
+    }
+    
+    @keyframes dotty {
+        0%   { content: ''; }
+        25%  { content: '.'; }
+        50%  { content: '..'; }
+        75%  { content: '...'; }
+        100% { content: ''; }
+    }
+</style>
 
 {{ request.user.settings.dashboard_footer | safe }}
 

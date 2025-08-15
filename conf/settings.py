@@ -138,8 +138,7 @@ if os.getenv('DATABASE_URL'):
     db_from_env = dj_database_url.config(conn_max_age=600)
     DATABASES['default'].update(db_from_env)
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100 MB
-# FILE_UPLOAD_MAX_MEMORY_SIZE = 0 # Stream files to disk to reduce memory burden
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
