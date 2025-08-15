@@ -139,6 +139,8 @@ if os.getenv('DATABASE_URL'):
     DATABASES['default'].update(db_from_env)
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 0 # Stream files to disk to reduce memory burden
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Password validation

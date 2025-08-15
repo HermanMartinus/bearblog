@@ -48,8 +48,9 @@ def media_center(request, id):
     error_messages = []
 
     # Upload media
-    if request.method == "POST" and request.FILES.getlist('file') and blog.user.settings.upgraded is True:
-        file_links = upload_files(blog, request.FILES.getlist('file'))
+    file_list = request.FILES.getlist('file')
+    if request.method == "POST" and file_list and blog.user.settings.upgraded is True:
+        file_links = upload_files(blog, file_list)
         for link in file_links:
             if 'Error' in link:
                 error_messages.append(link)
@@ -90,7 +91,8 @@ def upload_image(request, id):
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST" and blog.user.settings.upgraded is True:
-        file_links = upload_files(blog, request.FILES.getlist('file'))
+        file_list = request.FILES.getlist('file')
+        file_links = upload_files(blog, file_list)
 
         return HttpResponse(json.dumps(sorted(file_links)), 200)
 
