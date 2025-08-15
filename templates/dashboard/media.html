@@ -81,6 +81,7 @@ function upload() {
 }
 
 function uploadNextFile(index, files) {
+    $loadingDotty.innerText = `Uploading ${index + 1} of ${files.length}`
     const file = files[index];
     console.log(file.name)
     if (file.size > 10000000) {
