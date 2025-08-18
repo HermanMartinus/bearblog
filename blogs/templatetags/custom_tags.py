@@ -297,11 +297,9 @@ def element_replacement(markup, blog, post=None, tz=None):
     if blog.user.settings.upgraded:
         markup = markup.replace('{{ email-signup }}', render_to_string('snippets/email_subscribe_form.html'))
         markup = markup.replace('{{ email_signup }}', render_to_string('snippets/email_subscribe_form.html'))
-        markup = markup.replace('{{email-signup}}', render_to_string('snippets/email_subscribe_form.html'))
     else:
         markup = markup.replace('{{ email-signup }}', '')
         markup = markup.replace('{{ email_signup }}', '')
-        markup = markup.replace('{{email-signup}}', '')
 
     markup = markup.replace('{{ blog_title }}', escape(blog.title))
     markup = markup.replace('{{ blog_description }}', escape(blog.meta_description))
