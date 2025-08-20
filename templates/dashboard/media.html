@@ -58,6 +58,26 @@
     </div>
 </form>
 
+<style>
+    #loading {
+        display: none;
+    }
+
+    #loading::after {
+      display: inline-block;
+      animation: dotty steps(1,end) 1s infinite;
+      content: '';
+    }
+    
+    @keyframes dotty {
+        0%   { content: ''; }
+        25%  { content: '.'; }
+        50%  { content: '..'; }
+        75%  { content: '...'; }
+        100% { content: ''; }
+    }
+</style>
+
 <script>
 const $fileInput = document.getElementById("fileSelect");
 const $uploadButton = document.getElementById('uploadMedia');
@@ -146,26 +166,6 @@ function handleImageError(img) {
     }
 }
 </script>
-
-<style>
-    #loading {
-        display: none;
-    }
-
-    #loading::after {
-      display: inline-block;
-      animation: dotty steps(1,end) 1s infinite;
-      content: '';
-    }
-    
-    @keyframes dotty {
-        0%   { content: ''; }
-        25%  { content: '.'; }
-        50%  { content: '..'; }
-        75%  { content: '...'; }
-        100% { content: ''; }
-    }
-</style>
 
 {{ request.user.settings.dashboard_footer | safe }}
 
