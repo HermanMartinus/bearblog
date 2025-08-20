@@ -171,7 +171,7 @@ def feed(request):
         fe.link(href=f"{post.blog.useful_domain}/{post.slug}/")
         fe.content(
             clean_text(mistune.html(post.content.replace("{{ email-signup }}", ''))),
-            clean_text(mistune.html(post.content.replace("{{ email_signup }}", ''))),
+            # clean_text(mistune.html(post.content.replace("{{ email_signup }}", ''))),
             type="html"
         )
         fe.published(post.published_date)

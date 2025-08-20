@@ -63,7 +63,7 @@ def generate_feed(blog, feed_type="atom", tag=None):
             fe.summary(clean_string(post.meta_description))
         
         post_content = post.content.replace('{{ email-signup }}', '')
-        post_content = post.content.replace('{{ email_signup }}', '')
+        # post_content = post.content.replace('{{ email_signup }}', '')
 
         fe.content(clean_string(markdown(post_content, blog, post)), type="html")
         
