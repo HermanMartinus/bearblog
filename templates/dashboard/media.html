@@ -29,7 +29,7 @@
         {% for document in documents %}
         <li>
             <input type="checkbox" name="selected_media" value="{{ document.url }}">
-            <small>{{ document.created_at|date:'d M, Y'}}</small>
+            <small>{{ document.created_at|date:'d M, Y' }}</small>
             <a href="{{ document.url }}" target="_blank">{{ document.name }}</a>
             <button type="button" onclick="navigator.clipboard.writeText('{{ document.url }}').then(() => alert('URL copied to clipboard'));">Copy URL</button>
         </li>

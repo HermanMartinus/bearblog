@@ -108,7 +108,6 @@ def dashboard(request):
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
 
-    persistent_store = PersistentStore.load()
 
     return render(
         request,
@@ -131,11 +130,29 @@ def dashboard(request):
             'new_blogs_count': new_blogs_count,
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
-            'reviewed_blogs': persistent_store.reviewed_blogs,
+            'reviewed_blogs': get_weekly_reviews(),
             'heroku_slug_description': os.getenv('HEROKU_SLUG_DESCRIPTION'),
             'heroku_release_created_at': datetime.fromisoformat(os.getenv('HEROKU_RELEASE_CREATED_AT', timezone.now().isoformat()).replace('Z', '+00:00'))
         }
     )
+
+def get_weekly_reviews():
+    persistent_store = PersistentStore.load()
+    reviewed_blogs = persistent_store.reviewed_blogs
+    print(reviewed_blogs)
+
+     # Aggregate by week
+    weekly_reviews = {}
+    for date_str, count in reviewed_blogs.items():
+        date = datetime.strptime(date_str, '%Y-%m-%d')
+        # Find days since last Sunday (week starts at midnight before Monday)
+        days_since_sunday = (date.weekday() + 1) % 7
+        week_start = (date - timedelta(days=days_since_sunday)).strftime('%Y-%m-%d')
+        weekly_reviews[week_start] = weekly_reviews.get(week_start, 0) + count
+    
+    # Sort by week start date
+    weekly_reviews = dict(sorted(weekly_reviews.items()))
+    return weekly_reviews
 
 
 @staff_member_required

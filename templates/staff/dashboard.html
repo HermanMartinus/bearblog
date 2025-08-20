@@ -29,9 +29,9 @@ Staff dashboard  ʕง•ᴥ•ʔง
     <p>
         <h2>Blog review counter</h2>
         <ul>
-            {% for day, count in reviewed_blogs.items %}
-            <li><b>{{ day }}</b>: {{ count }}</li>
-            {% endfor %}
+        {% for week_start, count in reviewed_blogs.items %}
+            <li><b>Week starting {{ week_start }}</b>: {{ count }}</li>
+        {% endfor %}
         </ul>
     </p>
 
