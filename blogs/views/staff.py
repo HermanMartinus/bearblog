@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 from django.db.models import Q, F, Count
-from django.db.models.functions import Length, TruncDate, Length
+from django.db.models.functions import Length, TruncWeek, TruncDate, TruncMonth, Length
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
@@ -15,6 +15,7 @@ from blogs.middleware import request_metrics, redis_client
 
 from statistics import mean
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 import pygal
 from pygal.style import LightColorizedStyle
 import json
@@ -24,91 +25,99 @@ from datetime import datetime
 @staff_member_required
 def dashboard(request):
     days_filter = int(request.GET.get('days', 30))
+    period = request.GET.get('period', 'weeks')
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
-
     opt_in_blogs_count = len(opt_in_blogs().values_list('id', flat=True))
     dodgy_blogs_count = len(dodgy_blogs().values_list('id', flat=True))
     flagged_blogs_count = len(flagged_blogs().values_list('id', flat=True))
     new_blogs_count = len(new_blogs().values_list('id', flat=True))
-
     all_empty_blogs = empty_blogs()
-
-    users = User.objects.filter(is_active=True, date_joined__gt=start_date).order_by('date_joined')
-
+    users = User.objects.filter(is_active=True, date_joined__gte=start_date).order_by('date_joined')
+    # Configure period settings
+    if period == 'days':
+        trunc = TruncDate
+        delta = timedelta(days=1)
+        label_format = lambda d: d.split('-')[2]
+        get_start = lambda d: d
+    elif period == 'weeks':
+        trunc = TruncWeek
+        delta = timedelta(days=7)
+        label_format = lambda d: d[5:]
+        get_start = lambda d: d - timedelta(days=d.weekday())
+    elif period == 'months':
+        trunc = TruncMonth
+        delta = relativedelta(months=1)
+        label_format = lambda d: d[:7]
+        get_start = lambda d: d.replace(day=1)
+    else:
+        period = 'weeks'
+        trunc = TruncWeek
+        delta = timedelta(days=7)
+        label_format = lambda d: d[5:]
+        get_start = lambda d: d - timedelta(days=d.weekday())
+    start_period = get_start(start_date)
+    end_period = get_start(end_date)
     # Signups
-    date_iterator = start_date
-    user_count = users.annotate(date=TruncDate('date_joined')).values('date').annotate(c=Count('date')).order_by()
-
-    # Create dates dict with zero signups
+    user_count = users.annotate(p=trunc('date_joined')).values('p').annotate(c=Count('id')).order_by('p')
+    # Create dict with zero signups
     user_dict = {}
+    date_iterator = start_period
     while date_iterator <= end_date:
         user_dict[date_iterator.strftime("%Y-%m-%d")] = 0
-        date_iterator += timedelta(days=1)
-
+        date_iterator += delta
     # Populate dict with signup count
     for signup in user_count:
-        user_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
-
+        if signup['p'] is not None:
+            p_str = signup['p'].strftime("%Y-%m-%d")
+            if p_str in user_dict:
+                user_dict[p_str] = signup['c']
     # Generate chart
     chart_data = []
     for date, count in user_dict.items():
         chart_data.append({'date': date, 'signups': count})
-
     chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
     chart.force_uri_protocol = 'http'
     mark_list = [x['signups'] for x in chart_data]
-    [x['date'] for x in chart_data]
     chart.add('Signups', mark_list)
-    chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
+    chart.x_labels = [label_format(x['date']) for x in chart_data]
     signup_chart = chart.render_data_uri()
-
     # Upgrades
-    date_iterator = start_date
     upgraded_users = User.objects.filter(settings__upgraded=True, settings__upgraded_date__gte=start_date).order_by('settings__upgraded_date')
-    upgrades_count = upgraded_users.annotate(date=TruncDate('settings__upgraded_date')).values('date').annotate(c=Count('date')).order_by()
-
-
-    # Create dates dict with zero upgrades
+    upgrades_count = upgraded_users.annotate(p=trunc('settings__upgraded_date')).values('p').annotate(c=Count('id')).order_by('p')
+    # Create dict with zero upgrades
     user_dict = {}
+    date_iterator = start_period
     while date_iterator <= end_date:
         user_dict[date_iterator.strftime("%Y-%m-%d")] = 0
-        date_iterator += timedelta(days=1)
-
-    # Populate dict with signup count
-    for signup in upgrades_count:
-        if signup['date']:
-            user_dict[signup['date'].strftime("%Y-%m-%d")] = signup['c']
-
+        date_iterator += delta
+    # Populate dict with upgrade count
+    for upgrade in upgrades_count:
+        if upgrade['p'] is not None:
+            p_str = upgrade['p'].strftime("%Y-%m-%d")
+            if p_str in user_dict:
+                user_dict[p_str] = upgrade['c']
     # Generate chart
     chart_data = []
     for date, count in user_dict.items():
         chart_data.append({'date': date, 'upgrades': count})
-
     chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
     chart.force_uri_protocol = 'http'
     mark_list = [x['upgrades'] for x in chart_data]
-    [x['date'] for x in chart_data]
     chart.add('Upgrades', mark_list)
-    chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
+    chart.x_labels = [label_format(x['date']) for x in chart_data]
     upgrade_chart = chart.render_data_uri()
-
-    # Calculate signups and upgrades for the past month
+    # Calculate signups and upgrades for the period
     signups = users.count()
-    upgrades = User.objects.filter(settings__upgraded=True, settings__upgraded_date__gt=start_date).count()
-
+    upgrades = User.objects.filter(settings__upgraded=True, settings__upgraded_date__gte=start_date).count()
     # Calculate all-time totals
     total_signups = User.objects.count()
     total_upgrades = User.objects.filter(settings__upgraded=True).count()
-
     # Calculate conversion rates
     conversion_rate = upgrades / signups if signups > 0 else 0
     total_conversion_rate = total_upgrades / total_signups if total_signups > 0 else 0
-
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
-
-
     return render(
         request,
         'staff/dashboard.html',
@@ -130,11 +139,13 @@ def dashboard(request):
             'new_blogs_count': new_blogs_count,
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
+            'period': period,
             'reviewed_blogs': get_weekly_reviews(),
             'heroku_slug_description': os.getenv('HEROKU_SLUG_DESCRIPTION'),
             'heroku_release_created_at': datetime.fromisoformat(os.getenv('HEROKU_RELEASE_CREATED_AT', timezone.now().isoformat()).replace('Z', '+00:00'))
         }
     )
+
 
 def get_weekly_reviews():
     persistent_store = PersistentStore.load()

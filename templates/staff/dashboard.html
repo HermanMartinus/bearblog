@@ -45,13 +45,19 @@ Staff dashboard  ʕง•ᴥ•ʔง
         </ul>
     </p>
     <p>
-        <h2>Past {{ days_filter }} days</h2>
+        <h2>Past {{ days_filter }} days ({{ period|capfirst }})</h2>
         <span>
-            <button onclick="window.location = '?days=7'">Last week</button>
-            <button onclick="window.location = '?days=30'">Last month</button>
-            <button onclick="window.location = '?days=60'">Last 3 months</button>
-            <button onclick="window.location = '?days=180'">Last 6 months</button>
-            <button onclick="window.location = '?days=365'">Last year</button>
+            <button onclick="window.location = '?days=7&amp;period={{ period }}'">Last week</button>
+            <button onclick="window.location = '?days=30&amp;period={{ period }}'">Last month</button>
+            <button onclick="window.location = '?days=60&amp;period={{ period }}'">Last 3 months</button>
+            <button onclick="window.location = '?days=180&amp;period={{ period }}'">Last 6 months</button>
+            <button onclick="window.location = '?days=365&amp;period={{ period }}'">Last year</button>
+        </span>
+        <br>
+        <span>
+            <button onclick="window.location = '?days={{ days_filter }}&amp;period=days'">Days</button>
+            <button onclick="window.location = '?days={{ days_filter }}&amp;period=weeks'">Weeks</button>
+            <button onclick="window.location = '?days={{ days_filter }}&amp;period=months'">Months</button>
         </span>
         <ul>
             <li>Signups: {{ signups }}</li>
@@ -63,14 +69,13 @@ Staff dashboard  ʕง•ᴥ•ʔง
     <embed type="image/svg+xml" src= {{ signup_chart|safe }} />
     <span class="helptext" style="display: flex; justify-content:space-between;">
         <span>{{ start_date|date:"j F Y" }}</span>
-        <span>{{ end_date|date:"j F Y" }}</span> 
+        <span>{{ end_date|date:"j F Y" }}</span>
     </span>
-
     <h2>Upgrades</h2>
     <embed type="image/svg+xml" src= {{ upgrade_chart|safe }} />
     <span class="helptext" style="display: flex; justify-content:space-between;">
         <span>{{ start_date|date:"j F Y" }}</span>
-        <span>{{ end_date|date:"j F Y" }}</span> 
+        <span>{{ end_date|date:"j F Y" }}</span>
     </span>
 
     <h2>Recent upgrades</h2>
