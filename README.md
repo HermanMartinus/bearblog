@@ -1,5 +1,5 @@
 # BōcPress
-## https://bearblog.dev
+## https://bocpress.co.uk
 
 ## From Quill to Cloud.
 ### No javascript, no stylesheets, no trackers. Just your words.
