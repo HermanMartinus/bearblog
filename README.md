@@ -1,7 +1,7 @@
-# ʕ•ᴥ•ʔ Bear
+# BōcPress
 ## https://bearblog.dev
 
-## Free, no-nonsense, super-fast blogging
+## From Quill to Cloud.
 ### No javascript, no stylesheets, no trackers. Just your words.
 
 To request a feature or report a bug, please send an email to [Herman](https://herman.bearblog.dev/contact/).
@@ -21,13 +21,3 @@ There are a few Hugo themes that use Bear's stylesheet which you can find on the
 
 ## Wiki
 The full documentation for Bear can be found at https://docs.bearblog.dev
-
-## Some Bear faces
-
-```
-ʕ •ᴥ•ʔ  ʕ •ᴥ•ʔゝ☆  ＼ʕ •ᴥ•ʔ／  ＼ʕ •ᴥ•ʔ＼  ／ʕ •ᴥ•ʔ／  ʕง•ᴥ•ʔง  ᕕʕ •ᴥ•ʔ୨  ʕ　·ᴥʔ  ʕ　·ᴥ·ʔ
-ʕ·ᴥ·　ʔ  ʕᴥ·　ʔ  ʕ •`ᴥ•´ʔ  Σʕﾟᴥﾟﾉʔﾉ  “φʕ•ᴥ•oʔ  ᕦʕ •ᴥ•ʔᕤ  ┏ʕ •ᴥ•ʔ┛  ʕ´•ᴥ•`ʔ  ʅʕ•ᴥ•ʔʃ  ʕノ)ᴥ(ヾʔ
-ʕ/　·ᴥ·ʔ/  ʕ☞ᴥ ☜ʔ  ʕᴥ• ʔ☝  ʕ·ᴥ·˵ ʔ ʕ　˵·ᴥ·ʔ  ʕ º ᴥ ºʔ  ʕ ᵒ ᴥ ᵒʔ  ʕ ꆤ ᴥ ꆤʔ  ʕ ㅇ ᴥ ㅇʔ  ʕ≧ᴥ≦ʔ
-ʕ ꈍᴥꈍʔ  ʕ ﹷ ᴥ ﹷʔ  ʕ´• ᴥ•̥`ʔ  ʕ ´•̥̥̥ ᴥ•̥̥̥`ʔ  ╲ʕ·ᴥ·　╲ʔ  ʕ•ᴥ•ʔﾉ♡  ʕ￫ᴥ￩　ʔ  ʕ – ᴥ – ʔ  ʕ˵ ̿ᴥ ̿˵ʔ
-┬┴┬┴┤•ᴥ•ʔ├┬┴┬┴  ʕノ•ᴥ•ʔノ ︵ ┻━┻
-```
