@@ -19,5 +19,17 @@ It is more like Substack than Hugo. Due to this it isn't possible to individuall
 
 In the future we hope to draft a guide that explains how to set up a self-hosted instance. However, it will not be as easy as a purpose-built individual blog generator.
 
+## Background of BōcPress
+
+BōcPress was chosen because it blends heritage, literature, and modern publishing in a single, memorable name.
+
+“Bōc” comes from the Old English word for book, evoking centuries of literary tradition and the enduring power of the written word.
+
+“Press” signals publishing and dissemination, connecting the platform to both historic printing presses and today’s digital tools.
+
+Together, BōcPress represents a modern platform for writers while honoring the timeless craft of storytelling.
+
+This name reflects our mission: to provide a digital space where stories, ideas, and voices endure, combining elegance, literary heritage, and modern accessibility.
+
 ## Wiki
-The full documentation for Bear can be found at https://docs.bearblog.dev
+The full documentation for BōcPress is in development.
