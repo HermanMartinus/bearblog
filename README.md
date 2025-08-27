@@ -1,8 +1,11 @@
 # BōcPress
-## https://bocpress.co.uk
+https://bocpress.co.uk
 
 ## From Quill to Cloud.
-### No javascript, no stylesheets, no trackers. Just your words.
+
+BōcPress unites the tradition of the book with the power of digital publishing — a platform where words endure and stories take flight.
+
+No javascript, no stylesheets, no trackers. Just your words.
 
 To request a feature or report a bug, please send an email to [hello@bocpress.co.uk](mailto:hello@bocpress.co.uk).
 
