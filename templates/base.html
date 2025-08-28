@@ -6,12 +6,12 @@
   {% endblock %}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
-  
-  <title>{% block title %}Bear Blog{% endblock %}</title>
+
+  <title>{% block title %}BōcPress{% endblock %}</title>
   {% block canonical %}{% endblock %}
   {% block seo %}{% endblock %}
-  {% block imports %}{% endblock %}  
-  
+  {% block imports %}{% endblock %}
+
   {% block favicon %}
   <link rel="icon" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
@@ -37,11 +37,14 @@
   {% endif %}
   <header>
     <a class="title" href="{% block heading-link %}/{% endblock %}">
-      <h1>
+      <h1 style="margin-bottom: 0">
         {% block heading %}
-        <span class="bear">ʕ•ᴥ•ʔ</span> Bear
+        BōcPress
         {% endblock %}
       </h1>
+      <p style="margin-top: 0">
+          {% block motto %}From Quill to Cloud.{% endblock %}
+      </p>
     </a>
     <nav>
       {% block nav %}

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Blog list | Bear Blog{% endblock %}
+{% block title %}Blog list | BōcPress{% endblock %}
 
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
@@ -17,7 +17,7 @@
 {% if not request.user.settings.upgraded and request.user.blogs.all|length > 1 %}
     <p style="color:lightsalmon">
         You've exceeded the number of blogs for the free plan.
-        Please <a href="{% url 'upgrade' %}" style="color:lightsalmon;text-decoration:underline">upgrade</a> to keep your blogs. 
+        Please <a href="{% url 'upgrade' %}" style="color:lightsalmon;text-decoration:underline">upgrade</a> to keep your blogs.
     </p>
 {% endif %}
 
@@ -36,7 +36,7 @@
 </ul>
 {% if request.user.blogs.all|length > 0 and not request.user.settings.upgraded %}
 <p>
-    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs <span class="bear flex"></span></a>
+    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs</a>
 </p>
 {% else %}
 {% if error_messages %}
@@ -93,7 +93,7 @@
     <a href="{{ upgrade_subscription_link }}" target="_blank">Yearly</a>
     (2 months free) or {% endif %}
     <a href="https://docs.bearblog.dev/upgrading-from-subscription-to-lifetime/" target="_blank">Lifetime</a>
-    (once-off purchase).  
+    (once-off purchase).
 </p>
 <p>
     <a href="{{ subscription_link }}" target="_blank">Manage subscription</a>

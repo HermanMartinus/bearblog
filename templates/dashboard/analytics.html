@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Analytics | Bear Blog{% endblock %}
+{% block title %}Analytics | BōcPress{% endblock %}
 
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
@@ -24,7 +24,7 @@
 {{ chart|safe  }}
 <h3>Need more in-depth analytics?</h3>
 <p>
-    <a href="{% url 'upgrade' %}">Upgrade</a> to get access to in-depth, long-term analytics (<a href="https://docs.bearblog.dev/analytics/" target="_blank">more info</a>).
+    <a href="{% url 'upgrade' %}">Upgrade</a> to get access to in-depth, long-term analytics (<a href="https://docs.bocpress.co.uk/analytics/" target="_blank">more info</a>).
 </p>
 
 {{ request.user.settings.dashboard_footer | safe }}

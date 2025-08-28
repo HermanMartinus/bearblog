@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Analytics | Bear Blog{% endblock %}
+{% block title %}Analytics | BōcPress{% endblock %}
 
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
@@ -21,7 +21,7 @@
 <h1>Analytics{% if public %} for {{ blog.title }}{% endif %}</h1>
 <p>
     <b>Reading now:</b> {{ on_site|intcomma }}
-    
+
 </p>
 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
     <small>
@@ -39,7 +39,7 @@
 <embed type="image/svg+xml" src= {{ chart|safe }} />
 <span class="helptext" style="display: flex; justify-content:space-between;">
     <span>{{ start_date|date:"j F Y" }}</span>
-    <span>{{ end_date|date:"j F Y" }}</span> 
+    <span>{{ end_date|date:"j F Y" }}</span>
 </span>
 
 <p>
@@ -138,7 +138,7 @@
 
 {% block footer %}
 {% if public %}
-Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+Powered by <a href="https://bocpress.co.uk">BōcPress</a>
 {% else %}
 {% include 'snippets/dashboard_footer.html' %}
 {% endif %}

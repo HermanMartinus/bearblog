@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
 {% block seo %}
-{% include 'snippets/seo_tags.html' with site_name='ʕ•ᴥ•ʔ Bear Blog' type="website" title='ʕ•ᴥ•ʔ Bear Blog' url='https://bearblog.dev' description='Free, no-nonsense, super-fast blogging' image="https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556668-0.png" %}
+{% include 'snippets/seo_tags.html' with site_name='BōcPress' type="website" title='BōcPress' url='https://bocpress.co.uk' description='A blogging platform where words endure and stories take flight' image="https://bocpress-media.s3.nl-ams.scw.cloud/docs/logo.webp" %}
 {% endblock %}
+
+{% block motto %}From Quill to Cloud.{% endblock %}
 
 {% block nav %}
 {% endblock %}
 
 {% block content %}
-<h2 style="font-size: 1.34em">A privacy-first, no-nonsense, super-fast blogging platform</h2>
-<h3>No trackers, no javascript, no stylesheets. Just your words.</h3>
+<h2 style="font-size: 1.34em">A blogging platform where words endure and stories take flight.</h2>
 <nav>
     {% if  user.is_authenticated %}
     <a href="/dashboard/">Dashboard</a>
@@ -23,22 +24,31 @@
     This is a blogging platform where words matter most.
 </p>
 <h4>
-    Shun the bloat of the current web, embrace the <i>bear</i> necessities.
+    Benefits of BōcPress
 </h4>
 <ul>
     <li>Looks great on <b>any</b> device</li>
     <li>Tiny (~2.7kb), optimized, and awesome pages</li>
+    <li>Privacy respecting</li>
     <li>No trackers, ads, or scripts</li>
     <li>Seconds to sign up</li>
     <li>Connect your custom domain</li>
     <li>Free themes</li>
     <li>RSS &amp; Atom feeds</li>
-    <li>Built to last forever<sup><a href="https://herman.bearblog.dev/manifesto/" target="_blank">*</a></sup></li>
+    <li>Built to last forever<sup><a href="https://docs.bocpress.co.uk/manifesto/" target="_blank">*</a></sup></li>
 </ul>
-<p><a href="https://herman.bearblog.dev" target="_blank">View example blog</a></p>
-<h3>
-   Publish something awesome with your <i>bear</i> hands
-   <a class="bear flex" href="https://herman.bearblog.dev/praise-for-bear/" target="_blank" style="text-decoration: none; color: inherit;"></a>
-</h3>
+<p><a href="https://jordanrobinson.org" target="_blank">View example blog</a></p>
+
+<h3>What does "BōcPress" mean?</h3>
+<p>BōcPress was chosen because it blends heritage, literature, and modern publishing in a single, memorable name.</p>
+<p>Let's break it down:</p>
+<ul>
+    <li>“Bōc” comes from the Old English word for book, evoking centuries of literary tradition and the enduring power of the written word.</li>
+    <li>“Press” signals publishing and dissemination, connecting the platform to both historic printing presses and today’s digital tools.</li>
+</ul>
+
+<p>Together, BōcPress represents a modern platform for writers while honoring the timeless craft of storytelling.</p>
+
+<p>This name reflects our mission: to provide a digital space where stories, ideas, and voices endure, combining elegance, literary heritage, and modern accessibility.</p>
 
 {% endblock %}

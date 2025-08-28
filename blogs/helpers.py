@@ -97,7 +97,7 @@ def create_cache_key(host, path=None, tag=None):
     if path:
         cache_key += f"_{path}"
     if tag:
-        cache_key += f"_{tag}" 
+        cache_key += f"_{tag}"
     cache_key = slugify(cache_key).replace('-', '_')
 
     return cache_key
@@ -106,20 +106,20 @@ def create_cache_key(host, path=None, tag=None):
 def pseudo_word(length=5):
     vowels = "aeiou"
     consonants = "".join(set(string.ascii_lowercase) - set(vowels))
-    
+
     word = ""
     for i in range(length):
         if i % 2 == 0:
             word += random.choice(consonants)
         else:
             word += random.choice(vowels)
-    
+
     return word
 
 
 def salt_and_hash(request, duration='day'):
     ip_date_salt_string = f"{client_ip(request)}-{timezone.now().date()}-{os.getenv('SALT')}"
-    
+
     if duration == 'year':
         ip_date_salt_string = f"{client_ip(request)}-{timezone.now().year}-{os.getenv('SALT')}"
 

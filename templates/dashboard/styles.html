@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Styling | Bear Blog {% endblock %}
+{% block title %}Styling | BōcPress {% endblock %}
 
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
@@ -34,7 +34,7 @@
           <button type="submit" onclick="return confirm('This will overwrite your current styles, are you sure?')">Apply {{ style.name }}</button>
       </form>
     </span>
-    
+
     </span>
   </div>
   {% endfor %}
@@ -74,7 +74,7 @@
   setTimeout(() => {
     window.scrollTo(0, sessionStorage.getItem('scrollY'))
   }, 10)
-  
+
 
 	window.addEventListener("scroll", function(event) {
 		sessionStorage.setItem('scrollY', window.scrollY)

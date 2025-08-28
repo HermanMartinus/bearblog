@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-PROJECT_NAME = "🐼 BEARBLOG 🐼"
+PROJECT_NAME = "BōcPress"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,27 +24,27 @@ if not DEBUG:
                 return None
         return event
 
-    sentry_sdk.init(
-        dsn=os.getenv("SENTRY_DSN"),
-        auto_session_tracking=False,
-        traces_sample_rate=0.001,
-        profiles_sample_rate=0.001,
-        send_default_pii=True,
-        before_send=before_send
-    )
+    #sentry_sdk.init(
+    #    dsn=os.getenv("SENTRY_DSN"),
+    #    auto_session_tracking=False,
+    #    traces_sample_rate=0.001,
+    #    profiles_sample_rate=0.001,
+    #    send_default_pii=True,
+    #    before_send=before_send
+    #)
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://*.bearblog.dev', 'https://bearblog.dev']
+CSRF_TRUSTED_ORIGINS = ['https://*.bocpress.co.uk', 'https://bocpress.co.uk', 'http://dev-bocpress.co.uk']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
 X_FRAME_OPTIONS = 'ALLOWALL'
 
-INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = ['127.0.0.1','http://dev-bocpress.co.uk']
 
 # Application definition
 SITE_ID = 1
@@ -188,12 +188,12 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 
 # Emailer
 
-DEFAULT_FROM_EMAIL = "ʕ•ᴥ•ʔ Bear Blog <noreply@bearblog.dev>"
-SERVER_EMAIL = "ʕ•ᴥ•ʔ Bear Admin <noreply@bearblog.dev>"
+DEFAULT_FROM_EMAIL = "BōcPress Support <noreply@bocpress.co.uk>"
+SERVER_EMAIL = "BōcPress Admin <noreply@bocpress.co.uk>"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.eu.mailgun.org'
-EMAIL_HOST_USER = 'postmaster@mg.bearblog.dev'
-EMAIL_HOST_PASSWORD = os.getenv('MAILGUN_PASSWORD', False)
+EMAIL_HOST = 'smtp.fastmail.com'
+EMAIL_HOST_USER = 'jordanrobinson@fastmail.com'
+EMAIL_HOST_PASSWORD = os.getenv('SMTP_PASSWORD', False)
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 

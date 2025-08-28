@@ -14,7 +14,7 @@
 {% block seo %}
 {% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
-<meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
+<meta name="{{ blog.subdomain }}" content="From Quill to Cloud.">
 
 {% include 'snippets/seo_tags.html' with site_name=blog.title title=blog_path_title type="website" url=blog.useful_domain description=blog.meta_description image=blog.meta_image meta_tag=blog.meta_tag %}
 <link rel="alternate" type="application/atom+xml" href="/feed/{% if query %}?q={{ query }}{% endif %}" title="{{ blog.title }}">
@@ -32,12 +32,14 @@
 
 {% block heading %}{{ blog.title }}{% endblock %}
 
+{% block motto %}{% endblock %}
+
 {% block nav %}{% markdown content=blog.nav blog=blog post=None tz=tz %}{% endblock %}
 
 {% block content %}
 
 {% if active_tags %}
-<h3 style="margin-bottom:0">Filtering for: 
+<h3 style="margin-bottom:0">Filtering for:
     {% for tag in active_tags %}
     <span class="tag">
         #{{ tag }}
@@ -74,6 +76,6 @@
 </span>
 {% endif %}
 <span>
-    Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+    Powered by <a href="https://bocpress.co.uk">BōcPress</a>
 </span>
 {% endblock %}

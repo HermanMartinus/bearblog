@@ -1,5 +1,8 @@
-Use the link below to confirm your email address.
+Dear User,
+
+Please click the link below to confirm your email address:
 
 {{ activate_url }}
 
-Keep the tiny internet awesome! \ʕ•ᴥ•ʔ/
+With kind regards,
+The BōcPress Team

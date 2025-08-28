@@ -1,179 +1,192 @@
+/* ===========================
+   Bocpress — Elegant Literary Style
+   =========================== */
+
+/* Typography */
+body {
+    font-family: "Garamond", "Baskerville", "Georgia", serif;
+    color: #2b2b2b;
+    background-color: #fafafa;
+    line-height: 1.65;
+    font-size: 17px;
+}
+
+/* Headings — elegant, bookish */
+h1,
+h2,
+h3,
+h4,
+h5 {
+    font-family: "Baskerville", "Times New Roman", serif;
+    font-weight: 600;
+    color: #1c1c1c;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.4em;
+}
+
+/* Inline Titles */
 .title {
     display: inline-block;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
+/* Logo Bear Character */
 .bear {
     font-weight: 400;
-    font-family:  "Lucida", monospace;
+    font-family: "Lucida Console", monospace;
     white-space: nowrap;
     display: inline-block;
+    font-size: 1.1em;
 }
 
+/* Decorative Emoticon Animations */
 .flex::before {
     content: "ᕦʕ •ᴥ•ʔᕤ";
-    animation: blink 10s infinite;
+    animation: blink 12s infinite;
+    font-size: 1rem;
 }
 
-.flex:hover::before {
-    content: "ᕙʕ ಠᴥಠʔᕗ";
-    animation: none;
-}
-
+.flex:hover::before,
 .upgrade:hover .flex::before {
     content: "ᕙʕ ಠᴥಠʔᕗ";
     animation: none;
-    text-decoration: underline;
-}
-
-@keyframes blink {
-    0%, 96% { content: "ᕦʕ •ᴥ•ʔᕤ"; }
-    97%, 100% { content: "ᕦʕ -ᴥ-ʔᕤ"; }
-}
-
-a.account:hover {
     text-decoration: none;
 }
 
+/* Blink animation — subtle fade */
+@keyframes blink {
+    0%,
+    97% {
+        content: "ᕦʕ •ᴥ•ʔᕤ";
+    }
+    98%,
+    100% {
+        content: "ᕦʕ -ᴥ-ʔᕤ";
+    }
+}
+
+/* Account styling */
+a.account {
+    font-weight: 500;
+    text-decoration: none;
+    color: inherit;
+}
+
 a.account::before {
-    content: "ʕ-ᴥ-ʔ";
+    content: "ʕ-ᴥ-ʔ ";
+    margin-right: 5px;
 }
 
-.account:hover::before {
-    content: "ʕ•ᴥ•ʔ";
+a.account:hover::before {
+    content: "ʕ•ᴥ•ʔ ";
 }
 
+/* Navigation */
 header nav {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
+    border-bottom: 1px solid #dcdcdc;
+    padding: 0.5em 0;
 }
 
-header nav a:last-child {
-    margin-right: 0;
-}
-
+/* Labels */
 label {
-    font-weight: bold;
+    font-weight: 600;
+    font-family: "Baskerville", serif;
 }
 
+/* Time / Metadata */
 time {
-    font-family: monospace;
-    font-size: 15px;
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    color: #555;
 }
 
+/* Input Fields */
 textarea,
 input:not([type="submit"]),
 .editable {
-    background-color: #eceff4;
-    border: none;
-    line-height: 1.7;
-    outline: none;
-    color: inherit;
+    background-color: #f4f4f2;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    color: #222;
     padding: 10px;
-    font-size: 18px;
+    font-size: 16px;
+    transition: border 0.2s ease-in-out;
 }
 
-@media (prefers-color-scheme: dark) {
-    textarea,
-    input:not([type="submit"]),
-    .editable {
-        background-color: #004052;
-    }
-}
-
-.full-width textarea,
-.full-width input:not([type="submit"], [type="checkbox"], [type="radio"]) {
-    width: calc(100% - 20px);
+textarea:focus,
+input:focus {
+    border: 1px solid #8b6fcb;
+    outline: none;
 }
 
 textarea:required,
-input:required:not([type="submit"]){
-    border-left: 1px solid #f99f9f;
+input:required:not([type="submit"]) {
+    border-left: 3px solid #c27a7a;
 }
 
-input[type='checkbox'], input[type='radio'] {
-    height: 15px;
-    margin-right: 10px;
-}
-
-button {
-    margin: 5px 0;
-}
-
-button.floating {
-    position: fixed;
-    bottom: 20px;
-    right: 25px;
-}
-
-button#toggle-full-screen {
-    float: right;
-}
-
-.sticky-controls {
-    position: sticky;
-    top: 0;
-    background-color: white;
-    line-height: 0;
-    z-index: 10;
-}
-
-.helptext {
-    display: flex;
-    justify-content: space-between;
-    color: #777;
-    font-size: small;
-}
-
-.helptext.sticky {
-    position: sticky;
-    bottom: 0;
-    background-color: white;
-    padding: 3px 0;
-}
-
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
-    .helptext.sticky,
-    .sticky-controls {
-        background-color: var(--background-color);
+    body {
+        background-color: #0f1a1c; /* deep ink navy */
+        color: #e8e6e3; /* warm off-white (like aged paper) */
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        color: #f2f0ec; /* slightly brighter for headings */
+    }
+
+    textarea,
+    input:not([type="submit"]),
+    .editable {
+        background-color: #1c2c30;
+        border: 1px solid #444;
+        color: #e8e6e3; /* ensures input text is readable */
+    }
+
+    .sticky-controls,
+    .helptext.sticky {
+        background-color: #0f1a1c;
+        border-color: #333;
+    }
+
+    .helptext {
+        color: #aaa; /* muted but visible */
+    }
+
+    a,
+    a:visited {
+        color: #cbb67a; /* golden accent for links */
+    }
+
+    .errorlist {
+        color: #e89a7a; /* warm highlight for errors */
     }
 }
 
-.errorlist {
-    color: #eba613;
-    font-size: small;
-}
-
-#date-range{
-    display: none;
-}
-
-#date-range:target{
-    display: block;
-}
-
-.notification {
-    width: 100%;
-    text-align: left;
-    padding: 5px 0;
-    margin-bottom: -15px;
-}
-
-.notification a {
-    margin: 0;
-}
-
-/* dashboard post list and analytics */
-ul.post-list {
+/* Lists — publishing vibe */
+ul.post-list,
+ul.discover-posts {
     list-style-type: none;
-    padding: unset;
+    padding: 0;
+    margin: 0;
+    font-family: "Georgia", serif;
 }
 
+/* Post List */
 ul.post-list li {
     display: flex;
     align-items: baseline;
-    padding: 10px 0;
-    border-bottom: 1px solid #eceff4;
+    padding: 12px 0;
+    border-bottom: 1px solid #e2e2e2;
 }
 
 ul.post-list li span {
@@ -187,62 +200,114 @@ ul.post-list li span.number {
 ul.post-list li small {
     text-align: right;
     flex: 0 0 115px;
+    color: #555;
 }
 
-/* media center */
-
-.media-container {
-    display: flex;
-    flex-flow: row wrap;
-    gap: 5px;
-}
-.media-item {
-    text-align: center;
-    background-color: #eceff4;
-    position: relative;
-}
-.media-checkbox {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    margin: 0 !important;
-    height: unset !important;
-}
-
-/* discovery feed */
-ul.discover-posts {
-    list-style-type: none;
-    padding: unset;
-}
-
+/* Discovery Feed */
 ul.discover-posts li {
     display: flex;
-    flex-flow: row no-wrap;
-    gap: 10px;
-    line-height: 1.2;
-    position: relative;
+    flex-flow: row nowrap;
+    gap: 12px;
+    line-height: 1.4;
+    padding: 8px 0;
 }
 
-ul.discover-posts li span {
-    flex: 0 0 30px;
+ul.discover-posts li a {
+    color: inherit;
+    text-decoration: none;
 }
 
 ul.discover-posts li a:visited {
-  color: #8b6fcb;
+    color: #6c5fa7;
 }
 
-ul.discover-posts li div {
-    padding-bottom: 10px;
-}
-
-ul.discover-posts li small span, ul.discover-posts li small span a {
+ul.discover-posts li small span,
+ul.discover-posts li small span a {
     color: #777 !important;
 }
 
+/* Media */
+.media-container {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 10px;
+}
 
-@media (prefers-color-scheme: dark) {
+.media-item {
+    text-align: center;
+    background-color: #f4f4f2;
+    padding: 6px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    position: relative;
+    font-family: "Georgia", serif;
+}
 
-    .helptext {
-        color: #aaa;
-    }
+/* Notifications */
+.notification {
+    width: 100%;
+    text-align: left;
+    padding: 6px 0;
+    margin-bottom: -10px;
+    font-family: "Georgia", serif;
+}
+
+/* Buttons */
+button {
+    font-family: "Georgia", serif;
+    background-color: #f7f7f5;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 6px 12px;
+    margin: 5px 0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background-color: #eceae7;
+}
+
+button.floating {
+    position: fixed;
+    bottom: 20px;
+    right: 25px;
+}
+
+button#toggle-full-screen {
+    float: right;
+}
+
+/* Sticky Controls */
+.sticky-controls {
+    position: sticky;
+    top: 0;
+    border-bottom: 1px solid #ddd;
+    z-index: 10;
+}
+
+/* Helptext */
+.helptext {
+    display: flex;
+    justify-content: space-between;
+    color: #777;
+    font-size: 0.85rem;
+}
+
+.helptext.sticky {
+    position: sticky;
+    bottom: 0;
+    padding: 4px 0;
+}
+
+/* Errors */
+.errorlist {
+    color: #c27a7a;
+    font-size: small;
+    font-family: "Georgia", serif;
+}
+
+.full-width textarea,
+.full-width input:not([type="submit"], [type="checkbox"], [type="radio"]) {
+    width: calc(100% - 20px);
 }

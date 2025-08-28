@@ -1,0 +1,14 @@
+[Unit]
+Description=BocPress Service
+After=network.target
+
+[Service]
+Type=simple
+User=bocpress
+Group=bocpress
+WorkingDirectory=/opt/bocpress
+ExecStart=/opt/bocpress/venv/bin/gunicorn conf.wsgi --log-file - --timeout 24 --graceful-timeout 5 --max-requests 10000 --bind 0.0.0.0:7000
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

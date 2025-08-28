@@ -42,14 +42,14 @@
         <a href="{{ request.path }}" onclick="document.cookie='lang={{ language }}; path=/discover/; expires=Fri, 31 Dec 9999 23:59:59 GMT';">{{ language }}</a>
         {% endif %}
         {% endfor %}
-    
+
         <br><br>
         Hidden blogs:
         <br>
         <textarea id="hidden-blogs" style="width: calc(100% - 20px); height: 100px; padding: 10px;">{% for domain in hide_list_cookie %}{{ domain }}
 {% endfor %}</textarea>
         <br>
-        
+
         <button onclick="document.cookie='hide_list=' + document.getElementById('hidden-blogs').value.split('\n').join(',') + '; path=/discover/; expires=Fri, 31 Dec 9999 23:59:59 GMT'; location.reload();">Save</button>
         <br>
         Not everyone likes everything. Some people like programming posts, others like slices of life.
@@ -152,8 +152,8 @@
             title="https://bearblog.dev/discover/feed/?newest=True{% if lang %}&lang={{ lang }}{% endif %}"
         >RSS feed</a>
         {% else %}
-        <a 
-            href="feed/{% if lang %}?lang={{ lang }}{% endif %}" 
+        <a
+            href="feed/{% if lang %}?lang={{ lang }}{% endif %}"
             title="https://bearblog.dev/discover/feed/{% if lang %}?lang={{ lang }}{% endif %}"
         >RSS feed</a>
         {% endif %}
@@ -182,6 +182,6 @@ B values is used to modify the effect of time on the score. A lower B causes pos
 
 {% block footer %}
 <p>
-    Start your own blog with <a href="/accounts/signup/"><span class="bear">ʕ•ᴥ•ʔ</span> Bear</a>
+    Start your own blog with <a href="https://bocpress.co.uk">BōcPress</a>
 </p>
 {% endblock %}
