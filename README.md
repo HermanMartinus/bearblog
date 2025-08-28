@@ -36,3 +36,7 @@ This name reflects our mission: to provide a digital space where stories, ideas,
 
 ## Wiki
 The full documentation for BōcPress is in development.
+
+## Forked
+
+Forked from [Bearblog.dev](https://github.com/HermanMartinus/bearblog)
