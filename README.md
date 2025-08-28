@@ -35,7 +35,7 @@ Together, BōcPress represents a modern platform for writers while honoring the 
 This name reflects our mission: to provide a digital space where stories, ideas, and voices endure, combining elegance, literary heritage, and modern accessibility.
 
 ## Wiki
-The full documentation for BōcPress is in development.
+The full documentation for BōcPress is in development, but is available at [https://docs.bocpress.co.uk](https://docs.bocpress.co.uk).
 
 ## Forked
 
