@@ -1,5 +1,8 @@
 {% load i18n %}
+Dear User,
 
 It looks like this email address does not have a blog associated with it.
-You can sign up for a new blog at https://bearblog.dev
+You can sign up for a new blog at https://bocpress.co.uk
 
+With kind regards,
+The BōcPress Team

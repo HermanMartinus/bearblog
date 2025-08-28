@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Custom domain | Bear Blog
+Custom domain | BōcPress
 {% endblock %}
 
 {% block custom_styles %}
@@ -14,7 +14,7 @@ Custom domain | Bear Blog
 {% block content %}
 <main>
     <h1>Custom domain</h1>
-    
+
     <form method="POST" class="post-form full-width">
         {% csrf_token %}
         <p style="line-height: 0">
@@ -30,7 +30,7 @@ Custom domain | Bear Blog
             {% endfor %}
         </p>
         {% endif %}
-        
+
         <p>
             <label>Domain:</label>
             <br>
@@ -42,7 +42,7 @@ Custom domain | Bear Blog
     </form>
 
     <p>
-        
+
         <p>Once you have a domain registered with a <a href="https://porkbun.com" target="_blank">domain registrar</a>, add the following DNS records:</p>
         <table>
             <tr>
@@ -54,13 +54,13 @@ Custom domain | Bear Blog
             <tr>
                 <td>CNAME</td>
                 <td><small>@</small></td>
-                <td><small>domain-proxy.bearblog.dev</small></td>
+                <td><small>domain-proxy.bocpress.co.uk</small></td>
                 <td>3600</td>
             </tr>
             <tr>
                 <td>CNAME</td>
                 <td><small>www</small></td>
-                <td><small>domain-proxy.bearblog.dev</small></td>
+                <td><small>domain-proxy.bocpress.co.uk</small></td>
                 <td>3600</td>
             </tr>
         </table>
@@ -78,13 +78,13 @@ Custom domain | Bear Blog
                 <tr>
                     <td>A</td>
                     <td><small>@</small></td>
-                    <td><small>159.223.204.176</small></td>
+                    <td><small>78.47.67.77</small></td>
                     <td>3600</td>
                 </tr>
                 <tr>
                     <td>A</td>
                     <td><small>www</small></td>
-                    <td><small>159.223.204.176</small></td>
+                    <td><small>78.47.67.77</small></td>
                     <td>3600</td>
                 </tr>
             </table>

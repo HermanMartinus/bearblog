@@ -19,7 +19,7 @@
 <form method="POST" class="full-width">
     {% csrf_token %}
     <p>
-        To ensure you keep control <b>{{ subdomain }}.bearblog.dev</b>
+        To ensure you keep control <b>{{ subdomain }}.bocpress.co.uk</b>
     </p>
     <p style="display: flex; gap: 20px;">
         <input
@@ -50,10 +50,10 @@
     <textarea hidden name="content">{{ content }}</textarea>
 
     <small><input type="checkbox" required>
-        I agree to the <a target="_blank" href="https://docs.bearblog.dev/terms-of-service">terms of service</a>.
+        I agree to the <a target="_blank" href="https://docs.bocpress.co.uk/terms-of-service">terms of service</a>.
     </small>
     <br>
-    
+
     <button type="submit">Create &raquo;</button>
 </form>
 

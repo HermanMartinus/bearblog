@@ -1,3 +1,3 @@
 {% if blog %}{{ blog.robots_txt }}{% endif %}
 
-Sitemap: {% if blog %}{{ blog.useful_domain }}{% else %}https://bearblog.dev{% endif %}/sitemap.xml
+Sitemap: {% if blog %}{{ blog.useful_domain }}{% else %}https://bocpress.co.uk{% endif %}/sitemap.xml

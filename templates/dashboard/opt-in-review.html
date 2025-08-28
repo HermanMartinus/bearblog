@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Opt-in review | Bear Blog{% endblock %}
+{% block title %}Opt-in review | BōcPress{% endblock %}
 
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
@@ -12,27 +12,28 @@
 <button onclick="window.history.back()">← Back</button>
 <h1>Opt-in review</h1>
 {% if blog.reviewed %}
-<p>Your blog has already been reviewed. <span class="bear">\ʕ•ᴥ•ʔ/</span></p>
+<p>Your blog has already been reviewed.</p>
 {% elif blog.to_review %}
 <p>Your blog is under review. Blogs are reviewed about twice a week. <a href="{% url 'upgrade' %}">Upgrade</a> to get approved immediately.
 {% else %}
 <p>
-    Hi, Herman here  <span class="bear">ʕ •ᴥ•ʔゝ</span>
+    Dear Reader,
     <br><br>
-    The Internet is full of spam, scams, and SEO goop. I, however, want Bear to remain a bastion of awesomeness.
-    This manual review step is to keep junk out while ensuring Bear remains free-to-use.
+    The Internet is awash with spam, scams, and needless clutter. It is my intention that BōcPress remain a haven of quality and refinement.
+    This manual review step ensures that only genuine blogs are admitted, while keeping the service freely available.
     <br><br>
-    I review new blogs about twice a week. If you'd like to skip the wait and get approved immediately you can
-    <a href="{% url 'upgrade' %}">upgrade</a>. This comes with a bunch of neat features and supports the project.
+    I review new submissions approximately twice a week. Should you wish to bypass the waiting period and gain immediate approval, you may
+    <a href="{% url 'upgrade' %}">upgrade</a>. This offers a selection of useful features and supports the continued work of the project.
     <br><br>
-    By submitting the form below you are opting into a human review of your blog (by me <span class="bear">ʕ•ᴥ•ʔﾉ♡</span>).
+    By submitting the form below, you consent to a careful, human review of your blog by the BōcPress team.
 </p>
+
 <form method="POST" class="post-form full-width">{% csrf_token %}
     <p>
         <input type="checkbox" required name="spam">
         <label for="spam"><small>I confirm that this blog is not being used for backlink spam</small></label>
     </p>
-    <textarea name="note" placeholder="(optional) Say hi to Herman!"></textarea>
+    <textarea name="note" placeholder="(optional) Say hi!"></textarea>
     <button type="submit" class="save btn btn-default">Submit</button>
 </form>
 {% endif %}

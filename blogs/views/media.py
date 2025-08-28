@@ -21,7 +21,7 @@ import threading
 
 from blogs.models import Blog, Media
 
-bucket_name = 'bear-images'
+bucket_name = 'bocpress-media'
 
 
 image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic']
@@ -41,7 +41,7 @@ def media_center(request, id):
         blog = get_object_or_404(Blog, subdomain=id)
     else:
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-    
+
     if not blog.user.settings.upgraded:
         return redirect('upgrade')
 
@@ -62,7 +62,7 @@ def media_center(request, id):
     image_filter = Q()
     for ext in image_types + video_types:
         image_filter |= Q(url__iendswith=ext)
-    
+
     images = blog.media.filter(image_filter).order_by('-created_at')
 
     document_filter = Q()
@@ -110,14 +110,14 @@ def upload_files(blog, file_list):
         if file.size > file_size_limit:
             file_links.append(f'Error: File {file.name} exceeds 10MB limit')
             break
-        
+
         # Only allowed file types but also explicitly excluding heic since Safari auto-converts it otherwise
         if not file.name.lower().endswith(tuple(file_types)) or file.name.lower().endswith('heic'):
             file_links.append(f'Error: File type not supported: {file.name}')
             break
-        
+
         extension = file.name.split('.')[-1].lower()
-        
+
         # Strip metadata if the file is an image
         if extension in image_types and not extension.endswith('svg') and not extension.endswith('gif'):
             try:
@@ -136,9 +136,9 @@ def upload_files(blog, file_list):
             count += 1
             new_file_name = f"{file_name}-{count}"
         file_name = new_file_name
-        
+
         filepath = f'{blog.subdomain}/{file_name}.{extension}'
-        url = f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/{filepath}'
+        url = f'https://{bucket_name}.s3.nl-ams.scw.cloud/{filepath}'
         file_links.append(url)
 
         # Create Media object first
@@ -154,7 +154,7 @@ def upload_files(blog, file_list):
             args=(filepath, file_data, content_type)
         )
         thread.start()
-    
+
     return sorted(file_links)
 
 
@@ -162,8 +162,8 @@ def upload_to_s3(filepath, file_data, content_type):
     session = boto3.session.Session()
     client = session.client(
         's3',
-        endpoint_url='https://sfo2.digitaloceanspaces.com',
-        region_name='sfo2',
+        endpoint_url='https://s3.nl-ams.scw.cloud',
+        region_name='nl-ams',
         aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
         aws_secret_access_key=os.getenv('SPACES_SECRET'))
 
@@ -248,14 +248,14 @@ def extract_date_from_url(url):
         return dt
     else:
         raise ValueError("Invalid URL format")
-    
+
 
 def get_uploaded_images(blog):
     session = boto3.session.Session()
     client = session.client(
         's3',
-        endpoint_url='https://sfo2.digitaloceanspaces.com',
-        region_name='sfo2',
+        endpoint_url='https://s3.nl-ams.scw.cloud',
+        region_name='nl-ams',
         aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
         aws_secret_access_key=os.getenv('SPACES_SECRET'))
 
@@ -266,7 +266,7 @@ def get_uploaded_images(blog):
         return []
 
     image_urls = [
-        f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/{item["Key"]}'
+        f'https://{bucket_name}.s3.nl-ams.scw.cloud/{item["Key"]}'
         for item in response['Contents']
         if item['Key'].split('.')[-1].lower() in file_types
     ]
@@ -280,15 +280,15 @@ def delete_selected_media(request, id):
         blog = get_object_or_404(Blog, subdomain=id)
     else:
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-    
+
     if request.method == "POST":
         selected_media = request.POST.getlist('selected_media')
-        
+
         session = boto3.session.Session()
         client = session.client(
             's3',
-            endpoint_url='https://sfo2.digitaloceanspaces.com',
-            region_name='sfo2',
+            endpoint_url='https://s3.nl-ams.scw.cloud',
+            region_name='nl-ams',
             aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
             aws_secret_access_key=os.getenv('SPACES_SECRET')
         )
@@ -296,7 +296,7 @@ def delete_selected_media(request, id):
         for url in selected_media:
             print(url)
             if Media.objects.filter(blog=blog, url=url).exists():
-                key = url.replace(f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/', '')
+                key = url.replace(f'https://{bucket_name}.s3.nl-ams.scw.cloud/', '')
                 print(f"Deleting key: {key}")
                 response = client.delete_object(Bucket=bucket_name, Key=key)
                 # print("S3 Response:", response)
@@ -304,23 +304,23 @@ def delete_selected_media(request, id):
             else:
                 return HttpResponseForbidden("Error: Attempted to delete unauthorized media")
 
-            
-        
+
+
     return redirect('media_center', id=id)
 
 
 def image_proxy(request, img):
     # Construct the DigitalOcean Spaces URL
-    remote_url = f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/{img}'
-    
+    remote_url = f'https://{bucket_name}.s3.nl-ams.scw.cloud/{img}'
+
     # Stream the content from the remote URL
     response = requests.get(remote_url, stream=True, timeout=10)
-    
+
     # Define a generator to yield chunks of the response content
     def generate():
         for chunk in response.iter_content(chunk_size=8192):
             yield chunk
-    
+
     # Return a StreamingHttpResponse
     return StreamingHttpResponse(
         generate(),

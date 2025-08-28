@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Directives | Bear Blog
+Directives | BōcPress
 {% endblock %}
 
 {% block custom_styles %}
@@ -15,7 +15,7 @@ Directives | Bear Blog
 <main>
     <h1>Directives</h1>
     <p class="helptext">
-        Extend your Bear blog by adding custom code to the &lt;head&gt; and &lt;footer&gt; tags.
+        Extend your BōcPress blog by adding custom code to the &lt;head&gt; and &lt;footer&gt; tags.
     </p>
     <form method="POST" class="post-form full-width">
         {% csrf_token %}
@@ -29,7 +29,7 @@ Directives | Bear Blog
             <br>
             <textarea name="header" style="height: 150px;">{{ blog.header_directive }}</textarea>
             <p style="color:lightsalmon;font-size:small;display:none;" class="domain-error">
-                ʕ ·ᴥ·ʔ The custom_domain attribute should be with the blog attributes on the <a href="{% url 'dashboard' id=blog.subdomain %}">home page</a>, not here. 
+                ʕ ·ᴥ·ʔ The custom_domain attribute should be with the blog attributes on the <a href="{% url 'dashboard' id=blog.subdomain %}">home page</a>, not here.
             </p>
         </p>
         <p>

@@ -26,7 +26,7 @@ if os.environ.get('REDISCLOUD_URL'):
 
 # Fallback to in-memory when Redis is not available
 request_metrics = defaultdict(list)
-    
+
 
 # Thread-local storage for query times
 _local = threading.local()
@@ -42,10 +42,10 @@ def track_db_time():
             return execute(sql, params, many, context)
         finally:
             _local.db_time += time.time() - start
-    
+
     with connection.execute_wrapper(execute_wrapper):
         yield
-        
+
 
 class RequestPerformanceMiddleware:
     def __init__(self, get_response):
@@ -56,7 +56,7 @@ class RequestPerformanceMiddleware:
     def get_pattern_name(self, request):
         if request.method in self.skip_methods:
             return None
-            
+
         try:
             resolver_match = getattr(request, 'resolver_match', None) or resolve(request.path)
             # Normalize all feed endpoints to a single path
@@ -65,20 +65,20 @@ class RequestPerformanceMiddleware:
             return f"{request.method} {resolver_match.route}"
         except Resolver404:
             return None
-        
+
     def __call__(self, request):
         endpoint = self.get_pattern_name(request)
         if endpoint is None:
             return self.get_response(request)
 
         start_time = time.time()
-        
+
         with track_db_time():
             response = self.get_response(request)
             db_time = getattr(_local, 'db_time', 0.0)
 
         total_time = time.time() - start_time
-        
+
         metric_data = {
             'total_time': total_time,
             'db_time': db_time,
@@ -96,12 +96,12 @@ class RequestPerformanceMiddleware:
                     metrics = json.loads(metrics)
                 else:
                     metrics = []
-                
+
                 # Add new metric
                 metrics.append(metric_data)
                 # Keep only last 50 metrics
                 metrics = metrics[-self.max_metrics:]
-                
+
                 # Store back in Redis without TTL
                 redis_client.set(
                     redis_key,
@@ -141,12 +141,12 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
                     reason = REASON_CSRF_TOKEN_MISSING
                 else:
                     reason = REASON_BAD_ORIGIN
-                
+
                 return self._reject(request, reason)
 
-   
+
 class RateLimitMiddleware:
-    RATE_LIMIT = 10  # max requests per thread
+    RATE_LIMIT = 50  # max requests per thread
     TIME_WINDOW = 10  # seconds
     BAN_DURATION = 60  # seconds
 
@@ -198,8 +198,8 @@ class ConditionalXFrameOptionsMiddleware:
         response = self.get_response(request)
         host = request.get_host().lower()
         main_domains = {'bearblog.dev', 'www.bearblog.dev', 'lh.co'}
-        
+
         if host in main_domains:
             response['X-Frame-Options'] = 'DENY'
-        
+
         return response

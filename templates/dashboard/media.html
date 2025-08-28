@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load custom_tags %}
 
-{% block title %}Media | Bear Blog{% endblock %}
+{% block title %}Media | BōcPress{% endblock %}
 {% block custom_styles %}
 {% include 'styles/blog/default.css' %}
 {% include 'styles/dashboard.css' %}
@@ -40,10 +40,10 @@
         <div class="media-item">
             <input type="checkbox" name="selected_media" value="{{ image.url }}" class="media-checkbox">
             <a href="{{ image.url }}" target="_blank">
-                <img style="object-fit: contain;" 
-                     src="{{ image.url }}" 
-                     width=190 
-                     height=190 
+                <img style="object-fit: contain;"
+                     src="{{ image.url }}"
+                     width=190
+                     height=190
                      loading="lazy"
                      title="Still uploading..."
                      onerror="handleImageError(this)"
@@ -68,7 +68,7 @@
       animation: dotty steps(1,end) 1s infinite;
       content: '';
     }
-    
+
     @keyframes dotty {
         0%   { content: ''; }
         25%  { content: '.'; }

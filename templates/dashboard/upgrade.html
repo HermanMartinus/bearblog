@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Upgrade | Bear Blog{% endblock %}
+{% block title %}Upgrade | BōcPress{% endblock %}
 
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
@@ -13,9 +13,9 @@
 {% comment %} <h1>Upgrade</h1> {% endcomment %}
 
 {% if not request.user.settings.upgraded %}
-<h2>Upgrade and keep the tiny internet awesome!  <span class="bear">\ʕ•ᴥ•ʔ/</span></h2>
+<h2>Upgrade and keep the tiny internet awesome!</h2>
 <p>
-    With Bear, you're not just blogging - you're nurturing a space that's truly yours.
+    With BōcPress, you're not just blogging - you're nurturing a space that's truly yours.
     <br>
     <br>
     We don't make money by selling data, tracking readers, or displaying ads.
@@ -28,14 +28,14 @@
     Here's what you get if you upgrade:
     <ul>
         <li>Custom domains</li>
-        <li>Show up on the <a href="https://bearblog.dev/discover/" target="_blank">Discover feed</a></li>
+        <li>Show up on the <a href="https://bocpress.co.uk/discover/" target="_blank">Discover feed</a></li>
         <li>Publish up to 10 sites</li>
         <li>Media and file uploading</li>
         <li>In-depth analytics</li>
         <li>Email subscriber capture</li>
         <li>Add javascript to page content</li>
         <li>Add code to head and footer elements</li>
-        <li>Remove Bear branding (but only if you want to)</li>
+        <li>Remove BōcPress branding (but only if you want to)</li>
     </ul>
 </p>
 <p>
@@ -47,27 +47,22 @@
 {% if discount %}
 <p style="background-color: rgb(0,0,0,0.1); text-align: center; font-size: small">
     Hey, it looks like you're from {{ country_name }} {{ country_emoji }}<br>
-    We support <b>Purchasing Power Parity</b> to make Bear more affordable to everyone.<br>
+    We support <b>Purchasing Power Parity</b> to make BōcPress more affordable to everyone.<br>
     Use the promo code <b>{{ promo_code }}</b> to get a <b>{{ discount }}% discount</b> when you upgrade.
 </p>
 {% endif %}
 
 <p>
-    <button onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][user_id]={{user.id}}')">Upgrade</button>
+    <button onclick="window.open('https://bocpress.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][user_id]={{user.id}}')">Upgrade</button>
 </p>
 
 <small>
-    Let's take back control in an ever enshittifying Internet. 
-    Support the small, fast web, and a blogging platform that's <a href="https://herman.bearblog.dev/manifesto/" target="_blank">built to last forever</a>.
+    Let us reclaim some measure of order in an increasingly chaotic Internet.
+    Support a small, swift web, and a blogging platform devoted to making the world a little more civil.
 </small>
 
-<p>
-    <small>
-    <a href="https://herman.bearblog.dev/praise-for-bear/" target="_blank">Still need convincing?</a>
-    </small>
-</p>
 {% else %}
-<h3>You've already upgraded your Bear account! <span class="bear">\ʕ•ᴥ•ʔ/</span></h3>
+<h3>You've already upgraded your BōcPress account.</h3>
 {% endif %}
 
 {% endblock %}

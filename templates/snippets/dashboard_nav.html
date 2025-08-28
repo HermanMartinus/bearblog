@@ -4,7 +4,7 @@
         target="_blank"
         style="font-weight: 400; font-size: 14px; color: inherit; width: fit-content"
     >
-        {{ blog.blank_useful_domain }} 
+        {{ blog.blank_useful_domain }}
     </a>
 </p>
 
@@ -18,7 +18,7 @@
     <a href="{% url 'email_list' id=blog.subdomain %}">Emails</a>
     {% endif %}
     {% if not blog.user.settings.upgraded %}
-    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear flex"></span></a>
+    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade</a>
     {% endif %}
 </span>
 
@@ -27,14 +27,14 @@
     <a href="{% url 'analytics' id=blog.subdomain %}">Analytics</a>
     {% endif %}
     <a href="{% url 'settings' id=blog.subdomain %}">Settings</a>
-    <a href="{% url 'account' %}" class="account bear"></a>
+    <a href="{% url 'account' %}">Account</a>
 </span>
 
 {% if not blog.reviewed and not blog.to_review and blog.posts.count > 0 %}
 <p class="notification">
     <small>
     🐼 Your blog is currently hidden from search engines and the
-    <a href="https://bearblog.dev/discover/" target="_blank">discover feed</a>.
+    <a href="https://bocpress.co.uk/discover/" target="_blank">discover feed</a>.
 
     {% if blog.is_after_cutoff %}
         Upgrade to get discovered.

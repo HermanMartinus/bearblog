@@ -3,9 +3,9 @@
 
 {% block title %}
 {% if post %}
-Editing {{ post.title }} | Bear Blog
+Editing {{ post.title }} | BōcPress
 {% else %}
-New post | Bear Blog
+New post | BōcPress
 {% endif %}
 {% endblock %}
 
@@ -32,7 +32,7 @@ New post | Bear Blog
             &#8592; Back
         </button>
         <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
-        
+
         {% if post %}
             <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}/{{ post.slug }}{% if not post.publish %}?token={{ post.token }}{% endif %}');">
                 View{% if not post.publish %} draft{% endif %}
@@ -58,23 +58,23 @@ New post | Bear Blog
             Attributes
         </summary>
         <p>
-            title: I like Bears<br>
-            link: i-like-bears<br>
+            title: The Duck Who Debated Parliament<br>
+            link: the-duck-who-debated-parliament<br>
             alias: 2012/01/02/cool-post.html<br>
-            canonical_url: https://example.com/bears<br>
+            canonical_url: https://example.com/debating-duck<br>
             published_date: 2022-12-30 08:30<br>
             is_page: false<br>
-            meta_description: Look for the bear necessities.<br>
+            meta_description: A ridiculous account of feathered eloquence in high society.<br>
             meta_image: https://example.com/image.jpeg<br>
             lang: en<br>
-            tags: {% if blog.tags %}{{ blog.tags|join:", " }}{% else %}bears, writing, thoughts{% endif %}<br>
+            tags: {% if blog.tags %}{{ blog.tags|join:", " }}{% else %}duck, satire, whimsy{% endif %}<br>
             make_discoverable: true
         </p>
-        <a href="https://docs.bearblog.dev/post" target="_blank">
+        <a href="https://docs.bocpress.co.uk/post" target="_blank">
             More info
         </a>
     </details>
-    
+
     {% csrf_token %}
     <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden>
     <div
@@ -110,7 +110,7 @@ New post | Bear Blog
 
     <span class="helptext sticky">
         <span>
-            <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown syntax</a>
+            <a href='https://jordanrobinson.org/markdown-cheatsheet/' target='_blank'>Markdown syntax</a>
         </span>
         <span>
             <a id='upload-image'>Insert media</a> |
