@@ -79,25 +79,25 @@ def subscribe(request):
 @csrf_exempt
 def email_subscribe(request):
     if is_dodgy(request):
-        return HttpResponse("Something went wrong. Try subscribing again. ʕノ•ᴥ•ʔノ ︵ ┻━┻")
-    
+        return HttpResponse("Something went wrong. Try subscribing again.")
+
     blog = resolve_address(request)
     if not blog:
         return not_found(request)
-    
+
     if request.method == "POST":
         email = request.POST.get("email")
         match = re.match(r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email)
         if not match:
             return HttpResponse("Bad email address.")
-        
+
         recent_subscriptions = Subscriber.objects.filter(blog=blog, subscribed_date__gt=timezone.now()-timezone.timedelta(minutes=2)).count()
         if recent_subscriptions > 10:
             return HttpResponse("Too many recent subscriptions timeout")
 
         subscriber, created = Subscriber.objects.get_or_create(blog=blog, email_address=email)
         if created:
-            return HttpResponse("You've been subscribed! ＼ʕ •ᴥ•ʔ／")
+            return HttpResponse("You've been subscribed.")
         else:
             return HttpResponse("You're already subscribed.")
 
@@ -132,7 +132,7 @@ def confirm_subscription(request):
             </p>
             ''')
 
-    return HttpResponse("Something went wrong. Try subscribing again. ʕノ•ᴥ•ʔノ ︵ ┻━┻")
+    return HttpResponse("Something went wrong. Try subscribing again.")
 
 
 def validate_subscriber_email(email, blog):
@@ -146,18 +146,18 @@ def validate_subscriber_email(email, blog):
         Follow this <a href="{confirmation_link}">link</a> to confirm your subscription.
         <br>
         <br>
-        Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+        Powered by <a href="https://bocpress.co.uk">BōcPress</a>
     '''
     text_message = f'''
         You've decided to subscribe to {blog.title} ({blog.useful_domain}). That's awesome!
 
         Follow this link to confirm your subscription: {confirmation_link}
 
-        Powered by Bear ʕ•ᴥ•ʔ
+        Powered by BōcPress
     '''
     send_async_mail(
         f'Confirm your subscription to {blog.title}',
         html_message,
-        'Bear ʕ•ᴥ•ʔ <no_reply@bearblog.dev>',
+        'BōcPress <no_reply@bocpress.co.uk>',
         [email],
     )

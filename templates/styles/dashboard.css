@@ -311,3 +311,135 @@ button#toggle-full-screen {
 .full-width input:not([type="submit"], [type="checkbox"], [type="radio"]) {
     width: calc(100% - 20px);
 }
+
+/* Base Button Styling */
+button,
+input[type="submit"],
+a.button {
+    font-family: "Georgia", serif;
+    background-color: #f7f7f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px 16px;
+    margin: 5px 0;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+    color: #2b2b2b;
+    transition:
+        background 0.2s,
+        color 0.2s,
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+/* Hover & Focus States */
+button:hover,
+input[type="submit"]:hover,
+a.button:hover {
+    background-color: #eceae7;
+    border-color: #bfbdb8;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    color: #1c1c1c;
+}
+
+button:focus,
+input[type="submit"]:focus,
+a.button:focus {
+    outline: none;
+    border-color: #8b6fcb;
+    box-shadow: 0 0 0 3px rgba(139, 111, 203, 0.3);
+}
+
+/* Active/Pressed State */
+button:active,
+input[type="submit"]:active,
+a.button:active {
+    background-color: #e6e4e1;
+    border-color: #aaa;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Disabled State */
+button:disabled,
+input[type="submit"]:disabled,
+a.button.disabled {
+    background-color: #f4f4f2;
+    border-color: #ddd;
+    color: #aaa;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Floating & Sticky Buttons */
+button.floating {
+    position: fixed;
+    bottom: 20px;
+    right: 25px;
+    z-index: 100;
+}
+
+button#toggle-full-screen {
+    float: right;
+}
+
+/* Dark Mode Button Overrides */
+@media (prefers-color-scheme: dark) {
+    button,
+    input[type="submit"],
+    a.button {
+        background-color: #1c2c30;
+        border: 1px solid #444;
+        color: #e8e6e3;
+    }
+
+    button:hover,
+    input[type="submit"]:hover,
+    a.button:hover {
+        background-color: #2a3a3e;
+        border-color: #666;
+        color: #fff;
+    }
+
+    button:focus,
+    input[type="submit"]:focus,
+    a.button:focus {
+        border-color: #cbb67a;
+        box-shadow: 0 0 0 3px rgba(203, 182, 122, 0.4);
+    }
+
+    button:active,
+    input[type="submit"]:active,
+    a.button:active {
+        background-color: #162127;
+        border-color: #555;
+    }
+
+    button:disabled,
+    input[type="submit"]:disabled,
+    a.button.disabled {
+        background-color: #0f1a1c;
+        border-color: #333;
+        color: #555;
+    }
+}
+
+/* Optional Button Variants */
+button.primary,
+input[type="submit"].primary,
+a.button.primary {
+    background-color: #cbb67a;
+    border-color: #bfa358;
+    color: #1c1c1c;
+}
+
+button.primary:hover,
+input[type="submit"].primary:hover,
+a.button.primary:hover {
+    background-color: #bfa358;
+    border-color: #a48e45;
+    color: #fff;
+}

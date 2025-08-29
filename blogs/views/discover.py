@@ -55,13 +55,13 @@ def admin_actions(request):
             post = Post.objects.get(pk=request.POST.get("block-blog"))
             post.blog.user.is_active = False
             post.blog.user.save()
-        
+
         if request.POST.get("set-values", False):
             post = Post.objects.get(pk=request.POST.get("set-values"))
             post.shadow_votes = int(request.POST.get("shadow-votes"))
             post.lang = request.POST.get('lang')
             post.save()
-        
+
 
 
 @csrf_exempt
@@ -72,7 +72,7 @@ def discover(request):
         page = int(request.GET.get("page", 0) or 0)
     except ValueError:
         page = 0
-    
+
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page
 
@@ -85,7 +85,7 @@ def discover(request):
     if hide_list_raw:
         hide_list_raw = ','.join(x for x in hide_list_raw.split(',') if x.strip())
         hide_list_raw = hide_list_raw.replace(' ', ',').replace('https://', '').replace('http://', '')
-        
+
         hide_list = hide_list_raw.replace(f".{os.getenv('MAIN_SITE_HOSTS').split(',')[0]}", '').split(',')
         hide_list = [x.split('/')[0] for x in hide_list if x.strip()]
         print("Hide list:", hide_list)
@@ -130,16 +130,16 @@ def feed(request):
     feed_kind = "newest" if request.GET.get("newest") else "trending"
     feed_type = 'rss' if request.GET.get("type") == "rss" else "atom"
     lang = request.GET.get("lang")
-    
+
     fg = FeedGenerator()
-    fg.id("bearblog")
-    fg.author({"name": "Bear Blog", "email": "feed@bearblog.dev"})
+    fg.id("bocpress")
+    fg.author({"name": "BōcPress", "email": "feed@bocpress.co.uk"})
 
     if feed_type == 'rss':
         feed_method = fg.rss_str
     else:
         feed_method = fg.atom_str
-    
+
     base_query = get_base_query()
     if lang:
         base_query = base_query.filter(
@@ -147,16 +147,16 @@ def feed(request):
             (Q(lang='') & Q(blog__lang__startswith=lang) & ~Q(blog__lang=''))
         )
     if feed_kind == 'newest':
-        fg.title("Bear Blog Most Recent Posts")
-        fg.subtitle("Most recent posts on Bear Blog")
-        fg.link(href="https://bearblog.dev/discover/?newest=True", rel="alternate")
+        fg.title("BōcPress Most Recent Posts")
+        fg.subtitle("Most recent posts on BōcPress")
+        fg.link(href="https://bocpress.co.uk/discover/?newest=True", rel="alternate")
         # Sort by published date
         all_posts = base_query.order_by("-published_date")[:posts_per_page]
-        
+
     else:
-        fg.title("Bear Blog Trending Posts")
-        fg.subtitle("Trending posts on Bear Blog")
-        fg.link(href="https://bearblog.dev/discover/", rel="alternate")
+        fg.title("BōcPress Trending Posts")
+        fg.subtitle("Trending posts on BōcPress")
+        fg.link(href="https://bocpress.co.uk/discover/", rel="alternate")
         # Sort by score and then by published date
         all_posts = base_query.order_by("-score", "-published_date")[:posts_per_page]
 
