@@ -16,6 +16,7 @@
     <a href="{% url 'pages_edit' id=blog.subdomain %}">Pages</a>
     <a href="{% url 'styles' id=blog.subdomain %}">Themes</a>
     <a href="{% url 'email_list' id=blog.subdomain %}">Emails</a>
+    <a href="{% url 'media_center' id=blog.subdomain %}">Media</a>
     {% endif %}
     {% if not blog.user.settings.upgraded %}
     <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade</a>
