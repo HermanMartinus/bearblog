@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 
 import latex2mathml.converter
 import re
+from urllib.parse import quote, urlsplit, urlunsplit, parse_qsl
 
 from blogs.helpers import unmark
 from blogs.models import Post
@@ -173,20 +174,21 @@ def markdown(content, blog=None, post=None, tz=None):
     # Find urls with parentheses and escape them
     content = fix_links(content)
 
+    # Replace {{ xyz }} elements
+    if blog:
+        content = excluding_pre(content, blog, post, tz=tz)
+
     try:
         # TODO: Implement excluding_script to not parse script tags
         # processed_markup = excluding_script(content)
         processed_markup = markdown_renderer(content)
+
     except TypeError:
         return ''
 
     # If not upgraded remove iframes and js
     if not blog or not blog.user.settings.upgraded:
         processed_markup = clean(processed_markup)
-
-    # Replace {{ xyz }} elements
-    if blog:
-        processed_markup = excluding_pre(processed_markup, blog, post, tz=tz)
 
     return mark_safe(processed_markup)
 
@@ -220,6 +222,55 @@ def excluding_pre(markup, blog=None, post=None, tz=None):
         placeholders[key] = match.group(0)
         return key
 
+    def fix_markdown_link_breaks(markup):
+        # Function to percent-encode spaces and query parameters
+        def encode_url(url):
+            if url.startswith(("mailto:", "tel:")):
+                parts = urlsplit(url)
+                query = "&".join(f"{k}={quote(v)}" for k, v in parse_qsl(parts.query))
+                return urlunsplit((parts.scheme, parts.netloc, parts.path, query, parts.fragment))
+            else:
+                # Percent-encode spaces in regular URLs
+                return re.sub(r' ', '%20', url)
+
+        # Images: ![alt](URL)
+        markup = re.sub(
+            r'!\[(.*?)\]\((.*?)\)',
+            lambda m: f'![{m.group(1)}]({encode_url(m.group(2))})',
+            markup
+        )
+
+        # Standard links: [text](URL)
+        markup = re.sub(
+            r'\[(.*?)\]\((.*?)\)',
+            lambda m: f'[{m.group(1)}]({encode_url(m.group(2))})',
+            markup
+        )
+
+        # Reference-style link definitions: [id]: URL
+        markup = re.sub(
+            r'^\[([^\]]+)\]:\s*(\S+)',
+            lambda m: f'[{m.group(1)}]: {encode_url(m.group(2))}',
+            markup,
+            flags=re.MULTILINE
+        )
+
+        # Autolinks: <URL>
+        markup = re.sub(
+            r'<(https?://[^>]+)>',
+            lambda m: f'<{encode_url(m.group(1))}>',
+            markup
+        )
+
+        # Inline HTML <a href="URL">
+        markup = re.sub(
+            r'(<a\s+href=")([^"]+)(")',
+            lambda m: f'{m.group(1)}{encode_url(m.group(2))}{m.group(3)}',
+            markup
+        )
+
+        return markup
+
     markup = re.sub(r'(<pre.*?>.*?</pre>|<code.*?>.*?</code>)', placeholder_div, markup, flags=re.DOTALL)
 
     if blog:
@@ -229,6 +280,8 @@ def excluding_pre(markup, blog=None, post=None, tz=None):
             markup = element_replacement(markup, blog, tz=tz)
     else:
         markup = element_replacement(markup, tz=tz)
+
+    markup = fix_markdown_link_breaks(markup)
 
     for key in sorted(placeholders.keys(), reverse=True):
         markup = markup.replace(key, placeholders[key])
