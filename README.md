@@ -14,7 +14,7 @@ To request a feature or report a bug, please send an email to [hello@bocpress.co
 BōcPress is not currently accepting contributions. See CONTRIBUTIONS.md for more info. 
 
 ## Markdown
-All the post content is written in [markdown](https://herman.bearblog.dev/markdown-cheatsheet/).
+All the post content is written in [markdown](https://jordanrobinson.org/markdown-cheatsheet/).
 
 ## Can BōcPress be self-hosted? 
 BōcPress has been built as a platform and not as an individual blog generator.
