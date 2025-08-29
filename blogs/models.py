@@ -79,7 +79,7 @@ class Blog(models.Model):
     robots_txt = models.TextField(blank=True, default="User-agent: *\nAllow: /")
     rss_alias = models.CharField(max_length=100, blank=True)
     codemirror_enabled = models.BooleanField(default=True)
-    
+
     # Discovery feed settings
     dodginess_score = models.FloatField(default=0, db_index=True)
     reviewed = models.BooleanField(default=False, db_index=True)
@@ -91,6 +91,8 @@ class Blog(models.Model):
     flagged = models.BooleanField(default=False, db_index=True)
     posts_in_last_24_hours = models.IntegerField(default=0, db_index=True)
 
+    max_feed_entries = models.IntegerField(default=10)
+
     @property
     def older_than_one_day(self):
         return (timezone.now() - self.created_date).days > 1
@@ -99,7 +101,7 @@ class Blog(models.Model):
     def is_after_cutoff(self):
         cutoff_date = timezone.datetime(2025, 4, 20, tzinfo=ZoneInfo('UTC'))
         return self.created_date > cutoff_date
-    
+
     @property
     def user_email_verified(self):
         return EmailAddress.objects.filter(user=self.user, verified=True).exists()
@@ -131,16 +133,16 @@ class Blog(models.Model):
     @property
     def dynamic_useful_domain(self):
         return f'//{self.blank_useful_domain}'
-    
+
     @property
     def is_empty(self):
         content_length = len(self.content) if self.content is not None else 0
         return not self.user.settings.upgraded and content_length < 20 and self.posts.count() == 0 and self.custom_styles == ""
-    
+
     @property
     def tags(self):
         return sorted(json.loads(self.all_tags))
-    
+
     def generate_auth_token(self):
         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
         self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(30))
@@ -151,7 +153,7 @@ class Blog(models.Model):
         dodgy_term_count = 0
         blacklisted_term_count = 0
         all_content = f"{self.title} {self.content}"
-        
+
         if self.pk:
             post = self.posts.first()
             if post:
@@ -181,22 +183,22 @@ class Blog(models.Model):
         cloudflare_api_key = os.getenv('CLOUDFLARE_API_KEY')
         cloudflare_email = os.getenv('CLOUDFLARE_EMAIL')
         cloudflare_zone_id = os.getenv('CLOUDFLARE_ZONE_ID')
-        
+
         if not all([cloudflare_api_key, cloudflare_email, cloudflare_zone_id]):
             return
-            
+
         headers = {
             'X-Auth-Email': cloudflare_email,
             'Authorization': f'Bearer {cloudflare_api_key}',
             'Content-Type': 'application/json',
         }
-        
+
         url = f"https://api.cloudflare.com/client/v4/zones/{cloudflare_zone_id}/purge_cache"
-        
+
         data = {
             "tags": [self.subdomain]
         }
-        
+
         try:
             response = requests.post(url, headers=headers, json=data)
             response.raise_for_status()
@@ -214,7 +216,7 @@ class Blog(models.Model):
         # Upgraded blogs are auto-reviewed
         if self.user.settings.upgraded:
             self.reviewed = True
-        
+
         # Determine how dodgy the blog is if it's not reviewed
         if not self.reviewed:
             self.determine_dodginess()
@@ -223,7 +225,7 @@ class Blog(models.Model):
         if not self.custom_styles:
             self.custom_styles = Stylesheet.objects.filter(identifier="default").first().css
             self.overwrite_styles = True
-        
+
         # Double check subdomains are lowercase
         self.subdomain = self.subdomain.lower()
 
@@ -236,7 +238,7 @@ class Blog(models.Model):
 
         # Save the blog
         super(Blog, self).save(*args, **kwargs)
-        
+
         # Invalidate Cloudflare cache after saving
         if self.pk:
             self.invalidate_cloudflare_cache()
@@ -277,7 +279,7 @@ class Post(models.Model):
     @property
     def tags(self):
         return sorted(json.loads(self.all_tags))
-    
+
     @property
     def token(self):
         return hashlib.sha256(self.uid.encode()).hexdigest()[0:10]
@@ -286,7 +288,7 @@ class Post(models.Model):
         self.upvotes = self.upvote_set.count()
         upvotes = self.upvotes
 
-        if upvotes > 1: 
+        if upvotes > 1:
             # Cap upvotes at 30 so they don't stick to the top forever
             if upvotes > 30:
                 upvotes = 30
@@ -303,12 +305,12 @@ class Post(models.Model):
                 buoyancy = 14
                 score = (log_of_upvotes) + ((seconds - 1577811600) / (buoyancy * 86400))
                 self.score = score
-    
+
     def save(self, *args, **kwargs):
         self.slug = self.slug.lower()
         if not self.all_tags:
             self.all_tags = '[]'
-        
+
         # Create unique random identifier
         if not self.uid:
             allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
@@ -341,7 +343,7 @@ class Upvote(models.Model):
     def save(self, *args, **kwargs):
         # Save the Upvote instance
         super(Upvote, self).save(*args, **kwargs)
-        
+
         # Update the post score on post save
         self.post.save()
 
@@ -378,7 +380,7 @@ class Subscriber(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     email_address = models.EmailField()
     subscribed_date = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return f"{self.blog.title} - {self.email_address}"
 
@@ -408,7 +410,7 @@ class Media(models.Model):
 
     def __str__(self):
         return f"{self.blog.subdomain} - {self.url} - {self.created_at}"
-    
+
 
 # Singleton model to store Bear specific settings
 class PersistentStore(models.Model):
@@ -421,15 +423,15 @@ class PersistentStore(models.Model):
     @property
     def ignore_terms(self):
         return sorted(json.loads(self.review_ignore_terms))
-    
+
     @property
     def highlight_terms(self):
         return sorted(json.loads(self.review_highlight_terms))
-    
+
     @property
     def blacklist_terms(self):
         return sorted(json.loads(self.review_blacklist_terms))
-    
+
     @classmethod
     def load(cls):
         obj, created = cls.objects.get_or_create(pk=1)

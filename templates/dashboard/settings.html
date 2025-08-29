@@ -49,6 +49,23 @@
             </span>
         </p>
 
+        <p>
+            <label for="max_feed_entries">Max feed entries</label>
+            <br>
+            <input
+                type="number"
+                name="max_feed_entries"
+                id="max_feed_entries"
+                min="1"
+                value="{{ blog.max_feed_entries }}"
+                style="max-width:100px"
+            />
+            <br>
+            <span class="helptext">
+                Maximum number of posts shown in RSS/Atom feeds for this blog
+            </span>
+        </p>
+
         <button type="submit">Save</button>
     </form>
 </p>

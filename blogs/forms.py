@@ -12,10 +12,12 @@ class BlogForm(forms.ModelForm):
         self.fields['title'].label = False
         self.fields['subdomain'].widget.attrs.update({'placeholder': 'Preferred subdomain...'})
         self.fields['subdomain'].label = False
+        self.fields['max_feed_entries'].widget.attrs.update({'placeholder': 'Maximum feed entries to return...'})
+        self.fields['max_feed_entries'].label = False
 
     class Meta:
         model = Blog
-        fields = ('title', 'subdomain')
+        fields = ('title', 'subdomain', 'max_feed_entries')
 
 
 class DashboardCustomisationForm(forms.ModelForm):
