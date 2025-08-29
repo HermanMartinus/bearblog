@@ -30,7 +30,7 @@ def feed(request):
         print(f'Feeds: Error generating feed for {blog.subdomain}: {e}')
         feed = ''
         raise e
-    
+
     response = HttpResponse(feed, content_type='application/xml')
     response['Cache-Tag'] = blog.subdomain
     return response
@@ -42,9 +42,9 @@ def generate_feed(blog, feed_type="atom", tag=None):
     if tag:
         all_posts = all_posts.filter(all_tags__icontains=tag)
 
-    all_posts = all_posts.order_by('-published_date')[:10]
-    # Reverse the most recent posts 
-    all_posts = list(all_posts)[::-1] 
+    all_posts = all_posts.order_by('-published_date')[:blog.max_feed_entries]
+    # Reverse the most recent posts
+    all_posts = list(all_posts)[::-1]
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain)
@@ -61,15 +61,15 @@ def generate_feed(blog, feed_type="atom", tag=None):
         fe.link(href=f"{blog.useful_domain}/{post.slug}/")
         if post.meta_description:
             fe.summary(clean_string(post.meta_description))
-        
+
         post_content = post.content.replace('{{ email-signup }}', '')
         # post_content = post.content.replace('{{ email_signup }}', '')
 
         fe.content(clean_string(markdown(post_content, blog, post)), type="html")
-        
+
         fe.published(post.published_date)
         fe.updated(post.last_modified)
-        
+
         for tag in post.tags:
             fe.category(term=tag)
 
