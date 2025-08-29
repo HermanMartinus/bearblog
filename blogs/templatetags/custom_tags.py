@@ -90,14 +90,14 @@ def fix_links(text):
         return f'[{label}]({escaped_url})'
 
     fixed_text = re.sub(parentheses_pattern, escape_parentheses, text)
-    
+
 
     return fixed_text
 
 class MyRenderer(HTMLRenderer):
     def heading(self, text, level, **attrs):
         return f'<h{level} id={slugify(text)}>{text}</h{level}>'
-    
+
     def link(self, text, url, title=None):
         if title:
             title = title.replace("'", "&apos;").replace('"', "&quot;")
@@ -106,7 +106,7 @@ class MyRenderer(HTMLRenderer):
             if title:
                 return f"<a href='{url}' target='_blank' title='{title}'>{text}</a>"
             return f"<a href='{url}' target='_blank'>{text}</a>"
-        
+
         if title:
             return f"<a href='{url}' title='{title}'>{text}</a>"
         return f"<a href='{url}'>{text}</a>"
@@ -117,13 +117,13 @@ class MyRenderer(HTMLRenderer):
         if re.match(r'^\s*\\\s*$', text):
             text = '<br>'
         return typographic_replacements(text)
-    
+
     def inline_html(self, html):
         return html
-    
+
     def block_html(self, html):
         return html
-    
+
     def inline_math(self, text):
         # Skip rendering if there's a space before the closing dollar sign
         if text.endswith(' '):
@@ -133,14 +133,14 @@ class MyRenderer(HTMLRenderer):
         except Exception as e:
             print("LaTeX rendering error")
 
-    
+
     def block_math(self, text):
         try:
-            
+
             return latex2mathml.converter.convert(text).replace('display="inline"', 'display="block"')
         except Exception as e:
             print("LaTeX rendering error")
-    
+
     def block_code(self, code, info=None):
         if info is None:
             info = 'text'
@@ -148,7 +148,7 @@ class MyRenderer(HTMLRenderer):
             lexer = get_lexer_by_name(info)
         except ValueError:
             lexer = get_lexer_by_name('text')
-        
+
         formatter = HtmlFormatter(style='friendly')
         highlighted_code = highlight(code, lexer, formatter)
         return highlighted_code
@@ -223,7 +223,7 @@ def excluding_pre(markup, blog=None, post=None, tz=None):
     markup = re.sub(r'(<pre.*?>.*?</pre>|<code.*?>.*?</code>)', placeholder_div, markup, flags=re.DOTALL)
 
     if blog:
-        if post: 
+        if post:
             markup = element_replacement(markup, blog, post, tz=tz)
         else:
             markup = element_replacement(markup, blog, tz=tz)
@@ -258,11 +258,11 @@ def apply_filters(posts, tag=None, limit=None, order=None):
 def element_replacement(markup, blog, post=None, tz=None):
     # Match the entire {{ posts ... }} directive, including parameters
     pattern = r'\{\{\s*posts([^}]*)\}\}'
-    
+
     def replace_with_filtered_posts(match):
-        params_str = match.group(1) 
+        params_str = match.group(1)
         tag, limit, order, description, image, content = None, None, None, False, False, False
-        
+
         # Extract and process parameters one by one
         param_pattern = r'(tag:([^|}\s][^|}]*)|limit:(\d+)|order:(asc|desc)|description:(True)|image:(True)|content:(True))'
         params = re.findall(param_pattern, params_str)
@@ -311,16 +311,16 @@ def element_replacement(markup, blog, post=None, tz=None):
         markup = markup.replace('{{ blog_last_posted }}', '')
 
     markup = markup.replace('{{ tags }}', render_to_string('snippets/blog_tags.html', {"tags": blog.tags, "blog_path": blog.blog_path or "blog"}))
-        
+
     markup = markup.replace('{{ blog_link }}', f"{blog.useful_domain}")
 
     if post:
-        markup = markup.replace('{{ post_title }}', escape(post.title))
-        markup = markup.replace('{{ post_description }}', escape(post.meta_description))
-        markup = markup.replace('{{ post_published_date }}', format_date(post.published_date, blog.date_format, blog.lang, tz))
+        post_title = escape(post.title)
+        post_description = escape(post.meta_description)
+        post_published_date = format_date(post.published_date, blog.date_format, blog.lang, tz)
         last_modified = post.last_modified or timezone.now()
-        markup = markup.replace('{{ post_last_modified }}', timesince(last_modified))
-        markup = markup.replace('{{ post_link }}', f"{blog.useful_domain}/{post.slug}")
+        post_last_modified = timesince(last_modified)
+        post_link = f"{blog.useful_domain}/{post.slug}"
 
         if "{{ next_post }}" in markup or "{{ previous_post }}" in markup:
             # Only find adjacent posts if necessary
@@ -333,6 +333,18 @@ def element_replacement(markup, blog, post=None, tz=None):
                 previous_link = f'<a class="previous-post" href="/{adjacent_post_links['previous']}">Previous</a>'
             markup = markup.replace('{{ next_post }}', next_link)
             markup = markup.replace('{{ previous_post }}', previous_link)
+    else: # Blank out post tags if post is None
+        post_title = ""
+        post_description = ""
+        post_published_date = ""
+        post_last_modified = ""
+        post_link = ""
+
+    markup = markup.replace('{{ post_title }}', post_title)
+    markup = markup.replace('{{ post_description }}', post_description)
+    markup = markup.replace('{{ post_published_date }}', post_published_date)
+    markup = markup.replace('{{ post_last_modified }}', post_last_modified)
+    markup = markup.replace('{{ post_link }}', post_link)
 
     translation.activate(current_lang)
 
@@ -364,14 +376,14 @@ def get_adjacent_post_slugs(post, blog):
 @register.filter
 def clean(markup):
     cleaned_markup = re.sub(r'<script.*?>.*?</script>', '', markup, flags=re.DOTALL | re.IGNORECASE)
-    
+
     cleaned_markup = re.sub(r'\son\w+="[^"]*"', '', cleaned_markup, flags=re.IGNORECASE)
     cleaned_markup = re.sub(r'\son\w+=\'[^\']*\'', '', cleaned_markup, flags=re.IGNORECASE)
     cleaned_markup = re.sub(r'\son\w+=\w+', '', cleaned_markup, flags=re.IGNORECASE)
     cleaned_markup = re.sub(r'(<\w+\s+.*?)(href|src)\s*=\s*["\']?javascript:[^"\']*["\']?', r'\1', cleaned_markup, flags=re.IGNORECASE)
     cleaned_markup = re.sub(r'<(object|embed|form|input|button).*?>', '', cleaned_markup, flags=re.IGNORECASE)
     cleaned_markup = re.sub(r'</(object|embed|form|input|button)>', '', cleaned_markup, flags=re.IGNORECASE)
-    
+
     def iframe_whitelisted(match):
         src = match.group(2)
         if any(host in src for host in HOST_WHITELIST):
@@ -410,7 +422,7 @@ def format_date(date, format_string, lang=None, tz='UTC'):
         formatted_date = date_format(date, format_string)
         translation.activate(current_lang)
         return formatted_date
-    
+
     return dateformat.format(date, format_string)
 
 
