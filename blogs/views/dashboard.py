@@ -63,7 +63,7 @@ def styles(request, id):
             blog.overwrite_styles = True
             return render(request, 'home.html', {'blog': blog, 'preview': True})
 
-    
+
 
     return render(request, 'dashboard/styles.html', {
         'blog': blog,
@@ -137,10 +137,10 @@ def upgrade(request):
     discount = 0
 
     country_code = country.get("country_code")
-   
+
     if country_code:
         country_name = country.get('country_name', {})
-        
+
         country_emoji = lookup(
             f'REGIONAL INDICATOR SYMBOL LETTER {country_code[0]}') + lookup(f'REGIONAL INDICATOR SYMBOL LETTER {country_code[1]}')
 
@@ -197,18 +197,20 @@ def settings(request, id):
         blog = get_object_or_404(Blog, subdomain=id)
     else:
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-    
+
     error_messages = []
-    
+
     if request.method == "POST":
         subdomain = request.POST.get('subdomain').lower().strip()
         lang = request.POST.get('lang', 'en')
+        max_feed_entries = request.POST.get('max_feed_entries', '10')
 
         if subdomain:
             subdomain = slugify(subdomain.split('.')[0]).replace('_', '-')
             if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).exists() and not is_protected(subdomain):
                 blog.subdomain = subdomain
                 blog.lang = lang
+                blog.max_feed_entries = max_feed_entries
                 blog.save()
                 return redirect('settings', id=blog.subdomain)
             else:
@@ -216,12 +218,12 @@ def settings(request, id):
 
     if request.GET.get("export", ""):
         # Only export specified fields
-        fields = ['uid', 'title', 'slug', 'alias', 'published_date', 'all_tags', 
-                  'publish', 'make_discoverable', 'is_page', 'content', 
-                  'canonical_url', 'meta_description', 'meta_image', 'lang', 
-                  'class_name', 'first_published_at']
+        fields = ['uid', 'title', 'slug', 'alias', 'published_date', 'all_tags',
+                  'publish', 'make_discoverable', 'is_page', 'content',
+                  'canonical_url', 'meta_description', 'meta_image', 'lang',
+                  'class_name', 'first_published_at', 'max_feed_entries']
         return djqscsv.render_to_csv_response(blog.posts.values(*fields))
-    
+
     return render(request, "dashboard/settings.html", {
         "blog": blog,
         "error_messages": error_messages
