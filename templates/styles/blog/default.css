@@ -1,9 +1,9 @@
 :root {
     --width: 800px;
-    --font-main: Verdana, sans-serif;
-    --font-secondary: Verdana, sans-serif;
-    --font-scale: 1em;
-    --background-color: #fff;
+    --font-main: "Garamond", "Baskerville", "Georgia", serif;
+    --font-secondary: V "Garamond", "Baskerville", "Georgia", serif;
+    --font-scale: 20px;
+    --background-color: #fffdf5;
     --heading-color: #222;
     --text-color: #444;
     --link-color: #0b3d0b;
