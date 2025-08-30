@@ -221,7 +221,7 @@ def settings(request, id):
         fields = ['uid', 'title', 'slug', 'alias', 'published_date', 'all_tags',
                   'publish', 'make_discoverable', 'is_page', 'content',
                   'canonical_url', 'meta_description', 'meta_image', 'lang',
-                  'class_name', 'first_published_at', 'max_feed_entries']
+                  'class_name', 'first_published_at']
         return djqscsv.render_to_csv_response(blog.posts.values(*fields))
 
     return render(request, "dashboard/settings.html", {
