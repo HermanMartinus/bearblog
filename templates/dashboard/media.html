@@ -8,6 +8,8 @@
 {{ request.user.settings.dashboard_styles | safe }}
 {% endblock %}
 
+{% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
+
 {% block content %}
 <h1>Media</h1>
 
