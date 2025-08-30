@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if newest %}Most recent{% else %}Trending{% endif %} | Bear Blog{% endblock %}
+{% block title %}{% if newest %}Most recent{% else %}Trending{% endif %} | BōcPress{% endblock %}
 
 {% block seo %}
 <meta name="robots" content="nofollow">
-{% include 'snippets/seo_tags.html' with site_name='ʕ•ᴥ•ʔ Bear Blog' type="website" title='Discovery feed' url='https://bearblog.dev/discover' description='Discover articles and blogs on Bear' image="https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556668-0.png" %}
-<link rel="alternate" type="application/atom+xml" href="/feed/{% if newest %}?newest=True{% endif %}" title="{% if newest %}Most recent{% else %}Trending{% endif %} | Bear Blog">
-<link rel="alternate" type="application/rss+xml" href="feed/?type=rss{% if newest %}&newest=True{% endif %}" title="{% if newest %}Most recent{% else %}Trending{% endif %} | Bear Blog">
+{% include 'snippets/seo_tags.html' with site_name='BōcPress' type="website" title='Discovery feed' url='https://bocpress.co.uk/discover' description='Discover articles and blogs on BōcPress' image="https://bocpress-media.s3.nl-ams.scw.cloud/docs/logo.webp" %}
+<link rel="alternate" type="application/atom+xml" href="/feed/{% if newest %}?newest=True{% endif %}" title="{% if newest %}Most recent{% else %}Trending{% endif %} | BōcPress">
+<link rel="alternate" type="application/rss+xml" href="feed/?type=rss{% if newest %}&newest=True{% endif %}" title="{% if newest %}Most recent{% else %}Trending{% endif %} | BōcPress">
 {% endblock %}
 
 {% block nav %}
@@ -65,7 +65,7 @@
 
 {% if newest and request.user.is_authenticated %}
 <p>
-    <small><i><a target="_blank" href="https://docs.bearblog.dev/not-seeing-your-post/">Not seeing your post?</a></i></small>
+    <small><i><a target="_blank" href="https://docs.bocpress.co.uk/not-seeing-your-post/">Not seeing your post?</a></i></small>
 </p>
 {% endif %}
 <ul class="discover-posts">
@@ -95,7 +95,7 @@
                 </small> {% endcomment %}
                 {% if request.user.is_staff %}
                     <details>
-                        <summary style="font-size: 0.7rem;">{% if post.blog.user.settings.upgraded %}🐻{% else %}🌱{% endif %} {{ post.blog.lang }} {{ post.lang }}</summary>
+                        <summary style="font-size: 0.7rem;">{% if post.blog.user.settings.upgraded %}B{% else %}🌱{% endif %} {{ post.blog.lang }} {{ post.lang }}</summary>
                         <form method="POST" style="display:inline">
                             <input hidden name="hide-post" value="{{ post.pk }}">
                             <button onclick="event.preventDefault();if(confirm('Hide this post?')){event.target.parentElement.submit()}">Hide post</button>
@@ -130,7 +130,7 @@
     </li>
     {% empty %}
     <li>
-        We've run out of posts ʕノ•ᴥ•ʔノ ︵ ┻━┻
+        That’s everything for now—check back soon for more.
     </li>
     {% endfor %}
 </ul>
@@ -149,12 +149,12 @@
         {% if newest %}
         <a
             href="feed/?newest=True{% if lang %}&lang={{ lang }}{% endif %}"
-            title="https://bearblog.dev/discover/feed/?newest=True{% if lang %}&lang={{ lang }}{% endif %}"
+            title="https://bocpress.co.uk/discover/feed/?newest=True{% if lang %}&lang={{ lang }}{% endif %}"
         >RSS feed</a>
         {% else %}
         <a
             href="feed/{% if lang %}?lang={{ lang }}{% endif %}"
-            title="https://bearblog.dev/discover/feed/{% if lang %}?lang={{ lang }}{% endif %}"
+            title="https://bocpress.co.uk/discover/feed/{% if lang %}?lang={{ lang }}{% endif %}"
         >RSS feed</a>
         {% endif %}
     </i>
