@@ -154,7 +154,7 @@ input:required:not([type="submit"]) {
 
     .sticky-controls,
     .helptext.sticky {
-        background-color: #0f1a1c;
+        background-color: #011f2b;
         border-color: #333;
     }
 
@@ -425,7 +425,7 @@ button#toggle-full-screen {
     button:disabled,
     input[type="submit"]:disabled,
     a.button.disabled {
-        background-color: #0f1a1c;
+        background-color: #011f2b;
         border-color: #333;
         color: #555;
     }
