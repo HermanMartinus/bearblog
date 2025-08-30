@@ -14,6 +14,7 @@ class BlogForm(forms.ModelForm):
         self.fields['subdomain'].label = False
         self.fields['max_feed_entries'].widget.attrs.update({'placeholder': 'Maximum feed entries to return...'})
         self.fields['max_feed_entries'].label = False
+        self.fields['max_feed_entries'].help_text = "Enter the maximum number of feed entries to return."
 
     class Meta:
         model = Blog
