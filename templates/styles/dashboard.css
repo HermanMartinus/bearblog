@@ -162,6 +162,10 @@ input:required:not([type="submit"]) {
         color: #aaa; /* muted but visible */
     }
 
+    .media-item {
+        background-color: transparent !important;
+    }
+
     a,
     a:visited {
         color: #eae0c8; /* cream accent for links */
