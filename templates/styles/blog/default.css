@@ -6,8 +6,8 @@
     --background-color: #fff;
     --heading-color: #222;
     --text-color: #444;
-    --link-color: #3273dc;
-    --visited-color:  #8b6fcb;
+    --link-color: #0b3d0b;
+    --visited-color: #8b6fcb;
     --code-background-color: #f2f2f2;
     --code-color: #222;
     --blockquote-color: #222;
@@ -15,11 +15,11 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --background-color: #01242e;
+        --background-color: #011f2b;
         --heading-color: #eee;
         --text-color: #ddd;
-        --link-color: #8cc2dd;
-        --visited-color:  #8b6fcb;
+        --link-color: #eae0c8;
+        --visited-color: #8b6fcb;
         --code-background-color: #000;
         --code-color: #ddd;
         --blockquote-color: #ccc;
@@ -40,7 +40,12 @@ body {
     color: var(--text-color);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: var(--font-main);
     color: var(--heading-color);
 }
@@ -52,14 +57,15 @@ a {
 }
 
 a:hover {
-    text-decoration: underline; 
+    text-decoration: underline;
 }
 
 nav a {
     margin-right: 8px;
 }
 
-strong, b {
+strong,
+b {
     color: var(--heading-color);
 }
 
@@ -117,7 +123,8 @@ footer {
     width: auto !important;
 }
 
-.highlight, .code {
+.highlight,
+.code {
     padding: 1px 15px;
     background-color: var(--code-background-color);
     color: var(--code-color);

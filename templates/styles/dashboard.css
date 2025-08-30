@@ -6,9 +6,9 @@
 body {
     font-family: "Garamond", "Baskerville", "Georgia", serif;
     color: #2b2b2b;
-    background-color: #fafafa;
+    background-color: #fffdf5;
     line-height: 1.65;
-    font-size: 17px;
+    font-size: 20px;
 }
 
 /* Headings — elegant, bookish */
@@ -132,7 +132,7 @@ input:required:not([type="submit"]) {
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
     body {
-        background-color: #0f1a1c; /* deep ink navy */
+        background-color: #011f2b; /* deep ink navy */
         color: #e8e6e3; /* warm off-white (like aged paper) */
     }
 
@@ -164,7 +164,7 @@ input:required:not([type="submit"]) {
 
     a,
     a:visited {
-        color: #cbb67a; /* golden accent for links */
+        color: #eae0c8; /* cream accent for links */
     }
 
     .errorlist {
