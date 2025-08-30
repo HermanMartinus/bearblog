@@ -2,20 +2,24 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+The following table outlines which versions of **BōcPress** currently receive security updates:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| 1.0.x   | :white_check_mark: |
+| < 1.0   | ❌ No               |
+
+We recommend upgrading to the latest supported version to ensure you receive important fixes and updates.
+
+---
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability in BōcPress, we encourage you to report it responsibly.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+- **How to report:** Please email us at [security@bocpress.org](mailto:security@bocpress.co.uk) with details.
+- **What to include:** A clear description of the issue, steps to reproduce, and (if possible) a proof-of-concept.
+- **Response time:** We aim to acknowledge your report within **72 hours** and provide updates until resolution.
+- **Disclosure:** If a vulnerability is confirmed, we will work on a fix before publicly disclosing details.
+
+We appreciate your help in keeping BōcPress safe and secure for everyone.
