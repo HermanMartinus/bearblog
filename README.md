@@ -41,4 +41,6 @@ The full documentation for BōcPress is in development, but is available at [htt
 
 ## Forked
 
-Forked from [Bearblog.dev](https://github.com/HermanMartinus/bearblog)
+This project is based on [Bear Blog](https://github.com/HermanMartinus/bearblog), which is licensed under the MIT License.
+
+All modifications and additional code are also licensed under the MIT License.
