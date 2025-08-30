@@ -1,17 +1,22 @@
-# Bear Blog Contributions
+# BōcPress Contributions
 
-Before opening a PR, please read the following guidelines.
+Thank you for your interest in contributing to BōcPress! We welcome contributions and ask that you review the following guidelines before opening a PR.
 
-## Current Contribution Status
-Bear Blog is currently **not actively accepting contributions**. This decision is due to the numerous low-effort PRs submitted to gaining "Bear Contributor" status on GitHub. These waste developer time and energy. 
+## Contribution Guidelines
 
-The primary purpose of making the Bear Blog source code available is:
+To keep development smooth and productive, please make sure your contribution:
 
-- To allow others to use the code for personal projects or to satisfy their curiosity.
-- To ensure code transparency, keeping the organization honest about its actions.
+- Adds meaningful improvements (features, fixes, documentation, or tests).
+- Is well-documented and easy to understand.
+- Aligns with the overall goals and direction of the project.
+- Low-effort or spammy contributions (e.g., trivial changes made only for contributor status) will be closed without review.
 
-## Future Contributions
-If our stance on contributions changes in the future, we will update this file with relevant guidelines and requirements. We appreciate your understanding and support.
+# Why the Source Code Is Public
 
-## Support the Project
-If you would like to support Bear Blog, consider upgrading your blog. Upgrading provides additional features and helps fund ongoing development and maintenance of the platform. Your support is always appreciated!
+The BōcPress source code is public to:
+- Allow developers to use it for personal projects, learning, or experimentation.
+- Maintain transparency in how the platform is built and maintained.
+
+# Supporting the Project
+
+If you’d like to support BōcPress beyond contributing code, consider upgrading your blog. Upgrading unlocks additional features and helps fund ongoing development and maintenance. Your support means a lot!

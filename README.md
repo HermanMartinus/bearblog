@@ -11,12 +11,14 @@ To request a feature or report a bug, please send an email to [hello@bocpress.co
 
 ## Contributions
 
-BōcPress is not currently accepting contributions. See CONTRIBUTIONS.md for more info. 
+We welcome contributions to **BōcPress**.
+
+If you'd like to help improve the project, please check out our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get started. Whether it's fixing a bug, adding a feature, improving documentation, or writing tests — your efforts are greatly appreciated.
 
 ## Markdown
 All the post content is written in [markdown](https://jordanrobinson.org/markdown-cheatsheet/).
 
-## Can BōcPress be self-hosted? 
+## Can BōcPress be self-hosted?
 BōcPress has been built as a platform and not as an individual blog generator.
 It is more like Substack than Hugo. Due to this it isn't possible to individually self-host a BōcPress.
 
