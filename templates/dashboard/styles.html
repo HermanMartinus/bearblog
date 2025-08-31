@@ -52,11 +52,11 @@
   </p>
   {% csrf_token %} {{ form.as_p }}
 </form>
-
+{% load static %}
 {% if blog.codemirror_enabled %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/css/css.min.js"></script>
+<script src="{% static 'codemirror/5.65.7/codemirror.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'codemirror/5.65.7/codemirror.min.css' %}">
+<script src="{% static 'codemirror/5.65.7/css.min.js' %}"></script>
 <style>
 	.CodeMirror {
 		height: unset;
