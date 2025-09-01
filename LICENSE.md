@@ -1,11 +1,31 @@
-Copyright 2023 - [Bear Blog](https://bearblog.dev) - [Herman Martinus](https://herman.bearblog.dev)
+Bear Blog License 2.0
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Copyright (c) 2025 [Herman Martinus](https://herman.bearblog.dev)
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+By using Bear Blog software ("Software"), you agree to the terms below.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+License Grant: The licensor grants you a non-exclusive, royalty-free, worldwide license to use, copy, modify, distribute, and create derivative works of the Software, subject to the limitations below.
 
-Commons Clause Restriction
+Limitations:
 
-The Software is provided under the above MIT License, with the additional restriction that you may not offer it as a service that competes with Bear Blog. This means to sell, lease, or otherwise commercially distribute the Software or derivatives thereof as a product or service, including providing it as a hosted service for commercial or social gain.
+1. You may not provide the Software as a hosted or managed service that offers users access to substantial features or functionality of Bear Blog, such as a competing blogging platform.
+
+2. You may not circumvent or remove any license key functionality or obscure features protected by license keys.
+
+3. You may not remove or obscure any licensing, copyright, or other notices in the Software.
+
+Patent License: The licensor grants you a license under any patent claims the licensor can license to make, use, sell, offer for sale, import, or distribute the Software, subject to these terms. If you or your company claim the Software infringes any patent, this patent license terminates immediately.
+
+Distribution: You must ensure anyone receiving the Software from you also receives these terms. Modified copies must include prominent notices stating the Software has been modified.
+
+No Warranty: The Software is provided "as is," without any warranty. The licensor is not liable for any damages arising from the use of the Software under any legal claim.
+
+Definitions:
+
+"Licensor" is Herman Martinus, offering these terms.
+
+"You" is the individual or entity agreeing to these terms.
+
+"Your company" is any organization you work for or control.
+
+"Software" is Bear Blog, including any portion of it.
