@@ -8,11 +8,9 @@ License Grant: The licensor grants you a non-exclusive, royalty-free, worldwide 
 
 Limitations:
 
-1. You may not provide the Software as a hosted or managed service that offers users access to substantial features or functionality of Bear Blog, such as a competing blogging platform.
+- You may not provide the Software as a hosted or managed service that offers users access to substantial features or functionality.
 
-2. You may not circumvent or remove any license key functionality or obscure features protected by license keys.
-
-3. You may not remove or obscure any licensing, copyright, or other notices in the Software.
+- You may not remove or obscure any licensing, copyright, or other notices in the Software.
 
 Patent License: The licensor grants you a license under any patent claims the licensor can license to make, use, sell, offer for sale, import, or distribute the Software, subject to these terms. If you or your company claim the Software infringes any patent, this patent license terminates immediately.
 
