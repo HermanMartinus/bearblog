@@ -8,4 +8,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 Commons Clause Restriction
 
-The Software is provided under the above MIT License, with the additional restriction that you may not use the Software to "Sell" the Software or offer it as a service that competes with Bear Blog. For purposes of this clause, "Sell" means to sell, lease, or otherwise commercially distribute the Software or derivatives thereof as a product or service, including providing it as a hosted service for commercial gain.
+The Software is provided under the above MIT License, with the additional restriction that you may not offer it as a service that competes with Bear Blog. This means to sell, lease, or otherwise commercially distribute the Software or derivatives thereof as a product or service, including providing it as a hosted service for commercial or social gain.
