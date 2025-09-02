@@ -5,9 +5,7 @@
     <li>
         <span>
             <i>
-                <time datetime="{{ post.published_date|date:'Y-m-d\TH:i\Z' }}">
-                    {% format_date post.published_date blog.date_format blog.lang tz %}
-                </time>
+                {% include '../snippets/formatted_date.html' with date=post.published_date %}
             </i>
         </span>
         <a href="/{{ post.slug }}/">{{ post.title }}</a>

@@ -57,5 +57,63 @@
     {% include 'snippets/dashboard_footer.html' %}
     {% endblock %}
   </footer>
+
+  {% if blog %}
+  <script>
+        const times = document.querySelectorAll('time');
+        const format_string = "{{ blog.date_format }}" || "d M, Y"
+
+        times.forEach(time => {
+            time.innerText = formatDate(time.dateTime, format_string)
+        });
+
+        function formatDate(dateStr, formatStr) {
+            const date = new Date(dateStr);
+            const day = date.getDate();
+            const month = date.getMonth();
+            const year = date.getFullYear();
+            const weekday = date.getDay();
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+
+            const monthsFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const daysFull = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            function getOrdinal(n) {
+            const s = ['th', 'st', 'nd', 'rd'];
+            const v = n % 100;
+            return s[(v - 20) % 10] || s[v] || s[0];
+            }
+
+            const map = {
+            'd': () => day.toString().padStart(2, '0'),
+            'm': () => (month + 1).toString().padStart(2, '0'),
+            'Y': () => year.toString(),
+            'F': () => monthsFull[month],
+            'j': () => day.toString(),
+            'D': () => daysShort[weekday],
+            'l': () => daysFull[weekday],
+            'S': () => getOrdinal(day),
+            'M': () => monthsShort[month],
+            'H': () => hours.toString().padStart(2, '0'),
+            'h': () => {
+                let h = hours % 12;
+                h = h === 0 ? 12 : h;
+                return h.toString().padStart(2, '0');
+            },
+            'i': () => minutes.toString().padStart(2, '0'),
+            'a': () => hours < 12 ? 'am' : 'pm',
+            };
+
+            let result = '';
+            for (let char of formatStr) {
+                result += map[char] ? map[char]() : char;
+            }
+            return result;
+        }
+    </script>
+    {% endif %}
 </body>
 </html>

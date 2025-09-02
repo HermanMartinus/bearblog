@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.utils.text import slugify
+from django.views.decorators.cache import cache_page
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import salt_and_hash, unmark
