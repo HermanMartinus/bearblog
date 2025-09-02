@@ -52,7 +52,8 @@ HOST_WHITELIST = [
     'supercut.video',
     'listenbrainz.org',
     'api.listenbrainz.org',
-    'archive.org'
+    'archive.org',
+    'panel.radiocast.net'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
