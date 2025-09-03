@@ -246,12 +246,13 @@ def robots(request):
 
 def favicon(request):
     blog = resolve_address(request)
-    if not blog:
-        if '.ico' in request.path:
-            return redirect('/static/favicon.ico', permanent=True)
-        return redirect('/static/logo.png', permanent=True)
     
     # import requests    
     # response = requests.get(blog.favicon)
     # return HttpResponse(response.content, content_type='image/x-icon')
-    return redirect(blog.favicon)
+    if blog and 'https://' in blog.favicon:
+        return redirect(blog.favicon)
+
+    if '.ico' in request.path:
+        return redirect('/static/favicon.ico', permanent=True)
+    return redirect('/static/logo.png', permanent=True)
