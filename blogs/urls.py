@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media
 from blogs import subscriptions
@@ -91,6 +91,11 @@ urlpatterns = [
     # Blog
     path('ping/', blog.ping, name='ping'),
     
+    path('favicon.ico', blog.favicon, name='favicon'),
+    path("apple-touch-icon.png", blog.favicon),
+    path("apple-touch-icon-precomposed.png", blog.favicon),
+    re_path(r"^favicons/.*$", blog.favicon),
+
     path('sitemap.xml', blog.sitemap, name='sitemap'),
     path('robots.txt', blog.robots, name='robots'),
     path('public-analytics/', blog.public_analytics, name="public_analytics"),
