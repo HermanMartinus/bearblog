@@ -8,11 +8,11 @@ urlpatterns = [
     path('mothership/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('blogs.urls')),
-    # path("favicon.ico", RedirectView.as_view(url='/static/favicon.ico', permanent=True)),
-    # path("logo.png", RedirectView.as_view(url='/static/logo.png', permanent=True)),
-    # path("apple-touch-icon.png", RedirectView.as_view(url='/static/logo.png', permanent=True)),
-    # path("apple-touch-icon-precomposed.png", RedirectView.as_view(url='/static/logo.png', permanent=True)),
-    # re_path(r"^favicons/.*$", RedirectView.as_view(url='/static/logo.png', permanent=True)),
+    path("favicon.ico", RedirectView.as_view(url='/static/favicon.ico', permanent=True)),
+    path("logo.png", RedirectView.as_view(url='/static/logo.png', permanent=True)),
+    path("apple-touch-icon.png", RedirectView.as_view(url='/static/logo.png', permanent=True)),
+    path("apple-touch-icon-precomposed.png", RedirectView.as_view(url='/static/logo.png', permanent=True)),
+    re_path(r"^favicons/.*$", RedirectView.as_view(url='/static/logo.png', permanent=True)),
 ]
 
 if settings.DEBUG:

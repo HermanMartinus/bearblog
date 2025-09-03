@@ -91,10 +91,10 @@ urlpatterns = [
     # Blog
     path('ping/', blog.ping, name='ping'),
     
-    path('favicon.ico', blog.favicon, name='favicon'),
-    path("apple-touch-icon.png", blog.favicon),
-    path("apple-touch-icon-precomposed.png", blog.favicon),
-    re_path(r"^favicons/.*$", blog.favicon),
+    # path('favicon.ico', blog.favicon, name='favicon'),
+    # path("apple-touch-icon.png", blog.favicon),
+    # path("apple-touch-icon-precomposed.png", blog.favicon),
+    # re_path(r"^favicons/.*$", blog.favicon),
 
     path('sitemap.xml', blog.sitemap, name='sitemap'),
     path('robots.txt', blog.robots, name='robots'),
