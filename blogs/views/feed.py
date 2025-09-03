@@ -37,12 +37,15 @@ def feed(request):
 
 
 def generate_feed(blog, feed_type="atom", tag=None):
-    all_posts = blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now())
+    all_posts = blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now()).order_by('-published_date')
 
     if tag:
-        all_posts = all_posts.filter(all_tags__icontains=tag)
+        all_posts = all_posts.filter(all_tags__icontains=tag).order_by('-published_date')
+        all_posts = [post for post in all_posts if tag in post.tags]
 
-    all_posts = all_posts.order_by('-published_date')[:10]
+    # Only last 10 posts
+    all_posts = all_posts[:10]
+
     # Reverse the most recent posts 
     all_posts = list(all_posts)[::-1] 
 
