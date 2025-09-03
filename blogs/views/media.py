@@ -92,7 +92,10 @@ def upload_image(request, id):
 
     if request.method == "POST" and blog.user.settings.upgraded is True:
         file_list = request.FILES.getlist('file')
-        optimise = request.POST.get('raw') == 'false'
+        optimise = True
+        if request.POST.get('raw') == 'true':
+            optimise = False
+
         file_links = upload_files(blog, file_list, optimise)
 
         return HttpResponse(json.dumps(sorted(file_links)), 200)

@@ -66,6 +66,8 @@ class Blog(models.Model):
         choices=((True, 'Overwrite default styles'), (False, 'Extend default styles')),
         verbose_name='')
     favicon = models.CharField(max_length=100, default="🐼", blank=True)
+
+    # TODO: Deprecate this
     optimise_images = models.BooleanField(default=True)
 
     date_format = models.CharField(max_length=32, default="d M, Y", blank=True)
