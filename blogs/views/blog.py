@@ -246,10 +246,7 @@ def robots(request):
 
 def favicon(request):
     blog = resolve_address(request)
-    
-    # import requests    
-    # response = requests.get(blog.favicon)
-    # return HttpResponse(response.content, content_type='image/x-icon')
+
     if blog and 'https://' in blog.favicon:
         return redirect(blog.favicon)
 
