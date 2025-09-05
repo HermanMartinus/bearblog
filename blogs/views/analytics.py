@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db import IntegrityError
@@ -16,7 +17,6 @@ import httpagentparser
 import pygal
 
 import pygal
-from pygal.style import LightColorizedStyle
 import djqscsv
 
 
@@ -102,26 +102,26 @@ def render_analytics(request, blog, public=False):
     if referrer_filter:
         base_hits = base_hits.filter(referrer=referrer_filter)
 
-    posts = Post.objects.annotate(
-        hit_count=Count('hit', filter=Q(hit__in=base_hits)),
-    ).filter(
-        blog=blog,
-        publish=True,
-    ).filter(Q(slug=post_filter) if post_filter else Q()
-            ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+    # posts = Post.objects.annotate(
+    #     hit_count=Count('hit', filter=Q(hit__in=base_hits)),
+    # ).filter(
+    #     blog=blog,
+    #     publish=True,
+    # ).filter(Q(slug=post_filter) if post_filter else Q()
+    #         ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
 
 
     hits = base_hits.order_by('created_date')
     start_date = hits.first().created_date.date() if hits.exists() else start_date
 
-    unique_reads = hits.count()
-    unique_visitors = hits.values('hash_id').distinct().count()
+    # unique_reads = hits.count()
+    # unique_visitors = hits.values('hash_id').distinct().count()
     on_site = hits.filter(created_date__gt=now-timedelta(minutes=4)).count()
 
-    referrers = hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
-    devices = hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
-    browsers = hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
-    countries = hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
+    # referrers = hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
+    # devices = hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
+    # browsers = hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
+    # countries = hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
 
     # Build chart data
 
@@ -139,23 +139,67 @@ def render_analytics(request, blog, public=False):
         date_str = date.strftime('%Y-%m-%d')
         count = hit_date_count.get(date, 0)
         chart_data.append({'date': date_str, 'hits': count})
+
     return render(request, 'studio/analytics.html', {
         'public': public,
         'blog': blog,
-        'posts': posts,
+        # 'posts': posts,
         'start_date': start_date,
         'end_date': end_date,
-        'unique_reads': unique_reads,
-        'unique_visitors': unique_visitors,
+        # 'unique_reads': unique_reads,
+        # 'unique_visitors': unique_visitors,
         'on_site': on_site,
         'chart_data': chart_data,
-        'referrers': referrers,
-        'devices': devices,
-        'browsers': browsers,
-        'countries': countries,
+        # 'referrers': referrers,
+        # 'devices': devices,
+        # 'browsers': browsers,
+        # 'countries': countries,
         'days_filter': days_filter,
         'post_filter': post_filter,
         'referrer_filter': referrer_filter,
+    })
+
+
+@login_required
+def additional_data(request, id):
+    if request.user.is_superuser:
+        blog = get_object_or_404(Blog, subdomain=id)
+    else:
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    
+    now = timezone.now()
+    post_filter = request.GET.get('post', False)
+    days_filter = int(request.GET.get('days', 7))
+    start_date = (now - timedelta(days=days_filter)).date()
+    
+    base_hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date)
+    if post_filter:
+        base_hits = base_hits.filter(post__slug=post_filter)
+    
+    unique_reads = base_hits.count()
+    unique_visitors = base_hits.values('hash_id').distinct().count()
+
+    referrers = base_hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
+    devices = base_hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
+    browsers = base_hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
+    countries = base_hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
+    
+    posts = Post.objects.annotate(
+        hit_count=Count('hit', filter=Q(hit__in=base_hits)),
+    ).filter(
+        blog=blog,
+        publish=True,
+    ).filter(Q(slug=post_filter) if post_filter else Q()
+    ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+    
+    return JsonResponse({
+        'unique_reads': unique_reads,
+        'unique_visitors': unique_visitors,
+        'referrers': list(referrers),
+        'devices': list(devices),
+        'browsers': list(browsers),
+        'countries': list(countries),
+        'posts': list(posts)
     })
 
 
