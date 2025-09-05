@@ -372,6 +372,7 @@ def clean(markup):
     cleaned_markup = re.sub(r'(<\w+\s+.*?)(href|src)\s*=\s*["\']?javascript:[^"\']*["\']?', r'\1', cleaned_markup, flags=re.IGNORECASE)
     cleaned_markup = re.sub(r'<(object|embed|form|input|button).*?>', '', cleaned_markup, flags=re.IGNORECASE)
     cleaned_markup = re.sub(r'</(object|embed|form|input|button)>', '', cleaned_markup, flags=re.IGNORECASE)
+    cleaned_markup = re.sub(r'<\w+\s*[^>]*\bon\w+\s*=\s*(".*?"|\'.*?\'|[^\s>]*)\s*[^>]*>', '', cleaned_markup, flags=re.IGNORECASE | re.DOTALL)
     
     def iframe_whitelisted(match):
         src = match.group(2)
