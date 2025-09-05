@@ -105,6 +105,8 @@ def render_analytics(request, blog, public=False):
     hits = base_hits.order_by('created_date')
     start_date = hits.first().created_date.date() if hits.exists() else start_date
 
+    unique_reads = base_hits.count()
+    unique_visitors = base_hits.values('hash_id').distinct().count()
     on_site = hits.filter(created_date__gt=now-timedelta(minutes=4)).count()
 
     # Build chart data
@@ -128,6 +130,8 @@ def render_analytics(request, blog, public=False):
         'blog': blog,
         'start_date': start_date,
         'end_date': end_date,
+        'unique_reads': unique_reads,
+        'unique_visitors': unique_visitors,
         'on_site': on_site,
         'chart_data': chart_data,
         'days_filter': days_filter,
@@ -152,8 +156,7 @@ def additional_data(request, id):
     if post_filter:
         base_hits = base_hits.filter(post__slug=post_filter)
     
-    unique_reads = base_hits.count()
-    unique_visitors = base_hits.values('hash_id').distinct().count()
+
 
     referrers = base_hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
     devices = base_hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
@@ -169,8 +172,6 @@ def additional_data(request, id):
     ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
     
     return JsonResponse({
-        'unique_reads': unique_reads,
-        'unique_visitors': unique_visitors,
         'referrers': list(referrers),
         'devices': list(devices),
         'browsers': list(browsers),

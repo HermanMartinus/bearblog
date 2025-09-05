@@ -67,11 +67,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/{{ blog.subdomain }}/dashboard/analytics/data/?days={{ days_filter }}{% if post_filter %}&post={{ post_filter }}{% endif %}')
             .then(response => response.json())
-            .then(data => {
-                // Update unique reads and visitors
-                document.getElementById('unique-reads').textContent = data.unique_reads.toLocaleString();
-                document.getElementById('unique-visitors').textContent = data.unique_visitors.toLocaleString();
-                
+            .then(data => {                
                 // Update posts list
                 const postsList = document.getElementById('posts-list');
                 data.posts.forEach(post => {
@@ -145,9 +141,9 @@
 </script>
 
 <p>
-    <b>Unique reads:</b> <span id="unique-reads">Loading...</span>
+    <b>Unique reads:</b> {{ unique_reads|intcomma }}
     <br>
-    <b>Unique visitors:</b> ~<span id="unique-visitors">Loading...</span>
+    <b>Unique visitors:</b> ~{{ unique_visitors|intcomma }}
 <p>
 {% if post_filter %}
     <small>Post: <b>{{ posts.first.title }}</b></small>
