@@ -139,18 +139,6 @@ def render_analytics(request, blog, public=False):
         date_str = date.strftime('%Y-%m-%d')
         count = hit_date_count.get(date, 0)
         chart_data.append({'date': date_str, 'hits': count})
-
-    # Render chart
-
-    chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
-    chart.force_uri_protocol = 'http'
-    mark_list = [x['hits'] for x in chart_data]
-    [x['date'] for x in chart_data]
-    chart.add('Reads', mark_list)
-    chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
-    chart_render = chart.render_data_uri()
-
-
     return render(request, 'studio/analytics.html', {
         'public': public,
         'blog': blog,
@@ -160,7 +148,7 @@ def render_analytics(request, blog, public=False):
         'unique_reads': unique_reads,
         'unique_visitors': unique_visitors,
         'on_site': on_site,
-        'chart': chart_render,
+        'chart_data': chart_data,
         'referrers': referrers,
         'devices': devices,
         'browsers': browsers,

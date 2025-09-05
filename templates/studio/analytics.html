@@ -36,11 +36,34 @@
         <button onclick="window.location = '?days=99999{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">All time</button>
     </span>
 </div>
-<embed type="image/svg+xml" src= {{ chart|safe }} />
+
+<canvas id="hitsChart" height="200"></canvas>
 <span class="helptext" style="display: flex; justify-content:space-between;">
     <span>{{ start_date|date:"j F Y" }}</span>
-    <span>{{ end_date|date:"j F Y" }}</span> 
+    <span>{{ end_date|date:"j F Y" }}</span>
 </span>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('hitsChart').getContext('2d');
+    const chartData = {{ chart_data|safe }};
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.map(item => item.date.split('-')[2]),
+            datasets: [{
+                label: 'Reads',
+                data: chartData.map(item => item.hits),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
 
 <p>
     <b>Unique reads:</b> {{ unique_reads|intcomma }}
