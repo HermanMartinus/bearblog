@@ -102,29 +102,12 @@ def render_analytics(request, blog, public=False):
     if referrer_filter:
         base_hits = base_hits.filter(referrer=referrer_filter)
 
-    # posts = Post.objects.annotate(
-    #     hit_count=Count('hit', filter=Q(hit__in=base_hits)),
-    # ).filter(
-    #     blog=blog,
-    #     publish=True,
-    # ).filter(Q(slug=post_filter) if post_filter else Q()
-    #         ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
-
-
     hits = base_hits.order_by('created_date')
     start_date = hits.first().created_date.date() if hits.exists() else start_date
 
-    # unique_reads = hits.count()
-    # unique_visitors = hits.values('hash_id').distinct().count()
     on_site = hits.filter(created_date__gt=now-timedelta(minutes=4)).count()
 
-    # referrers = hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
-    # devices = hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
-    # browsers = hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
-    # countries = hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
-
     # Build chart data
-
     hit_dict = hits.annotate(
         date=TruncDate('created_date')
     ).values('date').annotate(
@@ -143,17 +126,10 @@ def render_analytics(request, blog, public=False):
     return render(request, 'studio/analytics.html', {
         'public': public,
         'blog': blog,
-        # 'posts': posts,
         'start_date': start_date,
         'end_date': end_date,
-        # 'unique_reads': unique_reads,
-        # 'unique_visitors': unique_visitors,
         'on_site': on_site,
         'chart_data': chart_data,
-        # 'referrers': referrers,
-        # 'devices': devices,
-        # 'browsers': browsers,
-        # 'countries': countries,
         'days_filter': days_filter,
         'post_filter': post_filter,
         'referrer_filter': referrer_filter,

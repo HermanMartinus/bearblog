@@ -98,7 +98,7 @@
                     li.innerHTML = `
                         <span>
                             <a href="?days={{ days_filter }}&referrer=${encodeURIComponent(referrer.referrer)}{% if post_filter %}&post={{ post_filter }}{% endif %}">${referrer.referrer}</a>
-                            <a href="${encodeURIComponent(referrer.referrer)}" target="_blank">↪</a>
+                            <a href="${referrer.referrer}" target="_blank">↪</a>
                         </span>
                         <span>${referrer.count ? referrer.count.toLocaleString() : '0'}</span>
                     `;
