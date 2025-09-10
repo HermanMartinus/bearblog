@@ -195,17 +195,23 @@ def upvote(request, uid):
     hash_id = salt_and_hash(request, 'year')
 
     if uid == request.POST.get("uid", "") and not request.POST.get("title", False):
+        print("Attempting upvote")
         post = get_object_or_404(Post, uid=uid)
-        print("Upvoting", post)
         try:
             upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
         
             if created:
-                return HttpResponse(f'Upvoted {post.title}')
-            raise Http404('Duplicate upvote')
+                print("Upvoting", post)
+            else:
+                print("Not upvoting: Duplicate upvote")
         except Upvote.MultipleObjectsReturned:
-            return HttpResponse(f'Upvoted {post.title}')
-    raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
+            print("Not upvoting: Duplicate upvote")
+
+        return HttpResponse(f'Upvoted {post.title}')
+        
+    print("Not upvoting: Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
+
+    return HttpResponse(f'Upvoted')
 
 
 def public_analytics(request):
