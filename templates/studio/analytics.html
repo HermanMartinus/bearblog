@@ -49,7 +49,7 @@
     <b>Unique visitors:</b> ~{{ unique_visitors|intcomma }}
 <p>
 {% if post_filter %}
-    <small>Post: <b>{{ posts.first.title }}</b></small>
+    <small>Post: <b>{{ posts.0.title }}</b></small>
     <a href="?days={{days_filter}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}"><button>Remove filter</button></a>
     <br>
 {% endif %}
