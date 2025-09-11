@@ -178,13 +178,16 @@ def additional_data(request, id):
     ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug'
     ).order_by('-hit_count', '-published_date')
     
+    print('Analytics: Creating list')
+    posts_list = list(posts)
+
     print("Analytics: Complete!")
     return JsonResponse({
         'referrers': list(referrers),
         'devices': list(devices),
         'browsers': list(browsers),
         'countries': list(countries),
-        'posts': list(posts)
+        'posts': posts_list
     })
 
 
