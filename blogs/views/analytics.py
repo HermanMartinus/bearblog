@@ -126,70 +126,40 @@ def render_analytics(request, blog, public=False):
         count = hit_date_count.get(date, 0)
         chart_data.append({'date': date_str, 'hits': count})
 
-    return render(request, 'studio/analytics.html', {
-        'public': public,
-        'blog': blog,
-        'start_date': start_date,
-        'end_date': end_date,
-        'unique_reads': unique_reads,
-        'unique_visitors': unique_visitors,
-        'on_site': on_site,
-        'chart_data': chart_data,
-        'days_filter': days_filter,
-        'post_filter': post_filter,
-        'referrer_filter': referrer_filter,
-    })
-
-
-@login_required
-def additional_data(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-    
-    now = timezone.now()
-    post_filter = request.GET.get('post', False)
-    days_filter = int(request.GET.get('days', 7))
-    start_date = (now - timedelta(days=days_filter)).date()
-    
-    print("Analytics: Getting base query")
-    base_hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date)
-    if post_filter:
-        base_hits = base_hits.filter(post__slug=post_filter)
-    
-
-    print("Analytics: Getting referrers")
-    referrers = base_hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
-    print("Analytics: Getting devices")
-    devices = base_hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
-    print("Analytics: Getting browsers")
-    browsers = base_hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
-    print("Analytics: Getting countries")
-    countries = base_hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
-    
-    print("Analytics: Counting hits in posts")
     posts = Post.objects.filter(
         blog=blog,
         publish=True,
     ).filter(
         Q(slug=post_filter) if post_filter else Q()
     ).annotate(
+        # Using custom hit filter for hit count to prevent unoptimised call
         hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date, hit__post__blog=blog))
     ).values(
         'title', 'hit_count', 'upvotes', 'published_date', 'slug'
     ).order_by('-hit_count', '-published_date')
-    
-    print('Analytics: Creating list')
-    posts_list = list(posts)
 
-    print("Analytics: Complete!")
-    return JsonResponse({
-        'referrers': list(referrers),
-        'devices': list(devices),
-        'browsers': list(browsers),
-        'countries': list(countries),
-        'posts': posts_list
+    referrers = base_hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
+    devices = base_hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
+    browsers = base_hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
+    countries = base_hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
+
+    return render(request, 'studio/analytics.html', {
+        'public': public,
+        'blog': blog,
+        'posts': posts,
+        'start_date': start_date,
+        'end_date': end_date,
+        'unique_reads': unique_reads,
+        'unique_visitors': unique_visitors,
+        'on_site': on_site,
+        'chart_data': chart_data,
+        'referrers': referrers,
+        'devices': devices,
+        'browsers': browsers,
+        'countries': countries,
+        'days_filter': days_filter,
+        'post_filter': post_filter,
+        'referrer_filter': referrer_filter,
     })
 
 

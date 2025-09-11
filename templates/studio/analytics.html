@@ -61,15 +61,38 @@
 
 <div style="display:flex;flex-flow:row wrap;justify-content:space-between; font-size: 12px;">
     <div style="width: 340px">
-    <h3>Pages</h3>
-        <ul id="posts-list" style="padding: 0; max-height: 300px; overflow-y: auto;">
-            Loading...
+        <h3>Pages</h3>
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto;">
+            {% for post in posts %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                <span>
+                    {% if post.hit_count > 0 %}
+                    <a href="?days={{days_filter}}&post={{post.slug}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">
+                        {{post.title}}
+                    </a>
+                    {% else %}
+                    {{post.title}}
+                    {% endif %}
+                    <small>(▵{{ post.upvotes }})</small>
+                    <a href="{{ blog.dynamic_useful_domain }}/{{ post.slug }}" target="_blank">↪</a>
+                </span>
+                <span>{{post.hit_count|intcomma}}</span>
+            </li>
+            {% endfor %}
         </ul>
     </div>
     <div style="width: 340px">
         <h3>Referrers</h3>
-        <ul id="referrers-list" style="padding: 0;max-height: 300px;overflow-y: auto;word-break:break-all;">
-            Loading...
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto;word-break:break-all;">
+            {% for referrer in referrers %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                <span>
+                    <a href="?days={{ days_filter }}&referrer={{ referrer.referrer }}{% if post_filter %}&post={{ post_filter }}{% endif %}">{{ referrer.referrer }}</a>
+                    <a href="{{ referrer.referrer }}" target="_blank">↪</a>
+                </span>
+                <span>{{ referrer.count|intcomma }}</span>
+            </li>
+            {% endfor %}
         </ul>
     </div>
 </div>
@@ -77,20 +100,35 @@
 <div style="padding-top:20px;display:flex; flex-flow: row wrap;justify-content:space-between; font-size: 12px;">
     <div style="width:220px">
         <h3>Devices</h3>
-        <ul id="devices-list" style="padding: 0;max-height: 300px;overflow-y: auto">
-            Loading...
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto">
+            {% for device in devices %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                {{ device.device }}
+                <span>{{ device.count|intcomma }}</span>
+            </li>
+            {% endfor %}
         </ul>
     </div>
     <div style="width:220px">
         <h3>Browsers</h3>
-        <ul id="browsers-list" style="padding: 0;max-height: 300px;overflow-y: auto">
-            Loading...
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto">
+            {% for browser in browsers %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                {{ browser.browser }}
+                <span>{{ browser.count|intcomma }}</span>
+            </li>
+            {% endfor %}
         </ul>
     </div>
     <div style="width:220px">
         <h3>Countries</h3>
-        <ul id="countries-list" style="padding: 0;max-height: 300px;overflow-y: auto">
-            Loading...
+        <ul style="padding: 0;max-height: 300px;overflow-y: auto">
+            {% for country in countries %}
+            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+                {{ country.country }}
+                <span>{{ country.count|intcomma }}</span>
+            </li>
+            {% endfor %}
         </ul>
     </div>
 </div>
@@ -123,101 +161,6 @@ Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
         options: {
             plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true } }
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', async function() {
-        async function fetchWithRetry(url) {
-            try {
-                // First attempt
-                console.log("First attempt")
-                return await fetch(url, { signal: AbortSignal.timeout(15000) });
-            } catch (error) {
-                // Second attempt
-                console.log("Second attempt")
-                return await fetch(url, { signal: AbortSignal.timeout(15000) });
-            }
-        }
-
-        try {
-            const response = await fetchWithRetry('/{{ blog.subdomain }}/dashboard/analytics/data/?days={{ days_filter }}{% if post_filter %}&post={{ post_filter }}{% endif %}');
-            const data = await response.json();
-
-            // Update posts list
-            const postsList = document.getElementById('posts-list');
-            postsList.innerHTML = "";
-            data.posts.forEach(post => {
-                const li = document.createElement('li');
-                li.style.cssText = 'display:flex;justify-content:space-between;padding:5px 0;';
-                li.innerHTML = `
-                    <span>
-                        ${post.hit_count > 0 ?
-                            `<a href="?days={{ days_filter }}&post=${post.slug}{% if referrer_filter %}&referrer={{ referrer_filter }}{% endif %}">${post.title}</a>` :
-                            post.title}
-                        <small>(▵${post.upvotes})</small>
-                        <a href="{{ blog.dynamic_useful_domain }}/${post.slug}" target="_blank">↪</a>
-                    </span>
-                    <span>${post.hit_count.toLocaleString()}</span>
-                `;
-                postsList.appendChild(li);
-            });
-
-            // Update referrers list
-            const referrersList = document.getElementById('referrers-list');
-            referrersList.innerHTML = "";
-            data.referrers.forEach(referrer => {
-                const li = document.createElement('li');
-                li.style.cssText = 'display:flex;justify-content:space-between;padding:5px 0;';
-                li.innerHTML = `
-                    <span>
-                        <a href="?days={{ days_filter }}&referrer=${encodeURIComponent(referrer.referrer)}{% if post_filter %}&post={{ post_filter }}{% endif %}">${referrer.referrer}</a>
-                        <a href="${referrer.referrer}" target="_blank">↪</a>
-                    </span>
-                    <span>${referrer.count ? referrer.count.toLocaleString() : '0'}</span>
-                `;
-                referrersList.appendChild(li);
-            });
-
-            // Update devices list
-            const devicesList = document.getElementById('devices-list');
-            devicesList.innerHTML = "";
-            data.devices.forEach(device => {
-                const li = document.createElement('li');
-                li.style.cssText = 'display:flex;justify-content:space-between;padding:5px 0;';
-                li.innerHTML = `
-                    ${device.device}
-                    <span>${device.count.toLocaleString()}</span>
-                `;
-                devicesList.appendChild(li);
-            });
-
-            // Update browsers list
-            const browsersList = document.getElementById('browsers-list');
-            browsersList.innerHTML = "";
-            data.browsers.forEach(browser => {
-                const li = document.createElement('li');
-                li.style.cssText = 'display:flex;justify-content:space-between;padding:5px 0;';
-                li.innerHTML = `
-                    ${browser.browser}
-                    <span>${browser.count.toLocaleString()}</span>
-                `;
-                browsersList.appendChild(li);
-            });
-
-            // Update countries list
-            const countriesList = document.getElementById('countries-list');
-            countriesList.innerHTML = "";
-            data.countries.forEach(country => {
-                const li = document.createElement('li');
-                li.style.cssText = 'display:flex;justify-content:space-between;padding:5px 0;';
-                li.innerHTML = `
-                    ${country.country}
-                    <span>${country.count.toLocaleString()}</span>
-                `;
-                countriesList.appendChild(li);
-            });
-        } catch (error) {
-            console.error('Fetch failed:', error);
         }
     });
 </script>
