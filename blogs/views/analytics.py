@@ -132,8 +132,13 @@ def render_analytics(request, blog, public=False):
     ).filter(
         Q(slug=post_filter) if post_filter else Q()
     ).annotate(
-        # Using custom hit filter for hit count to prevent unoptimised call
-        hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date, hit__post__blog=blog))
+        hit_count=Count(
+            'hit',
+            filter=Q(
+                hit__created_date__gt=start_date,
+                hit__post__blog=blog,
+            ) & (Q(hit__referrer=referrer_filter) if referrer_filter else Q())
+        )
     ).values(
         'title', 'hit_count', 'upvotes', 'published_date', 'slug'
     ).order_by('-hit_count', '-published_date')
