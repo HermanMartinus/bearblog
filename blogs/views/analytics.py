@@ -169,13 +169,15 @@ def additional_data(request, id):
     countries = base_hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
     
     print("Analytics: Counting hits in posts")
-    posts = Post.objects.annotate(
-        hit_count=Count('hit', filter=Q(hit__in=base_hits)),
-    ).filter(
+    posts = Post.objects.filter(
         blog=blog,
         publish=True,
-    ).filter(Q(slug=post_filter) if post_filter else Q()
-    ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug'
+    ).filter(
+        Q(slug=post_filter) if post_filter else Q()
+    ).annotate(
+        hit_count=Count('hit', filter=Q(hit__created_date__gt=start_date, hit__post__blog=blog))
+    ).values(
+        'title', 'hit_count', 'upvotes', 'published_date', 'slug'
     ).order_by('-hit_count', '-published_date')
     
     print('Analytics: Creating list')
