@@ -1,15 +1,16 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+
+from django.http import HttpResponse
 from django.db import IntegrityError, connection
-from datetime import timedelta
-from django.db.models.functions import TruncDate
+from django.db.models import DateField, Count, Sum, Q
+from django.db.models.functions import Cast
 
 from blogs.models import Blog, Hit, Post
 from blogs.helpers import daterange, get_country, salt_and_hash
-from django.db.models import Count, Sum, Q
-from django.http import HttpResponse
 
+from datetime import timedelta
 from ipaddr import client_ip
 from urllib.parse import urlparse
 import httpagentparser
@@ -110,7 +111,7 @@ def render_analytics(request, blog, public=False):
 
     # Build chart data
     hit_dict = hits.annotate(
-        date=TruncDate('created_date')
+        date=Cast('created_date', output_field=DateField())
     ).values('date').annotate(
         c=Count('date')
     ).order_by('date')
