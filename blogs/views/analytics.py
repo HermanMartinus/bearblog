@@ -154,16 +154,20 @@ def render_analytics(request, blog, public=False):
 def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT "blogs_post"."title",
-                   "blogs_post"."upvotes",
-                   "blogs_post"."published_date",
-                   "blogs_post"."slug",
-                   COUNT("blogs_hit"."id") FILTER (WHERE "blogs_hit"."created_date" > %s AND ("blogs_hit"."referrer" = %s OR %s IS NULL)) AS "hit_count"
-            FROM "blogs_post"
-            LEFT OUTER JOIN "blogs_hit" ON ("blogs_post"."id" = "blogs_hit"."post_id")
-            WHERE "blogs_post"."blog_id" = %s AND "blogs_post"."publish" AND ("blogs_post"."slug" = %s OR %s IS NULL)
-            GROUP BY "blogs_post"."id"
-            ORDER BY "hit_count" DESC, "blogs_post"."published_date" DESC
+            SELECT p.title,
+                   p.upvotes,
+                   p.published_date,
+                   p.slug,
+                   (SELECT COUNT(h.id)
+                    FROM blogs_hit h
+                    WHERE h.post_id = p.id
+                    AND h.created_date > %s
+                    AND (h.referrer = %s OR %s IS NULL)) AS hit_count
+            FROM blogs_post p
+            WHERE p.blog_id = %s
+            AND p.publish
+            AND (p.slug = %s OR %s IS NULL)
+            ORDER BY hit_count DESC, p.published_date DESC
         """, [start_date, referrer_filter or None, referrer_filter or None, blog_id, post_filter or None, post_filter or None])
         columns = ['title', 'upvotes', 'published_date', 'slug', 'hit_count']
         posts = [dict(zip(columns, row)) for row in cursor.fetchall()]
