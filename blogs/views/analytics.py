@@ -1,9 +1,7 @@
-import time
 from django.shortcuts import get_object_or_404, redirect, render
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 from datetime import timedelta
 from django.db.models.functions import TruncDate
 
@@ -126,22 +124,7 @@ def render_analytics(request, blog, public=False):
         count = hit_date_count.get(date, 0)
         chart_data.append({'date': date_str, 'hits': count})
 
-    posts = Post.objects.filter(
-        blog=blog,
-        publish=True,
-    ).filter(
-        Q(slug=post_filter) if post_filter else Q()
-    ).annotate(
-        hit_count=Count(
-            'hit',
-            filter=Q(
-                hit__created_date__gt=start_date,
-                hit__post__blog=blog,
-            ) & (Q(hit__referrer=referrer_filter) if referrer_filter else Q())
-        )
-    ).values(
-        'title', 'hit_count', 'upvotes', 'published_date', 'slug'
-    ).order_by('-hit_count', '-published_date')
+    posts = get_posts(blog.id, start_date, post_filter, referrer_filter)
 
     referrers = base_hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
     devices = base_hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
@@ -166,6 +149,25 @@ def render_analytics(request, blog, public=False):
         'post_filter': post_filter,
         'referrer_filter': referrer_filter,
     })
+
+
+def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT "blogs_post"."title",
+                   "blogs_post"."upvotes",
+                   "blogs_post"."published_date",
+                   "blogs_post"."slug",
+                   COUNT("blogs_hit"."id") FILTER (WHERE "blogs_hit"."created_date" > %s AND ("blogs_hit"."referrer" = %s OR %s IS NULL)) AS "hit_count"
+            FROM "blogs_post"
+            LEFT OUTER JOIN "blogs_hit" ON ("blogs_post"."id" = "blogs_hit"."post_id")
+            WHERE "blogs_post"."blog_id" = %s AND "blogs_post"."publish" AND ("blogs_post"."slug" = %s OR %s IS NULL)
+            GROUP BY "blogs_post"."id"
+            ORDER BY "hit_count" DESC, "blogs_post"."published_date" DESC
+        """, [start_date, referrer_filter or None, referrer_filter or None, blog_id, post_filter or None, post_filter or None])
+        columns = ['title', 'upvotes', 'published_date', 'slug', 'hit_count']
+        posts = [dict(zip(columns, row)) for row in cursor.fetchall()]
+    return posts
 
 
 def post_hit(request, uid):
