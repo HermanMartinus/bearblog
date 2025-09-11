@@ -220,6 +220,10 @@ def post(request, id, uid=None):
                 elif name == 'link':
                     slug = value
                 elif name == 'alias':
+                    if value[0] == '/':
+                        value = value[1:]
+                    if value[-1] == '/':
+                        value = value[:-1]
                     post.alias = value
                 elif name == 'published_date':
                     if not value:
