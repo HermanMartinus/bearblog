@@ -131,11 +131,11 @@ Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
             try {
                 // First attempt
                 console.log("First attempt")
-                return await fetch(url, { signal: AbortSignal.timeout(3000) });
+                return await fetch(url, { signal: AbortSignal.timeout(15000) });
             } catch (error) {
                 // Second attempt
                 console.log("Second attempt")
-                return await fetch(url, { signal: AbortSignal.timeout(6000) });
+                return await fetch(url, { signal: AbortSignal.timeout(15000) });
             }
         }
 
