@@ -1,3 +1,4 @@
+import time
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -169,7 +170,8 @@ def additional_data(request, id):
         blog=blog,
         publish=True,
     ).filter(Q(slug=post_filter) if post_filter else Q()
-    ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
+    ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug'
+    ).order_by('-hit_count', '-published_date')
     
     return JsonResponse({
         'referrers': list(referrers),
