@@ -153,17 +153,22 @@ def additional_data(request, id):
     days_filter = int(request.GET.get('days', 7))
     start_date = (now - timedelta(days=days_filter)).date()
     
+    print("Analytics: Getting base query")
     base_hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date)
     if post_filter:
         base_hits = base_hits.filter(post__slug=post_filter)
     
 
-
+    print("Analytics: Getting referrers")
     referrers = base_hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
+    print("Analytics: Getting devices")
     devices = base_hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
+    print("Analytics: Getting browsers")
     browsers = base_hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
+    print("Analytics: Getting countries")
     countries = base_hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
     
+    print("Analytics: Counting hits in posts")
     posts = Post.objects.annotate(
         hit_count=Count('hit', filter=Q(hit__in=base_hits)),
     ).filter(
@@ -173,6 +178,7 @@ def additional_data(request, id):
     ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug'
     ).order_by('-hit_count', '-published_date')
     
+    print("Analytics: Complete!")
     return JsonResponse({
         'referrers': list(referrers),
         'devices': list(devices),
