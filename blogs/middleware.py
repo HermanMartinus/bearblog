@@ -147,8 +147,8 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
    
 class RateLimitMiddleware:
     RATE_LIMIT = 10  # max requests per thread
-    if os.getenv('ENVIRONMENT') == 'dev':
-        RATE_LIMIT = 100
+    # if os.getenv('ENVIRONMENT') == 'dev':
+    #     RATE_LIMIT = 100
     TIME_WINDOW = 10  # seconds
     BAN_DURATION = 60  # seconds
 
@@ -159,15 +159,20 @@ class RateLimitMiddleware:
 
     def __call__(self, request):
         # Skip rate limiting for ping and feed endpoints
-        if 'ping' in request.path or 'feed' in request.path:
+        if 'ping' in request.path or 'feed' in request.path or 'hit' in request.path:
             return self.get_response(request)
 
         client_ip_address = client_ip(request)
         current_time = time.time()
 
+        # Ban WP scrapers
+        if '.php' in request.path:
+            self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
+
+        full_path = request.build_absolute_uri()
+
         # Check ban
         if client_ip_address in self.banned_ips and current_time < self.banned_ips[client_ip_address]:
-            full_path = request.build_absolute_uri()
             print(f"Banned: {client_ip_address} at {full_path}")
             return JsonResponse({'error': 'Rate limit exceeded'}, status=429)
 
@@ -183,7 +188,6 @@ class RateLimitMiddleware:
         # Check rate limit
         if len(self.ip_request_counts[client_ip_address]) > self.RATE_LIMIT:
             self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
-            full_path = request.build_absolute_uri()
             print(f"Rate limit: Exceeded for {client_ip_address} at {full_path}")
             print(f"Rate limit: User agent {request.META.get('HTTP_USER_AGENT')}")
             return JsonResponse({'error': 'Rate limit exceeded'}, status=429)
