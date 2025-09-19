@@ -15,6 +15,7 @@ def clean_string(s):
 
 def feed(request):
     tag = request.GET.get('q')
+    page = int(request.GET.get('page', 0))
 
     if "rss" in request.GET.get('type', 'atom') or "rss" in request.path:
         feed_type = "rss"
@@ -25,26 +26,29 @@ def feed(request):
     if not blog:
         return not_found(request)
     try:
-        feed = generate_feed(blog, feed_type, tag)
+        feed = generate_feed(blog, feed_type, tag, page)
     except Exception as e:
         print(f'Feeds: Error generating feed for {blog.subdomain}: {e}')
         feed = ''
         raise e
     
-    response = HttpResponse(feed, content_type='application/xml')
+    response = HttpResponse(feed, content_type=f'application/{feed_type}+xml')
     response['Cache-Tag'] = blog.subdomain
     return response
 
 
-def generate_feed(blog, feed_type="atom", tag=None):
+def generate_feed(blog, feed_type="atom", tag=None, page=0):
     all_posts = blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now()).order_by('-published_date')
 
     if tag:
         all_posts = all_posts.filter(all_tags__icontains=tag).order_by('-published_date')
         all_posts = [post for post in all_posts if tag in post.tags]
 
+    first_post = page * 10
+    last_post = page * 10 + 10
+
     # Only last 10 posts
-    all_posts = all_posts[:10]
+    all_posts = all_posts[first_post:last_post]
 
     # Reverse the most recent posts 
     all_posts = list(all_posts)[::-1] 
