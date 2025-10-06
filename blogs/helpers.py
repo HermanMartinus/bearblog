@@ -206,6 +206,7 @@ class EmailThread(threading.Thread):
             html_message=self.html_message)
 
 
+# Important! All members of the recipient list will see the other recipients in the 'To' field
 def send_async_mail(subject, html_message, from_email, recipient_list):
     if settings.DEBUG:
         print(html_message)

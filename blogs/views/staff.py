@@ -2,6 +2,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.db.models import Q, F, Count
 from django.db.models.functions import Length, TruncWeek, TruncDate, TruncMonth, Length
 from django.shortcuts import get_object_or_404, redirect, render
@@ -475,6 +476,13 @@ def ignore(request, pk):
         blog = get_object_or_404(Blog, pk=pk)
         if blog.ignored_date:
             blog.permanent_ignore = True
+        else:
+            send_async_mail(
+                "Good to have you on board!",
+                render_to_string('emails/welcome.html'),
+                'Herman Martinus <herman@bearblog.dev>',
+                [blog.user.email]
+            )
         blog.ignored_date = timezone.now()
         blog.flagged = False
         blog.to_review = False
