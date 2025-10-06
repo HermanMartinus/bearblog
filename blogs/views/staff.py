@@ -356,7 +356,7 @@ def new_blogs():
         user__is_active=True,
         to_review=False,
         flagged=False,
-        created_date__lte=timezone.now() - timedelta(days=2)
+        created_date__lte=timezone.now() - timedelta(days=1)
     )
 
     # Avoid showing empty blogs
