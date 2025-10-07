@@ -379,7 +379,7 @@ def new_blogs():
         to_review=False,
         flagged=False,
         created_date__lte=timezone.now() - timedelta(days=1)
-    )
+    ).order_by("-created_date")
 
     # Avoid showing empty blogs
     to_review = to_review.annotate(num_posts=Count('posts')).annotate(content_length=Length('content')).exclude(
@@ -412,7 +412,7 @@ def review_bulk(request):
     if 'opt-in' in request.path:
         blogs = opt_in_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
     elif 'new' in request.path:
-        blogs = new_blogs().select_related('user').prefetch_related('posts').order_by('-created_date')[:100]
+        blogs = new_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
     elif 'dodgy' in request.path:
         blogs = dodgy_blogs().select_related('user').prefetch_related('posts').order_by('-dodginess_score')[:100]
     elif 'flagged' in request.path:
