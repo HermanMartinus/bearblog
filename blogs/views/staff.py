@@ -119,13 +119,16 @@ def dashboard(request):
     total_conversion_rate = total_upgrades / total_signups if total_signups > 0 else 0
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
+
+    emailed_upgrades = email_new_upgrades()
+
     return render(
         request,
         'staff/dashboard.html',
         {
             'signups': signups,
             'upgrades': upgrades,
-            'recent_upgrades': recent_upgrades(),
+            'emailed_upgrades': emailed_upgrades,
             'total_signups': total_signups,
             'total_upgrades': total_upgrades,
             'conversion_rate': formatted_conversion_rate,
@@ -151,7 +154,6 @@ def dashboard(request):
 def get_weekly_reviews():
     persistent_store = PersistentStore.load()
     reviewed_blogs = persistent_store.reviewed_blogs
-    print(reviewed_blogs)
 
      # Aggregate by week
     weekly_reviews = {}
@@ -165,6 +167,26 @@ def get_weekly_reviews():
     # Sort by week start date
     weekly_reviews = dict(sorted(weekly_reviews.items()))
     return weekly_reviews
+
+
+def email_new_upgrades():
+    upgraded_users = User.objects.filter(
+        settings__upgraded=True,
+        settings__upgraded_date__gte=timezone.now()-timedelta(days=1),
+        settings__upgraded_email_sent=False,
+        settings__order_id__isnull=False
+        )
+
+    for user in upgraded_users:
+        send_async_mail(
+            "Good to have you on board!",
+            render_to_string('emails/upgraded.html'),
+            'Herman Martinus <herman@bearblog.dev>',
+            [user.email]
+        )
+        user.settings.upgraded_email_sent = True
+        user.settings.save()
+    return f"Emailed {upgraded_users.count()} new upgrades"
 
 
 @staff_member_required
