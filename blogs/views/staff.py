@@ -179,7 +179,7 @@ def email_new_upgrades():
 
     for user in upgraded_users:
         send_async_mail(
-            "Good to have you on board!",
+            "You upgraded!",
             render_to_string('emails/upgraded.html'),
             'Herman Martinus <herman@bearblog.dev>',
             [user.email]
@@ -379,7 +379,7 @@ def new_blogs():
         to_review=False,
         flagged=False,
         created_date__lte=timezone.now() - timedelta(days=1)
-    ).order_by("-created_date")
+    )
 
     # Avoid showing empty blogs
     to_review = to_review.annotate(num_posts=Count('posts')).annotate(content_length=Length('content')).exclude(
@@ -499,12 +499,13 @@ def ignore(request, pk):
         if blog.ignored_date:
             blog.permanent_ignore = True
         else:
-            send_async_mail(
-                "Good to have you on board!",
-                render_to_string('emails/welcome.html'),
-                'Herman Martinus <herman@bearblog.dev>',
-                [blog.user.email]
-            )
+            if blog.created_date > timezone.now() - timedelta(weeks=2):
+                send_async_mail(
+                    "Good to have you on board",
+                    render_to_string('emails/welcome.html'),
+                    'Herman Martinus <herman@bearblog.dev>',
+                    [blog.user.email]
+                )
         blog.ignored_date = timezone.now()
         blog.flagged = False
         blog.to_review = False
