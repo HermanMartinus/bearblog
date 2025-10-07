@@ -172,7 +172,7 @@ def get_weekly_reviews():
 def email_new_upgrades():
     upgraded_users = User.objects.filter(
         settings__upgraded=True,
-        settings__upgraded_date__gte=timezone.now()-timedelta(week=1),
+        settings__upgraded_date__gte=timezone.now()-timedelta(weeks=1),
         settings__upgraded_email_sent=False,
         settings__order_id__isnull=False
         )
