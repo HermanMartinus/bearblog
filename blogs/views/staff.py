@@ -23,6 +23,7 @@ import json
 import os
 from datetime import datetime
 
+
 @staff_member_required
 def dashboard(request):
     days_filter = int(request.GET.get('days', 30))

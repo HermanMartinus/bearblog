@@ -119,6 +119,9 @@ def spam_check(title, content, email, user_ip, user_agent):
     )
 
     if is_spam > 0:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f'Spam: {title} — {content}')
         return True
     return False
 
