@@ -188,8 +188,8 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 
 # Emailer
 
-DEFAULT_FROM_EMAIL = "ʕ•ᴥ•ʔ Bear Blog <noreply@bearblog.dev>"
-SERVER_EMAIL = "ʕ•ᴥ•ʔ Bear Admin <noreply@bearblog.dev>"
+DEFAULT_FROM_EMAIL = "Bear Blog <noreply@bearblog.dev>"
+SERVER_EMAIL = "Bear Admin <noreply@bearblog.dev>"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.eu.mailgun.org'
 EMAIL_HOST_USER = 'postmaster@mg.bearblog.dev'
