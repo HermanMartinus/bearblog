@@ -2,4 +2,6 @@ Use the link below to confirm your email address.
 
 {{ activate_url }}
 
-Keep the tiny internet awesome! \ʕ•ᴥ•ʔ/
+If the url isn't clickable you can copy and paste the link into your browser.
+
+Keep the tiny internet awesome!
