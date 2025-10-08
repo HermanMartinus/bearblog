@@ -41,7 +41,7 @@ def signup(request):
     # If all fields are present do spam check and create account
     if title and subdomain and content and email and password:
         # Simple honeypot pre-db check
-        if honeypot_check(request) or spam_check(title, content, email, request.META['REMOTE_ADDR'], request.META['HTTP_USER_AGENT']):
+        if honeypot_check(request):
             error_messages.append(random_error_message())
             return render(request, 'signup_flow/step_1.html', {
                 'error_messages': error_messages,
