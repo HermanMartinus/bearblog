@@ -93,6 +93,8 @@ def honeypot_check(request):
         return True
     if request.POST.get('name'):
         return True
+    
+    # Keyword check
     if request.POST.get('email', '').endswith('@cleardex.io') or request.POST.get('email', '').endswith('@example.com') :
         return True
 
@@ -118,11 +120,13 @@ def spam_check(title, content, email, user_ip, user_agent):
         comment_type='signup',
     )
 
-    if is_spam > 0:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.info(f'Spam: {title} — {content}')
+    # Only discard blatant spam (2), possible spam is allowed (1)
+    if is_spam == 2:
+        print("Spam (blatant):", content)
         return True
+    if is_spam == 1:
+        print("Spam (possible):", content)
+        return False
     return False
 
 
