@@ -187,7 +187,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 LOGIN_REDIRECT_URL = '/dashboard/'
 
 # Emailer
-ACCOUNT_EMAIL_SUBJECT_PREFIX = '' # Allauth setting
+ACCOUNT_EMAIL_SUBJECT_PREFIX = '' # Allauth email setting
 DEFAULT_FROM_EMAIL = "Bear Blog <noreply@bearblog.dev>"
 SERVER_EMAIL = "Bear Admin <noreply@bearblog.dev>"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
