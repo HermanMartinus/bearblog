@@ -188,8 +188,8 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 
 # Emailer
 ACCOUNT_EMAIL_SUBJECT_PREFIX = '' # Allauth email setting
-DEFAULT_FROM_EMAIL = "Bear Blog <noreply@bearblog.dev>"
-SERVER_EMAIL = "Bear Admin <noreply@bearblog.dev>"
+DEFAULT_FROM_EMAIL = "Bear Blog Admin <admin@bearblog.dev>"
+SERVER_EMAIL = "Bear Blog Admin <admin@bearblog.dev>"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.eu.mailgun.org'
 EMAIL_HOST_USER = 'postmaster@mg.bearblog.dev'
