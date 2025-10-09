@@ -121,7 +121,7 @@ def dashboard(request):
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
 
-    emailed_upgrades = email_new_upgrades()
+    # emailed_upgrades = email_new_upgrades()
 
     return render(
         request,
@@ -129,7 +129,7 @@ def dashboard(request):
         {
             'signups': signups,
             'upgrades': upgrades,
-            'emailed_upgrades': emailed_upgrades,
+            # 'emailed_upgrades': emailed_upgrades,
             'total_signups': total_signups,
             'total_upgrades': total_upgrades,
             'conversion_rate': formatted_conversion_rate,
