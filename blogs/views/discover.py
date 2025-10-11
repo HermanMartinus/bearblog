@@ -22,7 +22,7 @@ def get_base_query(user=None):
         blog__user__is_active=True,
         make_discoverable=True,
         published_date__lte=timezone.now(),
-        blog__posts_in_last_24_hours__lte=3
+        blog__posts_in_last_24_hours__lte=4
     ).annotate(
         content_length=Length('content')
     ).filter(
