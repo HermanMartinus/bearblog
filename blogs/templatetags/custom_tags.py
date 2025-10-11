@@ -325,13 +325,13 @@ def element_replacement(markup, blog, post=None, tz=None):
 
         if "{{ next_post }}" in markup or "{{ previous_post }}" in markup:
             # Only find adjacent posts if necessary
-            adjacent_post_links = get_adjacent_post_slugs(post, blog)
+            adjacent_posts = get_adjacent_posts(post, blog)
             next_link = ""
             previous_link = ""
-            if adjacent_post_links['next']:
-                next_link = f'<a class="next-post" href="/{adjacent_post_links['next']}">Next</a>'
-            if adjacent_post_links['previous']:
-                previous_link = f'<a class="previous-post" href="/{adjacent_post_links['previous']}">Previous</a>'
+            if adjacent_posts['next_slug']:
+                next_link = f'<a class="next-post" href="/{adjacent_posts['next_slug']}" title="{escape(adjacent_posts['next_title'])}">Next</a>'
+            if adjacent_posts['previous_slug']:
+                previous_link = f'<a class="previous-post" href="/{adjacent_posts['previous_slug']}" title="{escape(adjacent_posts['previous_title'])}">Previous</a>'
             markup = markup.replace('{{ next_post }}', next_link)
             markup = markup.replace('{{ previous_post }}', previous_link)
 
@@ -340,13 +340,13 @@ def element_replacement(markup, blog, post=None, tz=None):
     return markup
 
 
-def get_adjacent_post_slugs(post, blog):
+def get_adjacent_posts(post, blog):
     base_qs = Post.objects.filter(
         blog=blog,
         is_page=False,
         publish=True,
         published_date__lte=timezone.now()
-    ).values('slug', 'published_date', 'id')
+    ).values('slug', 'title', 'published_date', 'id')
 
     next_post = base_qs.filter(
         published_date__gt=post.published_date
@@ -357,8 +357,10 @@ def get_adjacent_post_slugs(post, blog):
     ).order_by('-published_date', '-id').first()
 
     return {
-        'next': next_post['slug'] if next_post else None,
-        'previous': previous_post['slug'] if previous_post else None
+        'next_slug': next_post['slug'] if next_post else None,
+        'next_title': next_post['title'] if next_post else None,
+        'previous_slug': previous_post['slug'] if previous_post else None,
+        'previous_title': previous_post['title'] if previous_post else None,
     }
 
 
