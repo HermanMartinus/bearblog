@@ -504,7 +504,7 @@ def ignore(request, pk):
         if blog.ignored_date:
             blog.permanent_ignore = True
         else:
-            if blog.created_date > timezone.now() - timedelta(weeks=2):
+            if blog.created_date > timezone.now() - timedelta(weeks=1):
                 send_async_mail(
                     "Welcome to Bear",
                     render_to_string('emails/welcome.html'),
