@@ -121,15 +121,13 @@ def dashboard(request):
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
 
-    # emailed_upgrades = email_new_upgrades()
-
+    new_upgrades_count = new_upgrades().count()
     return render(
         request,
         'staff/dashboard.html',
         {
             'signups': signups,
             'upgrades': upgrades,
-            # 'emailed_upgrades': emailed_upgrades,
             'total_signups': total_signups,
             'total_upgrades': total_upgrades,
             'conversion_rate': formatted_conversion_rate,
@@ -142,6 +140,7 @@ def dashboard(request):
             'dodgy_blogs_count': dodgy_blogs_count,
             'flagged_blogs_count': flagged_blogs_count,
             'new_blogs_count': new_blogs_count,
+            'new_upgrades_count': new_upgrades_count,
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
             'period': period,
@@ -170,24 +169,29 @@ def get_weekly_reviews():
     return weekly_reviews
 
 
-def email_new_upgrades():
+def new_upgrades():
     upgraded_users = User.objects.filter(
         settings__upgraded=True,
         settings__upgraded_date__gte=timezone.now()-timedelta(weeks=1),
         settings__upgraded_email_sent=False,
         settings__order_id__isnull=False
         )
+    return upgraded_users
+
+@staff_member_required
+def email_new_upgrades(request):
+    upgraded_users = new_upgrades()
 
     for user in upgraded_users:
         send_async_mail(
-            "You upgraded!",
+            "Good to have you on board",
             render_to_string('emails/upgraded.html'),
             'Herman Martinus <herman@bearblog.dev>',
             [user.email]
         )
         user.settings.upgraded_email_sent = True
         user.settings.save()
-    return f"Emailed {upgraded_users.count()} new upgrades"
+    return HttpResponse(f"Emailed {upgraded_users.count()} new upgrades.")
 
 
 @staff_member_required
@@ -502,7 +506,7 @@ def ignore(request, pk):
         else:
             if blog.created_date > timezone.now() - timedelta(weeks=2):
                 send_async_mail(
-                    "Good to have you on board",
+                    "Welcome to Bear",
                     render_to_string('emails/welcome.html'),
                     'Herman Martinus <herman@bearblog.dev>',
                     [blog.user.email]

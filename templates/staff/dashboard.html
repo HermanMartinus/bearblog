@@ -80,7 +80,7 @@ Staff dashboard  ʕง•ᴥ•ʔง
 
     <h2>Recent upgrades</h2>
     <p>
-        {{ emailed_upgrades }}
+        <a href="{% url 'email_new_upgrades' %}" target="_blank">Email {{ new_upgrades_count }} new upgrades</a>
     </p>
     <hr>
 
