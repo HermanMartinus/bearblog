@@ -4,7 +4,7 @@
 
 .bear {
     font-weight: 400;
-    font-family: "Consolas", "Menlo", "Droid Sans Mono", "Courier New", monospace;
+    font-family: "Menlo";
     white-space: nowrap;
     display: inline-block;
 }
