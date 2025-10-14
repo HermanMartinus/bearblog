@@ -184,7 +184,7 @@ def email_new_upgrades(request):
 
     for user in upgraded_users:
         send_async_mail(
-            "Good to have you on board",
+            "You upgraded!",
             render_to_string('emails/upgraded.html'),
             'Herman Martinus <herman@bearblog.dev>',
             [user.email]
