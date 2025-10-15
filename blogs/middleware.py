@@ -146,7 +146,7 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
 
    
 class RateLimitMiddleware:
-    RATE_LIMIT = 30  # max requests per thread
+    RATE_LIMIT = 10  # max requests per thread
     if os.getenv('ENVIRONMENT') == 'dev':
         RATE_LIMIT = 100
     TIME_WINDOW = 10  # seconds
