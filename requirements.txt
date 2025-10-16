@@ -19,7 +19,7 @@ psycopg2==2.9.10
 pygal==3.0.5
 python-akismet==0.4.3
 python-dotenv==1.0.0
-requests==2.27.1
+requests==2.32.5
 sentry-sdk==2.19.0
 tldextract==2.2.2
 tzdata>=2025.1 # Keeps the timezone data up to date
