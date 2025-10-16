@@ -87,7 +87,8 @@ Herman
         </textarea>
     </details>
     <br>
-    <input type="checkbox" class="hide" name="hide"> hide
+    <input type="checkbox" class="hide" name="hide"> Hide
+    | <input type="checkbox" class="welcome-email" name="welcome-email" checked> Send welcome email
     <br>
     <br>
     <div class="controls">
@@ -155,8 +156,9 @@ Herman
     }
 
     function ignoreBlog(pk) {
+        const sendWelcomeEmail = document.querySelector(`#blog-${pk} .welcome-email`).checked ? 'on' : '';
         document.querySelector(`#blog-${pk}`).style.background = "lightyellow";
-        sendPostRequest(`/staff/review/ignore/${pk}`, {});
+        sendPostRequest(`/staff/review/ignore/${pk}`, { email: sendWelcomeEmail });
     }
 
     function blockBlog(pk) {
