@@ -27,7 +27,7 @@
     <a href="{% url 'analytics' id=blog.subdomain %}">Analytics</a>
     {% endif %}
     <a href="{% url 'settings' id=blog.subdomain %}">Settings</a>
-    <a href="{% url 'account' %}" class="account bear"></a>
+    <a href="{% url 'account' %}" class="account bear" title="Account"></a>
 </span>
 
 {% if not blog.reviewed and not blog.to_review and blog.posts.count > 0 %}
