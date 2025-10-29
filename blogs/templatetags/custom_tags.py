@@ -54,7 +54,8 @@ HOST_WHITELIST = [
     'api.listenbrainz.org',
     'archive.org',
     'panel.radiocast.net',
-    'albums.ente.io'
+    'albums.ente.io',
+    'app.hearthis.at'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
