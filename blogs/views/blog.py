@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -126,7 +126,6 @@ def posts(request, blog):
     )
 
 
-@csrf_exempt
 def post(request, slug):
     # Prevent null characters in path
     slug = slug.replace('\x00', '')
@@ -158,10 +157,6 @@ def post(request, slug):
                 return posts(request, blog)
 
             return render(request, '404.html', {'blog': blog}, status=404)
-    
-    # Check if upvoted
-    hash_id = salt_and_hash(request, 'year')
-    upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
 
     meta_description = post.meta_description or unmark(post.content)[:157] + '...'
     full_path = f'{blog.useful_domain}/{post.slug}/'
@@ -179,15 +174,30 @@ def post(request, slug):
         'canonical_url': canonical_url,
         'meta_description': meta_description,
         'meta_image': post.meta_image or blog.meta_image,
-        'upvoted': upvoted,
     }
 
     response = render(request, 'post.html', context)
 
     if post.publish and not request.GET.get('token'):
         response['Cache-Tag'] = blog.subdomain
-        
+
     return response
+
+
+def get_upvote_info(request, uid):
+    post = Post.objects.filter(uid=uid).first()
+    if post:
+        upvote_count = Upvote.objects.filter(post=post).count()
+        hash_id = salt_and_hash(request, 'year')
+        upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
+        print('Getting upvote count:', upvote_count)
+        print('Getting upvoted state:', upvoted)
+        return JsonResponse({
+            "upvoted": upvoted,
+            "upvote_count": upvote_count,
+        })
+    
+    return Http404()
 
 
 @csrf_exempt
