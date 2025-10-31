@@ -12,11 +12,14 @@
 {% block nav %}
 {% endblock %}
 
+{% block page_type %}discover{% endblock %}
+
 {% block content %}
 
 <h1>
     Discovery feed
 </h1>
+
 <nav>
     {% if not newest %}
     <b><a href="/discover/">Trending</a></b>
@@ -181,6 +184,9 @@ B values is used to modify the effect of time on the score. A lower B causes pos
 {% endblock %}
 
 {% block footer %}
+ <!-- Halloween theme -->
+<p><small>Spoooky theme inspired by <a href="https://robertbirming.com/bear-halloween-theme/" target="_blank">Robert</a></small></p>
+
 <p>
     Start your own blog with <a href="/accounts/signup/">Bear</a> <span class="bear" role="img" aria-label="ASCII bear logo">ʕ•ᴥ•ʔﾉ</span>
 </p>

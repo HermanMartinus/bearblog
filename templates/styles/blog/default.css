@@ -144,3 +144,83 @@ ul.blog-posts li span {
 ul.blog-posts li a:visited {
     color: var(--visited-color);
 }
+
+/* ========= Halloween styles ========= */
+
+body.landing, body.discover {
+    background-color: #fff9f5;
+
+    @media (prefers-color-scheme: dark) {
+        background-color: #1f1508ff;
+    }
+
+    a {
+        cursor: url("data:image/svg+xml;utf8,\
+        <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>\
+        <text y='24' font-size='24'>🤏🏽</text></svg>") 8 8, auto;   
+        color: #c25400;
+
+        @media (prefers-color-scheme: dark) {
+            color: #ffa24a;
+        }
+    }
+
+    a:hover {
+        display: inline-block;
+        transform: rotate(2deg) !important;
+        color: red;
+    }
+
+    .title h1:before {
+        content: "🕸️";
+    }
+
+    .title h1:after {
+        content: "🕯️";
+    }
+
+
+    .discover-posts li > span:first-child:before {
+        content: "🎃";
+    }
+}
+
+
+body.discover::after, body.landing::after {
+  content: "🦇";
+  transform: scaleX(-1);
+  position: fixed;
+  top: 10%;
+  left: -60px;
+  font-size: 1.8rem;
+  opacity: 0.6;
+  z-index: 9999;
+  pointer-events: none;
+  animation: emberwing 30s linear infinite;
+}
+
+@keyframes emberwing {
+  0%   { transform: translate(0, 0) rotate(8deg) scaleX(-1); opacity: 0; }
+  5%   { transform: translate(3vw, -1vh) rotate(6deg) scaleX(-1); opacity: 0.8; }
+  10%  { transform: translate(10vw, -4vh) rotate(-6deg) scaleX(-1); }
+  15%  { transform: translate(18vw, -3vh) rotate(-2deg) translateY(-2px) scaleX(-1); }
+  25%  { transform: translate(40vw, 6vh) rotate(10deg) scaleX(-1); }
+  30%  { transform: translate(46vw, 5vh) rotate(8deg) translateY(-3px) scaleX(-1); }
+  37%  { transform: translate(55vw, -2vh) rotate(-3deg) scaleX(-1); }
+  45%  { transform: translate(68vw, 1vh) rotate(2deg) translateY(-2px) scaleX(-1); }
+  50%  { transform: translate(80vw, 3vh) rotate(6deg) scaleX(-1); }
+  58%  { transform: translate(88vw, 2vh) rotate(4deg) translateY(-3px) scaleX(-1); }
+  65%  { transform: translate(95vw, -5vh) rotate(-8deg) scaleX(-1); }
+  72%  { transform: translate(110vw, -3vh) rotate(-4deg) translateY(-2px) scaleX(-1); }
+  75%  { transform: translate(120vw, 0vh) rotate(5deg) scaleX(-1); }
+  82%  { transform: translate(130vw, -2vh) rotate(3deg) translateY(-3px) scaleX(-1); }
+  85%  { transform: translate(140vw, -4vh) rotate(-4deg) scaleX(-1); }
+  92%  { transform: translate(150vw, -1vh) rotate(-2deg) translateY(-2px) scaleX(-1); }
+  100% { transform: translate(160vw, 3vh) rotate(8deg) scaleX(-1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none !important; opacity: 0 !important; }
+}
+
+/* ================ End ================ */
