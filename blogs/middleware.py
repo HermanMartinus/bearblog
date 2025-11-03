@@ -167,16 +167,10 @@ class RateLimitMiddleware:
         current_time = time.time()
 
         # Ban WP scrapers
-        if '.php' in request.path:
+        if '.php' in request.path or '.env' in request.path:
             self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
 
         full_path = request.build_absolute_uri()
-
-        # # Ban scrapers using queries
-        # if "?q=" in full_path:
-        #     if "timezone" not in request.COOKIES:
-        #         self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
-
 
         # Check ban
         if client_ip_address in self.banned_ips and current_time < self.banned_ips[client_ip_address]:

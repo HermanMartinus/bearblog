@@ -54,7 +54,6 @@ HOST_WHITELIST = [
     'api.listenbrainz.org',
     'archive.org',
     'panel.radiocast.net',
-    'albums.ente.io',
     'embed.ente.io',
     'app.hearthis.at'
 ]
