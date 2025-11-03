@@ -173,9 +173,9 @@ class RateLimitMiddleware:
         full_path = request.build_absolute_uri()
 
         # # Ban scrapers using queries
-        if "?q=" in full_path:
-            if "timezone" not in request.COOKIES:
-                self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
+        # if "?q=" in full_path:
+        #     if "timezone" not in request.COOKIES:
+        #         self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
 
 
         # Check ban
