@@ -55,6 +55,7 @@ HOST_WHITELIST = [
     'archive.org',
     'panel.radiocast.net',
     'albums.ente.io',
+    'embed.ente.io',
     'app.hearthis.at'
 ]
 
