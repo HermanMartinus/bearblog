@@ -1,4 +1,5 @@
 from django.db import connection
+from django.shortcuts import redirect
 from django.urls import resolve, Resolver404
 from django.http import JsonResponse
 from django.middleware.csrf import (
@@ -170,6 +171,12 @@ class RateLimitMiddleware:
             self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
 
         full_path = request.build_absolute_uri()
+
+        # Ban scrapers using queries
+        if "?q=" in full_path:
+            if "timezone" not in request.COOKIES:
+                self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
+
 
         # Check ban
         if client_ip_address in self.banned_ips and current_time < self.banned_ips[client_ip_address]:

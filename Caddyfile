@@ -11,19 +11,21 @@ https:// {
         on_demand
     }
 
+    # Block requests with empty user agents
+    @emptyUA {
+        not header_regexp User-Agent ".+"
+    }
+
+    handle @emptyUA {
+        respond "Forbidden: Verification required" 403
+    }
+
+
     reverse_proxy https://bearblog.dev {
         header_up Host {upstream_hostport}
         header_up X-Forwarded-For {remote_host}
         header_up X-Real-IP {remote_host}
         header_up X-Forwarded-Proto {scheme}
-    }
-
-    @blocked {
-        header_regexp User-Agent (?i:ActivityRelay*)
-    }
-
-    handle @blocked {
-        abort
     }
 
     log {
