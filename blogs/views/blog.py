@@ -191,10 +191,12 @@ def get_upvote_info(request, uid):
         hash_id = salt_and_hash(request, 'year')
         upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
 
-        return JsonResponse({
+        response = JsonResponse({
             "upvoted": upvoted,
             "upvote_count": upvote_count,
         })
+        response['X-Robots-Tag'] = 'noindex'
+        return response
     
     return Http404()
 
@@ -216,11 +218,15 @@ def upvote(request, uid):
         except Upvote.MultipleObjectsReturned:
             print("Not upvoting: Duplicate upvote")
 
-        return HttpResponse(f'Upvoted {post.title}')
+        response = HttpResponse(f'Upvoted {post.title}')
+        response['X-Robots-Tag'] = 'noindex'
+        return response
         
     print("Not upvoting: Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
-    return HttpResponse(f'Upvoted')
+    response = HttpResponse(f'Upvoted')
+    response['X-Robots-Tag'] = 'noindex'
+    return response
 
 
 def public_analytics(request):
