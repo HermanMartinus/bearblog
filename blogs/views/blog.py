@@ -195,7 +195,7 @@ def get_upvote_info(request, uid):
             "upvoted": upvoted,
             "upvote_count": upvote_count,
         })
-        response['X-Robots-Tag'] = 'noindex'
+        response['X-Robots-Tag'] = 'noindex, nofollow'
         return response
     
     return Http404()
@@ -219,13 +219,13 @@ def upvote(request, uid):
             print("Not upvoting: Duplicate upvote")
 
         response = HttpResponse(f'Upvoted {post.title}')
-        response['X-Robots-Tag'] = 'noindex'
+        response['X-Robots-Tag'] = 'noindex, nofollow'
         return response
         
     print("Not upvoting: Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
     response = HttpResponse(f'Upvoted')
-    response['X-Robots-Tag'] = 'noindex'
+    response['X-Robots-Tag'] = 'noindex, nofollow'
     return response
 
 
