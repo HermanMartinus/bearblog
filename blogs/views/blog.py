@@ -205,7 +205,7 @@ def get_upvote_info(request, uid):
         response['X-Robots-Tag'] = 'noindex, nofollow'
         return response
     
-    return Http404()
+    return HttpResponse('Not found', status=404)
 
 
 @csrf_exempt

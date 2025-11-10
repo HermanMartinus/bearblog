@@ -96,6 +96,7 @@ def posts_edit(request, id):
         'posts': posts
     })
 
+
 @login_required
 def pages_edit(request, id):
     if request.user.is_superuser:
@@ -123,6 +124,7 @@ def post_delete(request, id, uid):
         post = get_object_or_404(Post, blog=blog, uid=uid)
         is_page = post.is_page
         post.delete()
+        blog.save()
         if is_page:
             return redirect('pages_edit', id=blog.subdomain)
     return redirect('posts_edit', id=blog.subdomain)
