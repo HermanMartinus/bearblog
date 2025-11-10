@@ -112,7 +112,7 @@ def posts(request, blog):
 
     blog_path_title = blog.blog_path.replace('-', ' ').capitalize() or 'Blog'
 
-    return render(
+    response = render(
         request,
         'posts.html',
         {
@@ -125,6 +125,11 @@ def posts(request, blog):
             'blog_path_title': blog_path_title
         }
     )
+
+    response['Cache-Tag'] = blog.subdomain
+    response['Cache-Control'] = "max-age=43200"
+
+    return response
 
 
 def post(request, slug):
