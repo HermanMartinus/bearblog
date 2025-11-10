@@ -51,11 +51,14 @@
 
 {% block analytics %}
     {% if blog.analytics_active and not preview %}
-    <style>
-        body:hover {
-            shape-outside: url("/hit/{{ post.uid }}/{% if blog.blank_useful_domain not in request.META.HTTP_REFERER %}?ref={{ request.META.HTTP_REFERER }}{% endif %}");
-        }
-    </style>
+    <script>
+        window.addEventListener("load", (event) => {
+            document.body.addEventListener('pointerover', () => {
+                console.log(`/hit/{{ post.uid }}${document.referrer && new URL(document.referrer).hostname !== "{{ blog.blank_useful_domain }}" ? `?ref=${encodeURIComponent(document.referrer)}` : ""}`);
+                fetch(`/hit/{{ post.uid }}${document.referrer && new URL(document.referrer).hostname !== "{{ blog.blank_useful_domain }}" ? `?ref=${encodeURIComponent(document.referrer)}` : ""}`);
+            }, { once: true });
+        });
+    </script>
     {% endif %}
 {% endblock %}
 
