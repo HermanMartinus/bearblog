@@ -200,14 +200,14 @@ def post(request, slug):
 def get_upvote_info(request, uid):
     post = Post.objects.filter(uid=uid).first()
     if post:
-        upvote_count = Upvote.objects.filter(post=post).count()
         hash_id = salt_and_hash(request, 'year')
         upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
 
         response = JsonResponse({
             "upvoted": upvoted,
-            "upvote_count": upvote_count,
+            "upvote_count": post.upvotes,
         })
+        response['Cache-Tag'] = post.blog.subdomain
         response['X-Robots-Tag'] = 'noindex, nofollow'
         return response
     
