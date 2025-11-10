@@ -181,6 +181,7 @@ def post(request, slug):
 
     if post.publish and not request.GET.get('token'):
         response['Cache-Tag'] = blog.subdomain
+        response['Cache-Control'] = "public, max-age=3600"
 
     return response
 

@@ -73,10 +73,6 @@
                 Close and re-open to refresh
             </small>
         </p>
-    {% else %}
-        {% if request.user == blog.user %}
-            <a href="{% url 'post_edit' id=blog.subdomain uid=post.uid %}" target="_blank" style="position: fixed;right: 0;top: 0;padding: 20px;color: lightgrey;text-decoration: none;font-size: 25px;">✎</a>
-        {% endif %}
     {% endif %}
 
     {% if not post.is_page %}
