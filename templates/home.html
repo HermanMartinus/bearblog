@@ -37,13 +37,6 @@
 {% block nav %}{% markdown content=blog.nav blog=blog post=None tz=tz %}{% endblock %}
 
 {% block content %}
-{% if admin_passport %}
-<a href="{{ bear_root }}/mothership/blogs/blog/{{ blog.id }}/change/" target="_blank" style="position:absolute;top:0;left:3px;">Blog admin</a>
-{% endif %}
-
-{% if request.user == blog.user and not preview %}
-<a href="{% url 'dashboard' id=blog.subdomain %}" target="_blank" style="position: fixed;right: 0;top: 0;padding: 20px;color: lightgrey;text-decoration: none;font-size: 25px;">✎</a>
-{% endif %}
 
 {% if blog.content %}
 {% markdown content=blog.content blog=blog post=None tz=tz %}

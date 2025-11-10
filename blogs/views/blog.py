@@ -69,13 +69,14 @@ def ping(request):
 def home(request):
     blog = resolve_address(request)
     if not blog:
+        # Don't cache here
         return render(request, 'landing.html')
 
     all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
     
-    return render(
+    response = render(
         request,
         'home.html',
         {
@@ -84,6 +85,11 @@ def home(request):
             'meta_description': meta_description
         }
     )
+
+    response['Cache-Tag'] = blog.subdomain
+    response['Cache-Control'] = "max-age=43200"
+
+    return response
 
 
 def posts(request, blog):
