@@ -213,4 +213,6 @@ def post_hit(request, uid):
     except IntegrityError:
         print('Post does not exist')
 
-    return HttpResponse("Logged")
+    response = HttpResponse("Logged")
+    response['X-Robots-Tag'] = 'noindex, nofollow'
+    return response
