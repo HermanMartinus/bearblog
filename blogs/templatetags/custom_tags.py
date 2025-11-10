@@ -394,6 +394,7 @@ def remove_markup(content):
     return unmark(content)[:400] + '...'
 
 
+# This is only used in the post editor
 @register.simple_tag
 def format_date(date, format_string, lang=None, tz='UTC'):
     if date is None:
