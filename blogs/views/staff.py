@@ -2,6 +2,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.db.models import Q, F, Count
 from django.db.models.functions import Length, TruncWeek, TruncDate, TruncMonth, Length
 from django.shortcuts import get_object_or_404, redirect, render
@@ -21,6 +22,7 @@ from pygal.style import LightColorizedStyle
 import json
 import os
 from datetime import datetime
+
 
 @staff_member_required
 def dashboard(request):
@@ -118,13 +120,14 @@ def dashboard(request):
     total_conversion_rate = total_upgrades / total_signups if total_signups > 0 else 0
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
+
+    new_upgrades_count = new_upgrades().count()
     return render(
         request,
         'staff/dashboard.html',
         {
             'signups': signups,
             'upgrades': upgrades,
-            'recent_upgrades': recent_upgrades(),
             'total_signups': total_signups,
             'total_upgrades': total_upgrades,
             'conversion_rate': formatted_conversion_rate,
@@ -137,6 +140,7 @@ def dashboard(request):
             'dodgy_blogs_count': dodgy_blogs_count,
             'flagged_blogs_count': flagged_blogs_count,
             'new_blogs_count': new_blogs_count,
+            'new_upgrades_count': new_upgrades_count,
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
             'period': period,
@@ -150,7 +154,6 @@ def dashboard(request):
 def get_weekly_reviews():
     persistent_store = PersistentStore.load()
     reviewed_blogs = persistent_store.reviewed_blogs
-    print(reviewed_blogs)
 
      # Aggregate by week
     weekly_reviews = {}
@@ -164,6 +167,31 @@ def get_weekly_reviews():
     # Sort by week start date
     weekly_reviews = dict(sorted(weekly_reviews.items()))
     return weekly_reviews
+
+
+def new_upgrades():
+    upgraded_users = User.objects.filter(
+        settings__upgraded=True,
+        settings__upgraded_date__gte=timezone.now()-timedelta(weeks=1),
+        settings__upgraded_email_sent=False,
+        settings__order_id__isnull=False
+        )
+    return upgraded_users
+
+@staff_member_required
+def email_new_upgrades(request):
+    upgraded_users = new_upgrades()
+
+    for user in upgraded_users:
+        send_async_mail(
+            "You upgraded!",
+            render_to_string('emails/upgraded.html'),
+            'Herman Martinus <herman@bearblog.dev>',
+            [user.email]
+        )
+        user.settings.upgraded_email_sent = True
+        user.settings.save()
+    return HttpResponse(f"Emailed {upgraded_users.count()} new upgrades.")
 
 
 @staff_member_required
@@ -355,7 +383,7 @@ def new_blogs():
         user__is_active=True,
         to_review=False,
         flagged=False,
-        created_date__lte=timezone.now() - timedelta(days=2)
+        created_date__lte=timezone.now() - timedelta(days=1)
     )
 
     # Avoid showing empty blogs
@@ -389,7 +417,7 @@ def review_bulk(request):
     if 'opt-in' in request.path:
         blogs = opt_in_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
     elif 'new' in request.path:
-        blogs = new_blogs().select_related('user').prefetch_related('posts').order_by('-created_date')[:100]
+        blogs = new_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
     elif 'dodgy' in request.path:
         blogs = dodgy_blogs().select_related('user').prefetch_related('posts').order_by('-dodginess_score')[:100]
     elif 'flagged' in request.path:
@@ -475,6 +503,14 @@ def ignore(request, pk):
         blog = get_object_or_404(Blog, pk=pk)
         if blog.ignored_date:
             blog.permanent_ignore = True
+        else:
+            if blog.created_date > timezone.now() - timedelta(weeks=1) and request.POST.get('email'):
+                send_async_mail(
+                    "Welcome to Bear",
+                    render_to_string('emails/welcome.html'),
+                    'Herman Martinus <herman@bearblog.dev>',
+                    [blog.user.email]
+                )
         blog.ignored_date = timezone.now()
         blog.flagged = False
         blog.to_review = False

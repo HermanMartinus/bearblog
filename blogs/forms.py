@@ -118,7 +118,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('analytics_active', 'optimise_images', 'date_format', 'fathom_site_id', 'blog_path', 'rss_alias', 'meta_tag', 'robots_txt')
+        fields = ('analytics_active', 'date_format', 'fathom_site_id', 'blog_path', 'rss_alias', 'meta_tag', 'robots_txt')
 
 
 class PostTemplateForm(forms.ModelForm):

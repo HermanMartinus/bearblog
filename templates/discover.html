@@ -12,11 +12,14 @@
 {% block nav %}
 {% endblock %}
 
+{% block page_type %}discover{% endblock %}
+
 {% block content %}
 
 <h1>
     Discovery feed
 </h1>
+
 <nav>
     {% if not newest %}
     <b><a href="/discover/">Trending</a></b>
@@ -81,7 +84,7 @@
             <small>
                 <span>(<a href="{{ post.blog.dynamic_useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>
                 <br>
-                <small>Published {{ post.published_date|timesince }} ago</small>
+                <small title="{{ post.published_date|date:'Y-m-d\TH:i\Z' }}">Published {{ post.published_date|timesince }} ago</small>
                 <small>
                     <svg style="height:16px;margin: 0 -8px -4px 0;" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>
                     {{ post.upvotes }}
@@ -181,7 +184,8 @@ B values is used to modify the effect of time on the score. A lower B causes pos
 {% endblock %}
 
 {% block footer %}
+
 <p>
-    Start your own blog with <a href="/accounts/signup/"><span class="bear">ʕ•ᴥ•ʔ</span> Bear</a>
+    Start your own blog with <a href="/accounts/signup/">Bear</a> <span class="bear" role="img" aria-label="ASCII bear logo">ʕ•ᴥ•ʔﾉ</span>
 </p>
 {% endblock %}

@@ -1,22 +1,22 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.db import IntegrityError
-from datetime import timedelta
-from django.db.models.functions import TruncDate
+
+from django.http import HttpResponse
+from django.db import IntegrityError, connection
+from django.db.models import DateField, Count, Sum, Q
+from django.db.models.functions import Cast
 
 from blogs.models import Blog, Hit, Post
 from blogs.helpers import daterange, get_country, salt_and_hash
-from django.db.models import Count, Sum, Q
-from django.http import HttpResponse
 
+from datetime import timedelta
 from ipaddr import client_ip
 from urllib.parse import urlparse
 import httpagentparser
 import pygal
 
 import pygal
-from pygal.style import LightColorizedStyle
 import djqscsv
 
 
@@ -102,31 +102,16 @@ def render_analytics(request, blog, public=False):
     if referrer_filter:
         base_hits = base_hits.filter(referrer=referrer_filter)
 
-    posts = Post.objects.annotate(
-        hit_count=Count('hit', filter=Q(hit__in=base_hits)),
-    ).filter(
-        blog=blog,
-        publish=True,
-    ).filter(Q(slug=post_filter) if post_filter else Q()
-            ).values('title', 'hit_count', 'upvotes', 'published_date', 'slug').order_by('-hit_count', '-published_date')
-
-
     hits = base_hits.order_by('created_date')
     start_date = hits.first().created_date.date() if hits.exists() else start_date
 
-    unique_reads = hits.count()
-    unique_visitors = hits.values('hash_id').distinct().count()
+    unique_reads = base_hits.count()
+    unique_visitors = base_hits.values('hash_id').distinct().count()
     on_site = hits.filter(created_date__gt=now-timedelta(minutes=4)).count()
 
-    referrers = hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
-    devices = hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
-    browsers = hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
-    countries = hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
-
     # Build chart data
-
     hit_dict = hits.annotate(
-        date=TruncDate('created_date')
+        date=Cast('created_date', output_field=DateField())
     ).values('date').annotate(
         c=Count('date')
     ).order_by('date')
@@ -140,16 +125,12 @@ def render_analytics(request, blog, public=False):
         count = hit_date_count.get(date, 0)
         chart_data.append({'date': date_str, 'hits': count})
 
-    # Render chart
+    posts = get_posts(blog.id, start_date, post_filter, referrer_filter)
 
-    chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
-    chart.force_uri_protocol = 'http'
-    mark_list = [x['hits'] for x in chart_data]
-    [x['date'] for x in chart_data]
-    chart.add('Reads', mark_list)
-    chart.x_labels = [x['date'].split('-')[2] for x in chart_data]
-    chart_render = chart.render_data_uri()
-
+    referrers = base_hits.exclude(referrer='').values('referrer').annotate(count=Count('referrer')).order_by('-count').values('referrer', 'count')
+    devices = base_hits.exclude(device='').values('device').annotate(count=Count('device')).order_by('-count').values('device', 'count')
+    browsers = base_hits.exclude(browser='').values('browser').annotate(count=Count('browser')).order_by('-count').values('browser', 'count')
+    countries = base_hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
 
     return render(request, 'studio/analytics.html', {
         'public': public,
@@ -160,7 +141,7 @@ def render_analytics(request, blog, public=False):
         'unique_reads': unique_reads,
         'unique_visitors': unique_visitors,
         'on_site': on_site,
-        'chart': chart_render,
+        'chart_data': chart_data,
         'referrers': referrers,
         'devices': devices,
         'browsers': browsers,
@@ -169,6 +150,29 @@ def render_analytics(request, blog, public=False):
         'post_filter': post_filter,
         'referrer_filter': referrer_filter,
     })
+
+
+def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT p.title,
+                   p.upvotes,
+                   p.published_date,
+                   p.slug,
+                   (SELECT COUNT(h.id)
+                    FROM blogs_hit h
+                    WHERE h.post_id = p.id
+                    AND h.created_date > %s
+                    AND (h.referrer = %s OR %s IS NULL)) AS hit_count
+            FROM blogs_post p
+            WHERE p.blog_id = %s
+            AND p.publish
+            AND (p.slug = %s OR %s IS NULL)
+            ORDER BY hit_count DESC, p.published_date DESC
+        """, [start_date, referrer_filter or None, referrer_filter or None, blog_id, post_filter or None, post_filter or None])
+        columns = ['title', 'upvotes', 'published_date', 'slug', 'hit_count']
+        posts = [dict(zip(columns, row)) for row in cursor.fetchall()]
+    return posts
 
 
 def post_hit(request, uid):

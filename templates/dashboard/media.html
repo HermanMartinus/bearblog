@@ -13,6 +13,11 @@
 
 <button id="uploadMedia" style="margin-bottom: 10px;">Upload media</button>
 <button id="deleteSelected" style="margin-bottom: 10px;">Delete selected</button>
+<br>
+<small>
+    <input type="checkbox" id="raw" name="raw" style="margin:0">
+    <label for="raw" style="font-weight: normal">Upload raw</label>
+</small>
 
 <p style="color:lightsalmon">
     <span id="loading">Uploading</span>
@@ -83,6 +88,7 @@ const $fileInput = document.getElementById("fileSelect");
 const $uploadButton = document.getElementById('uploadMedia');
 const $deleteButton = document.getElementById('deleteSelected');
 const $loadingDotty = document.getElementById('loading');
+const $rawCheckbox = document.getElementById('raw');
 
 $uploadButton.addEventListener('click', function() {
     $fileInput.click();
@@ -116,6 +122,7 @@ function uploadNextFile(index, files) {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("raw", $rawCheckbox.checked);
 
     const target = "{% url 'upload_image' id=blog.subdomain %}";
 

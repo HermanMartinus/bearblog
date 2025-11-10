@@ -23,6 +23,7 @@ class UserSettings(models.Model):
     upgraded_date = models.DateTimeField(blank=True, null=True, db_index=True)
     order_id = models.CharField(max_length=100, blank=True, null=True)
     order_email = models.CharField(max_length=100, blank=True, null=True)
+    upgraded_email_sent = models.BooleanField(default=False)
 
     dashboard_styles = models.TextField(blank=True)
     dashboard_footer = models.TextField(blank=True)
@@ -66,6 +67,8 @@ class Blog(models.Model):
         choices=((True, 'Overwrite default styles'), (False, 'Extend default styles')),
         verbose_name='')
     favicon = models.CharField(max_length=100, default="🐼", blank=True)
+
+    # TODO: Deprecate this
     optimise_images = models.BooleanField(default=True)
 
     date_format = models.CharField(max_length=32, default="d M, Y", blank=True)
@@ -89,7 +92,7 @@ class Blog(models.Model):
     reviewer_note = models.TextField(blank=True)
     hidden = models.BooleanField(default=False, db_index=True)
     flagged = models.BooleanField(default=False, db_index=True)
-    posts_in_last_24_hours = models.IntegerField(default=0, db_index=True)
+    posts_in_last_12_hours = models.IntegerField(default=0, db_index=True)
 
     @property
     def older_than_one_day(self):
@@ -231,8 +234,8 @@ class Blog(models.Model):
             # Update last posted
             self.last_posted = self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
-            # Update posts in last 24 hours
-            self.posts_in_last_24_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=24), published_date__lte=timezone.now(), publish=True, make_discoverable=True).count()
+            # Update posts in last 12 hours
+            self.posts_in_last_12_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=12), published_date__lte=timezone.now(), publish=True, make_discoverable=True).count()
 
         # Save the blog
         super(Blog, self).save(*args, **kwargs)

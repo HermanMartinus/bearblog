@@ -79,25 +79,9 @@ Staff dashboard  ʕง•ᴥ•ʔง
     </span>
 
     <h2>Recent upgrades</h2>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Domain</th>
-                <th>User Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for blog in recent_upgrades %}
-            <tr>
-                <td>{{ blog.title }}</td>
-                <td><a href="{{ blog.useful_domain }}" target="_blank">{{ blog.useful_domain }}</a></td>
-                <td>{{ blog.user.email }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <p>
+        <a href="{% url 'email_new_upgrades' %}" target="_blank">Email {{ new_upgrades_count }} new upgrades</a>
+    </p>
     <hr>
 
     <h2>Check spam blog</h2>
@@ -158,5 +142,5 @@ Staff dashboard  ʕง•ᴥ•ʔง
 {% endblock %}
 
 {% block footer %}
-Powered by <a href="https://bearblog.dev">Bear ʕ•ᴥ•ʔ</a>
+Be a good warden of Bear <span class="bear" role="img" aria-label="ASCII bear saluting">ʕ•ᴥ•ʔゝ</span>
 {% endblock %}

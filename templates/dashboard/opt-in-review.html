@@ -12,12 +12,12 @@
 <button onclick="window.history.back()">← Back</button>
 <h1>Opt-in review</h1>
 {% if blog.reviewed %}
-<p>Your blog has already been reviewed. <span class="bear">\ʕ•ᴥ•ʔ/</span></p>
+<p>Your blog has already been reviewed. <span class="bear" role="img" aria-label="ASCII bear cheering">\ʕ•ᴥ•ʔ/</span></p>
 {% elif blog.to_review %}
 <p>Your blog is under review. Blogs are reviewed about twice a week. <a href="{% url 'upgrade' %}">Upgrade</a> to get approved immediately.
 {% else %}
 <p>
-    Hi, Herman here  <span class="bear">ʕ •ᴥ•ʔゝ</span>
+    Hi, Herman here  <span class="bear" role="img" aria-label="ASCII bear saluting">ʕ •ᴥ•ʔゝ</span>
     <br><br>
     The Internet is full of spam, scams, and SEO goop. I, however, want Bear to remain a bastion of awesomeness.
     This manual review step is to keep junk out while ensuring Bear remains free-to-use.
@@ -25,7 +25,7 @@
     I review new blogs about twice a week. If you'd like to skip the wait and get approved immediately you can
     <a href="{% url 'upgrade' %}">upgrade</a>. This comes with a bunch of neat features and supports the project.
     <br><br>
-    By submitting the form below you are opting into a human review of your blog (by me <span class="bear">ʕ•ᴥ•ʔﾉ♡</span>).
+    By submitting the form below you are opting into a human review of your blog (by me <span class="bear" role="img" aria-label="ASCII bear waving">ʕ•ᴥ•ʔﾉ♡</span>).
 </p>
 <form method="POST" class="post-form full-width">{% csrf_token %}
     <p>

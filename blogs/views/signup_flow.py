@@ -41,7 +41,7 @@ def signup(request):
     # If all fields are present do spam check and create account
     if title and subdomain and content and email and password:
         # Simple honeypot pre-db check
-        if honeypot_check(request) or spam_check(title, content, email, request.META['REMOTE_ADDR'], request.META['HTTP_USER_AGENT']):
+        if honeypot_check(request):
             error_messages.append(random_error_message())
             return render(request, 'signup_flow/step_1.html', {
                 'error_messages': error_messages,
@@ -93,6 +93,8 @@ def honeypot_check(request):
         return True
     if request.POST.get('name'):
         return True
+    
+    # Keyword check
     if request.POST.get('email', '').endswith('@cleardex.io') or request.POST.get('email', '').endswith('@example.com') :
         return True
 
@@ -118,8 +120,13 @@ def spam_check(title, content, email, user_ip, user_agent):
         comment_type='signup',
     )
 
-    if is_spam > 0:
+    # Only discard blatant spam (2), possible spam is allowed (1)
+    if is_spam == 2:
+        print("Spam (blatant):", content)
         return True
+    if is_spam == 1:
+        print("Spam (possible):", content)
+        return False
     return False
 
 

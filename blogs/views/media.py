@@ -92,12 +92,17 @@ def upload_image(request, id):
 
     if request.method == "POST" and blog.user.settings.upgraded is True:
         file_list = request.FILES.getlist('file')
-        file_links = upload_files(blog, file_list)
+        optimise = True
+        if request.POST.get('raw') == 'true':
+            optimise = False
+
+        file_links = upload_files(blog, file_list, optimise)
 
         return HttpResponse(json.dumps(sorted(file_links)), 200)
+    return HttpResponse('Failed', 400)
 
 
-def upload_files(blog, file_list):
+def upload_files(blog, file_list, optimise=True):
     file_links = []
 
     for file in file_list:
@@ -121,7 +126,7 @@ def upload_files(blog, file_list):
         # Strip metadata if the file is an image
         if extension in image_types and not extension.endswith('svg') and not extension.endswith('gif'):
             try:
-                file = process_image(file, blog.optimise_images)
+                file = process_image(file, optimise)
             except UnidentifiedImageError:
                 file_links.append(f'Error: The image file cannot be identified or is not a valid image.')
                 break

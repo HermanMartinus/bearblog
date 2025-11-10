@@ -1,40 +1,58 @@
-<form id="upvote-form" action="/upvote/{{ post.uid }}/" method="post" style="display: inline">
+<form id="upvote-form" method="post" style="display: inline">
     <small>
         <input hidden name="uid" value="{{ post.uid }}" style="display:none">
-        <input hidden name="title" style="display:none">
+        <input hidden name="title" value="{{ post.title }}" style="display:none">
         {% csrf_token %}
-        {% if upvoted %}
-        <button
-            class="upvote-button upvoted"
-            disabled=true
-            title="Toasted"
-        >
-        {% else %}
+
         <button
             class="upvote-button"
             title="Toast this post"
         >
-        {% endif %}
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
                 <polyline points="17 11 12 6 7 11"></polyline>
                 <polyline points="17 18 12 13 7 18"></polyline>
             </svg>
-            <small class="upvote-count">{{ post.upvotes }}</small>
+            <small class="upvote-count">&nbsp;</small>
         </button>
     </small>        
 </form>
 
 <script>
+    const $upvoteButton = document.querySelector('.upvote-button');
+
+    fetch('/upvote-info/{{ post.uid }}/').then(response => response.json()).then(data => {
+        document.querySelector('.upvote-count').innerText = data.upvote_count;
+        if (data.upvoted) {
+            $upvoteButton.disabled = true
+            $upvoteButton.style.color = "salmon"
+            $upvoteButton.title = "Toasted"
+        }
+    });
+
+    let moved = false;
+    let pageLoaded = Date.now();
+
+    document.addEventListener('touchmove', () => moved = true);
+    document.addEventListener('mousemove', () => moved = true);
+
     document.querySelector('#upvote-form').addEventListener('submit', (e) => {
         e.preventDefault();
-        const form = e.target;
-        fetch(form.action, {
-            method: form.method,
-            body: new FormData(form),
+
+        if (moved) {
+            document.querySelector('input[name="title"]').value = "";
+        }
+        if (Date.now() - pageLoaded < 2000 || !moved) {
+            return;
+        }
+
+        fetch("/upvote/{{ post.uid }}/", {
+            method: 'post',
+            body: new FormData(e.target),
         });
-        const button = form.querySelector('button')
-        button.disabled = true
-        button.style.color = "salmon"
+        
+        $upvoteButton.disabled = true
+        $upvoteButton.style.color = "salmon"
+        $upvoteButton.title = "Toasted"
         const upvoteCount = document.querySelector('.upvote-count')
         upvoteCount.innerHTML = `${(parseInt(upvoteCount.innerHTML.split(" ")[0]) + 1)}`
     });

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media
 from blogs import subscriptions
@@ -34,6 +34,7 @@ urlpatterns = [
     path('staff/review/ignore/<pk>', main_site_only(staff.ignore), name='review_ignore'),
     path('staff/review/flag/<pk>', main_site_only(staff.flag), name='review_flag'),
     path('staff/review/delete/<pk>', main_site_only(staff.delete), name='review_delete'),
+    path('staff/dashboard/email-new-upgrades/', main_site_only(staff.email_new_upgrades), name='email_new_upgrades'),
     path('staff/dashboard/delete-empty/', main_site_only(staff.delete_empty), name='delete_empty'),
     path('staff/dashboard/migrate-blog/', main_site_only(staff.migrate_blog), name='migrate_blog'),
     path('staff/dashboard/import-posts/', main_site_only(staff.import_posts), name='import_posts'),
@@ -66,6 +67,7 @@ urlpatterns = [
     path('<id>/dashboard/upload-image/', media.upload_image, name='upload_image'),
     path('media/<str:img>/', media.image_proxy, name="image-proxy"),
 
+    # Analytics
     path('<id>/dashboard/analytics/', analytics.analytics, name='analytics'),
     path('<id>/dashboard/analytics-upgraded/', analytics.analytics_upgraded, name="analytics_upgraded"),
 
@@ -91,10 +93,17 @@ urlpatterns = [
     # Blog
     path('ping/', blog.ping, name='ping'),
     
+    # Icons
+    path('favicon.ico', blog.favicon, name='favicon'),
+    path("apple-touch-icon.png", blog.favicon),
+    path("apple-touch-icon-precomposed.png", blog.favicon),
+    re_path(r"^favicons/.*$", blog.favicon),
+
     path('sitemap.xml', blog.sitemap, name='sitemap'),
     path('robots.txt', blog.robots, name='robots'),
     path('public-analytics/', blog.public_analytics, name="public_analytics"),
     path('upvote/<uid>/', blog.upvote, name='upvote'),
+    path('upvote-info/<uid>/', blog.get_upvote_info, name='get_upvote_info'),
     path('hit/<uid>/', analytics.post_hit, name='post_hit'),
     path('subscribe/', emailer.subscribe, name='subscribe'),
     path('email-subscribe/', emailer.email_subscribe, name='email_subscribe'),

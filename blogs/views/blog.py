@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -127,7 +127,6 @@ def posts(request, blog):
     )
 
 
-@csrf_exempt
 def post(request, slug):
     # Prevent null characters in path
     slug = slug.replace('\x00', '')
@@ -159,10 +158,6 @@ def post(request, slug):
                 return posts(request, blog)
 
             return render(request, '404.html', {'blog': blog}, status=404)
-    
-    # Check if upvoted
-    hash_id = salt_and_hash(request, 'year')
-    upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
 
     meta_description = post.meta_description or unmark(post.content)[:157] + '...'
     full_path = f'{blog.useful_domain}/{post.slug}/'
@@ -180,15 +175,31 @@ def post(request, slug):
         'canonical_url': canonical_url,
         'meta_description': meta_description,
         'meta_image': post.meta_image or blog.meta_image,
-        'upvoted': upvoted,
     }
 
     response = render(request, 'post.html', context)
 
     if post.publish and not request.GET.get('token'):
         response['Cache-Tag'] = blog.subdomain
-        
+
     return response
+
+
+def get_upvote_info(request, uid):
+    post = Post.objects.filter(uid=uid).first()
+    if post:
+        upvote_count = Upvote.objects.filter(post=post).count()
+        hash_id = salt_and_hash(request, 'year')
+        upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
+
+        response = JsonResponse({
+            "upvoted": upvoted,
+            "upvote_count": upvote_count,
+        })
+        response['X-Robots-Tag'] = 'noindex, nofollow'
+        return response
+    
+    return Http404()
 
 
 @csrf_exempt
@@ -196,17 +207,27 @@ def upvote(request, uid):
     hash_id = salt_and_hash(request, 'year')
 
     if uid == request.POST.get("uid", "") and not request.POST.get("title", False):
+        print("Attempting upvote")
         post = get_object_or_404(Post, uid=uid)
-        print("Upvoting", post)
         try:
             upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
         
             if created:
-                return HttpResponse(f'Upvoted {post.title}')
-            raise Http404('Duplicate upvote')
+                print("Upvoting", post)
+            else:
+                print("Not upvoting: Duplicate upvote")
         except Upvote.MultipleObjectsReturned:
-            return HttpResponse(f'Upvoted {post.title}')
-    raise Http404("Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
+            print("Not upvoting: Duplicate upvote")
+
+        response = HttpResponse(f'Upvoted {post.title}')
+        response['X-Robots-Tag'] = 'noindex, nofollow'
+        return response
+        
+    print("Not upvoting: Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
+
+    response = HttpResponse(f'Upvoted')
+    response['X-Robots-Tag'] = 'noindex, nofollow'
+    return response
 
 
 def public_analytics(request):
@@ -243,3 +264,14 @@ def robots(request):
         return not_found(request)
 
     return render(request, 'robots.txt',  {'blog': blog}, content_type="text/plain")
+
+
+def favicon(request):
+    blog = resolve_address(request)
+
+    if blog and 'https://' in blog.favicon:
+        return redirect(blog.favicon)
+
+    if '.ico' in request.path:
+        return redirect('/static/favicon.ico', permanent=True)
+    return redirect('/static/logo.png', permanent=True)
