@@ -53,9 +53,11 @@
     {% if blog.analytics_active and not preview %}
     <script>
         window.addEventListener("load", (event) => {
-            document.body.addEventListener('pointerover', () => {
-                fetch(`/hit/{{ post.uid }}${document.referrer && new URL(document.referrer).hostname !== "{{ blog.blank_useful_domain }}" ? `?ref=${encodeURIComponent(document.referrer)}` : ""}`);
-            }, { once: true });
+            if (navigator.webdriver !== true) {
+                document.body.addEventListener('pointerover', () => {
+                    fetch(`/hit/{{ post.uid }}${document.referrer && new URL(document.referrer).hostname !== "{{ blog.blank_useful_domain }}" ? `?ref=${encodeURIComponent(document.referrer)}` : ""}`);
+                }, { once: true });
+            }
         });
     </script>
     {% endif %}
