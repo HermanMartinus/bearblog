@@ -49,20 +49,6 @@
     }
 {% endblock %}
 
-{% block analytics %}
-    {% if blog.analytics_active and not preview %}
-    <script>
-        window.addEventListener("load", (event) => {
-            if (navigator.webdriver !== true) {
-                document.body.addEventListener('pointerover', () => {
-                    fetch(`/hit/{{ post.uid }}${document.referrer && new URL(document.referrer).hostname !== "{{ blog.blank_useful_domain }}" ? `?ref=${encodeURIComponent(document.referrer)}` : ""}`);
-                }, { once: true });
-            }
-        });
-    </script>
-    {% endif %}
-{% endblock %}
-
 {% block heading %}{{ blog.title }}{% endblock %}
 
 {% block nav %}{% markdown content=blog.nav blog=blog post=post tz=tz %}{% endblock %}
@@ -110,6 +96,43 @@
 
         {% if post.make_discoverable %}
             {% include 'snippets/upvote_form.html' with post=post upvoted=upvoted %}
+        {% endif %}
+
+        {% if blog.analytics_active %}
+            <form id="hit-form" action="/hit/" method="post" style="display: none">
+                <input name="token" value="{{ post.uid }}">
+                <input name="title" value="{{ post.title }}" >
+                <input name="referrer" >
+            </form>
+
+            <script>
+                window.addEventListener("load", (event) => {
+                    if (navigator.webdriver !== true) {
+                        document.body.addEventListener('pointerover', () => {
+                            const hitForm = document.getElementById('hit-form');
+                            const referrerInput = hitForm.querySelector('input[name="referrer"]');
+                            const titleInput = hitForm.querySelector('input[name=title]')
+                            
+                            // Set the referrer value
+                            if (!document.referrer.includes("{{ blog.blank_useful_domain }}")) {
+                                referrerInput.value = document.referrer;
+                            }
+
+                            // Remove the title value
+                            titleInput.value = ""
+                            
+                            // Log the form data before submitting
+                            const formData = new FormData(hitForm);
+                            
+                            // Submit the form
+                            fetch(hitForm.action, {
+                                method: 'post',
+                                body: new FormData(hitForm),
+                            });
+                        }, { once: true });
+                    }
+                });
+            </script>
         {% endif %}
     {% endif %}
 

@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 
 from django.http import HttpResponse
@@ -216,3 +217,38 @@ def post_hit(request, uid):
     response = HttpResponse("Logged")
     response['X-Robots-Tag'] = 'noindex, nofollow'
     return response
+
+
+@csrf_exempt
+def hit(request):
+    if request.method == "POST" and request.POST.get('token') and not request.POST.get('title'):
+        print('Using new hit logic')
+        user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
+
+        # Prevent duplicates with ip hash + date
+        hash_id = salt_and_hash(request)
+
+        country = get_country(client_ip(request)).get('country_name', '')
+        device = user_agent.get('platform', {}).get('name', '')
+        browser = user_agent.get('browser', {}).get('name', '')
+        referrer = request.POST.get('referrer')
+
+        post_pk = Post.objects.filter(uid=request.POST.get('token')).values_list('pk', flat=True).first()
+
+        if post_pk:
+            hit, create = Hit.objects.get_or_create(
+                post_id=post_pk,
+                hash_id=hash_id,
+                referrer=referrer,
+                country=country,
+                device=device,
+                browser=browser)
+            if create:
+                print('Hit:', hit)
+                print('Referrer:', referrer)
+
+        response = HttpResponse("Logged hit")
+        response['X-Robots-Tag'] = 'noindex, nofollow'
+        return response
+    
+    return HttpResponse('Forbidden', status=403)
