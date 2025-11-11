@@ -231,6 +231,7 @@ def hit(request):
         device = user_agent.get('platform', {}).get('name', '')
         browser = user_agent.get('browser', {}).get('name', '')
         
+        referrer = ""
         parsed = urlparse(request.POST.get('referrer'))
         if parsed.scheme and parsed.netloc:
             referrer = f"{parsed.scheme}://{parsed.netloc}"
