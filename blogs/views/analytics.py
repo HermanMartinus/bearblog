@@ -231,10 +231,10 @@ def hit(request):
         device = user_agent.get('platform', {}).get('name', '')
         browser = user_agent.get('browser', {}).get('name', '')
         
-        referrer = ""
-        parsed = urlparse(request.POST.get('referrer'))
-        if parsed.scheme and parsed.netloc:
-            referrer = f"{parsed.scheme}://{parsed.netloc}"
+        referrer = request.POST.get('referrer','')
+        if referrer:
+            referrer = urlparse(referrer)
+            referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
 
         post_pk = Post.objects.filter(uid=request.POST.get('token')).values_list('pk', flat=True).first()
 
