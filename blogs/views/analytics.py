@@ -225,8 +225,8 @@ def hit(request):
         print('Using new hit logic')
         user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
 
-        if 'bot' in user_agent.lower():
-            return HttpResponse('Forbidden', status=403)
+        # if 'bot' in user_agent.lower():
+        #     return HttpResponse('Forbidden', status=403)
 
         # Prevent duplicates with ip hash + date
         hash_id = salt_and_hash(request)

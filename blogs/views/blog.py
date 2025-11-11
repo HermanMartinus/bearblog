@@ -212,10 +212,9 @@ def get_upvote_info(request, uid):
 
 @csrf_exempt
 def upvote(request, uid):
-    hash_id = salt_and_hash(request, 'year')
-
     if uid == request.POST.get("uid", "") and not request.POST.get("title", False):
         print("Attempting upvote")
+        hash_id = salt_and_hash(request, 'year')
         post = get_object_or_404(Post, uid=uid)
         try:
             upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
@@ -230,12 +229,8 @@ def upvote(request, uid):
         response = HttpResponse(f'Upvoted {post.title}')
         response['X-Robots-Tag'] = 'noindex, nofollow'
         return response
-        
-    print("Not upvoting: Someone's doing something dodgy ʕ •`ᴥ•´ʔ")
 
-    response = HttpResponse(f'Upvoted')
-    response['X-Robots-Tag'] = 'noindex, nofollow'
-    return response
+    return HttpResponse('Forbidden', 403)
 
 
 def public_analytics(request):
