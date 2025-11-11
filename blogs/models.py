@@ -362,9 +362,9 @@ class Hit(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     hash_id = models.CharField(max_length=200)
     referrer = models.URLField(default=None, blank=True, null=True)
-    country = models.CharField(max_length=200, blank=True)
-    device = models.CharField(max_length=200, blank=True)
-    browser = models.CharField(max_length=200, blank=True)
+    country = models.CharField(max_length=200, blank=True, null=True)
+    device = models.CharField(max_length=200, blank=True, null=True)
+    browser = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
         indexes = [

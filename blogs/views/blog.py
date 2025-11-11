@@ -62,7 +62,7 @@ def ping(request):
     except:
         pass
 
-    print(f'Ping! Could not find blog with domain {domain}')
+    # print(f'Ping! Could not find blog with domain {domain}')
     return HttpResponse('Invalid domain', status=422)
 
 
