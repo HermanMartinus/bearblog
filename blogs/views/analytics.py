@@ -222,7 +222,6 @@ def post_hit(request, uid):
 @csrf_exempt
 def hit(request):
     if request.method == "POST" and request.POST.get('token') and not request.POST.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
-        print('Using new hit logic')
         user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
 
         # Prevent duplicates with ip hash + date
@@ -231,7 +230,10 @@ def hit(request):
         country = get_country(client_ip(request)).get('country_name', '')
         device = user_agent.get('platform', {}).get('name', '')
         browser = user_agent.get('browser', {}).get('name', '')
-        referrer = request.POST.get('referrer')
+        
+        parsed = urlparse(request.POST.get('referrer'))
+        if parsed.scheme and parsed.netloc:
+            referrer = f"{parsed.scheme}://{parsed.netloc}"
 
         post_pk = Post.objects.filter(uid=request.POST.get('token')).values_list('pk', flat=True).first()
 
