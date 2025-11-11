@@ -1,4 +1,4 @@
-<form id="upvote-form" method="post" style="display: inline">
+<form id="upvote-form" action="/upvote/{{ post.uid }}/" method="post" style="display: inline">
     <small>
         <input hidden name="uid" value="{{ post.uid }}" style="display:none">
         <input hidden name="title" value="{{ post.title }}" style="display:none">
@@ -44,7 +44,7 @@
             return;
         }
 
-        fetch("/upvote/{{ post.uid }}/", {
+        fetch(e.target.action, {
             method: 'post',
             body: new FormData(e.target),
         });
