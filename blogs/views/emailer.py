@@ -67,13 +67,16 @@ def subscribe(request):
     if not blog:
         return not_found(request)
 
-    return render(
+    response = render(
         request,
         'subscribe.html',
         {
             'blog': blog
         }
     )
+    response['Cache-Tag'] = blog.subdomain
+    response['Cache-Control'] = "max-age=43200"
+    return response
 
 
 @csrf_exempt
