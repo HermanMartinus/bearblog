@@ -221,12 +221,9 @@ def post_hit(request, uid):
 
 @csrf_exempt
 def hit(request):
-    if request.method == "POST" and request.POST.get('token') and not request.POST.get('title'):
+    if request.method == "POST" and request.POST.get('token') and not request.POST.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
         print('Using new hit logic')
         user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
-
-        # if 'bot' in user_agent.lower():
-        #     return HttpResponse('Forbidden', status=403)
 
         # Prevent duplicates with ip hash + date
         hash_id = salt_and_hash(request)
