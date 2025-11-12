@@ -105,7 +105,6 @@ urlpatterns = [
     path('upvote/<uid>/', blog.upvote, name='upvote'),
     path('upvote-info/<uid>/', blog.get_upvote_info, name='get_upvote_info'),
     path('hit/', analytics.hit, name='hit'),
-    path('hit/<uid>/', analytics.post_hit, name='post_hit'),
     path('subscribe/', emailer.subscribe, name='subscribe'),
     path('email-subscribe/', emailer.email_subscribe, name='email_subscribe'),
     path('confirm-subscription/', emailer.confirm_subscription, name='confirm_subscription'),

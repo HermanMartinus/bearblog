@@ -203,8 +203,15 @@ class Blog(models.Model):
         try:
             response = requests.post(url, headers=headers, json=data)
             response.raise_for_status()
-            print(f"Invalidated Cloudflare cache for tag: {self.subdomain}, response: {response.json()}")
-            return response.json()
+            response_data = response.json()
+            if response_data.get('success') == True:
+                print(f"Invalidated Cloudflare cache for tag: {self.subdomain}")
+            else:
+                errors = response_data.get('errors', [])
+                print(f"Failed to invalidate Cloudflare cache for tag: {self.subdomain}")
+                print(f"Errors: {errors}")
+
+            return response_data
         except Exception as e:
             # Log the error but don't prevent the save operation
             print(f"Error invalidating Cloudflare cache for {self.subdomain}: {str(e)}")

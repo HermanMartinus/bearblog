@@ -176,49 +176,6 @@ def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
     return posts
 
 
-def post_hit(request, uid):
-    user_agent = request.META.get('HTTP_USER_AGENT', '')
-    if 'bot' in user_agent.lower():
-        return HttpResponse("Bot traffic")
-
-    try:
-        user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
-
-        # Prevent duplicates with ip hash + date
-        hash_id = salt_and_hash(request)
-
-        country = get_country(client_ip(request)).get('country_name', '')
-        device = user_agent.get('platform', {}).get('name', '')
-        browser = user_agent.get('browser', {}).get('name', '')
-
-        referrer = request.GET.get('ref', '')
-        if referrer:
-            referrer = urlparse(referrer)
-            referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
-        
-        post_pk = Post.objects.filter(uid=uid).values_list('pk', flat=True).first()
-
-        if post_pk:
-            hit, create = Hit.objects.get_or_create(
-                post_id=post_pk,
-                hash_id=hash_id,
-                referrer=referrer,
-                country=country,
-                device=device,
-                browser=browser)
-            if create:
-                print('Hit', hit)
-
-    except Hit.MultipleObjectsReturned:
-        print('Duplicate hit')
-    except IntegrityError:
-        print('Post does not exist')
-
-    response = HttpResponse("Logged")
-    response['X-Robots-Tag'] = 'noindex, nofollow'
-    return response
-
-
 @csrf_exempt
 def hit(request):
     if request.method == "POST" and request.POST.get('token') and not request.POST.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
