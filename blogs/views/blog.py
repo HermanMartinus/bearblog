@@ -168,7 +168,10 @@ def post(request, slug):
             if slug == blog.blog_path or slug == 'blog':
                 return posts(request, blog)
 
-            return render(request, '404.html', {'blog': blog}, status=404)
+            response = render(request, '404.html', {'blog': blog}, status=404)
+            response['Cache-Tag'] = blog.subdomain
+            response['Cache-Control'] = "max-age=43200"
+            return response
 
     meta_description = post.meta_description or unmark(post.content)[:157] + '...'
     full_path = f'{blog.useful_domain}/{post.slug}/'
