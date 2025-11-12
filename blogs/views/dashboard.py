@@ -77,6 +77,8 @@ def styles(request, id):
 def blog_delete(request, id):
     if request.method == "POST":
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+        # Invalidates the cache
+        blog.save()
         blog.delete()
     return redirect('account')
 
@@ -234,6 +236,9 @@ def settings(request, id):
 def delete_user(request):
     if request.method == "POST":
         user = get_object_or_404(get_user_model(), pk=request.user.pk)
+        # Invalidates the cache for all blogs
+        for blog in user.blogs.all():
+            blog.save()
         user.delete()
         return redirect('/')
 
