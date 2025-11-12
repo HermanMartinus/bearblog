@@ -315,6 +315,9 @@ class Post(models.Model):
                 self.score = score
     
     def save(self, *args, **kwargs):
+        # Use to skip blog save so as to not invalidate cache
+        skip_blog_save = kwargs.pop('skip_blog_save', False)
+
         self.slug = self.slug.lower()
         if not self.all_tags:
             self.all_tags = '[]'
@@ -336,9 +339,10 @@ class Post(models.Model):
         # Save the post
         super(Post, self).save(*args, **kwargs)
 
-        # Save blog to trigger a few other things
-        self.blog.save()
-
+        # Save blog to trigger a few other things (unless skipped)
+        if not skip_blog_save:
+            self.blog.save()
+            
     def __str__(self):
         return self.title
 
@@ -352,8 +356,8 @@ class Upvote(models.Model):
         # Save the Upvote instance
         super(Upvote, self).save(*args, **kwargs)
         
-        # Update the post score on post save
-        self.post.save()
+        # Update the post score without triggering blog save
+        self.post.save(skip_blog_save=True)
 
     class Meta:
         indexes = [
