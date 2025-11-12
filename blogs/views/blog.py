@@ -211,11 +211,10 @@ def get_upvote_info(request, uid):
 
 
 @csrf_exempt
-def upvote(request, uid):
-    if uid == request.POST.get("uid", "") and not request.POST.get("title", False):
-        print("Attempting upvote")
+def upvote(request, uid=None):
+    if request.POST.get("uid", "") and not request.POST.get("title", False):
         hash_id = salt_and_hash(request, 'year')
-        post = get_object_or_404(Post, uid=uid)
+        post = get_object_or_404(Post, uid=request.POST.get("uid", ""))
         try:
             upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
         
