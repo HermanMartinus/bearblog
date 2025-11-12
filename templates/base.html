@@ -89,6 +89,7 @@
             'd': () => day.toString().padStart(2, '0'),
             'm': () => (month + 1).toString().padStart(2, '0'),
             'Y': () => year.toString(),
+            'y': () => year.toString().slice(-2),
             'F': () => monthsFull[month],
             'j': () => day.toString(),
             'D': () => daysShort[weekday],
