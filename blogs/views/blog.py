@@ -214,7 +214,7 @@ def get_upvote_info(request, uid):
 
 
 @csrf_exempt
-def upvote(request, uid=None):
+def upvote(request):
     if request.POST.get("uid", "") and not request.POST.get("title", False):
         hash_id = salt_and_hash(request, 'year')
         post = get_object_or_404(Post, uid=request.POST.get("uid", ""))

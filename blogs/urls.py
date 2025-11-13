@@ -103,7 +103,6 @@ urlpatterns = [
     path('robots.txt', blog.robots, name='robots'),
     path('public-analytics/', blog.public_analytics, name="public_analytics"),
     path('upvote/', blog.upvote, name='upvote'),
-    path('upvote/<uid>/', blog.upvote, name='upvote_old'),
     path('upvote-info/<uid>/', blog.get_upvote_info, name='get_upvote_info'),
     path('hit/', analytics.hit, name='hit'),
     path('subscribe/', emailer.subscribe, name='subscribe'),

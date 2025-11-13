@@ -17,7 +17,7 @@ https:// {
     }
 
     handle @emptyUA {
-        respond "Forbidden: Verification required" 403
+        respond "Forbidden" 403
     }
 
 

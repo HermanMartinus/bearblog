@@ -1,8 +1,8 @@
 .PHONY: dev shell logs 404 migrate makemigrations
 
 dev:
-	echo http://lh.co
-	python manage.py runserver 0:80
+	echo localhost:1414
+	python manage.py runserver 0:1414
 
 migrate:
 	python manage.py migrate
