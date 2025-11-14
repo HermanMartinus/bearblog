@@ -9,6 +9,21 @@
 	const $previewButton = document.getElementById('preview')
 	const $uploadButton = document.getElementById('upload-image')
 	
+	// Check for autosaved content on page load in case of server mishap
+	const autosaveTimestamp = sessionStorage.getItem('autosave_timestamp');
+	const autosaveBody = sessionStorage.getItem('autosave_body');
+
+	if (autosaveTimestamp) {
+		const secondsSinceSave = (Date.now() - parseInt(autosaveTimestamp)) / 1000;
+		if (secondsSinceSave < 10) {	
+			// Restore body if different
+			if ($textarea.value.length != autosaveBody.length) {
+				$textarea.value = autosaveBody;
+				console.log('Restored body content from autosave');
+			}
+		}
+	}
+
 	// Submitting form with header content
 	const addHeaderContentToFormAndSubmit = () => {
 		$hiddenHeaderContent.value = $headerContent.innerText;
@@ -16,6 +31,9 @@
 	}
 
 	$form.addEventListener('submit', function(e) {
+		sessionStorage.setItem("autosave_timestamp", Date.now());
+		sessionStorage.setItem("autosave_body", $textarea.value);
+
 		e.preventDefault();
         addHeaderContentToFormAndSubmit()
     });
