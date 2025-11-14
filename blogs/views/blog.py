@@ -259,8 +259,11 @@ def sitemap(request):
         posts = blog.posts.filter(publish=True, published_date__lte=timezone.now()).only('slug', 'last_modified', 'blog_id').order_by('-published_date')
     except AttributeError:
         posts = []
-
-    return render(request, 'sitemap.xml', {'blog': blog, 'posts': posts}, content_type='text/xml')
+    
+    response = render(request, 'sitemap.xml', {'blog': blog, 'posts': posts}, content_type='text/xml')
+    response['Cache-Tag'] = blog.subdomain
+    response['Cache-Control'] = "max-age=43200"
+    return response
 
 
 def robots(request):
@@ -268,7 +271,10 @@ def robots(request):
     if not blog:
         return not_found(request)
 
-    return render(request, 'robots.txt',  {'blog': blog}, content_type="text/plain")
+    response = render(request, 'robots.txt',  {'blog': blog}, content_type="text/plain")
+    response['Cache-Tag'] = blog.subdomain
+    response['Cache-Control'] = "max-age=43200"
+    return response
 
 
 def favicon(request):

@@ -102,15 +102,18 @@
             <script>
             window.addEventListener("load", () => {
                 if (navigator.webdriver !== true) {
-                    document.body.addEventListener('pointerover', () => {
+                    const sendHit = score => {
                         const params = new URLSearchParams({
                             token: "{{ post.uid }}",
                             referrer: document.referrer.includes("{{ blog.blank_useful_domain }}") ? "" : document.referrer,
-                            title: ""
+                            title: "",
+                            score: score
                         });
-
                         new Image().src = `/hit/?${params.toString()}`;
-                    }, { once: true });
+                    };
+
+                    document.addEventListener('touchmove', () => sendHit(100), { once: true });
+                    document.addEventListener('mousemove', () => sendHit(100), { once: true });
                 }
             });
             </script>
