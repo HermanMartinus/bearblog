@@ -10,18 +10,23 @@
 	const $uploadButton = document.getElementById('upload-image')
 	
 	// Check for autosaved content on page load in case of server mishap
+	const path = window.location.pathname;
+	const autosavePath = sessionStorage.getItem('autosave_path');
 	const autosaveTimestamp = sessionStorage.getItem('autosave_timestamp');
 	const autosaveBody = sessionStorage.getItem('autosave_body');
 
-	if (autosaveTimestamp) {
-		const secondsSinceSave = (Date.now() - parseInt(autosaveTimestamp)) / 1000;
-		if (secondsSinceSave < 3) {	
-			// Restore body if different
-			if ($textarea.value.trim().length != autosaveBody.trim().length) {
-				$textarea.value = autosaveBody;
-				console.log('Restored body content from autosave');
-			}
+	const secondsSinceSave = (Date.now() - parseInt(autosaveTimestamp)) / 1000;
+
+	if (autosaveTimestamp && autosavePath == path && secondsSinceSave < 5) {
+		// Restore body if different
+		if ($textarea.value.trim().length != autosaveBody.trim().length) {
+			$textarea.value = autosaveBody;
+			console.log('Restored body content from autosave');
 		}
+	} else {
+		sessionStorage.removeItem('autosave_path');
+		sessionStorage.removeItem('autosave_timestamp');
+		sessionStorage.removeItem('autosave_body');
 	}
 
 	// Submitting form with header content
@@ -31,6 +36,7 @@
 	}
 
 	$form.addEventListener('submit', function(e) {
+		sessionStorage.setItem("autosave_path", path);
 		sessionStorage.setItem("autosave_timestamp", Date.now());
 		sessionStorage.setItem("autosave_body", $textarea.value);
 
