@@ -178,7 +178,7 @@ def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
 
 @csrf_exempt
 def hit(request):
-    if request.method == "POST" and request.POST.get('token') and not request.POST.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
+    if request.GET.get('token') and not request.GET.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
         user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
 
         # Prevent duplicates with ip hash + date
@@ -188,12 +188,12 @@ def hit(request):
         device = user_agent.get('platform', {}).get('name', '')
         browser = user_agent.get('browser', {}).get('name', '')
         
-        referrer = request.POST.get('referrer','')
+        referrer = request.GET.get('referrer','')
         if referrer:
             referrer = urlparse(referrer)
             referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
 
-        post_pk = Post.objects.filter(uid=request.POST.get('token')).values_list('pk', flat=True).first()
+        post_pk = Post.objects.filter(uid=request.GET.get('token')).values_list('pk', flat=True).first()
 
         if post_pk:
             hit, create = Hit.objects.get_or_create(

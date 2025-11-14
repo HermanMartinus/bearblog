@@ -99,39 +99,20 @@
         {% endif %}
 
         {% if blog.analytics_active %}
-            <form id="hit-form" action="/hit/" method="post" style="display: none">
-                <input name="token" value="{{ post.uid }}">
-                <input name="title" value="{{ post.title }}" >
-                <input name="referrer" >
-            </form>
-
             <script>
-                window.addEventListener("load", (event) => {
-                    if (navigator.webdriver !== true) {
-                        document.body.addEventListener('pointerover', () => {
-                            const hitForm = document.getElementById('hit-form');
-                            const referrerInput = hitForm.querySelector('input[name="referrer"]');
-                            const titleInput = hitForm.querySelector('input[name=title]')
-                            
-                            // Set the referrer value
-                            if (!document.referrer.includes("{{ blog.blank_useful_domain }}")) {
-                                referrerInput.value = document.referrer;
-                            }
+            window.addEventListener("load", () => {
+                if (navigator.webdriver !== true) {
+                    document.body.addEventListener('pointerover', () => {
+                        const params = new URLSearchParams({
+                            token: "{{ post.uid }}",
+                            referrer: document.referrer.includes("{{ blog.blank_useful_domain }}") ? "" : document.referrer,
+                            title: ""
+                        });
 
-                            // Remove the title value
-                            titleInput.value = ""
-                            
-                            // Log the form data before submitting
-                            const formData = new FormData(hitForm);
-                            
-                            // Submit the form
-                            fetch(hitForm.action, {
-                                method: 'post',
-                                body: new FormData(hitForm),
-                            });
-                        }, { once: true });
-                    }
-                });
+                        new Image().src = `/hit/?${params.toString()}`;
+                    }, { once: true });
+                }
+            });
             </script>
         {% endif %}
     {% endif %}
