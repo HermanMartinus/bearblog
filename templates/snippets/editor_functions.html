@@ -17,7 +17,7 @@
 		const secondsSinceSave = (Date.now() - parseInt(autosaveTimestamp)) / 1000;
 		if (secondsSinceSave < 10) {	
 			// Restore body if different
-			if ($textarea.value.length != autosaveBody.length) {
+			if ($textarea.value.trim().length != autosaveBody.trim().length) {
 				$textarea.value = autosaveBody;
 				console.log('Restored body content from autosave');
 			}
