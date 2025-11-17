@@ -107,7 +107,6 @@ urlpatterns = [
     path('hit/', analytics.hit, name='hit'),
     path('subscribe/', emailer.subscribe, name='subscribe'),
     path('email-subscribe/', emailer.email_subscribe, name='email_subscribe'),
-    path('confirm-subscription/', emailer.confirm_subscription, name='confirm_subscription'),
     
     # Feeds + aliases
     path("feed/", feed.feed),
