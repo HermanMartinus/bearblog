@@ -86,11 +86,13 @@ def analytics_upgraded(request, id):
         return djqscsv.render_to_csv_response(hits)
     
     # Test on my blog first
-    if not blog.analytics_update and blog.subdomain is 'herman':
-        print("Updating!")
+    print("Try updating hits")
+    if not blog.analytics_update:
+        print("Updating hits")
         Hit.objects.filter(post__blog=blog, blog__isnull=True).update(blog=blog)
         blog.analytics_update = True
         blog.save()
+        print("Updated hits")
     
     return render_analytics(request, blog)
 
