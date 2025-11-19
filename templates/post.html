@@ -104,6 +104,7 @@
                 if (navigator.webdriver !== true) {
                     const sendHit = score => {
                         const params = new URLSearchParams({
+                            blog: "{{ blog.subdomain }}",
                             token: "{{ post.uid }}",
                             referrer: document.referrer.includes("{{ blog.blank_useful_domain }}") ? "" : document.referrer,
                             title: "",

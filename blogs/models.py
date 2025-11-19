@@ -75,8 +75,12 @@ class Blog(models.Model):
 
     analytics_active = models.BooleanField(default=True)
     fathom_site_id = models.CharField(max_length=8, blank=True)
+    
     # TODO: Deprecate this
     public_analytics = models.BooleanField(default=False)
+
+    # Add blog to hits in legacy hits
+    analytics_update = models.BooleanField(default=False)
 
     post_template = models.TextField(blank=True)
     robots_txt = models.TextField(blank=True, default="User-agent: *\nAllow: /")
@@ -369,7 +373,8 @@ class Upvote(models.Model):
 
 
 class Hit(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, blank=True, null=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     hash_id = models.CharField(max_length=200)
     referrer = models.URLField(default=None, blank=True, null=True)

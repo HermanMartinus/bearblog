@@ -51,6 +51,28 @@
 </p>
 {% endif %}
 
+{% if blog.analytics_active %}
+    <script>
+    window.addEventListener("load", () => {
+        if (navigator.webdriver !== true) {
+            const sendHit = score => {
+                const params = new URLSearchParams({
+                    blog: "{{ blog.subdomain }}",
+                    token: "/",
+                    referrer: document.referrer.includes("{{ blog.blank_useful_domain }}") ? "" : document.referrer,
+                    title: "",
+                    score: score
+                });
+                new Image().src = `/hit/?${params.toString()}`;
+            };
+
+            document.addEventListener('touchmove', () => sendHit(100), { once: true });
+            document.addEventListener('mousemove', () => sendHit(100), { once: true });
+        }
+    });
+    </script>
+{% endif %}
+
 {% endblock %}
 
 {% block footer %}

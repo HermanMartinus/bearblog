@@ -85,6 +85,13 @@ def analytics_upgraded(request, id):
         hits = Hit.objects.filter(post__blog=blog).order_by('created_date')
         return djqscsv.render_to_csv_response(hits)
     
+    # Test on my blog first
+    if not blog.analytics_update and blog.subdomain is 'herman':
+        print("Updating!")
+        Hit.objects.filter(post__blog=blog, blog__isnull=True).update(blog=blog)
+        blog.analytics_update = True
+        blog.save()
+    
     return render_analytics(request, blog)
 
 
@@ -178,9 +185,8 @@ def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
 
 @csrf_exempt
 def hit(request):
-    if request.GET.get('token') and not request.GET.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
-        # TODO: Soon add score check: and int(request.GET.get('score')) > 50
-
+    # TODO: Readd blog check
+    if int(request.GET.get('score')) > 50 and not request.GET.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
         user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
 
         # Prevent duplicates with ip hash + date
@@ -194,11 +200,18 @@ def hit(request):
         if referrer:
             referrer = urlparse(referrer)
             referrer = '{uri.scheme}://{uri.netloc}/'.format(uri=referrer)
+        
 
-        post_pk = Post.objects.filter(uid=request.GET.get('token')).values_list('pk', flat=True).first()
-
-        if post_pk:
+        blog_pk = Blog.objects.filter(subdomain=request.GET.get('blog')).values_list('pk', flat=True).first()
+        post_pk = None
+        if '/' not in request.GET.get('token'):
+            post_pk = Post.objects.filter(uid=request.GET.get('token')).values_list('pk', flat=True).first()
+        
+        # TODO: Remove post_pk
+        if blog_pk or post_pk:
+            print(blog_pk, post_pk)
             hit, create = Hit.objects.get_or_create(
+                blog_id=blog_pk,
                 post_id=post_pk,
                 hash_id=hash_id,
                 referrer=referrer,
@@ -207,7 +220,6 @@ def hit(request):
                 browser=browser)
             if create:
                 print('Hit:', hit)
-                print('Referrer:', referrer)
 
         response = HttpResponse("Logged hit")
         response['X-Robots-Tag'] = 'noindex, nofollow'

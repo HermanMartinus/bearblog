@@ -225,15 +225,26 @@ class MediaAdmin(admin.ModelAdmin):
 
 @admin.register(Hit)
 class HitAdmin(admin.ModelAdmin):
+    raw_id_fields = ('blog',)
+    def blog_link(self, obj):
+        if obj.blog:
+            return format_html('<a href="/mothership/blogs/blog/{id}/change/">{blog}</a>',
+                           id=obj.blog.id,
+                           blog=escape(obj.blog.subdomain))
+        return None
+    
     raw_id_fields = ('post',)
     def post_link(self, obj):
-        return format_html('<a href="/mothership/blogs/post/{id}/change/">{post}</a>',
+        if obj.post:
+            return format_html('<a href="/mothership/blogs/post/{id}/change/">{post}</a>',
                            id=obj.post.pk,
                            post=escape(obj.post))
+        return None
 
-    list_display = ('created_date', 'post_link', 'hash_id')
-    search_fields = ('created_date', 'post__title')
+    list_display = ('created_date', 'blog_link', 'post_link', 'hash_id')
+    search_fields = ('created_date', 'blog__subdomain', 'post__title')
     ordering = ('-created_date',)
+    list_per_page = 10
 
 
 @admin.register(Subscriber)
