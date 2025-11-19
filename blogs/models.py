@@ -390,7 +390,7 @@ class Hit(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.hash_id} - {self.post}"
+        return f"{self.created_date.strftime('%d %b %Y, %X')} - {self.blog.subdomain} - {self.post.title}"
 
 
 class Subscriber(models.Model):

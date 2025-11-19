@@ -211,7 +211,6 @@ def hit(request):
         
         # TODO: Remove post_pk
         if blog_pk or post_pk:
-            print(blog_pk, post_pk)
             hit, create = Hit.objects.get_or_create(
                 blog_id=blog_pk,
                 post_id=post_pk,
