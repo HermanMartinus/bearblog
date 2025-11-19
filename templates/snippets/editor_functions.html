@@ -15,19 +15,29 @@
 	const autosaveTimestamp = sessionStorage.getItem('autosave_timestamp');
 	const autosaveBody = sessionStorage.getItem('autosave_body');
 
-	const secondsSinceSave = (Date.now() - parseInt(autosaveTimestamp)) / 1000;
-
-	{% comment %} if (autosaveTimestamp && autosavePath == path && secondsSinceSave < 5) {
-		// Restore body if different
-		if ($textarea.value.trim().length != autosaveBody.trim().length) {
-			$textarea.value = autosaveBody;
-			console.log('Restored body content from autosave');
-		}
-	} else {
+	{% comment %} const secondsSinceSave = (Date.now() - parseInt(autosaveTimestamp)) / 1000; {% endcomment %}
+	console.log("Paths match:", autosavePath == path)
+	console.log("Path: ", autosavePath)
+	console.log("Lengths match:", autosaveBody && autosaveBody.trim().length == $textarea.value.length)
+	
+	if (autosavePath == path && $textarea.value.trim().length != autosaveBody.trim().length) {
+		// Restore body if path is same but content length differs
+		$textarea.value = autosaveBody;
+		console.log('Restored body content from autosave');
+	} 
+	else {
+		console.log("Removing autosave")
 		sessionStorage.removeItem('autosave_path');
 		sessionStorage.removeItem('autosave_timestamp');
 		sessionStorage.removeItem('autosave_body');
-	} {% endcomment %}
+	}
+
+	$textarea.addEventListener('input', () => {
+		console.log("Autosaving")
+		sessionStorage.setItem("autosave_path", path);
+		sessionStorage.setItem("autosave_timestamp", Date.now());
+		sessionStorage.setItem("autosave_body", $textarea.value);
+	})
 
 	// Submitting form with header content
 	const addHeaderContentToFormAndSubmit = () => {
@@ -36,10 +46,6 @@
 	}
 
 	$form.addEventListener('submit', function(e) {
-		sessionStorage.setItem("autosave_path", path);
-		sessionStorage.setItem("autosave_timestamp", Date.now());
-		sessionStorage.setItem("autosave_body", $textarea.value);
-
 		e.preventDefault();
         addHeaderContentToFormAndSubmit()
     });

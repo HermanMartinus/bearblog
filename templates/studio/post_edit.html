@@ -27,7 +27,7 @@ New post | Bear Blog
 <form method="POST" class="post-form full-width">
     <p class="sticky-controls">
         <button
-            onclick="event.preventDefault(); sessionStorage.clear(); window.location = '{% if post.is_page or is_page %}{% url 'pages_edit' id=blog.subdomain %}{% else %}{% url 'posts_edit' id=blog.subdomain %}{% endif %}'"
+            onclick="event.preventDefault(); sessionStorage.removeItem('textareaY'); window.location = '{% if post.is_page or is_page %}{% url 'pages_edit' id=blog.subdomain %}{% else %}{% url 'posts_edit' id=blog.subdomain %}{% endif %}'"
         >
             &#8592; Back
         </button>
