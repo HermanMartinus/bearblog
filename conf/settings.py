@@ -123,6 +123,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 90 # 90 days
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
