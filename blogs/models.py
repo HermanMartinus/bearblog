@@ -384,9 +384,23 @@ class Hit(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['post', 'created_date']),
-            models.Index(fields=['post', 'hash_id']),
-            models.Index(fields=['post', 'referrer']),
+            # Optimized for the get_posts query - covers blog_id, post_id, created_date, and referrer
+            models.Index(fields=['blog', 'post', 'created_date', 'referrer'], name='hit_blog_post_date_ref'),
+            
+            # For unique visitors
+            models.Index(fields=['blog', 'created_date', 'post', 'referrer', 'hash_id'], name='hit_visitors_opt'),
+            
+            # For blog-level analytics queries
+            models.Index(fields=['blog', 'created_date'], name='hit_blog_date'),
+
+            # For device aggregation
+            models.Index(fields=['blog', 'created_date', 'device'], name='hit_blog_date_device'),
+            
+            # For browser aggregation
+            models.Index(fields=['blog', 'created_date', 'browser'], name='hit_blog_date_browser'),
+            
+            # For country aggregation
+            models.Index(fields=['blog', 'created_date', 'country'], name='hit_blog_date_country'),
         ]
 
     def __str__(self):

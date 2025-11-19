@@ -84,16 +84,7 @@ def analytics_upgraded(request, id):
     if request.GET.get('export', False):
         hits = Hit.objects.filter(post__blog=blog).order_by('created_date')
         return djqscsv.render_to_csv_response(hits)
-    
-    # Test on my blog first
-    # print("Try updating hits")
-    # if not blog.analytics_update:
-    #     print("Updating hits")
-    #     Hit.objects.filter(post__blog=blog, blog__isnull=True).update(blog=blog)
-    #     blog.analytics_update = True
-    #     blog.save()
-    #     print("Updated hits")
-    
+
     return render_analytics(request, blog)
 
 
@@ -105,7 +96,7 @@ def render_analytics(request, blog, public=False):
     start_date = (now - timedelta(days=days_filter)).date()
     end_date = now.date()
 
-    base_hits = Hit.objects.filter(post__blog=blog, created_date__gt=start_date)
+    base_hits = Hit.objects.filter(blog=blog, created_date__gt=start_date)
 
     if post_filter:
         base_hits = base_hits.filter(post__slug=post_filter)
@@ -171,7 +162,8 @@ def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
                    p.slug,
                    (SELECT COUNT(h.id)
                     FROM blogs_hit h
-                    WHERE h.post_id = p.id
+                    WHERE h.blog_id = %s
+                    AND h.post_id = p.id
                     AND h.created_date > %s
                     AND (h.referrer = %s OR %s IS NULL)) AS hit_count
             FROM blogs_post p
@@ -179,7 +171,10 @@ def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
             AND p.publish
             AND (p.slug = %s OR %s IS NULL)
             ORDER BY hit_count DESC, p.published_date DESC
-        """, [start_date, referrer_filter or None, referrer_filter or None, blog_id, post_filter or None, post_filter or None])
+        """, [
+            blog_id, start_date, referrer_filter or None, referrer_filter or None,
+            blog_id, post_filter or None, post_filter or None
+        ])
         columns = ['title', 'upvotes', 'published_date', 'slug', 'hit_count']
         posts = [dict(zip(columns, row)) for row in cursor.fetchall()]
     return posts
@@ -187,8 +182,7 @@ def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
 
 @csrf_exempt
 def hit(request):
-    # TODO: Readd blog check
-    if int(request.GET.get('score')) > 50 and not request.GET.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
+    if request.GET.get('blog') and int(request.GET.get('score')) > 50 and not request.GET.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
         user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
 
         # Prevent duplicates with ip hash + date
@@ -209,8 +203,7 @@ def hit(request):
         if '/' not in request.GET.get('token'):
             post_pk = Post.objects.filter(uid=request.GET.get('token')).values_list('pk', flat=True).first()
         
-        # TODO: Remove post_pk
-        if blog_pk or post_pk:
+        if blog_pk:
             hit, create = Hit.objects.get_or_create(
                 blog_id=blog_pk,
                 post_id=post_pk,
