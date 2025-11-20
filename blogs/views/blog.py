@@ -49,6 +49,30 @@ def get_blog_with_domain(domain):
             return get_object_or_404(Blog, domain__iexact=f'www.{domain}', user__is_active=True)
 
 
+def get_domain_id(check):
+    if not check:
+        return None
+    
+    domain_map = cache.get('domain_map')
+
+    if domain_map is None:
+        domain_map = {
+            domain.strip().lower().removeprefix('www.'): pk
+            for domain, pk in Blog.objects
+                .exclude(domain__isnull=True)
+                .exclude(domain='')
+                .values_list('domain', 'pk')
+        }
+        print("Ping! Creating domain map cache")
+        cache.set('domain_map', domain_map, timeout=60)
+    else:
+        print("Ping! Using cached domainmap")
+    clean = check.strip().lower().removeprefix('www.')
+
+    return domain_map.get(clean)
+
+
+
 @csrf_exempt
 def ping(request):
     domain = request.GET.get("domain", None)
@@ -57,7 +81,7 @@ def ping(request):
         return HttpResponse('Invalid domain', status=422)
     
     try:
-        if get_blog_with_domain(domain):
+        if get_domain_id(domain):
             print('Ping! Found correct blog. Issuing certificate for', domain)
             return HttpResponse('Ping', status=200)
     except:
