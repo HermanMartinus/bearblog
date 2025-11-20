@@ -145,20 +145,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Cache
-# REDISCLOUD_URL = os.environ.get("REDISCLOUD_TLS_URL") or os.environ.get("REDISCLOUD_URL")
+REDISCLOUD_URL = os.environ.get("REDISCLOUD_TLS_URL") or os.environ.get("REDISCLOUD_URL")
 
-# if REDISCLOUD_URL:
-#     CACHES = {
-#         "default": {
-#             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-#             "LOCATION": REDISCLOUD_URL,
-#             "KEY_PREFIX": "bearblog",
-#             "TIMEOUT": 60 * 60 * 24
-#         }
-#     }
+if REDISCLOUD_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDISCLOUD_URL,
+            "KEY_PREFIX": "bearblog",
+            "TIMEOUT": 60 * 60 * 24
+        }
+    }
 
-#     SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-#     SESSION_CACHE_ALIAS = "default"
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
 
 
 # Password validation
