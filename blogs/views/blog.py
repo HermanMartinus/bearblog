@@ -56,22 +56,14 @@ def ping(request):
     if not domain:
         return HttpResponse('Invalid domain', status=422)
     
-    # Check if domain is cached as invalid
-    cache_key = f'invalid_domain:{domain}'
-    if cache.get(cache_key):
-        print("Ping! Using cached invalid response")
-        return HttpResponse('Invalid domain', status=422)
-    
     try:
         if get_blog_with_domain(domain):
-            print('Ping! Found correct blog. Issuing certificate.')
+            print('Ping! Found correct blog. Issuing certificate for', domain)
             return HttpResponse('Ping', status=200)
     except:
         pass
 
-    # Cache invalid domain for 60 seconds
-    cache.set(cache_key, True, 30)
-    print("Ping! Caching invalid domain")
+    print("Ping! Invalid domain", domain)
     return HttpResponse('Invalid domain', status=422)
 
 
