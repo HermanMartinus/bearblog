@@ -1,10 +1,8 @@
 from django.http import HttpResponse, JsonResponse
-from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from django.utils.text import slugify
-from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import salt_and_hash, unmark
@@ -55,6 +53,15 @@ def get_blog_with_domain(domain):
 def ping(request):
     domain = request.GET.get("domain", None)
     
+    if not domain:
+        return HttpResponse('Invalid domain', status=422)
+    
+    # Check if domain is cached as invalid
+    cache_key = f'invalid_domain:{domain}'
+    if cache.get(cache_key):
+        print("Ping! Using cached invalid response")
+        return HttpResponse('Invalid domain', status=422)
+    
     try:
         if get_blog_with_domain(domain):
             print('Ping! Found correct blog. Issuing certificate.')
@@ -62,7 +69,9 @@ def ping(request):
     except:
         pass
 
-    print('Ping! Invalid domain', domain)
+    # Cache invalid domain for 60 seconds
+    cache.set(cache_key, True, 30)
+    print("Ping! Caching invalid domain")
     return HttpResponse('Invalid domain', status=422)
 
 
