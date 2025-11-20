@@ -62,14 +62,14 @@ def ping(request):
     except:
         pass
 
-    # print(f'Ping! Could not find blog with domain {domain}')
+    print('Ping! Invalid domain', domain)
     return HttpResponse('Invalid domain', status=422)
 
 
 def home(request):
     blog = resolve_address(request)
     if not blog:
-        # Don't cache here
+        # Don't cache here because of dashboard
         return render(request, 'landing.html')
 
     all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
