@@ -64,13 +64,12 @@ def get_domain_id(check):
                 .values_list('domain', 'pk')
         }
         print("Ping! Creating domain map cache")
-        cache.set('domain_map', domain_map, timeout=60)
+        cache.set('domain_map', domain_map, timeout=3600)
     else:
         print("Ping! Using cached domainmap")
     clean = check.strip().lower().removeprefix('www.')
 
     return domain_map.get(clean)
-
 
 
 @csrf_exempt
@@ -82,12 +81,12 @@ def ping(request):
     
     try:
         if get_domain_id(domain):
-            print('Ping! Found correct blog. Issuing certificate for', domain)
+            # print('Ping! Found correct blog. Issuing certificate for', domain)
             return HttpResponse('Ping', status=200)
     except:
         pass
 
-    print("Ping! Invalid domain", domain)
+    # print("Ping! Invalid domain", domain)
     return HttpResponse('Invalid domain', status=422)
 
 

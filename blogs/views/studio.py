@@ -7,6 +7,7 @@ from django.http import HttpResponseBadRequest
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import URLValidator
+from django.core.cache import cache
 
 from zoneinfo import ZoneInfo
 from datetime import datetime
@@ -494,6 +495,9 @@ def custom_domain_edit(request, id):
                 validator('http://' + custom_domain)
                 blog.domain = custom_domain
                 blog.save()
+
+                # Regerenate domain_map
+                cache.delete('domain_map')
             except ValidationError:
                 error_messages.append(f'{custom_domain} is an invalid domain')
                 print("error")
