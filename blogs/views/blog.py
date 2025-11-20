@@ -1,8 +1,9 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import salt_and_hash, unmark
@@ -16,21 +17,14 @@ def resolve_address(request):
 
     sites = os.getenv('MAIN_SITE_HOSTS').split(',')
 
-    # forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
-    # if forwarded_for:
-    #     print('X-Forwarded-For: ', forwarded_for.split(',')[0], 'Full URL: ', request.build_absolute_uri())
-
     if any(http_host == site for site in sites):
         # Homepage
         return None
     elif any(site in http_host for site in sites):
         # Subdomained blog
-        subdomain = tldextract.extract(http_host).subdomain
-        
-        if request.COOKIES.get('admin_passport') == os.getenv('ADMIN_PASSPORT'):
-            return get_object_or_404(Blog.objects.select_related('user').select_related('user__settings'), subdomain__iexact=subdomain)
-        else:
-            return get_object_or_404(Blog.objects.select_related('user').select_related('user__settings'), subdomain__iexact=subdomain, user__is_active=True)
+        subdomain = tldextract.extract(http_host).subdomain.lower()
+
+        return get_object_or_404(Blog.objects.select_related('user').select_related('user__settings'), subdomain=subdomain, user__is_active=True)
     else:
         # Custom domain blog
         return get_blog_with_domain(http_host)
@@ -39,15 +33,16 @@ def resolve_address(request):
 def get_blog_with_domain(domain):
     if not domain:
         return False
-    try:
-        return Blog.objects.get(domain=domain, user__is_active=True)
-    except Blog.DoesNotExist:
-        # Handle www subdomain if necessary
-        if 'www.' in domain:
-            return get_object_or_404(Blog, domain__iexact=domain.replace('www.', ''), user__is_active=True)
-        else:
-            return get_object_or_404(Blog, domain__iexact=f'www.{domain}', user__is_active=True)
 
+    pk = get_domain_id(domain)
+    if not pk:
+        raise Http404
+
+    try:
+        # Single PK lookup
+        return Blog.objects.select_related('user').select_related('user__settings').get(pk=pk, user__is_active=True)
+    except ObjectDoesNotExist:
+        raise Http404
 
 def get_domain_id(check):
     if not check:
@@ -63,10 +58,8 @@ def get_domain_id(check):
                 .exclude(domain='')
                 .values_list('domain', 'pk')
         }
-        print("Ping! Creating domain map cache")
         cache.set('domain_map', domain_map, timeout=3600)
-    else:
-        print("Ping! Using cached domainmap")
+
     clean = check.strip().lower().removeprefix('www.')
 
     return domain_map.get(clean)
@@ -75,7 +68,7 @@ def get_domain_id(check):
 @csrf_exempt
 def ping(request):
     domain = request.GET.get("domain", None)
-    
+
     if not domain:
         return HttpResponse('Invalid domain', status=422)
     

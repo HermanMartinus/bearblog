@@ -496,7 +496,7 @@ def custom_domain_edit(request, id):
                 blog.domain = custom_domain
                 blog.save()
 
-                # Regerenate domain_map
+                # Invalidate domain_map cache
                 cache.delete('domain_map')
             except ValidationError:
                 error_messages.append(f'{custom_domain} is an invalid domain')
@@ -504,6 +504,9 @@ def custom_domain_edit(request, id):
         elif not custom_domain:
             blog.domain = ''
             blog.save()
+
+            # Invalidate domain_map cache
+            cache.delete('domain_map')
         else:
             error_messages.append(f"{custom_domain} is already registered with another blog")
 
