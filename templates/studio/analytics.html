@@ -73,7 +73,9 @@
                     {% else %}
                     {{post.title}}
                     {% endif %}
+                    {% if post.title != "Home" %}
                     <small>(▵{{ post.upvotes }})</small>
+                    {% endif %}
                     <a href="{{ blog.dynamic_useful_domain }}/{{ post.slug }}" target="_blank">↪</a>
                 </span>
                 <span>{{post.hit_count|intcomma}}</span>

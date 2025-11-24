@@ -99,7 +99,10 @@ def render_analytics(request, blog, public=False):
     base_hits = Hit.objects.filter(blog=blog, created_date__gt=start_date)
 
     if post_filter:
-        base_hits = base_hits.filter(post__slug=post_filter)
+        if post_filter == 'homepage':
+            base_hits = base_hits.filter(post__isnull=True)
+        else:
+            base_hits = base_hits.filter(post__slug=post_filter)
     if referrer_filter:
         base_hits = base_hits.filter(referrer=referrer_filter)
 
@@ -155,7 +158,22 @@ def render_analytics(request, blog, public=False):
 
 def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
     with connection.cursor() as cursor:
+        # Get homepage hits
         cursor.execute("""
+            SELECT 'Home' as title,
+                   0 as upvotes,
+                   NULL as published_date,
+                   'homepage' as slug,
+                   (SELECT COUNT(h.id)
+                    FROM blogs_hit h
+                    WHERE h.blog_id = %s
+                    AND h.post_id IS NULL
+                    AND h.created_date > %s
+                    AND (h.referrer = %s OR %s IS NULL)) AS hit_count
+            WHERE (%s = 'homepage' OR %s IS NULL)
+            
+            UNION ALL
+            
             SELECT p.title,
                    p.upvotes,
                    p.published_date,
@@ -170,8 +188,10 @@ def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
             WHERE p.blog_id = %s
             AND p.publish
             AND (p.slug = %s OR %s IS NULL)
-            ORDER BY hit_count DESC, p.published_date DESC
+            ORDER BY hit_count DESC, published_date DESC
         """, [
+            blog_id, start_date, referrer_filter or None, referrer_filter or None,
+            post_filter or None, post_filter or None,
             blog_id, start_date, referrer_filter or None, referrer_filter or None,
             blog_id, post_filter or None, post_filter or None
         ])
