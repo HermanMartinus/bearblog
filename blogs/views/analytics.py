@@ -224,16 +224,19 @@ def hit(request):
             post_pk = Post.objects.filter(uid=request.GET.get('token')).values_list('pk', flat=True).first()
         
         if blog_pk:
-            hit, create = Hit.objects.get_or_create(
-                blog_id=blog_pk,
-                post_id=post_pk,
-                hash_id=hash_id,
-                referrer=referrer,
-                country=country,
-                device=device,
-                browser=browser)
-            if create:
-                print('Hit:', hit)
+            try:
+                hit, create = Hit.objects.get_or_create(
+                    blog_id=blog_pk,
+                    post_id=post_pk,
+                    hash_id=hash_id,
+                    referrer=referrer,
+                    country=country,
+                    device=device,
+                    browser=browser)
+                if create:
+                    print('Hit:', hit)
+            except Hit.MultipleObjectsReturned:
+                pass
 
         response = HttpResponse("Logged hit")
         response['X-Robots-Tag'] = 'noindex, nofollow'
