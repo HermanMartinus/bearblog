@@ -20,14 +20,14 @@ Directives | Bear Blog
     <form method="POST" class="post-form full-width">
         {% csrf_token %}
         <p style="line-height: 0">
-            <button onclick="event.preventDefault(); window.location = '/{{ blog.subdomain}}/dashboard/settings/'">&#8592; Back</button>
+            <button type="button" onclick="event.preventDefault(); window.location = '/{{ blog.subdomain}}/dashboard/settings/'">&#8592; Back</button>
             <button type="submit">Save</button>
-            <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}');">View</button>
+            <button type="button" onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}');">View</button>
         </p>
         <p>
             <label>Head directive:</label>
             <br>
-            <textarea name="header" style="height: 150px;">{{ blog.header_directive }}</textarea>
+            <textarea name="header" style="height: 200px;">{{ blog.header_directive }}</textarea>
             <p style="color:lightsalmon;font-size:small;display:none;" class="domain-error">
                 ʕ ·ᴥ·ʔ The custom_domain attribute should be with the blog attributes on the <a href="{% url 'dashboard' id=blog.subdomain %}">home page</a>, not here. 
             </p>
@@ -35,23 +35,10 @@ Directives | Bear Blog
         <p>
             <label>Footer directive:</label>
             <br>
-            <textarea name="footer" style="height: 150px;">{{ blog.footer_directive }}</textarea>
+            <textarea name="footer" style="height: 200px;">{{ blog.footer_directive }}</textarea>
             <span class="helptext">Markdown/HTML</span>
         </p>
     </form>
 </main>
-
-<script>
-    const textarea = document.querySelector('textarea[name="header"]');
-    const domainErrorDiv = document.querySelector('.domain-error');
-
-    textarea.addEventListener('input', () => {
-        if (textarea.value.includes('custom_domain')) {
-        domainErrorDiv.style.display = 'block';
-        } else {
-        domainErrorDiv.style.display = 'none';
-        }
-    });
-</script>
 
 {% endblock %}

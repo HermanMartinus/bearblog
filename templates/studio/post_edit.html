@@ -27,6 +27,7 @@ New post | Bear Blog
 <form method="POST" class="post-form full-width">
     <p class="sticky-controls">
         <button
+            type="button" 
             onclick="event.preventDefault(); sessionStorage.clear(); window.location = '{% if post.is_page or is_page %}{% url 'pages_edit' id=blog.subdomain %}{% else %}{% url 'posts_edit' id=blog.subdomain %}{% endif %}'"
         >
             &#8592; Back
@@ -34,7 +35,7 @@ New post | Bear Blog
         <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
         
         {% if post %}
-            <button onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}/{{ post.slug }}{% if not post.publish %}?token={{ post.token }}{% endif %}');">
+            <button type="button" onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}/{{ post.slug }}{% if not post.publish %}?token={{ post.token }}{% endif %}');">
                 View{% if not post.publish %} draft{% endif %}
             </button>
             <button

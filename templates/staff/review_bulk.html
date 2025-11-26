@@ -92,18 +92,18 @@ Herman
     <br>
     <br>
     <div class="controls">
-        <button onclick="approveBlogWithEmail({{ blog.pk }})">Approve and email</button>
-        <button onclick="approveBlog({{ blog.pk }})">Approve</button>
-        <button onclick="blockBlog({{ blog.pk }})">Block</button>
-        <button onclick="flagBlog({{ blog.pk }})">Flag</button>
-        <button onclick="ignoreBlog({{ blog.pk }})">Ignore</button>
-        {% comment %} <button onclick="deleteBlog({{ blog.pk }})">Delete</button> {% endcomment %}
+        <button type="button" onclick="approveBlogWithEmail({{ blog.pk }})">Approve and email</button>
+        <button type="button" onclick="approveBlog({{ blog.pk }})">Approve</button>
+        <button type="button" onclick="blockBlog({{ blog.pk }})">Block</button>
+        <button type="button" onclick="flagBlog({{ blog.pk }})">Flag</button>
+        <button type="button" onclick="ignoreBlog({{ blog.pk }})">Ignore</button>
+        {% comment %} <button type="button" onclick="deleteBlog({{ blog.pk }})">Delete</button> {% endcomment %}
     </div>
 
     <hr>
 </div>
 {% endfor %}
-<button onclick="window.scrollTo(0, 0); setTimeout(function() { window.location.reload(); }, 10)">Next ››</button>
+<button type="button" onclick="window.scrollTo(0, 0); setTimeout(function() { window.location.reload(); }, 10)">Next ››</button>
 {% endblock %}
 
 {% block footer %}

@@ -13,7 +13,7 @@
 <h1>Customise dashboard</h1>
 <form method="POST" class="post-form full-width">{% csrf_token %}
     <p style="line-height: 0">
-        <button onclick="event.preventDefault(); window.location = '/dashboard/'">&#8592; Back</button>
+        <button type="button" onclick="event.preventDefault(); window.location = '/dashboard/'">&#8592; Back</button>
         <button type="submit">Save</button>
     </p>
     {{ form.as_p }}

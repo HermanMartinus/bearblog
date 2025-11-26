@@ -92,7 +92,7 @@ Staff dashboard  ʕง•ᴥ•ʔง
             <input type="checkbox" name="unblock"> Unblock
         </label>
         <br>
-        <button>Check</button>
+        <button type="submit">Check</button>
     </form>
 
     <h2>Import posts from CSV backup</h2>
@@ -109,7 +109,7 @@ Staff dashboard  ʕง•ᴥ•ʔง
         {% csrf_token %}
         <input type="text" name="subdomain" placeholder="Blog subdomain..." required>
         <input type="email" name="email" placeholder="Recipient account email address..." required>
-        <button>Migrate</button>
+        <button type="submit">Migrate</button>
     </form>
 
     {% comment %} <h2>Empty blogs</h2>
@@ -135,7 +135,7 @@ Staff dashboard  ʕง•ᴥ•ʔง
         </li>
         {% endfor %}
     </ul>
-    <button onclick="if (confirm('Are you sure?')) {window.location = '{% url 'delete_empty' %}'}">Delete empty</button> {% endcomment %}
+    <button type="button" onclick="if (confirm('Are you sure?')) {window.location = '{% url 'delete_empty' %}'}">Delete empty</button> {% endcomment %}
 
     {% endif %}
 </main>

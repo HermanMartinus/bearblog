@@ -27,8 +27,8 @@
 <form method="POST" id="import-contacts" class="full-width">
     <p>
     <input type="submit" value="Save">
-    <button onclick="event.preventDefault();window.location = '?export-csv=True'" download>Export csv</button>
-    <button onclick="event.preventDefault();window.location = '?export-txt=True'" download>Export txt</button>
+    <button type="button" onclick="event.preventDefault();window.location = '?export-csv=True'" download>Export csv</button>
+    <button type="button" onclick="event.preventDefault();window.location = '?export-txt=True'" download>Export txt</button>
     </p>
     {% csrf_token %}
     <textarea name="email_addresses" style="height: 400px">{% if email_addresses_text %}{{email_addresses_text}}{% else %}

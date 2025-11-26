@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<button onclick="window.history.back()">← Back</button>
+<button type="button" onclick="window.history.back()">← Back</button>
 {% comment %} <h1>Upgrade</h1> {% endcomment %}
 
 {% if not request.user.settings.upgraded %}
@@ -60,7 +60,7 @@
 {% endif %}
 
 <p>
-    <button onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][user_id]={{user.id}}')">
+    <button type="button" onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][user_id]={{user.id}}')">
         Upgrade
     </button>
 </p>
