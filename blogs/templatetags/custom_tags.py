@@ -156,6 +156,7 @@ class MyRenderer(HTMLRenderer):
         highlighted_code = highlight(code, lexer, formatter)
         return highlighted_code
 
+
 markdown_renderer = create_markdown(
     renderer=MyRenderer(),
     plugins=['math', 'strikethrough', 'footnotes', 'table', 'superscript', 'subscript', 'mark', 'task_lists', 'abbr', RSTDirective([
@@ -177,9 +178,8 @@ def markdown(content, blog=None, post=None, tz=None):
     content = fix_links(content)
 
     try:
-        # TODO: Implement excluding_script to not parse script tags
-        # processed_markup = excluding_script(content)
-        processed_markup = markdown_renderer(content)
+        processed_markup = excluding_script(content)
+        # processed_markup = markdown_renderer(content)
     except TypeError:
         return ''
 
@@ -197,20 +197,18 @@ def markdown(content, blog=None, post=None, tz=None):
 # Exclude script and style tags from markdown rendering
 def excluding_script(markup):
     placeholders = {}
-
     def placeholder_div(match):
-        key = f"PLACEHOLDER_{len(placeholders)}"
-        print(placeholders)
+        key = f"<!--SCRIPT_PLACEHOLDER_{len(placeholders)}-->"
         placeholders[key] = match.group(0)
         return key
-
-    markup = re.sub(r'(<script.*?>.*?</script>|<style.*?>.*?</style>)', placeholder_div, markup, flags=re.DOTALL)
-
+    
+    markup = re.sub(r'(<script.*?>.*?</script>|<style.*?>.*?</style>)', 
+                    placeholder_div, markup, flags=re.DOTALL)
     markup = markdown_renderer(markup)
-
-    for key in sorted(placeholders.keys(), reverse=True):
-        markup = markup.replace(key, placeholders[key])
-
+    
+    for key, value in placeholders.items():
+        markup = markup.replace(key, value)
+    
     return markup
 
 
@@ -338,10 +336,6 @@ def element_replacement(markup, blog, post=None, tz=None):
             markup = markup.replace('{{ previous_post }}', previous_link)
 
     translation.activate(current_lang)
-
-    # Replace newlines with breaks
-    # This has to be excluded from script as well
-    # markup = markup.replace('\\n', '<br>')
 
     return markup
 
