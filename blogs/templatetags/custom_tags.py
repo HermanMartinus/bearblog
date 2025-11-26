@@ -340,7 +340,8 @@ def element_replacement(markup, blog, post=None, tz=None):
     translation.activate(current_lang)
 
     # Replace newlines with breaks
-    markup = markup.replace('\\n', '<br>')
+    # This has to be excluded from script as well
+    # markup = markup.replace('\\n', '<br>')
 
     return markup
 
