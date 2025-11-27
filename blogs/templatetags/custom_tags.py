@@ -178,8 +178,8 @@ def markdown(content, blog=None, post=None, tz=None):
     content = fix_links(content)
 
     try:
-        processed_markup = excluding_script(content)
-        # processed_markup = markdown_renderer(content)
+        # processed_markup = excluding_script(content)
+        processed_markup = markdown_renderer(content)
     except TypeError:
         return ''
 
