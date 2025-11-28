@@ -178,7 +178,6 @@ def markdown(content, blog=None, post=None, tz=None):
     content = fix_links(content)
 
     try:
-        # processed_markup = excluding_script(content)
         processed_markup = markdown_renderer(content)
     except TypeError:
         return ''
@@ -192,24 +191,6 @@ def markdown(content, blog=None, post=None, tz=None):
         processed_markup = excluding_pre(processed_markup, blog, post, tz=tz)
 
     return mark_safe(processed_markup)
-
-
-# Exclude script and style tags from markdown rendering
-def excluding_script(markup):
-    placeholders = {}
-    def placeholder_div(match):
-        key = f"<!--SCRIPT_PLACEHOLDER_{len(placeholders)}-->"
-        placeholders[key] = match.group(0)
-        return key
-    
-    markup = re.sub(r'(<script.*?>.*?</script>|<style.*?>.*?</style>)', 
-                    placeholder_div, markup, flags=re.DOTALL)
-    markup = markdown_renderer(markup)
-    
-    for key, value in placeholders.items():
-        markup = markup.replace(key, value)
-    
-    return markup
 
 
 # Replace elements in all but pre and code tags

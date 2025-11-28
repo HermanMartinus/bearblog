@@ -160,17 +160,23 @@ class RateLimitMiddleware:
 
     def __call__(self, request):
         # Skip rate limiting for ping and feed endpoints
-        if 'ping' in request.path or 'feed' in request.path or 'hit' in request.path:
+        if 'ping' in request.path or 'feed' in request.path:
             return self.get_response(request)
 
         client_ip_address = client_ip(request)
         current_time = time.time()
 
+        full_path = request.build_absolute_uri()
+
         # Ban WP scrapers
-        if '.php' in request.path or '.env' in request.path:
+        if '.php' in full_path or '.env' in full_path:
+            self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
+        
+
+        # Ban SQL injection attacks
+        if 'sysdate(' in  full_path or 'sleep(' in full_path or 'waitfor%20delay' in full_path:
             self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
 
-        full_path = request.build_absolute_uri()
 
         # Check ban
         if client_ip_address in self.banned_ips and current_time < self.banned_ips[client_ip_address]:
