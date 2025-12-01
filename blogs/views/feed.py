@@ -10,13 +10,8 @@ import re
 
 
 def clean_string(s):
-    """Remove all XML-incompatible characters"""
-    if s is None:
-        return ''
-    # Convert to string if not already
-    s = str(s)
-    # Remove NULL bytes and control characters (except tab, newline, carriage return)
     s = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]', '', s)
+    s = re.sub(r'[\uFFFE\uFFFF\uFDD0-\uFDEF]', '', s)
     return s
 
 

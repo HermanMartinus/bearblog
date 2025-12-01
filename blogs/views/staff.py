@@ -244,6 +244,8 @@ def import_posts_from_csv(subdomain, csv_file):
         from io import StringIO
         import datetime
         
+        csv.field_size_limit(20 * 1024 * 1024)  # 10MB limit
+
         decoded_file = csv_file.read().decode('utf-8-sig')  # Use utf-8-sig to handle BOM character
         csv_reader = csv.DictReader(StringIO(decoded_file))
         
