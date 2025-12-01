@@ -10,7 +10,14 @@ import re
 
 
 def clean_string(s):
-    return re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', s)
+    """Remove all XML-incompatible characters"""
+    if s is None:
+        return ''
+    # Convert to string if not already
+    s = str(s)
+    # Remove NULL bytes and control characters (except tab, newline, carriage return)
+    s = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]', '', s)
+    return s
 
 
 def feed(request):
@@ -70,7 +77,6 @@ def generate_feed(blog, feed_type="atom", tag=None, page=0):
             fe.summary(clean_string(post.meta_description))
         
         post_content = post.content.replace('{{ email-signup }}', '')
-        # post_content = post.content.replace('{{ email_signup }}', '')
 
         fe.content(clean_string(markdown(post_content, blog, post)), type="html")
         
