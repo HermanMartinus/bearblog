@@ -36,6 +36,7 @@ def feed(request):
     
     response = HttpResponse(feed, content_type=f'application/{feed_type}+xml')
     response['Cache-Tag'] = blog.subdomain
+    response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
     return response
 
 
