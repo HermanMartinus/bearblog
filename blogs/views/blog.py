@@ -150,7 +150,7 @@ def posts(request, blog):
     )
 
     response['Cache-Tag'] = blog.subdomain
-    response['Cache-Control'] = "max-age=43200"
+    response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
 
     return response
 
@@ -212,7 +212,7 @@ def post(request, slug):
 
     if post.publish and not request.GET.get('token'):
         response['Cache-Tag'] = blog.subdomain
-        response['Cache-Control'] = "max-age=43200"
+        response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
 
     return response
 
@@ -279,7 +279,7 @@ def sitemap(request):
     
     response = render(request, 'sitemap.xml', {'blog': blog, 'posts': posts}, content_type='text/xml')
     response['Cache-Tag'] = blog.subdomain
-    response['Cache-Control'] = "max-age=43200"
+    response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
     return response
 
 
@@ -290,7 +290,7 @@ def robots(request):
 
     response = render(request, 'robots.txt',  {'blog': blog}, content_type="text/plain")
     response['Cache-Tag'] = blog.subdomain
-    response['Cache-Control'] = "max-age=43200"
+    response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
     return response
 
 

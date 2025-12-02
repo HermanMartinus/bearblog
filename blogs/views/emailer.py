@@ -75,7 +75,7 @@ def subscribe(request):
         }
     )
     response['Cache-Tag'] = blog.subdomain
-    response['Cache-Control'] = "max-age=43200"
+    response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
     return response
 
 
