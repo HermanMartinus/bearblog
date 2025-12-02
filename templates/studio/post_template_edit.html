@@ -16,6 +16,32 @@
         <button type="button" onclick="event.preventDefault(); window.location = '/{{ blog.subdomain }}/dashboard/posts/'">&#8592; Back</button>
         <button type="submit">Update</button>
     </p>
+
+    <details style="font-size: 12px; margin-bottom: 10px;">
+        <summary>
+            Attributes
+        </summary>
+        <p>
+            title: Bears' title template<br>
+            link: bears-url-template<br>
+            is_page: false<br>
+            meta_description: Meta necessities | Bear<br>
+            meta_image: https://example.com/bear.jpeg<br>
+            lang: en<br>
+            tags: bears, writing, thoughts<br>
+            make_discoverable: true
+        </p>
+        <a href="https://docs.bearblog.dev/post" target="_blank">
+            More info
+        </a>
+    </details>
+
     {{ form.as_p }}
+
+    <span class="helptext sticky">
+        <span>
+            <a href='https://herman.bearblog.dev/markdown-cheatsheet/' target='_blank'>Markdown syntax</a>
+        </span>
+    </span>
 </form>
 {% endblock %}
