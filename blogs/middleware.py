@@ -171,6 +171,11 @@ class RateLimitMiddleware:
         # Ban WP scrapers
         if '.php' in full_path or '.env' in full_path:
             self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
+
+        # Honeypot
+        if 'pot-of-honey' in full_path:
+            print("Banned: Caught in the honeypot")
+            self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
         
 
         # Ban SQL injection attacks

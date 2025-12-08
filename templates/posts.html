@@ -57,6 +57,7 @@
 
 <small>
     <div class="tags" id="tags">
+        <a rel="nofollow" href="/{{ blog.blog_path }}/?q=pot-of-honey" style="font-size: 0;">#potofhoney</a>
         {% for tag in blog.tags %}
             {% if tag not in active_tags and tag in available_tags %}
                 <a rel="nofollow" href="/{{ blog.blog_path }}/?q={% if active_tags %}{{ active_tags|join:',' }},{% endif %}{{ tag }}">#{{ tag }}</a>
