@@ -166,7 +166,11 @@ class RateLimitMiddleware:
         client_ip_address = client_ip(request)
         current_time = time.time()
 
-        full_path = request.build_absolute_uri()
+        full_path = request.get_full_path()
+
+        # Prevent long paths
+        if len(full_path) > 400:
+            return JsonResponse({"error": "URI Too Long"}, status=414)
 
         # Ban WP scrapers
         if '.php' in full_path or '.env' in full_path:
