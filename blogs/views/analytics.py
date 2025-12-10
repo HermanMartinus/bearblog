@@ -21,6 +21,13 @@ import pygal
 import djqscsv
 
 
+def get_int(value, default):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
+
 @login_required
 def analytics(request, id):
     if request.user.is_superuser:
@@ -92,7 +99,7 @@ def render_analytics(request, blog, public=False):
     now = timezone.now()
     post_filter = request.GET.get('post', False)
     referrer_filter = request.GET.get('referrer', False)
-    days_filter = int(request.GET.get('days', 7))
+    days_filter = get_int(request.GET.get('days', 7), 7)
     start_date = (now - timedelta(days=days_filter)).date()
     end_date = now.date()
 
@@ -202,7 +209,7 @@ def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
 
 @csrf_exempt
 def hit(request):
-    if request.GET.get('blog') and int(request.GET.get('score', 0)) > 50 and not request.GET.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
+    if request.GET.get('blog') and get_int(request.GET.get('score', 0), 0) > 50 and not request.GET.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
         user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
 
         # Prevent duplicates with ip hash + date
