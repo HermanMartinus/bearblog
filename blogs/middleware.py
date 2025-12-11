@@ -1,5 +1,5 @@
 from django.db import connection
-from django.shortcuts import redirect
+from django.shortcuts import render
 from django.urls import resolve, Resolver404
 from django.http import JsonResponse
 from django.middleware.csrf import (
@@ -144,6 +144,23 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
                     reason = REASON_BAD_ORIGIN
                 
                 return self._reject(request, reason)
+
+
+class BotWallMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if 'ping' in request.path or 'feed' in request.path:
+            return self.get_response(request)
+         
+        if request.GET.get('q'):
+            if request.COOKIES.get("timezone"):
+                return self.get_response(request)
+
+            return render(request, "botwall.html", status=200)
+
+        return self.get_response(request)
 
    
 class RateLimitMiddleware:

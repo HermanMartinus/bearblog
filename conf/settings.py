@@ -73,6 +73,7 @@ AUTHENTICATION_BACKENDS = (
 
 MIDDLEWARE = [
     'blogs.middleware.RateLimitMiddleware',
+    'blogs.middleware.BotWallMiddleware',
     'blogs.middleware.ConditionalXFrameOptionsMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
