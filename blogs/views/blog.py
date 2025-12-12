@@ -11,6 +11,8 @@ from blogs.views.analytics import render_analytics
 
 import os
 import tldextract
+import json
+import base64
 
 def resolve_address(request):
     http_host = request.get_host()
@@ -112,29 +114,38 @@ def home(request):
 def posts(request, blog):
     if not blog:
         blog = resolve_address(request)
-        if not blog:
-            return not_found(request)
+    if not blog:
+        return not_found(request)
     
     tag_param = request.GET.get('q', '')
     tags = [t.strip() for t in tag_param.split(',')] if tag_param else []
     tags = [t for t in tags if t]  # Remove empty strings
-
-    posts = blog.posts.filter(blog=blog, publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
+    
+    posts = blog.posts.filter(
+        blog=blog, 
+        publish=True, 
+        published_date__lte=timezone.now(), 
+        is_page=False
+    ).order_by('-published_date')
+    
     if tags:
         # Filter posts that contain ALL specified tags
         posts = [post for post in posts if all(tag in post.tags for tag in tags)]
-        
         available_tags = set()
         for post in posts:
             available_tags.update(post.tags)
-
     else:
         available_tags = set(blog.tags)
-
+    
+    # Prepare tags for JavaScript rendering
+    # Only include tags that aren't already active and are available
+    tags_to_show = [tag for tag in blog.tags if tag not in tags and tag in available_tags]
+    tags_json = base64.b64encode(json.dumps(tags_to_show).encode()).decode()
+    active_tags_str = ','.join(tags) if tags else ''
+    
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
-
     blog_path_title = blog.blog_path.replace('-', ' ').capitalize() or 'Blog'
-
+    
     response = render(
         request,
         'posts.html',
@@ -145,13 +156,14 @@ def posts(request, blog):
             'query': tag_param,
             'active_tags': tags,
             'available_tags': available_tags,
-            'blog_path_title': blog_path_title
+            'blog_path_title': blog_path_title,
+            'tags_json': tags_json,
+            'active_tags_str': active_tags_str,
         }
     )
-
+    
     response['Cache-Tag'] = blog.subdomain
     response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
-
     return response
 
 
