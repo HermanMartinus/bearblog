@@ -27,25 +27,37 @@ New post | Bear Blog
 <form method="POST" class="post-form full-width">
     <p class="sticky-controls">
         <button
-            type="button" 
+            type="button"
+            id="back-button"
             onclick="event.preventDefault(); sessionStorage.clear(); window.location = '{% if post.is_page or is_page %}{% url 'pages_edit' id=blog.subdomain %}{% else %}{% url 'posts_edit' id=blog.subdomain %}{% endif %}'"
         >
             &#8592; Back
         </button>
-        <button type="submit" onclick="document.getElementById('publish').value = true;">Publish</button>
+        <button type="submit" id="publish-button" onclick="document.getElementById('publish').value = true;">Publish</button>
         
         {% if post %}
-            <button type="button" onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}/{{ post.slug }}{% if not post.publish %}?token={{ post.token }}{% endif %}');">
+            <button type="button" id="view-button" onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}/{{ post.slug }}{% if not post.publish %}?token={{ post.token }}{% endif %}');">
                 View{% if not post.publish %} draft{% endif %}
             </button>
             <button
+                type="button"
+                id="delete-button"
                 style="color: red; float: right;"
                 onclick="event.preventDefault(); deletePost();"
             >
                 Delete
             </button>
         {% endif %}
-        <button type="submit" {% if post.publish %}style="color: lightsalmon;"{% endif %} onclick="document.getElementById('publish').value = false;">
+        <button
+            type="submit"
+            {% if post.publish %}
+            style="color: lightsalmon;"
+            id="unpublish-button"
+            {% else %}
+            id="save-button"
+            {% endif %}
+            onclick="document.getElementById('publish').value = false;"
+        >
             {% if post.publish %}
             Unpublish
             {% else %}
