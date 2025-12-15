@@ -186,8 +186,9 @@ def email_new_upgrades(request):
         send_async_mail(
             "You upgraded!",
             render_to_string('emails/upgraded.html'),
+            'Herman Martinus <herman@mg.bearblog.dev>',
+            [user.email],
             'Herman Martinus <herman@bearblog.dev>',
-            [user.email]
         )
         user.settings.upgraded_email_sent = True
         user.settings.save()
@@ -471,8 +472,9 @@ def approve(request, pk):
             send_async_mail(
                 "I've just reviewed your blog",
                 message,
+                'Herman Martinus <herman@mg.bearblog.dev>',
+                [blog.user.email],
                 'Herman Martinus <herman@bearblog.dev>',
-                [blog.user.email]
             )
         return HttpResponse("Approved")
 
@@ -510,8 +512,9 @@ def ignore(request, pk):
                 send_async_mail(
                     "Welcome to Bear",
                     render_to_string('emails/welcome.html'),
+                    'Herman Martinus <herman@mg.bearblog.dev>',
+                    [blog.user.email],
                     'Herman Martinus <herman@bearblog.dev>',
-                    [blog.user.email]
                 )
         blog.ignored_date = timezone.now()
         blog.flagged = False

@@ -1,5 +1,4 @@
 from curses.ascii import HT
-import hashlib
 import re
 
 import djqscsv
@@ -9,7 +8,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 
-from blogs.helpers import send_async_mail
 from blogs.models import Blog, Subscriber
 from blogs.views.blog import resolve_address, not_found
 

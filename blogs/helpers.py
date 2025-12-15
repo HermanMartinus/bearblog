@@ -190,30 +190,33 @@ def send_mass_html_mail(datatuple, fail_silently=False, user=None, password=None
 
 
 class EmailThread(threading.Thread):
-    def __init__(self, subject, html_message, from_email, recipient_list):
+    def __init__(self, subject, html_message, from_email, recipient_list, reply_to=None):
         self.subject = subject
         self.html_message = html_message
         self.from_email = from_email
         self.recipient_list = recipient_list
+        self.reply_to = reply_to
         threading.Thread.__init__(self)
-
+    
     def run(self):
-        send_mail(
-            self.subject,
-            self.html_message,
-            self.from_email,
-            self.recipient_list,
-            fail_silently=True,
-            html_message=self.html_message)
+        email = EmailMultiAlternatives(
+            subject=self.subject,
+            body=self.html_message,
+            from_email=self.from_email,
+            to=self.recipient_list,
+            reply_to=self.reply_to if self.reply_to else None,
+        )
+        email.attach_alternative(self.html_message, "text/html")
+        email.send(fail_silently=True)
 
 
 # Important! All members of the recipient list will see the other recipients in the 'To' field
-def send_async_mail(subject, html_message, from_email, recipient_list):
+def send_async_mail(subject, html_message, from_email, recipient_list, reply_to=None):
     if settings.DEBUG:
         print(html_message)
     else:
         print('Sent email to ', recipient_list)
-        EmailThread(subject, html_message, from_email, recipient_list).start()
+    EmailThread(subject, html_message, from_email, recipient_list, reply_to).start()
 
 
 def random_post_link():
