@@ -188,7 +188,7 @@ def email_new_upgrades(request):
             render_to_string('emails/upgraded.html'),
             'Herman Martinus <herman@mg.bearblog.dev>',
             [user.email],
-            'Herman Martinus <herman@bearblog.dev>',
+            ['Herman Martinus <herman@bearblog.dev>'],
         )
         user.settings.upgraded_email_sent = True
         user.settings.save()
@@ -474,7 +474,7 @@ def approve(request, pk):
                 message,
                 'Herman Martinus <herman@mg.bearblog.dev>',
                 [blog.user.email],
-                'Herman Martinus <herman@bearblog.dev>',
+                ['Herman Martinus <herman@bearblog.dev>'],
             )
         return HttpResponse("Approved")
 
@@ -514,7 +514,7 @@ def ignore(request, pk):
                     render_to_string('emails/welcome.html'),
                     'Herman Martinus <herman@mg.bearblog.dev>',
                     [blog.user.email],
-                    'Herman Martinus <herman@bearblog.dev>',
+                    ['Herman Martinus <herman@bearblog.dev>'],
                 )
         blog.ignored_date = timezone.now()
         blog.flagged = False
