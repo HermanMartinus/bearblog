@@ -76,7 +76,7 @@ def discover(request):
         if subdomain:
             if request.user.is_authenticated:
                 # Update user settings
-                hide_list = request.user.settings.discovery_hide_list
+                hide_list = request.user.settings.discovery_hide_list or []
                 
                 if action == 'hide' and subdomain not in hide_list:
                     hide_list.append(subdomain)
