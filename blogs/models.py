@@ -24,6 +24,7 @@ class UserSettings(models.Model):
     order_id = models.CharField(max_length=100, blank=True, null=True)
     order_email = models.CharField(max_length=100, blank=True, null=True)
     upgraded_email_sent = models.BooleanField(default=False)
+    discovery_hide_list = models.JSONField(default=dict)
 
     dashboard_styles = models.TextField(blank=True)
     dashboard_footer = models.TextField(blank=True)

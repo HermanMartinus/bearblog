@@ -1,11 +1,11 @@
 from django.http.response import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.utils import timezone
 from django.db.models.functions import Length
 
-from blogs.models import Post
+from blogs.models import Post, Blog
 from blogs.helpers import clean_text
 
 from feedgen.feed import FeedGenerator
@@ -68,6 +68,27 @@ def admin_actions(request):
 def discover(request):
     admin_actions(request)
 
+    # Handle hide/unhide actions
+    if request.method == 'POST':
+        subdomain = request.POST.get('subdomain')
+        action = request.POST.get('action')  # 'hide' or 'unhide'
+
+        if subdomain:
+            if request.user.is_authenticated:
+                # Update user settings
+                hide_list = request.user.settings.discovery_hide_list or request.COOKIES.get('hide_list', [])
+                
+                if action == 'hide' and subdomain not in hide_list:
+                    hide_list.append(subdomain)
+                elif action == 'unhide' and subdomain in hide_list:
+                    hide_list.remove(subdomain)
+                
+                request.user.settings.discovery_hide_list = hide_list
+                request.user.settings.save()
+                
+                # Redirect to same page to prevent resubmission
+                return redirect(request.get_full_path())
+
     try:
         page = int(request.GET.get("page", 0) or 0)
     except ValueError:
@@ -79,19 +100,15 @@ def discover(request):
     newest = request.GET.get("newest")
 
     base_query = get_base_query(request.user)
-
-    hide_list_raw = request.COOKIES.get('hide_list', '').strip()
-
-    if hide_list_raw:
-        hide_list_raw = ','.join(x for x in hide_list_raw.split(',') if x.strip())
-        hide_list_raw = hide_list_raw.replace(' ', ',').replace('https://', '').replace('http://', '')
-        
-        hide_list = hide_list_raw.replace(f".{os.getenv('MAIN_SITE_HOSTS').split(',')[0]}", '').split(',')
-        hide_list = [x.split('/')[0] for x in hide_list if x.strip()]
-        print("Hide list:", hide_list)
-        hide_list_raw = ','.join(hide_list)
-
-        base_query = base_query.exclude(blog__subdomain__in=hide_list).exclude(blog__domain__in=hide_list)
+    
+    # Get blog objects for display
+    hide_list = None
+    if request.user.is_authenticated:
+        hide_list_subdomains = request.user.settings.discovery_hide_list or []
+        hide_list = Blog.objects.filter(subdomain__in=hide_list_subdomains)
+        # Exclude hidden blogs from query
+        if hide_list:
+            base_query = base_query.exclude(blog__in=hide_list)
 
     lang = request.COOKIES.get('lang')
 
@@ -116,7 +133,7 @@ def discover(request):
         "next_page": page + 1,
         "posts_from": posts_from,
         "newest": newest,
-        "hide_list_cookie": hide_list_raw.split(',') if hide_list_raw else None,
+        "hide_list": hide_list
     })
 
 
