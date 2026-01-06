@@ -19,14 +19,17 @@
 
 {% block content %}
 <h1>Analytics{% if public %} for {{ blog.title }}{% endif %}</h1>
+{% if request.user.settings.upgraded %}
 <p>
     <b>Reading now:</b> {{ on_site|intcomma }}
     
 </p>
+{% endif %}
 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
     <small>
         Displaying the past {{ days_filter }} days
     </small>
+    {% if request.user.settings.upgraded %}
     <span>
         <button onclick="window.location = '?days=7{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last week</button>
         <button onclick="window.location = '?days=30{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last month</button>
@@ -35,6 +38,7 @@
         <button onclick="window.location = '?days=365{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">Last year</button>
         <button onclick="window.location = '?days=99999{% if post_filter %}&post={{post_filter}}{% endif %}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}'">All time</button>
     </span>
+    {% endif %}
 </div>
 
 <canvas id="hitsChart" height="200"></canvas>
@@ -48,6 +52,8 @@
     <br>
     <b>Unique visitors:</b> ~{{ unique_visitors|intcomma }}
 <p>
+
+{% if request.user.settings.upgraded %}
 {% if post_filter %}
     <small>Post: <b>{{ posts.0.title }}</b></small>
     <a href="?days={{days_filter}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}"><button>Remove filter</button></a>
@@ -134,6 +140,15 @@
         </ul>
     </div>
 </div>
+
+{% else %}
+<h3>Need more in-depth analytics?</h3>
+<p>
+    <a href="{% url 'upgrade' %}">Upgrade</a> to access in-depth, long-term analytics (<a href="https://docs.bearblog.dev/analytics/" target="_blank">more info</a>).
+</p>
+{% endif %}
+
+{{ request.user.settings.dashboard_footer | safe }}
 {% endblock %}
 
 

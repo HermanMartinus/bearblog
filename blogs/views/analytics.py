@@ -35,59 +35,6 @@ def analytics(request, id):
     else:
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
-    if blog.user.settings.upgraded:
-        return analytics_upgraded(request, id=id)
-
-    time_threshold = False
-    chart_data = []
-
-    days = 7
-
-    time_threshold = timezone.now() - timedelta(days=days)
-
-    posts = Post.objects.annotate(
-        hit_count=Count('hit', filter=Q(hit__created_date__gt=time_threshold))).filter(
-        blog=blog,
-        publish=True,
-    ).order_by('-hit_count', '-published_date')
-
-    hits = Hit.objects.filter(post__blog=blog, created_date__gt=time_threshold)
-
-    for single_date in daterange(timezone.now() - timedelta(days=days), timezone.now() + timedelta(days=1)):
-        chart_data.append({
-            "date": single_date.strftime("%Y-%m-%d"),
-            "hits": len(list(filter(lambda hit: hit.created_date.date() == single_date.date(), list(hits))))
-        })
-
-    unique_reads = posts.aggregate(Sum('hit_count'))
-    unique_visitors = len(hits.values('hash_id').distinct())
-
-    chart = pygal.Bar(height=300, show_legend=False)
-    mark_list = [x['hits'] for x in chart_data]
-    [x['date'] for x in chart_data]
-    chart.add('Reads', mark_list)
-    chart.x_labels = [x['date'] for x in chart_data]
-    chart_render = chart.render().decode('utf-8')
-
-    return render(request, 'dashboard/analytics.html', {
-        'unique_reads': unique_reads,
-        'unique_visitors': unique_visitors,
-        'posts': posts,
-        'blog': blog,
-        'chart': chart_render
-    })
-
-
-@login_required
-def analytics_upgraded(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-
-    if not blog.user.settings.upgraded:
-        return redirect('analytics', id=blog.subdomain)
-
     if request.GET.get('export', False):
         hits = Hit.objects.filter(post__blog=blog).order_by('created_date')
         return djqscsv.render_to_csv_response(hits)

@@ -69,7 +69,6 @@ urlpatterns = [
 
     # Analytics
     path('<id>/dashboard/analytics/', analytics.analytics, name='analytics'),
-    path('<id>/dashboard/analytics-upgraded/', analytics.analytics_upgraded, name="analytics_upgraded"),
 
     path('<id>/dashboard/opt-in-review/', dashboard.opt_in_review, name='opt_in_review'),
 
