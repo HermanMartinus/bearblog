@@ -55,7 +55,8 @@ HOST_WHITELIST = [
     'archive.org',
     'panel.radiocast.net',
     'embed.ente.io',
-    'app.hearthis.at'
+    'app.hearthis.at',
+    'datawrapper.de'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
