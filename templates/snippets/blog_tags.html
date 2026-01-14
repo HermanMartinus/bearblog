@@ -1,7 +1,6 @@
 {% if tags %}
 <small>
     <div class="tags">
-        <a rel="nofollow" href="/{{ blog.blog_path }}/?q=pot-of-honey" style="display:none;">#potofhoney</a>
     {% for tag in tags %}
         <a rel="nofollow" href="/{{ blog_path }}/?q={{ tag }}">#{{ tag }}</a>
     {% endfor %}
