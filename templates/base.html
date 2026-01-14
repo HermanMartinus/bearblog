@@ -58,64 +58,59 @@
 
   {% if blog %}
   <script>
-        const times = document.querySelectorAll('time');
-        const format_string = "{{ blog.date_format }}" || "d M, Y"
+        (() => {
+          "use strict";
 
-        times.forEach(time => {
-            time.innerText = formatDate(time.dateTime, format_string)
-        });
+          // 1. Select all <time> elements
+          const times = document.querySelectorAll("time");
+          if (!times.length) return;
 
-        function formatDate(dateStr, formatStr) {
-          const date = new Date(dateStr);
-          const day = date.getDate();
-          const month = date.getMonth();
-          const year = date.getFullYear();
-          const weekday = date.getDay();
-          const hours = date.getHours();
-          const minutes = date.getMinutes();
-          const monthsFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-          const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-          const daysFull = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-          const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-          
-          function getOrdinal(n) {
-              const s = ['th', 'st', 'nd', 'rd'];
-              const v = n % 100;
-              return s[(v - 20) % 10] || s[v] || s[0];
-          }
-          
-          const map = {
-              'd': () => day.toString().padStart(2, '0'),
-              'm': () => (month + 1).toString().padStart(2, '0'),
-              'Y': () => year.toString(),
-              'y': () => year.toString().slice(-2),
-              'F': () => monthsFull[month],
-              'j': () => day.toString(),
-              'D': () => daysShort[weekday],
-              'l': () => daysFull[weekday],
-              'S': () => getOrdinal(day),
-              'M': () => monthsShort[month],
-              'H': () => hours.toString().padStart(2, '0'),
-              'h': () => {
-                  let h = hours % 12;
-                  h = h === 0 ? 12 : h;
-                  return h.toString().padStart(2, '0');
+          // 2. Define the formatting logic
+          function formatDate(dateStr, formatStr, locale) {
+            const date = new Date(dateStr);
+            
+            // Helper to use native browser localization
+            const getPart = (options) => new Intl.DateTimeFormat(locale, options).format(date);
+
+            const day = date.getDate();
+            const month = date.getMonth();
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+
+            const map = {
+              'd': () => String(day).padStart(2, '0'),
+              'j': () => String(day),
+              'S': () => {
+                const v = day % 100;
+                return ['th', 'st', 'nd', 'rd'][(v > 10 && v < 14) ? 0 : (v % 10)] || 'th';
               },
-              'g': () => {
-                  let h = hours % 12;
-                  return h === 0 ? '12' : h.toString();
-              },
-              'i': () => minutes.toString().padStart(2, '0'),
+              'm': () => String(month + 1).padStart(2, '0'),
+              'M': () => getPart({ month: 'short' }),
+              'F': () => getPart({ month: 'long' }),
+              'Y': () => getPart({ year: 'numeric' }),
+              'y': () => getPart({ year: '2-digit' }),
+              'D': () => getPart({ weekday: 'short' }),
+              'l': () => getPart({ weekday: 'long' }),
+              'H': () => String(hours).padStart(2, '0'),
+              'h': () => String(hours % 12 || 12).padStart(2, '0'),
+              'g': () => String(hours % 12 || 12),
+              'i': () => String(minutes).padStart(2, '0'),
               'a': () => hours < 12 ? 'am' : 'pm',
               'A': () => hours < 12 ? 'AM' : 'PM',
-          };
-          
-          let result = '';
-          for (let char of formatStr) {
-              result += map[char] ? map[char]() : char;
+            };
+
+            return [...formatStr].map(c => map[c]?.() ?? c).join('');
           }
-          return result;
-      }
+
+          // 3. Detect language
+          const lang = document.documentElement.lang || navigator.language;
+
+          // 4. Apply to all elements
+          times.forEach(t => {
+            const format = "{{ blog.date_format }}" || "d M, Y";
+            t.textContent = formatDate(t.getAttribute('datetime') || t.textContent, format, lang);
+          });
+        })();
     </script>
     {% endif %}
 </body>
