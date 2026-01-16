@@ -16,6 +16,7 @@
     {% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
     <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
+    <meta name="token" content="{{ post.uid }}">
 
     {% include 'snippets/seo_tags.html' with site_name=blog.title title=post.title type="article" url=full_path description=meta_description image=meta_image meta_tag=blog.meta_tag %}
     <link rel="alternate" type="application/atom+xml" href="/feed/" title="{{ blog.title }}">
