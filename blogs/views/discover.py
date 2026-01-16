@@ -19,6 +19,7 @@ def get_base_query(user=None):
     queryset = Post.objects.select_related("blog").filter(
         publish=True,
         blog__reviewed=True,
+        blog__show_on_discover=True,
         blog__user__is_active=True,
         make_discoverable=True,
         published_date__lte=timezone.now(),

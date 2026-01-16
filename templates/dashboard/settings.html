@@ -49,6 +49,17 @@
             </span>
         </p>
 
+         {% if blog.reviewed %}
+        <p>
+            <label for="discoverable">Show on discovery feed</label>
+            <br>
+            <input type="checkbox" name="discoverable" {% if blog.show_on_discover %}checked{% endif %}>
+            <span class="helptext" style="display: inline;">
+                Make posts visible on the <a href="https://bearblog.dev/discover/">discovery feed</a>
+            </span>
+        </p>
+        {% endif %}
+
         <button type="submit">Save</button>
     </form>
 </p>

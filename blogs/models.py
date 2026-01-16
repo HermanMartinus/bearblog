@@ -89,13 +89,14 @@ class Blog(models.Model):
     codemirror_enabled = models.BooleanField(default=True)
     
     # Discovery feed settings
+    show_on_discover = models.BooleanField(default=True, db_index=True) # User controlled
     dodginess_score = models.FloatField(default=0, db_index=True)
     reviewed = models.BooleanField(default=False, db_index=True)
     ignored_date = models.DateTimeField(blank=True, null=True, db_index=True)
     permanent_ignore = models.BooleanField(default=False, db_index=True)
     to_review = models.BooleanField(default=False, db_index=True)
     reviewer_note = models.TextField(blank=True)
-    hidden = models.BooleanField(default=False, db_index=True)
+    hidden = models.BooleanField(default=False, db_index=True) # Admin controlled
     flagged = models.BooleanField(default=False, db_index=True)
     posts_in_last_12_hours = models.IntegerField(default=0, db_index=True)
 
