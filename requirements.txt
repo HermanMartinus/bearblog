@@ -13,7 +13,7 @@ gunicorn==23.0.0
 httpagentparser==1.9.2
 judoscale==1.7.5
 latex2mathml==3.77.0
-mistune==3.1.4
+mistune==3.2.0
 Pillow==10.4.0
 psycopg2==2.9.10
 pygal==3.0.5
