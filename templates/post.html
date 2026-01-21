@@ -89,7 +89,6 @@
     {% if not preview %}
         {% if post.tags|length > 0 %}
             <p class="tags">
-                <a rel="nofollow" href="/{{ blog.blog_path }}/?q=pot-of-honey" style="display:none;">#potofhoney</a>
                 {% for tag in post.tags %}
                     <a rel="nofollow" href="/{{ blog.blog_path }}/?q={{tag}}">#{{ tag }}</a>
                 {% endfor %}
