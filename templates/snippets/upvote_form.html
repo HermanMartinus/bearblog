@@ -1,17 +1,18 @@
 <form id="upvote-form" action="/upvote/" method="post" style="display: inline">
     <small>
-        <input hidden name="uid" value="{{ post.uid }}" style="display:none">
-        <input hidden name="title" value="{{ post.title }}" style="display:none">
+        <input hidden name="uid" value="{{ post.uid }}">
+        <input hidden name="title" value="{{ post.title }}">
 
         <button
             class="upvote-button"
+            aria-label="Toast this post"
             title="Toast this post"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
                 <polyline points="17 11 12 6 7 11"></polyline>
                 <polyline points="17 18 12 13 7 18"></polyline>
             </svg>
-            <small class="upvote-count">&nbsp;</small>
+            <small class="upvote-count" aria-live="polite">&nbsp;</small>
         </button>
     </small>        
 </form>
@@ -24,6 +25,7 @@
         if (data.upvoted) {
             $upvoteButton.disabled = true
             $upvoteButton.style.color = "salmon"
+            $upvoteButton.ariaLabel = "Toasted"
             $upvoteButton.title = "Toasted"
         }
     });
@@ -51,6 +53,7 @@
         
         $upvoteButton.disabled = true
         $upvoteButton.style.color = "salmon"
+        $upvoteButton.ariaLabel = "Toasted"
         $upvoteButton.title = "Toasted"
         const upvoteCount = document.querySelector('.upvote-count')
         upvoteCount.innerHTML = `${(parseInt(upvoteCount.innerHTML.split(" ")[0]) + 1)}`
