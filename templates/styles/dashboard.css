@@ -200,6 +200,7 @@ ul.post-list li small {
     text-align: center;
     background-color: #eceff4;
     position: relative;
+    color: #444;
 }
 .media-checkbox {
     position: absolute;
