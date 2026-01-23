@@ -1,7 +1,7 @@
 <form id="upvote-form" action="/upvote/" method="post" style="display: inline">
     <small>
-        <input hidden name="uid" value="{{ post.uid }}">
-        <input hidden name="title" value="{{ post.title }}">
+        <input hidden name="uid" value="{{ post.uid }}" style="display:none">
+        <input hidden name="title" value="{{ post.title }}" style="display:none">
 
         <button
             class="upvote-button"
