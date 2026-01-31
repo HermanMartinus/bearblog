@@ -44,3 +44,11 @@
     </small>
 </p>
 {% endif %}
+
+{% if blog.domain and not blog.user.settings.upgraded %}
+<p class="notification" style="background-color: lightsalmon; border-radius: 3px; padding: 5px">
+    <small>
+        ❗️Your blog's custom domain is at risk of being disconnected. Upgrade to ensure {{ blog.domain }} remains active. 
+    </small>
+</p>
+{% endif %}
