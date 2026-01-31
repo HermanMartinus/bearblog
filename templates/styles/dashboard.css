@@ -228,12 +228,8 @@ ul.discover-posts li span {
     flex: 0 0 30px;
 }
 
-ul.discover-posts li a {
-  color: #3273dc;
-}
-
 ul.discover-posts li a:visited {
-  color: #8b6fcb !important;
+  color: #8b6fcb;
 }
 
 ul.discover-posts li div {
