@@ -4,20 +4,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 
 from django.http import HttpResponse
-from django.db import IntegrityError, connection
-from django.db.models import DateField, Count, Sum, Q
+from django.db import connection
+from django.db.models import DateField, Count, Sum, Q, Min
 from django.db.models.functions import Cast
 
 from blogs.models import Blog, Hit, Post
-from blogs.helpers import daterange, get_country, salt_and_hash
+from blogs.helpers import get_country, salt_and_hash
 
 from datetime import timedelta
 from ipaddr import client_ip
 from urllib.parse import urlparse
 import httpagentparser
-import pygal
-
-import pygal
 import djqscsv
 
 
@@ -60,8 +57,10 @@ def render_analytics(request, blog, public=False):
     if referrer_filter:
         base_hits = base_hits.filter(referrer=referrer_filter)
 
-    hits = base_hits.order_by('created_date')
-    start_date = hits.first().created_date.date() if hits.exists() else start_date
+    hits = base_hits
+    min_date = base_hits.aggregate(m=Min('created_date'))['m']
+    if min_date:
+        start_date = min_date.date()
 
     unique_reads = base_hits.count()
     unique_visitors = base_hits.values('hash_id').distinct().count()
