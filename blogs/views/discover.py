@@ -59,8 +59,13 @@ def admin_actions(request):
         if request.POST.get("set-values", False):
             post = Post.objects.get(pk=request.POST.get("set-values"))
             post.shadow_votes = int(request.POST.get("shadow-votes"))
-            post.lang = request.POST.get('lang')
+            post.lang = request.POST.get('post-lang')
             post.save()
+
+            if post.blog.lang != request.POST.get('blog-lang'):
+                post.blog.lang = request.POST.get('blog-lang')
+                post.blog.save()
+
         
 
 

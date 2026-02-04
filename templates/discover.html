@@ -124,36 +124,54 @@
                     {% endfor %}
                 </small> {% endcomment %}
                 {% if request.user.is_staff %}
-                    <details>
-                        <summary style="font-size: 0.7rem;">{% if post.blog.user.settings.upgraded %}🐻{% else %}🌱{% endif %} {{ post.blog.lang }} {{ post.lang }}</summary>
-                        <form method="POST" style="display:inline">
-                            <input hidden name="hide-post" value="{{ post.pk }}">
-                            <button onclick="event.preventDefault();if(confirm('Hide this post?')){event.target.parentElement.submit()}">Hide post</button>
-                        </form>
-                        <form method="POST" style="display:inline">
-                            <input hidden name="hide-blog" value="{{ post.pk }}">
-                            <button onclick="event.preventDefault();if(confirm('Hide this blog?')){event.target.parentElement.submit()}">Hide blog</button>
-                        </form>
+                <details style="font-family: sans-serif; border: 1px solid #eee; padding: 10px; border-radius: 4px; font-size: small;">
+                    <summary>
+                        {% if post.blog.user.settings.upgraded %}🐻{% else %}🌱{% endif %} 
+                        <strong>Votes:</strong> {{ post.shadow_votes }} | <strong>Blog lang:</strong> {{ post.blog.lang }} | <strong>Post lang:</strong> {{ post.lang }}
+                    </summary>
 
-                        <form method="POST" style="display:inline">
-                            <input hidden name="block-blog" value="{{ post.pk }}">
-                            <button onclick="event.preventDefault();if(confirm('Block this blog?')){event.target.parentElement.submit()}">Block blog</button>
-                        </form>
-
-                        <form method="POST" style="display:inline">
-                            <span>Shadow votes/lang:</span>
-                            <input hidden name="set-values" value="{{ post.pk }}">
-                            <input type="number" name="shadow-votes" value="{{ post.shadow_votes }}" style="width:45px; padding: 0;">
-                            <input type="text" name="lang" value="{% if post.lang %}{{ post.lang }}{% else %}{{ post.blog.lang }}{% endif %}" style="width:45px; padding: 0;">
-                            <button>Set</button>
-                        </form>
+                    <form method="POST">
+                        <input hidden name="set-values" value="{{ post.pk }}">
+                        <br>
+                        <label>Shadow Votes: 
+                            <input type="number" name="shadow-votes" value="{{ post.shadow_votes }}" style="width:50px;line-height:1;padding:0;">
+                        </label>
                         <br><br>
-                        Admin:
-                        <a href="/mothership/blogs/blog/{{ post.blog.id }}/change/" target="_blank">Blog</a>
-                        | <a href="/mothership/blogs/post/{{ post.id }}/change/" target="_blank">Post</a>
-                        | <a href="/mothership/blogs/usersettings/{{ post.blog.user.settings.id }}/change/" target="_blank">User</a>
-                        <hr>
-                    </details>
+                        <label>Blog Lang: 
+                            <input type="text" name="blog-lang" value="{{ post.blog.lang }}" style="width:50px;line-height:1;padding:0;">
+                        </label>
+                        <br><br>
+                        <label>Post Lang: 
+                            <input type="text" name="post-lang" value="{{ post.lang }}" style="width:50px;line-height:1;padding:0;">
+                        </label>
+                        <br><br>
+                        <button type="submit" style="display: block; margin-top: 5px;">Update Metadata</button>
+                    </form>
+
+                    <hr>
+
+                    <form method="POST">
+                        <input hidden name="hide-post" value="{{ post.pk }}">
+                        <button onclick="event.preventDefault();if(confirm('Hide this post?')){this.form.submit()}">Hide Post</button>
+                    </form>
+
+                    <form method="POST">
+                        <input hidden name="hide-blog" value="{{ post.pk }}">
+                        <button onclick="event.preventDefault();if(confirm('Hide this blog?')){this.form.submit()}">Hide Blog</button>
+                    </form>
+
+                    <form method="POST">
+                        <input hidden name="block-blog" value="{{ post.pk }}">
+                        <button onclick="event.preventDefault();if(confirm('Block this blog?')){this.form.submit()}" style="color: red;">Block Blog</button>
+                    </form>
+
+                    <p>
+                        <strong>Admin:</strong>
+                        <a href="/mothership/blogs/blog/{{ post.blog.id }}/change/" target="_blank">Blog</a> | 
+                        <a href="/mothership/blogs/post/{{ post.id }}/change/" target="_blank">Post</a> | 
+                        <a href="/mothership/blogs/usersettings/{{ post.blog.user.settings.id }}/change/" target="_blank">User</a>
+                    </p>
+                </details>
                 {% endif %}
             </small>
         </div>
