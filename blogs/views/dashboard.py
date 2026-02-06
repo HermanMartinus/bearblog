@@ -211,6 +211,7 @@ def settings(request, id):
         if subdomain:
             subdomain = slugify(subdomain.split('.')[0]).replace('_', '-')
             if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).exists() and not is_protected(subdomain):
+                blog.invalidate_cloudflare_cache() # Gets rid of the cached version on old subdomain
                 blog.subdomain = subdomain
                 blog.lang = lang
                 blog.save()

@@ -25,9 +25,5 @@ https:// {
 		header_up Host {upstream_hostport}
 		header_up X-Real-IP {remote_host}
 	}
-
-	log {
-		output file /var/log/caddy/access.log
-	}
 }
 
