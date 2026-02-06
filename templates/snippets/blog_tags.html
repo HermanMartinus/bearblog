@@ -2,7 +2,7 @@
 <small>
     <div class="tags">
     {% for tag in tags %}
-        <a rel="nofollow" href="/{{ blog_path }}/?q={{ tag }}">#{{ tag }}</a>
+        <a rel="nofollow" href="/{{ blog_path }}/?q={{ tag|urlencode }}">#{{ tag }}</a>
     {% endfor %}
     </div>
 </small>

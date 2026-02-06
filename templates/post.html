@@ -90,7 +90,7 @@
         {% if post.tags|length > 0 %}
             <p class="tags">
                 {% for tag in post.tags %}
-                    <a rel="nofollow" href="/{{ blog.blog_path }}/?q={{tag}}">#{{ tag }}</a>
+                    <a rel="nofollow" href="/{{ blog.blog_path }}/?q={{tag|urlencode}}">#{{ tag }}</a>
                 {% endfor %}
             </p>
         {% endif %}

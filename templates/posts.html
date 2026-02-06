@@ -58,26 +58,10 @@
 <small>
     <div class="tags" id="tags">
         <a rel="nofollow" href="/{{ blog.blog_path }}/?q=pot-of-honey" style="display:none;">#potofhoney</a>
+        {% for tag in available_tags %}
+        <a rel="nofollow" href="/{{ blog.blog_path }}/?q={{tag|urlencode}}">#{{ tag }}</a>
+        {% endfor %}
     </div>
-    <script>
-        const tagData = '{{ tags_json }}';
-        const activeTagsStr = '{{ active_tags_str }}';
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const tags = JSON.parse(atob(tagData));
-            const container = document.getElementById('tags');
-            
-            tags.forEach(tag => {
-                const a = document.createElement('a');
-                const queryParams = activeTagsStr ? `${activeTagsStr},${tag}` : tag;
-                a.href = `/{{ blog.blog_path }}/?q=${queryParams}`;
-                a.textContent = `#${tag}`;
-                a.rel = 'nofollow';
-                container.appendChild(a);
-                container.appendChild(document.createTextNode(' '));
-            });
-        });
-    </script>
 </small>
 
 {% endblock %}
