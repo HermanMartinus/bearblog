@@ -177,9 +177,17 @@
 			if (this.status === 200) {
 				const response = JSON.parse(this.responseText);
 				const imageName = file.name.split('.')[0];
+				const fileExtension = file.name.split('.').pop().toLowerCase();
 
 				response.forEach(image => {
-					const toInsert = `![${imageName}](${image})\n`;
+					let toInsert;
+
+					if (fileExtension === 'mp4') {
+						toInsert = `<video controls style="max-width: 100%;">\n  <source src="${image}" type="video/mp4">\n</video>\n`;
+					} else {
+						toInsert = `![${imageName}](${image})\n`;
+					}
+
 					const currentText = $textarea.value;
 					const start = currentText.indexOf(placeholder);
 
