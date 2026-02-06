@@ -130,7 +130,7 @@ def posts(request, blog):
     
     if tags:
         # Filter posts that contain ALL specified tags
-        posts = [post for post in posts if all(tag in post.tags for tag in tags)]
+        posts = [post for post in posts if all(tag.lower() in post.tags for tag in tags)]
         available_tags = set()
         for post in posts:
             available_tags.update(post.tags)

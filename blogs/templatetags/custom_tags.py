@@ -229,7 +229,7 @@ def apply_filters(posts, tag=None, limit=None, order=None):
         # Split tags by comma and strip whitespace
         tags = [t.strip() for t in tag.replace('"', '').split(',')]
         if tags:
-            posts = [post for post in posts if all(tag in post.tags for tag in tags)]
+            posts = [post for post in posts if all(tag.lower() in post.tags for tag in tags)]
     if limit is not None:
         try:
             limit = int(limit)
