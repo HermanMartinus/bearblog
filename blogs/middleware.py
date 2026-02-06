@@ -2,7 +2,6 @@ from django.db import connection
 from django.shortcuts import render
 from django.urls import resolve, Resolver404
 from django.http import JsonResponse
-from django.core.exceptions import PermissionDenied
 from django.middleware.csrf import (
     CsrfViewMiddleware,
     REASON_NO_CSRF_COOKIE,
@@ -136,7 +135,15 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
             try:
                 return self._check_token(request)
             except Exception as e:
-                raise PermissionDenied(f"CSRF Failure: {str(e)}")
+                # Determine the appropriate reason based on the error message
+                if 'CSRF cookie not set' in str(e):
+                    reason = REASON_NO_CSRF_COOKIE
+                elif 'CSRF token missing' in str(e):
+                    reason = REASON_CSRF_TOKEN_MISSING
+                else:
+                    reason = REASON_BAD_ORIGIN
+                
+                return self._reject(request, reason)
 
 
 class BotWallMiddleware:
