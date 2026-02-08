@@ -154,11 +154,12 @@ class BotWallMiddleware:
         if 'ping' in request.path or 'feed' in request.path:
             return self.get_response(request)
          
-        if request.GET.get('q'):
-            if request.COOKIES.get("timezone"):
-                return self.get_response(request)
+        # Removing because this is getting cached :/
+        # if request.GET.get('q'):
+        #     if request.COOKIES.get("timezone"):
+        #         return self.get_response(request)
 
-            return render(request, "botwall.html", status=200)
+        #     return render(request, "botwall.html", status=200)
 
         return self.get_response(request)
 
