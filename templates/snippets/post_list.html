@@ -14,7 +14,7 @@
         {% endif %}
 
         {% if show_image and post.meta_image %}
-        <img src="{{ post.meta_image }}" alt="{{ post.title }}">
+        <img loading="lazy" src="{{ post.meta_image }}" alt="{{ post.title }}">
         {% endif %}
 
         {% if show_content %}
