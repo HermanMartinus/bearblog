@@ -141,19 +141,19 @@ def get_country(user_ip):
 
 
 def unmark(content):
-    content = re.sub(r'^\s{0,3}#{1,6}\s+.*$', '', content, flags=re.MULTILINE)
+    content = re.sub(r'^\s{0,3}#{1,6}\s+(.*)$', r'\1', content, flags=re.MULTILINE)
     content = re.sub(r'^\s{0,3}[-*]{3,}\s*$', '', content, flags=re.MULTILINE)
-    content = re.sub(r'^\s{0,3}>\s+.*$', '', content, flags=re.MULTILINE)
-    content = re.sub(r'```.*?```', '', content, flags=re.DOTALL)
-    content = re.sub(r'`[^`]+`', '', content)
-    content = re.sub(r'!\[.*?\]\(.*?\)', '', content)
-    content = re.sub(r'\[.*?\]\(.*?\)', '', content)
-    content = re.sub(r'(\*\*|__)(.*?)\1', '', content)
-    content = re.sub(r'(\*|_)(.*?)\1', '', content)
-    content = re.sub(r'~~.*?~~', '', content)
-    content = re.sub(r'^\s{0,3}[-*+]\s+.*$', '', content, flags=re.MULTILINE)
-    content = re.sub(r'^\s{0,3}\d+\.\s+.*$', '', content, flags=re.MULTILINE)
-    content = re.sub(r'^\s*\|.*?\|\s*$', '', content, flags=re.MULTILINE)
+    content = re.sub(r'^\s{0,3}>\s+(.*)$', r'\1', content, flags=re.MULTILINE)
+    content = re.sub(r'```(.*?)```', r'\1', content, flags=re.DOTALL)
+    content = re.sub(r'`([^`]+)`', r'\1', content)
+    content = re.sub(r'!\[(.*?)\]\(.*?\)', r'\1', content)
+    content = re.sub(r'\[(.*?)\]\(.*?\)', r'\1', content)
+    content = re.sub(r'(\*\*|__)(.*?)\1', r'\2', content)
+    content = re.sub(r'(\*|_)(.*?[^\\])\1', r'\2', content)
+    content = re.sub(r'~~(.*?)~~', r'\1', content)
+    content = re.sub(r'^\s{0,3}[-*+]\s+(.*)$', r'\1', content, flags=re.MULTILINE)
+    content = re.sub(r'^\s{0,3}\d+\.\s+(.*)$', r'\1', content, flags=re.MULTILINE)
+    content = re.sub(r'^\s*\|(.*?)\|\s*$', '\1', content, flags=re.MULTILINE)
     content = re.sub(r'^\s*[:-]{3,}\s*$', '', content, flags=re.MULTILINE)
 
     return content
