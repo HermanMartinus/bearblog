@@ -57,17 +57,22 @@ def render_analytics(request, blog, public=False):
     if referrer_filter:
         base_hits = base_hits.filter(referrer=referrer_filter)
 
-    hits = base_hits
-    min_date = base_hits.aggregate(m=Min('created_date'))['m']
+    # Combine multiple aggregates into single query for better performance
+    stats = base_hits.aggregate(
+        min_date=Min('created_date'),
+        unique_reads=Count('id'),
+        unique_visitors=Count('hash_id', distinct=True)
+    )
+    min_date = stats['min_date']
     if min_date:
         start_date = min_date.date()
 
-    unique_reads = base_hits.count()
-    unique_visitors = base_hits.values('hash_id').distinct().count()
-    on_site = hits.filter(created_date__gt=now-timedelta(minutes=4)).count()
+    unique_reads = stats['unique_reads']
+    unique_visitors = stats['unique_visitors']
+    on_site = base_hits.filter(created_date__gt=now-timedelta(minutes=4)).count()
 
     # Build chart data
-    hit_dict = hits.annotate(
+    hit_dict = base_hits.annotate(
         date=Cast('created_date', output_field=DateField())
     ).values('date').annotate(
         c=Count('date')
