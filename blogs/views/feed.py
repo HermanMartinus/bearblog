@@ -58,29 +58,29 @@ def generate_feed(blog, feed_type="atom", tag=None, page=0):
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain)
-    fg.author({'name': blog.subdomain, 'email': 'hidden'})
-    fg.title(blog.title)
-    fg.subtitle(blog.meta_description or unmark(blog.content)[:157] + '...' or blog.title)
+    fg.author({'name': clean_string(blog.subdomain), 'email': 'hidden'})
+    fg.title(clean_string(blog.title))
+    fg.subtitle(clean_string(blog.meta_description or unmark(blog.content)[:157] + '...' or blog.title))
     fg.link(href=f"{blog.useful_domain}/", rel='alternate')
 
     for post in all_posts:
         fe = fg.add_entry()
         fe.id(f"{blog.useful_domain}/{post.slug}/")
         fe.title(clean_string(post.title))
-        fe.author({'name': blog.subdomain, 'email': 'hidden'})
+        fe.author({'name': clean_string(blog.subdomain), 'email': 'hidden'})
         fe.link(href=f"{blog.useful_domain}/{post.slug}/")
         if post.meta_description:
             fe.summary(clean_string(post.meta_description))
-        
+
         post_content = post.content.replace('{{ email-signup }}', '')
 
         fe.content(clean_string(markdown(post_content, blog, post)), type="html")
-        
+
         fe.published(post.published_date)
         fe.updated(post.last_modified)
-        
+
         for tag in post.tags:
-            fe.category(term=tag)
+            fe.category(term=clean_string(tag))
 
     if feed_type == "atom":
         fg.link(href=f"{blog.useful_domain}/feed/", rel='self')
