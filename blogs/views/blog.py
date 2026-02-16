@@ -46,6 +46,7 @@ def get_blog_with_domain(domain):
     except ObjectDoesNotExist:
         raise Http404
 
+
 def get_domain_id(check):
     if not check:
         return None

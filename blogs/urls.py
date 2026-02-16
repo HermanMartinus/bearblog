@@ -40,8 +40,6 @@ urlpatterns = [
     path('staff/dashboard/import-posts/', main_site_only(staff.import_posts), name='import_posts'),
     path('staff/dashboard/check-spam/', main_site_only(staff.check_spam), name='check_spam'),
     path('staff/playground/', main_site_only(staff.playground), name='playground'),
-    path('staff/dashboard/performance/', main_site_only(staff.performance_dashboard), name='performance_dashboard'),
-
 
     # User dashboard
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),

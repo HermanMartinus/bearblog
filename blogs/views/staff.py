@@ -12,7 +12,6 @@ from django.shortcuts import render
 
 from blogs.helpers import send_async_mail
 from blogs.models import Blog, PersistentStore, Post
-from blogs.middleware import request_metrics, redis_client
 
 from statistics import mean
 from datetime import timedelta
@@ -568,50 +567,7 @@ def migrate_blog(request):
             message += 'Deleted...\n'
         
         return HttpResponse(message)
-    
 
-@staff_member_required
-def performance_dashboard(request):
-    metrics_summary = {}
-    
-    if redis_client:
-        # Get metrics from Redis
-        for key in redis_client.keys('request_metrics:*'):
-            endpoint = key.decode('utf-8').split(':')[1]
-            measurements = json.loads(redis_client.get(key))
-            
-            if measurements:
-                metrics_summary[endpoint] = calculate_metrics_summary(measurements)
-    else:
-        # Get metrics from in-memory storage
-        for endpoint, measurements in request_metrics.items():
-            if measurements:
-                metrics_summary[endpoint] = calculate_metrics_summary(measurements)
-    
-    # Sort metrics by average total time (descending)
-    sorted_metrics = dict(sorted(
-        metrics_summary.items(),
-        key=lambda x: x[1]['avg_total'],
-        reverse=True
-    ))
-    
-    return render(request, 'staff/performance.html', {
-        'metrics': sorted_metrics
-    })
-
-def calculate_metrics_summary(measurements):
-    """Helper function to calculate metrics summary"""
-    return {
-        'count': len(measurements),
-        'avg_total': mean(m['total_time'] for m in measurements) * 1000,
-        'avg_db': mean(m['db_time'] for m in measurements) * 1000,
-        'avg_compute': mean(m['compute_time'] for m in measurements) * 1000,
-        'max_total': max(m['total_time'] for m in measurements) * 1000,
-        'max_db': max(m['db_time'] for m in measurements) * 1000,
-        'max_compute': max(m['compute_time'] for m in measurements) * 1000,
-        'db_percent': (mean(m['db_time'] for m in measurements)) / (mean(m['total_time'] for m in measurements)) * 100,
-        'compute_percent': 100 - (mean(m['db_time'] for m in measurements)) / (mean(m['total_time'] for m in measurements)) * 100,
-    }
 
 # Playground for testing
 
