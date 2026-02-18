@@ -19,4 +19,18 @@
     </p>
     {{ form.as_p }}
 </form>
+{% if request.user.settings.upgraded %}
+<hr>
+<h2>API access</h2>
+<p>Authenticate requests with <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+{% if blog.auth_token %}
+<p><code>{{ blog.auth_token }}</code></p>
+{% else %}
+<p>No token generated yet.</p>
+{% endif %}
+<form method="POST" action="/{{ blog.subdomain }}/dashboard/regenerate-token/">
+    {% csrf_token %}
+    <button type="submit">{% if blog.auth_token %}Regenerate token{% else %}Generate token{% endif %}</button>
+</form>
+{% endif %}
 {% endblock %}

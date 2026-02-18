@@ -17,7 +17,7 @@ import string
 
 from blogs.backup import backup_in_thread
 from blogs.forms import AdvancedSettingsForm, BlogForm, DashboardCustomisationForm, PostTemplateForm
-from blogs.helpers import check_connection, is_protected, salt_and_hash
+from blogs.helpers import check_connection, is_protected, salt_and_hash, unique_slug
 from blogs.models import Blog, Post, Upvote
 from blogs.subscriptions import get_subscriptions
 
@@ -326,30 +326,6 @@ def post(request, id, uid=None):
     })
 
 
-def unique_slug(blog, post, new_slug):
-    # Clean the new_slug to be alphanumeric lowercase with only '/', '_' and '-' allowed
-    cleaned_slug = ''.join(c for c in new_slug.lower() if c.isalnum() or c == '/' or c == '-' or c == '_')
-
-    # Remove trailing and leading slashes
-    if len(cleaned_slug) > 0 and cleaned_slug[-1] == '/':
-        cleaned_slug = cleaned_slug[:-1]
-    if len(cleaned_slug) > 0 and cleaned_slug[0] == '/':
-        cleaned_slug = cleaned_slug[1:]
-
-    # If the cleaned slug is empty, use the title
-    if cleaned_slug == '':
-        slug = slugify(post.title) or slugify(str(random.randint(0,9999)))
-    else:
-        slug = cleaned_slug
-    
-    new_stack = "-new"
-
-    while Post.objects.filter(blog=blog, slug=slug).exclude(pk=post.pk).exists():
-        slug = f"{slug}{new_stack}"
-        new_stack += "-new"
-
-    return slug
-
 
 @csrf_exempt
 @login_required
@@ -562,6 +538,19 @@ def advanced_settings(request, id):
         'blog': blog,
         'form': form
     })
+
+
+@login_required
+def regenerate_token(request, id):
+    if request.user.is_superuser:
+        blog = get_object_or_404(Blog, subdomain=id)
+    else:
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+
+    if request.method == 'POST':
+        blog.generate_auth_token()
+
+    return redirect('advanced_settings', id=id)
 
 
 @login_required

@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media
+from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media, api
 from blogs import subscriptions
 from conf import logger
 
@@ -56,6 +56,7 @@ urlpatterns = [
     path('<id>/dashboard/settings/', dashboard.settings, name='settings'),
     path('<id>/dashboard/custom-domain/', studio.custom_domain_edit, name='custom_domain_edit'),
     path('<id>/dashboard/settings/advanced/', studio.advanced_settings, name='advanced_settings'),
+    path('<id>/dashboard/regenerate-token/', studio.regenerate_token, name='regenerate_token'),
     path('<id>/dashboard/directives/', studio.directive_edit, name="directive_edit"),
     path('<id>/dashboard/email-list/', emailer.email_list, name='email_list'),
 
@@ -81,6 +82,10 @@ urlpatterns = [
 
     # Webhook
     path('lemon-webhook/', subscriptions.lemon_webhook, name='lemon_webhook'),
+
+    # API
+    path('api/v1/posts/', api.posts_list, name='api_posts'),
+    path('api/v1/posts/<uid>/', api.post_detail, name='api_post_detail'),
 
     # Discover
     path('discover/', main_site_only(discover.discover), name='discover'),
