@@ -15,13 +15,22 @@
 	localStorage.removeItem('bear_draft_new');
 	{% endif %}
 
-	const savedDraft = localStorage.getItem(draftKey);
-	if (savedDraft !== null) {
-		if (savedDraft === $textarea.value) {
-			// Last save succeeded — content matches server, clean up
+	const DRAFT_TTL = 3 * 60 * 1000; // 3 minutes
+
+	const saveDraft = (body) => {
+		try { localStorage.setItem(draftKey, JSON.stringify({ body, savedAt: Date.now() })); } catch (e) {}
+	};
+
+	const rawDraft = localStorage.getItem(draftKey);
+	if (rawDraft !== null) {
+		let draft = null;
+		try { draft = JSON.parse(rawDraft); } catch (e) {}
+
+		if (!draft || Date.now() - draft.savedAt > DRAFT_TTL || draft.body === $textarea.value) {
+			// Invalid, expired, or already saved — discard silently
 			localStorage.removeItem(draftKey);
 		} else {
-			// Unsaved changes detected — show restore banner
+			// Recent unsaved changes — show restore banner
 			const $banner = document.createElement('p');
 			$banner.style.cssText = 'color:lightsalmon;margin:0;padding:4px 0;font-size:small;';
 			$banner.innerHTML = 'Unsaved draft detected. <a href="#" id="restore-draft">Restore</a> or <a href="#" id="dismiss-draft">dismiss</a>.';
@@ -30,7 +39,7 @@
 
 			document.getElementById('restore-draft').onclick = (e) => {
 				e.preventDefault();
-				$textarea.value = savedDraft;
+				$textarea.value = draft.body;
 				localStorage.removeItem(draftKey);
 				$banner.remove();
 			};
@@ -46,14 +55,14 @@
 	let draftTimer;
 	$textarea.addEventListener('input', () => {
 		clearTimeout(draftTimer);
-		draftTimer = setTimeout(() => { try { localStorage.setItem(draftKey, $textarea.value); } catch (e) {} }, 1000);
+		draftTimer = setTimeout(() => saveDraft($textarea.value), 1000);
 	});
 
 	// Submitting form with header content
 	const addHeaderContentToFormAndSubmit = () => {
 		// Flush draft immediately before navigating away
 		clearTimeout(draftTimer);
-		try { localStorage.setItem(draftKey, $textarea.value); } catch (e) {}
+		saveDraft($textarea.value);
 		$hiddenHeaderContent.value = $headerContent.innerText;
 		$form.submit();
 	}
