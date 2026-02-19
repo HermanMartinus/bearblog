@@ -10,12 +10,9 @@
 	const $uploadButton = document.getElementById('upload-image')
 
 	// Draft recovery via localStorage
-	const draftKey = 'bear_draft_{{ post.uid|default:"new" }}';
-	{% if post %}
-	localStorage.removeItem('bear_draft_new');
-	{% endif %}
+	const draftKey = {% if post %}'bear_draft_{{ post.uid }}'{% else %}'bear_draft_' + window.location.pathname{% endif %};
 
-	const DRAFT_TTL = 3 * 60 * 1000; // 3 minutes
+	const DRAFT_TTL = 1 * 60 * 1000; // 1 minute
 
 	const saveDraft = (body) => {
 		try { localStorage.setItem(draftKey, JSON.stringify({ body, savedAt: Date.now() })); } catch (e) {}
