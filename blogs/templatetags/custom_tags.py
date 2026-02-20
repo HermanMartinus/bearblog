@@ -85,7 +85,7 @@ def replace_inline_latex(text):
     return replaced_text
 
 def fix_links(text):
-    parentheses_pattern = r'\[([^\]]+)\]\(((?:tab:)?https?://[^\)]+\([^\)]+\)[^\)]*)\)'
+    parentheses_pattern = r'\[([^\]]+)\]\(((?:tab:)?https?://[^\)]+\([^\)]*\)[^\)]*)\)'
 
     def escape_parentheses(match):
         label = match.group(1)
