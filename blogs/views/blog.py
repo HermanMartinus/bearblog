@@ -11,8 +11,6 @@ from blogs.views.analytics import render_analytics
 
 import os
 import tldextract
-import json
-import base64
 
 def resolve_address(request):
     http_host = request.get_host()
@@ -138,11 +136,8 @@ def posts(request, blog):
     else:
         available_tags = set(blog.tags)
     
-    # Prepare tags for JavaScript rendering
     # Only include tags that aren't already active and are available
     tags_to_show = [tag for tag in blog.tags if tag not in tags and tag in available_tags]
-    tags_json = base64.b64encode(json.dumps(tags_to_show).encode()).decode()
-    active_tags_str = ','.join(tags) if tags else ''
     
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
     blog_path_title = blog.blog_path.replace('-', ' ').capitalize() or 'Blog'
@@ -158,8 +153,7 @@ def posts(request, blog):
             'active_tags': tags,
             'available_tags': available_tags,
             'blog_path_title': blog_path_title,
-            'tags_json': tags_json,
-            'active_tags_str': active_tags_str,
+            'tags_to_show': tags_to_show,
         }
     )
     
