@@ -107,6 +107,7 @@ venv.bak/
 
 # Sandbox
 blogs/sandbox.py
+/sandbox*
 
 # Testing tools
 fixture.json
