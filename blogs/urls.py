@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media
+from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media, staff_api
 from blogs import subscriptions
 from conf import logger
 
@@ -40,6 +40,11 @@ urlpatterns = [
     path('staff/dashboard/import-posts/', main_site_only(staff.import_posts), name='import_posts'),
     path('staff/dashboard/check-spam/', main_site_only(staff.check_spam), name='check_spam'),
     path('staff/playground/', main_site_only(staff.playground), name='playground'),
+    
+    # Staff API
+    path('staff-api/posts/', main_site_only(staff_api.most_recent_posts), name='staff_api_posts'),
+    path('staff-api/blog/<slug:subdomain>/', main_site_only(staff_api.blog), name='staff_api_blog'),
+    path('staff-api/post/<int:pk>/', main_site_only(staff_api.post), name='staff_api_post'),
 
     # User dashboard
     path('accounts/delete/', dashboard.delete_user, name='user_delete'),
