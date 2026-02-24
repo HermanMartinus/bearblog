@@ -121,5 +121,5 @@ def post(request, pk):
 
 @api_auth
 def most_recent_posts(request):
-    qs = get_base_query().order_by('-published_date').select_related('blog')[:60]
+    qs = get_base_query().order_by('-published_date')[:160]
     return JsonResponse({'posts': [post_data(p) for p in qs]})
