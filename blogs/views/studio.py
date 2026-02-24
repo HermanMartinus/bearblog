@@ -165,7 +165,7 @@ def post(request, id, uid=None):
     preview = request.POST.get("preview", False) == "true"
 
     if request.method == "POST" and header_content:
-        if blog.posts.count() >= 3000:
+        if blog.posts.count() >= 5000:
             error_messages.append("You have reached the maximum number of posts. This is a safety feature to prevent abuse. If you're sure you need more, please contact support.")
             return render(request, 'studio/post_edit.html', {
                 'blog': blog,
