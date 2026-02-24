@@ -59,7 +59,7 @@ def post_data(p, full_content=False):
     }
 
 
-BLOG_UPDATABLE = {'hidden', 'flagged', 'reviewed', 'reviewer_note', 'permanent_ignore', 'to_review'}
+BLOG_UPDATABLE = {'hidden', 'flagged', 'reviewed', 'reviewer_note', 'permanent_ignore', 'to_review', 'domain'}
 POST_UPDATABLE = {'hidden', 'make_discoverable', 'shadow_votes'}
 
 
