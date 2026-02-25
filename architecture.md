@@ -55,6 +55,17 @@ Reviewed blog content (posts + blog metadata as CSV) is backed up to a separate 
 | **Akismet** | Spam detection (secondary to dodginess score) |
 | **GeoIP2** | Geolocation for analytics |
 
+## Scheduled Tasks
+
+Periodic jobs run via the **Heroku Scheduler** add-on. Each job calls a Django management command:
+
+| Schedule | Command | Purpose |
+|----------|---------|---------|
+| Every 10 min | `python manage.py invalidate_cache` | Busts Cloudflare cache for posts that just went live |
+| Daily | `python manage.py scrub_hash_ids` | Anonymises `Hit` records older than 24h by replacing `hash_id` with `'scrubbed'` |
+
+Management commands live in `blogs/management/commands/`.
+
 ## Key Models
 
 - **`UserSettings`** — per-user upgrade status, LemonSqueezy order info
