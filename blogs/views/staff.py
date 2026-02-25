@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.cache import cache
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
@@ -122,6 +123,13 @@ def dashboard(request):
 
     new_upgrades_count = new_upgrades().count()
     orphaned_domain_blogs_count = blogs_with_orphaned_domains().values('user').distinct().count()
+
+    cutoff = timezone.now() - timedelta(days=14)
+    overdue_orphaned_domain_count = Blog.objects.filter(
+        user__settings__upgraded=False,
+        user__settings__orphaned_domain_warning_email_sent__lte=cutoff,
+    ).exclude(domain='').exclude(domain__isnull=True).count()
+    
     return render(
         request,
         'staff/dashboard.html',
@@ -142,6 +150,7 @@ def dashboard(request):
             'new_blogs_count': new_blogs_count,
             'new_upgrades_count': new_upgrades_count,
             'orphaned_domain_blogs_count': orphaned_domain_blogs_count,
+            'overdue_orphaned_domain_count': overdue_orphaned_domain_count,
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
             'period': period,
@@ -225,6 +234,26 @@ def email_domain_warnings(request):
         user.settings.save()
 
     return HttpResponse(f"Emailed {min(5, len(users_to_notify))} of {len(users_to_notify)} users about orphaned domains.")
+
+
+@staff_member_required
+def remove_orphaned_domains(request):
+    cutoff = timezone.now() - timedelta(days=14)
+    blogs = Blog.objects.filter(
+        user__settings__upgraded=False,
+        user__settings__orphaned_domain_warning_email_sent__lte=cutoff,
+    ).exclude(domain='').exclude(domain__isnull=True).select_related('user', 'user__settings')
+
+    to_remove = list(blogs[:5])
+    for blog in to_remove:
+        blog.domain = ''
+        blog.save()
+        blog.user.settings.orphaned_domain_warning_email_sent = None
+        blog.user.settings.save()
+    if to_remove:
+        cache.delete('domain_map')
+
+    return HttpResponse(f"Removed domains from {len(to_remove)} blogs.")
 
 
 @staff_member_required
