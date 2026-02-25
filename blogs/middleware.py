@@ -35,24 +35,6 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
                 return self._reject(request, reason)
 
 
-class BotWallMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        if 'ping' in request.path or 'feed' in request.path:
-            return self.get_response(request)
-         
-        # Removing because this is getting cached :/
-        # if request.GET.get('q'):
-        #     if request.COOKIES.get("timezone"):
-        #         return self.get_response(request)
-
-        #     return render(request, "botwall.html", status=200)
-
-        return self.get_response(request)
-
-   
 class RateLimitMiddleware:
     RATE_LIMIT = 10  # max requests per thread
     if os.getenv('ENVIRONMENT') == 'dev':

@@ -1,80 +1,81 @@
 # Bear Architecture
-Bear is a Django-based blogging platform that allows users to create and manage their own blogs. The project is hosted on Heroku and utilizes various technologies and services to provide a robust and scalable architecture.
 
-## Django
-Bear is built using the Django web framework, which follows the Model-View-Controller (MVC) architectural pattern. Django provides a powerful ORM (Object-Relational Mapping) for database management, an admin interface for easy data manipulation, and a templating engine for rendering dynamic HTML pages.
+Bear is a Django-based blogging platform. Users get a subdomain at `*.bearblog.dev` or can point a custom domain.
 
-## Database
-The project uses Heroku Postgres as the primary database. Heroku Postgres is a managed PostgreSQL database service that provides scalability, reliability, and automatic backups. The database connection is managed through the dj-database-url library, which allows seamless integration with Heroku's database configuration.
+## Stack
 
-## Dependencies
-Bear relies on various Python packages and libraries to extend its functionality. These dependencies are listed in the requirements.txt file and include packages for authentication (django-allauth), debugging (django-debug-toolbar), CSV export (django-queryset-csv), Markdown parsing (mistune), and more. The dependencies are installed and managed using virtualenv.
-
-## Templates
-Django's templating engine is used to render dynamic HTML pages. The project's templates are located in the templates directory and follow Django's template language syntax. The templates are organized into subdirectories based on their respective apps or functionalities.
-Static Files
-Static files such as CSS, JavaScript, and images are served using WhiteNoise, a Django middleware that allows serving static files efficiently. The static files are collected and stored in the staticfiles directory during the deployment process.
+- **Framework:** Django 5.2, Python 3.13
+- **Server:** Gunicorn (`conf.wsgi`), 24s timeout, max 10k requests per worker
+- **Database:** Heroku Postgres (via `dj-database-url`). SQLite used locally.
+- **Cache / Sessions:** RedisCloud (TLS). Falls back to no cache in dev.
+- **Static files:** WhiteNoise (GZip compressed)
 
 ## Deployment
-## Heroku
-Bear is deployed on Heroku, a cloud platform that provides easy deployment and scaling of web applications. Heroku's platform takes care of server management, load balancing, and automatic scaling based on the application's resource requirements.
 
-## Digital Ocean Spaces
-Images are uploaded to a Spaces S3 bucket on Digital Ocean. Their CDN is used to retrieve uploaded images. 
+Bear runs on **Heroku** (`bear-blog` app). The `Procfile` runs migrations on release and starts Gunicorn on web.
 
-## Procfile
-The Procfile file specifies the commands that need to be executed when the application starts on Heroku. It includes a release command to run database migrations and a web command to start the Gunicorn web server.
+Heroku Postgres is backed up locally on a daily schedule.
 
-## Runtime
-The runtime.txt file specifies the Python version used by the project. Bear uses Python 3.9.13.
+There is **no staging server**.
 
-## Networking and Security
-## DNS and SSL
-Bear uses Cloudflare as its DNS provider and for issuing SSL certificates for the .bearblog.dev domains. Cloudflare provides fast and secure DNS resolution and automatic SSL certificate management.
+## Routing
 
-## Reverse Proxy (custom domains)
-A reverse proxy is set up on a Digital Ocean droplet using Caddy. The reverse proxy handles custom domain routing and SSL termination. It forwards incoming requests to the Heroku application based on the host header. The Caddy configuration file (Caddyfile) specifies the proxy rules and SSL settings.
+### bearblog.dev subdomains
+Cloudflare handles DNS and SSL for `*.bearblog.dev`. Cloudflare also does the heavy lifting for caching and bot deterrence. Cache is invalidated per-blog using Cloudflare cache tags (keyed on subdomain) whenever a blog or post is saved.
 
-## Additional Services
-## Email
-Bear uses Mailgun for email delivery. The email backend is configured to use Mailgun's SMTP service, and the necessary credentials are stored securely in environment variables.
+### Custom domains
+A **Caddy** server running on a Digital Ocean droplet handles custom domain SSL and reverse proxies to `https://bearblog.dev`. It uses on-demand TLS, verifying domains by querying `https://bearblog.dev/ping/` before issuing a cert.
 
-## Logging and Monitoring
-The project utilizes Heroku's built-in logging and monitoring capabilities to track application performance, errors, and resource usage. Additionally, custom logging is implemented using Django's logging framework, with error logs being sent to a Slack channel for real-time notifications.
+Caddy config: `Caddyfile` in repo root.
 
----
-# Staging server
+### Main site routing
+The `MAIN_SITE_HOSTS` env var (`www.bearblog.dev,bearblog.dev`) gates staff and discover routes. Requests to any other host are treated as blog subdomain/custom domain requests.
 
-Bear Staging runs on a droplet with Caddy as the web server.
-The Django application is served by Gunicorn.
-The database is backed up using a cron job and with Litestream.
-Django, Caddy, and Litestream run as systemd services.
+## Storage
 
-### Caddy:
+### Images
+User-uploaded images go to a **Digital Ocean Spaces** S3 bucket. The DO CDN serves them.
 
-config: /etc/caddy/Caddyfile
-logs: /var/log/caddy/access.log
+### Blog backups
+Reviewed blog content (posts + blog metadata as CSV) is backed up to a separate DO Spaces bucket (`bear-backup`, region `fra1`) in a background thread whenever a blog is saved.
 
-### Django
+## Services
 
-script & config: /root/deploy/run.sh
+| Service | Purpose |
+|---------|---------|
+| **Cloudflare** | DNS, SSL (`.bearblog.dev`), caching, bot deterrence |
+| **Heroku Postgres** | Primary database |
+| **RedisCloud** | Cache + session store |
+| **Digital Ocean Spaces** | Image CDN + blog content backups |
+| **Digital Ocean Droplet** | Caddy reverse proxy for custom domains |
+| **LemonSqueezy** | Subscription payments. Webhooks upgrade/downgrade `UserSettings`. |
+| **Mailgun** | Transactional email (SMTP via `smtp.eu.mailgun.org`) |
+| **Sentry** | Error tracking (production only, low sample rate) |
+| **JudoScale** | Heroku autoscaling — passive unless under load |
+| **Akismet** | Spam detection (secondary to dodginess score) |
+| **GeoIP2** | Geolocation for analytics |
 
-### Services:
+## Key Models
 
-Caddy: /etc/systemd/system/caddy.service
-Bear: /etc/systemd/system/bearblog.service
-Litestream: /etc/systemd/system/litestream.service
+- **`UserSettings`** — per-user upgrade status, LemonSqueezy order info
+- **`Blog`** — subdomain, custom domain, styles, discovery settings, dodginess score
+- **`Post`** — content, slug, tags, upvotes, HN-style score for discover feed
+- **`Hit`** — analytics hits (hash_id scrubbed after 24h for privacy)
+- **`Subscriber`** — email subscribers per blog
+- **`Stylesheet`** — named CSS themes
+- **`Media`** — uploaded image URLs per blog
+- **`PersistentStore`** — singleton for platform-wide settings (review terms, blacklist)
 
-Restart service: systemctl restart bearblog
+## Discovery Feed & Moderation
 
-### DB backups run in a crontab:
+Unreviewed blogs get a `dodginess_score` computed from highlight/blacklist terms in `PersistentStore`. Upgraded users are auto-reviewed. Staff can approve, block, ignore, or flag blogs via `/staff/`.
 
-Backup is running in a cron job: crontab -e
- 
-script: /root/deploy/backup.sh
-local backups: /root/backups/
-remote backups: https://sqlite.sfo3.digitaloceanspaces.com/backups/
+Post scores use an HN-style algorithm (log of upvotes + time decay, capped at 30 upvotes to prevent permanent stickiness).
 
-### Litestream:
+## Middleware (in order)
 
-config: /etc/litestream.yml 
+1. `RateLimitMiddleware` — 10 req/10s per IP, bans on `.php`/`.env` probes and SQL injection patterns
+2. `ConditionalXFrameOptionsMiddleware` — `X-Frame-Options: DENY` on main domains only
+3. GZip, Security, WhiteNoise, Sessions, DebugToolbar, Common
+4. `AllowAnyDomainCsrfMiddleware` — custom CSRF handling to support custom domains
+

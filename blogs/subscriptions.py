@@ -53,6 +53,7 @@ def lemon_webhook(request):
             return HttpResponse(f'Upgraded {user}')
 
     # Account downgrade
+    # This only happens on order id, not on email to prevent old sub overwriting new one
     elif request.META.get('HTTP_X_EVENT_NAME') in ('subscription_expired', 'subscription_paused'):
         user_settings = None
         try:
