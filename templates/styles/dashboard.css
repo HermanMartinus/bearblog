@@ -163,6 +163,21 @@ button#toggle-full-screen {
     margin: 0;
 }
 
+button.link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: var(--link-color);
+    font-size: inherit;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+button.link-button:hover {
+    text-decoration: underline;
+}
+
 /* dashboard post list and analytics */
 ul.post-list {
     list-style-type: none;

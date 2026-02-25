@@ -521,6 +521,20 @@ def custom_domain_edit(request, id):
 
 
 @login_required
+def remove_domain(request, id):
+    if request.method != 'POST':
+        return redirect('dashboard', id=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog.domain = ""
+    blog.save()
+    # Invalidate domain_map cache
+    cache.delete('domain_map')
+    blog.user.settings.orphaned_domain_warning_email_sent = None
+    blog.user.settings.save()
+    return redirect('dashboard', id=blog.subdomain)
+
+
+@login_required
 def directive_edit(request, id):
     if request.user.is_superuser:
         blog = get_object_or_404(Blog, subdomain=id)

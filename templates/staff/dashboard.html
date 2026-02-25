@@ -81,6 +81,7 @@ Staff dashboard  ʕง•ᴥ•ʔง
     <h2>Recent upgrades</h2>
     <p>
         <a href="{% url 'email_new_upgrades' %}" target="_blank">Email {{ new_upgrades_count }} new upgrades</a>
+        | <a href="{% url 'email_domain_warnings' %}" target="_blank">Warn {{ orphaned_domain_blogs_count }} users about orphaned domains</a>
     </p>
     <hr>
 

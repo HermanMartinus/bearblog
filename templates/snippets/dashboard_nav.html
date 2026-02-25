@@ -46,9 +46,14 @@
 {% endif %}
 
 {% if blog.domain and not blog.user.settings.upgraded %}
-<p class="notification" style="background-color: lightsalmon; border-radius: 3px; padding: 5px">
-    <small>
-        ❗️Your blog's custom domain is at risk of being disconnected. Upgrade to ensure {{ blog.domain }} remains active. 
-    </small>
-</p>
+<div class="notification" style="background-color:lightsalmon;border-radius:3px;padding:5px;margin-top:10px;font-size:small;text-align:center">
+
+    Your blog's custom domain is at risk of being disconnected.
+    <br>
+    <a href="{% url 'upgrade' %}">Upgrade</a> to ensure {{ blog.domain }} remains active, or
+    <form method="post" action="{% url 'remove_domain' id=blog.subdomain %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="link-button" onclick="return confirm('Are you sure you want to remove the domain {{ blog.domain }}?')">remove the domain</button>.
+    </form>
+</div>
 {% endif %}

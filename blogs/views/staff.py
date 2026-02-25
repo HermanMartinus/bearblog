@@ -121,6 +121,7 @@ def dashboard(request):
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
 
     new_upgrades_count = new_upgrades().count()
+    orphaned_domain_blogs_count = blogs_with_orphaned_domains().values('user').distinct().count()
     return render(
         request,
         'staff/dashboard.html',
@@ -140,6 +141,7 @@ def dashboard(request):
             'flagged_blogs_count': flagged_blogs_count,
             'new_blogs_count': new_blogs_count,
             'new_upgrades_count': new_upgrades_count,
+            'orphaned_domain_blogs_count': orphaned_domain_blogs_count,
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
             'period': period,
@@ -177,6 +179,15 @@ def new_upgrades():
         )
     return upgraded_users
 
+
+def blogs_with_orphaned_domains():
+    return Blog.objects.filter(
+        domain__isnull=False,
+        user__settings__upgraded=False,
+        user__settings__orphaned_domain_warning_email_sent__isnull=True,
+    ).exclude(domain='').select_related('user', 'user__settings')
+
+
 @staff_member_required
 def email_new_upgrades(request):
     upgraded_users = new_upgrades()
@@ -192,6 +203,28 @@ def email_new_upgrades(request):
         user.settings.upgraded_email_sent = True
         user.settings.save()
     return HttpResponse(f"Emailed {upgraded_users.count()} new upgrades.")
+
+
+@staff_member_required
+def email_domain_warnings(request):
+    blogs = blogs_with_orphaned_domains()
+
+    users_to_notify = {}
+    for blog in blogs:
+        users_to_notify.setdefault(blog.user, []).append(blog)
+
+    for user, user_blogs in list(users_to_notify.items())[:5]:
+        send_async_mail(
+            "Your custom domain on Bear Blog",
+            render_to_string('emails/domain_warning.html', {'blogs': user_blogs}),
+            'Herman Martinus <herman@mg.bearblog.dev>',
+            [user.email],
+            ['Herman Martinus <herman@bearblog.dev>'],
+        )
+        user.settings.orphaned_domain_warning_email_sent = timezone.now()
+        user.settings.save()
+
+    return HttpResponse(f"Emailed {min(5, len(users_to_notify))} of {len(users_to_notify)} users about orphaned domains.")
 
 
 @staff_member_required
