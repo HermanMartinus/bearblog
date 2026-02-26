@@ -222,7 +222,7 @@ def email_domain_warnings(request):
     for blog in blogs:
         users_to_notify.setdefault(blog.user, []).append(blog)
 
-    for user, user_blogs in list(users_to_notify.items())[:5]:
+    for user, user_blogs in list(users_to_notify.items())[:20]:
         send_async_mail(
             "Your custom domain on Bear Blog",
             render_to_string('emails/domain_warning.html', {'blogs': user_blogs}),
@@ -233,7 +233,7 @@ def email_domain_warnings(request):
         user.settings.orphaned_domain_warning_email_sent = timezone.now()
         user.settings.save()
 
-    return HttpResponse(f"Emailed {min(5, len(users_to_notify))} of {len(users_to_notify)} users about orphaned domains.")
+    return HttpResponse(f"Emailed {min(20, len(users_to_notify))} of {len(users_to_notify)} users about orphaned domains.")
 
 
 @staff_member_required
@@ -244,7 +244,7 @@ def remove_orphaned_domains(request):
         user__settings__orphaned_domain_warning_email_sent__lte=cutoff,
     ).exclude(domain='').exclude(domain__isnull=True).select_related('user', 'user__settings')
 
-    to_remove = list(blogs[:5])
+    to_remove = list(blogs[:20])
     for blog in to_remove:
         blog.domain = ''
         blog.save()
