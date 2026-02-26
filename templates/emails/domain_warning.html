@@ -4,7 +4,7 @@ It looks like your Bear Blog subscription has expired, but you still have {% if 
 <br><br>
 Custom domains are an upgraded feature which support the project. Since you're not currently on an upgraded account, your {% if blogs|length == 1 %}domain is{% else %}domains are{% endif %} set to be removed over the next 2 weeks.
 <br><br>
-You can either <a href="https://bearblog.dev/upgrade/">upgrade your account</a> to keep your {% if blogs|length == 1 %}domain{% else %}domains{% endif %}, 
+You can either <a href="https://bearblog.dev/dashboard/upgrade/">upgrade your account</a> to keep your {% if blogs|length == 1 %}domain{% else %}domains{% endif %}, 
 or revert your {% if blogs|length == 1 %}domain{% else %}domains{% endif %} to {% for blog in blogs %}{{ blog.blank_bear_domain }}{% if not forloop.last %}{% if forloop.revcounter == 2 %} and {% else %}, {% endif %}{% endif %}{% endfor %} in <a href="https://bearblog.dev/dashboard/">your dashboard</a>.
 <br><br>
 If you have any questions or believe there has been a mistake please email me.
