@@ -200,8 +200,8 @@ def blogs_with_orphaned_domains():
 
 
 def monthly_users_to_upgrade():
-    earliest = timezone.now() - timedelta(days=150)  # ~5 months (past the high-churn window)
-    latest = timezone.now() - timedelta(days=60)  # ~2 months (just before churn spike)
+    earliest = timezone.now() - timedelta(days=150)  # ~5 months
+    latest = timezone.now() - timedelta(days=60)  # ~2 months
     return UserSettings.objects.filter(
         upgraded=True,
         plan_type='monthly',
@@ -215,7 +215,7 @@ def email_upgrade_from_monthly(request):
     users = list(monthly_users_to_upgrade()[:5])
     for user_settings in users:
         send_async_mail(
-            "Upgrade your Bear Blog subscription",
+            "Your Bear Blog subscription",
             render_to_string('emails/upgrade_from_monthly.html'),
             'Herman Martinus <herman@mg.bearblog.dev>',
             [user_settings.user.email],
