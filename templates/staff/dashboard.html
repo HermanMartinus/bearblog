@@ -83,6 +83,7 @@ Staff dashboard  ʕง•ᴥ•ʔง
         <a href="{% url 'email_new_upgrades' %}" target="_blank">Email {{ new_upgrades_count }} new upgrades</a>
         | <a href="{% url 'email_domain_warnings' %}" target="_blank">Warn {{ orphaned_domain_blogs_count }} users about orphaned domains</a>
         | <a href="{% url 'remove_orphaned_domains' %}" target="_blank">Remove domains from {{ overdue_orphaned_domain_count }} overdue blogs</a>
+        | <a href="{% url 'email_upgrade_from_monthly' %}" target="_blank">Nudge {{ upgrade_nudge_count }} monthly users to upgrade</a>
     </p>
     <hr>
 

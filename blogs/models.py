@@ -31,6 +31,7 @@ class UserSettings(models.Model):
     plan_type = models.CharField(max_length=20, choices=PLAN_TYPE_CHOICES, blank=True, null=True)
     upgraded_email_sent = models.BooleanField(default=False)
     orphaned_domain_warning_email_sent = models.DateTimeField(blank=True, null=True)
+    upgrade_nudge_email_sent = models.DateTimeField(blank=True, null=True)
     discovery_hide_list = models.JSONField(default=dict, blank=True)
 
     dashboard_styles = models.TextField(blank=True)

@@ -35,6 +35,7 @@ urlpatterns = [
     path('staff/review/flag/<pk>', main_site_only(staff.flag), name='review_flag'),
     path('staff/review/delete/<pk>', main_site_only(staff.delete), name='review_delete'),
     path('staff/dashboard/email-new-upgrades/', main_site_only(staff.email_new_upgrades), name='email_new_upgrades'),
+    path('staff/dashboard/email-upgrade-from-monthly/', main_site_only(staff.email_upgrade_from_monthly), name='email_upgrade_from_monthly'),
     path('staff/dashboard/email-domain-warnings/', main_site_only(staff.email_domain_warnings), name='email_domain_warnings'),
     path('staff/dashboard/remove-orphaned-domains/', main_site_only(staff.remove_orphaned_domains), name='remove_orphaned_domains'),
     path('staff/dashboard/delete-empty/', main_site_only(staff.delete_empty), name='delete_empty'),

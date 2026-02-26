@@ -12,7 +12,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 
 from blogs.helpers import send_async_mail
-from blogs.models import Blog, PersistentStore, Post
+from blogs.models import Blog, PersistentStore, Post, UserSettings
 
 from statistics import mean
 from datetime import timedelta
@@ -123,6 +123,7 @@ def dashboard(request):
 
     new_upgrades_count = new_upgrades().count()
     orphaned_domain_blogs_count = blogs_with_orphaned_domains().values('user').distinct().count()
+    upgrade_nudge_count = monthly_users_to_upgrade().count()
 
     cutoff = timezone.now() - timedelta(days=14)
     overdue_orphaned_domain_count = Blog.objects.filter(
@@ -149,6 +150,7 @@ def dashboard(request):
             'flagged_blogs_count': flagged_blogs_count,
             'new_blogs_count': new_blogs_count,
             'new_upgrades_count': new_upgrades_count,
+            'upgrade_nudge_count': upgrade_nudge_count,
             'orphaned_domain_blogs_count': orphaned_domain_blogs_count,
             'overdue_orphaned_domain_count': overdue_orphaned_domain_count,
             'empty_blogs': all_empty_blogs,
@@ -195,6 +197,32 @@ def blogs_with_orphaned_domains():
         user__settings__upgraded=False,
         user__settings__orphaned_domain_warning_email_sent__isnull=True,
     ).exclude(domain='').select_related('user', 'user__settings')
+
+
+def monthly_users_to_upgrade():
+    cutoff = timezone.now() - timedelta(days=120)  # ~4 months
+    return UserSettings.objects.filter(
+        upgraded=True,
+        plan_type='monthly',
+        upgraded_date__lte=cutoff,
+        upgrade_nudge_email_sent__isnull=True,
+    ).select_related('user')
+
+
+@staff_member_required
+def email_upgrade_from_monthly(request):
+    users = list(monthly_users_to_upgrade()[:5])
+    for user_settings in users:
+        send_async_mail(
+            "Upgrade your Bear Blog subscription",
+            render_to_string('emails/upgrade_from_monthly.html'),
+            'Herman Martinus <herman@mg.bearblog.dev>',
+            [user_settings.user.email],
+            ['Herman Martinus <herman@bearblog.dev>'],
+        )
+        user_settings.upgrade_nudge_email_sent = timezone.now()
+        user_settings.save()
+    return HttpResponse(f"Emailed {len(users)} monthly users to upgrade.")
 
 
 @staff_member_required
