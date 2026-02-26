@@ -121,16 +121,6 @@ def dashboard(request):
     formatted_conversion_rate = f"{conversion_rate*100:.2f}%"
     formatted_total_conversion_rate = f"{total_conversion_rate*100:.2f}%"
 
-    new_upgrades_count = new_upgrades().count()
-    orphaned_domain_blogs_count = blogs_with_orphaned_domains().values('user').distinct().count()
-    upgrade_nudge_count = monthly_users_to_upgrade().count()
-
-    cutoff = timezone.now() - timedelta(days=14)
-    overdue_orphaned_domain_count = Blog.objects.filter(
-        user__settings__upgraded=False,
-        user__settings__orphaned_domain_warning_email_sent__lte=cutoff,
-    ).exclude(domain='').exclude(domain__isnull=True).count()
-    
     return render(
         request,
         'staff/dashboard.html',
@@ -149,10 +139,6 @@ def dashboard(request):
             'dodgy_blogs_count': dodgy_blogs_count,
             'flagged_blogs_count': flagged_blogs_count,
             'new_blogs_count': new_blogs_count,
-            'new_upgrades_count': new_upgrades_count,
-            'upgrade_nudge_count': upgrade_nudge_count,
-            'orphaned_domain_blogs_count': orphaned_domain_blogs_count,
-            'overdue_orphaned_domain_count': overdue_orphaned_domain_count,
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
             'period': period,
@@ -208,6 +194,31 @@ def monthly_users_to_upgrade():
         upgraded_date__range=(earliest, latest),
         upgrade_nudge_email_sent__isnull=True,
     ).select_related('user')
+
+
+@staff_member_required
+def actions(request):
+    upgraded_users = list(new_upgrades().select_related('settings'))
+    nudge_users = list(monthly_users_to_upgrade())
+    orphaned_blogs = list(blogs_with_orphaned_domains())
+    cutoff = timezone.now() - timedelta(days=14)
+    overdue_blogs = list(Blog.objects.filter(
+        user__settings__upgraded=False,
+        user__settings__orphaned_domain_warning_email_sent__lte=cutoff,
+    ).exclude(domain='').exclude(domain__isnull=True).select_related('user', 'user__settings')[:20])
+
+    # Group orphaned blogs by user
+    orphaned_by_user = {}
+    for blog in orphaned_blogs:
+        orphaned_by_user.setdefault(blog.user, []).append(blog)
+
+    return render(request, 'staff/actions.html', {
+        'upgraded_users': upgraded_users,
+        'nudge_users': nudge_users,
+        'orphaned_blogs': orphaned_blogs,
+        'orphaned_by_user': orphaned_by_user,
+        'overdue_blogs': overdue_blogs,
+    })
 
 
 @staff_member_required

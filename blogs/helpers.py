@@ -212,10 +212,10 @@ class EmailThread(threading.Thread):
 
 # Important! All members of the recipient list will see the other recipients in the 'To' field
 def send_async_mail(subject, html_message, from_email, recipient_list, reply_to=None):
-    if settings.DEBUG:
-        print(html_message)
-    else:
-        print('Sent email to ', recipient_list)
+    if os.getenv('ENVIRONMENT') == 'dev':
+        print(f'[DEV] Would send email to {recipient_list}: {subject}')
+        return
+    print('Sent email to ', recipient_list)
     EmailThread(subject, html_message, from_email, recipient_list, reply_to).start()
 
 

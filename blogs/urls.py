@@ -25,6 +25,7 @@ urlpatterns = [
 
     # Staff dashboard
     path('staff/dashboard/', main_site_only(staff.dashboard), name='staff_dashboard'),
+    path('staff/actions/', main_site_only(staff.actions), name='staff_actions'),
     path('staff/review/new/', main_site_only(staff.review_bulk), name='review_new'),
     path('staff/review/opt-in/', main_site_only(staff.review_bulk), name='review_opt_in'),
     path('staff/review/dodgy/', main_site_only(staff.review_bulk), name='review_dodgy'),

@@ -21,7 +21,8 @@ Staff dashboard  ʕง•ᴥ•ʔง
 {% endblock %}
 
 {% block content %}
-<a href="{% url 'review_opt_in' %}">Review {{ opt_in_blogs_count }} opt-in blogs</a>
+<a href="{% url 'staff_actions' %}">Actions</a>
+| <a href="{% url 'review_opt_in' %}">Review {{ opt_in_blogs_count }} opt-in blogs</a>
 | <a href="{% url 'review_flagged' %}">Review {{ flagged_blogs_count }} flagged blogs</a>
 | <a href="{% url 'review_dodgy' %}">Review {{ dodgy_blogs_count }} dodgy blogs</a>
 | <a href="{% url 'review_new' %}">Review {{ new_blogs_count }} new blogs</a>
@@ -77,15 +78,6 @@ Staff dashboard  ʕง•ᴥ•ʔง
         <span>{{ start_date|date:"j F Y" }}</span>
         <span>{{ end_date|date:"j F Y" }}</span>
     </span>
-
-    <h2>Actions</h2>
-    <p>
-        <a href="{% url 'email_new_upgrades' %}" target="_blank">Email {{ new_upgrades_count }} new upgrades</a>
-        | <a href="{% url 'email_domain_warnings' %}" target="_blank">Warn {{ orphaned_domain_blogs_count }} users about orphaned domains</a>
-        | <a href="{% url 'remove_orphaned_domains' %}" target="_blank">Remove domains from {{ overdue_orphaned_domain_count }} overdue blogs</a>
-        | <a href="{% url 'email_upgrade_from_monthly' %}" target="_blank">Nudge {{ upgrade_nudge_count }} monthly users to upgrade</a>
-    </p>
-    <hr>
 
     <h2>Check spam blog</h2>
     <form method="post" action="{% url 'check_spam' %}" target="_blank" class="full-width">

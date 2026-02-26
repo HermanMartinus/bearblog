@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Actions{% endblock %}
+
+{% block seo %}
+<meta name="robots" content="noindex">
+{% endblock %}
+
+{% block heading %}
+Staff Actions
+{% endblock %}
+
+{% block content %}
+<main>
+    <p><a href="{% url 'staff_dashboard' %}">&larr; Back to dashboard</a></p>
+
+    <!-- Email new upgrades -->
+    <h2>Email new upgrades ({{ upgraded_users|length }})</h2>
+    {% if upgraded_users %}
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Upgraded date</th>
+                <th>Admin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in upgraded_users %}
+            <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.settings.upgraded_date|date:"j M Y" }}</td>
+                <td><a href="/admin/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" onclick="if (confirm('Send upgrade email to {{ upgraded_users|length }} users?')) { window.location = '{% url 'email_new_upgrades' %}' }">Send upgrade emails</button>
+    {% else %}
+    <p>No new upgrades to email.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- Nudge monthly users to upgrade -->
+    <h2>Nudge monthly users ({{ nudge_users|length }})</h2>
+    {% if nudge_users %}
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Upgraded date</th>
+                <th>Admin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for settings in nudge_users %}
+            <tr>
+                <td>{{ settings.user.email }}</td>
+                <td>{{ settings.plan_type }}</td>
+                <td>{{ settings.upgraded_date|date:"j M Y" }}</td>
+                <td><a href="/admin/blogs/usersettings/{{ settings.pk }}/change/" target="_blank">view</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" onclick="if (confirm('Send nudge email to {{ nudge_users|length }} users?')) { window.location = '{% url 'email_upgrade_from_monthly' %}' }">Send nudge emails</button>
+    {% else %}
+    <p>No monthly users to nudge.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- Warn about orphaned domains -->
+    <h2>Warn about orphaned domains ({{ orphaned_by_user|length }} users, {{ orphaned_blogs|length }} blogs)</h2>
+    {% if orphaned_by_user %}
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Domains</th>
+                <th>Admin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user, blogs in orphaned_by_user.items %}
+            <tr>
+                <td>{{ user.email }}</td>
+                <td>{% for blog in blogs %}{{ blog.domain }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                <td><a href="/admin/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" onclick="if (confirm('Send domain warning to {{ orphaned_by_user|length }} users?')) { window.location = '{% url 'email_domain_warnings' %}' }">Send domain warnings</button>
+    {% else %}
+    <p>No orphaned domains to warn about.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- Remove overdue orphaned domains -->
+    <h2>Remove overdue orphaned domains ({{ overdue_blogs|length }} blogs)</h2>
+    {% if overdue_blogs %}
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Domain</th>
+                <th>Warning sent</th>
+                <th>Admin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for blog in overdue_blogs %}
+            <tr>
+                <td>{{ blog.user.email }}</td>
+                <td>{{ blog.domain }}</td>
+                <td>{{ blog.user.settings.orphaned_domain_warning_email_sent|date:"j M Y" }}</td>
+                <td><a href="/admin/blogs/usersettings/{{ blog.user.settings.pk }}/change/" target="_blank">view</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" onclick="if (confirm('Remove domains from {{ overdue_blogs|length }} blogs?')) { window.location = '{% url 'remove_orphaned_domains' %}' }">Remove domains</button>
+    {% else %}
+    <p>No overdue domains to remove.</p>
+    {% endif %}
+</main>
+{% endblock %}
