@@ -34,7 +34,7 @@ Staff Actions
             <tr>
                 <td>{{ user.email }}</td>
                 <td>{{ user.settings.upgraded_date|date:"j M Y" }}</td>
-                <td><a href="/admin/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
+                <td><a href="/mothership/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -68,7 +68,7 @@ Staff Actions
                 <td>{{ settings.user.email }}</td>
                 <td>{{ settings.plan_type }}</td>
                 <td>{{ settings.upgraded_date|date:"j M Y" }}</td>
-                <td><a href="/admin/blogs/usersettings/{{ settings.pk }}/change/" target="_blank">view</a></td>
+                <td><a href="/mothership/blogs/usersettings/{{ settings.pk }}/change/" target="_blank">view</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -100,7 +100,7 @@ Staff Actions
             <tr>
                 <td>{{ user.email }}</td>
                 <td>{% for blog in blogs %}{{ blog.domain }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-                <td><a href="/admin/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
+                <td><a href="/mothership/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -134,7 +134,7 @@ Staff Actions
                 <td>{{ blog.user.email }}</td>
                 <td>{{ blog.domain }}</td>
                 <td>{{ blog.user.settings.orphaned_domain_warning_email_sent|date:"j M Y" }}</td>
-                <td><a href="/admin/blogs/usersettings/{{ blog.user.settings.pk }}/change/" target="_blank">view</a></td>
+                <td><a href="/mothership/blogs/usersettings/{{ blog.user.settings.pk }}/change/" target="_blank">view</a></td>
             </tr>
             {% endfor %}
         </tbody>
