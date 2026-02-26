@@ -200,7 +200,7 @@ def blogs_with_orphaned_domains():
 
 
 def monthly_users_to_upgrade():
-    cutoff = timezone.now() - timedelta(days=120)  # ~4 months
+    cutoff = timezone.now() - timedelta(days=75)  # ~2.5 months
     return UserSettings.objects.filter(
         upgraded=True,
         plan_type='monthly',
