@@ -212,88 +212,85 @@ def actions(request):
     for blog in orphaned_blogs:
         orphaned_by_user.setdefault(blog.user, []).append(blog)
 
+    result = None
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'email_new_upgrades':
+            count = 0
+            for user in upgraded_users:
+                send_async_mail(
+                    "You upgraded!",
+                    render_to_string('emails/upgraded.html'),
+                    'Herman Martinus <herman@mg.bearblog.dev>',
+                    [user.email],
+                    ['Herman Martinus <herman@bearblog.dev>'],
+                )
+                user.settings.upgraded_email_sent = True
+                user.settings.save()
+                count += 1
+            result = f"Emailed {count} new upgrades."
+            upgraded_users = list(new_upgrades().select_related('settings'))
+
+        elif action == 'email_nudge_monthly':
+            count = 0
+            for user_settings in nudge_users[:5]:
+                send_async_mail(
+                    "Your Bear Blog subscription",
+                    render_to_string('emails/upgrade_from_monthly.html'),
+                    'Herman Martinus <herman@mg.bearblog.dev>',
+                    [user_settings.user.email],
+                    ['Herman Martinus <herman@bearblog.dev>'],
+                )
+                user_settings.upgrade_nudge_email_sent = timezone.now()
+                user_settings.save()
+                count += 1
+            result = f"Emailed {count} monthly users to upgrade."
+            nudge_users = list(monthly_users_to_upgrade())
+
+        elif action == 'email_domain_warnings':
+            count = 0
+            for user, user_blogs in list(orphaned_by_user.items())[:20]:
+                send_async_mail(
+                    "Your custom domain on Bear Blog",
+                    render_to_string('emails/domain_warning.html', {'blogs': user_blogs}),
+                    'Herman Martinus <herman@mg.bearblog.dev>',
+                    [user.email],
+                    ['Herman Martinus <herman@bearblog.dev>'],
+                )
+                user.settings.orphaned_domain_warning_email_sent = timezone.now()
+                user.settings.save()
+                count += 1
+            result = f"Emailed {count} users about orphaned domains."
+            orphaned_blogs = list(blogs_with_orphaned_domains())
+            orphaned_by_user = {}
+            for blog in orphaned_blogs:
+                orphaned_by_user.setdefault(blog.user, []).append(blog)
+
+        elif action == 'remove_orphaned_domains':
+            count = 0
+            for blog in overdue_blogs:
+                blog.domain = ''
+                blog.save()
+                blog.user.settings.orphaned_domain_warning_email_sent = None
+                blog.user.settings.save()
+                count += 1
+            if count:
+                cache.delete('domain_map')
+            result = f"Removed domains from {count} blogs."
+            overdue_blogs = list(Blog.objects.filter(
+                user__settings__upgraded=False,
+                user__settings__orphaned_domain_warning_email_sent__lte=cutoff,
+            ).exclude(domain='').exclude(domain__isnull=True).select_related('user', 'user__settings')[:20])
+
     return render(request, 'staff/actions.html', {
         'upgraded_users': upgraded_users,
         'nudge_users': nudge_users,
         'orphaned_blogs': orphaned_blogs,
         'orphaned_by_user': orphaned_by_user,
         'overdue_blogs': overdue_blogs,
+        'result': result,
     })
-
-
-@staff_member_required
-def email_upgrade_from_monthly(request):
-    users = list(monthly_users_to_upgrade()[:5])
-    for user_settings in users:
-        send_async_mail(
-            "Your Bear Blog subscription",
-            render_to_string('emails/upgrade_from_monthly.html'),
-            'Herman Martinus <herman@mg.bearblog.dev>',
-            [user_settings.user.email],
-            ['Herman Martinus <herman@bearblog.dev>'],
-        )
-        user_settings.upgrade_nudge_email_sent = timezone.now()
-        user_settings.save()
-    return HttpResponse(f"Emailed {len(users)} monthly users to upgrade.")
-
-
-@staff_member_required
-def email_new_upgrades(request):
-    upgraded_users = new_upgrades()
-
-    for user in upgraded_users:
-        send_async_mail(
-            "You upgraded!",
-            render_to_string('emails/upgraded.html'),
-            'Herman Martinus <herman@mg.bearblog.dev>',
-            [user.email],
-            ['Herman Martinus <herman@bearblog.dev>'],
-        )
-        user.settings.upgraded_email_sent = True
-        user.settings.save()
-    return HttpResponse(f"Emailed {upgraded_users.count()} new upgrades.")
-
-
-@staff_member_required
-def email_domain_warnings(request):
-    blogs = blogs_with_orphaned_domains()
-
-    users_to_notify = {}
-    for blog in blogs:
-        users_to_notify.setdefault(blog.user, []).append(blog)
-
-    for user, user_blogs in list(users_to_notify.items())[:20]:
-        send_async_mail(
-            "Your custom domain on Bear Blog",
-            render_to_string('emails/domain_warning.html', {'blogs': user_blogs}),
-            'Herman Martinus <herman@mg.bearblog.dev>',
-            [user.email],
-            ['Herman Martinus <herman@bearblog.dev>'],
-        )
-        user.settings.orphaned_domain_warning_email_sent = timezone.now()
-        user.settings.save()
-
-    return HttpResponse(f"Emailed {min(20, len(users_to_notify))} of {len(users_to_notify)} users about orphaned domains.")
-
-
-@staff_member_required
-def remove_orphaned_domains(request):
-    cutoff = timezone.now() - timedelta(days=14)
-    blogs = Blog.objects.filter(
-        user__settings__upgraded=False,
-        user__settings__orphaned_domain_warning_email_sent__lte=cutoff,
-    ).exclude(domain='').exclude(domain__isnull=True).select_related('user', 'user__settings')
-
-    to_remove = list(blogs[:20])
-    for blog in to_remove:
-        blog.domain = ''
-        blog.save()
-        blog.user.settings.orphaned_domain_warning_email_sent = None
-        blog.user.settings.save()
-    if to_remove:
-        cache.delete('domain_map')
-
-    return HttpResponse(f"Removed domains from {len(to_remove)} blogs.")
 
 
 @staff_member_required

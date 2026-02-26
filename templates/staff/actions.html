@@ -14,6 +14,10 @@ Staff Actions
 <main>
     <p><a href="{% url 'staff_dashboard' %}">&larr; Back to dashboard</a></p>
 
+    {% if result %}
+    <p><b>{{ result }}</b></p>
+    {% endif %}
+
     <!-- Email new upgrades -->
     <h2>Email new upgrades ({{ upgraded_users|length }})</h2>
     {% if upgraded_users %}
@@ -35,7 +39,11 @@ Staff Actions
             {% endfor %}
         </tbody>
     </table>
-    <button type="button" onclick="if (confirm('Send upgrade email to {{ upgraded_users|length }} users?')) { window.location = '{% url 'email_new_upgrades' %}' }">Send upgrade emails</button>
+    <form method="post" onsubmit="return confirm('Send upgrade email to {{ upgraded_users|length }} users?')">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="email_new_upgrades">
+        <button type="submit">Send upgrade emails</button>
+    </form>
     {% else %}
     <p>No new upgrades to email.</p>
     {% endif %}
@@ -65,7 +73,11 @@ Staff Actions
             {% endfor %}
         </tbody>
     </table>
-    <button type="button" onclick="if (confirm('Send nudge email to {{ nudge_users|length }} users?')) { window.location = '{% url 'email_upgrade_from_monthly' %}' }">Send nudge emails</button>
+    <form method="post" onsubmit="return confirm('Send nudge email to {{ nudge_users|length }} users?')">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="email_nudge_monthly">
+        <button type="submit">Send nudge emails</button>
+    </form>
     {% else %}
     <p>No monthly users to nudge.</p>
     {% endif %}
@@ -93,7 +105,11 @@ Staff Actions
             {% endfor %}
         </tbody>
     </table>
-    <button type="button" onclick="if (confirm('Send domain warning to {{ orphaned_by_user|length }} users?')) { window.location = '{% url 'email_domain_warnings' %}' }">Send domain warnings</button>
+    <form method="post" onsubmit="return confirm('Send domain warning to {{ orphaned_by_user|length }} users?')">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="email_domain_warnings">
+        <button type="submit">Send domain warnings</button>
+    </form>
     {% else %}
     <p>No orphaned domains to warn about.</p>
     {% endif %}
@@ -123,7 +139,11 @@ Staff Actions
             {% endfor %}
         </tbody>
     </table>
-    <button type="button" onclick="if (confirm('Remove domains from {{ overdue_blogs|length }} blogs?')) { window.location = '{% url 'remove_orphaned_domains' %}' }">Remove domains</button>
+    <form method="post" onsubmit="return confirm('Remove domains from {{ overdue_blogs|length }} blogs?')">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="remove_orphaned_domains">
+        <button type="submit">Remove domains</button>
+    </form>
     {% else %}
     <p>No overdue domains to remove.</p>
     {% endif %}
