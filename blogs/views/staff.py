@@ -200,11 +200,12 @@ def blogs_with_orphaned_domains():
 
 
 def monthly_users_to_upgrade():
-    cutoff = timezone.now() - timedelta(days=75)  # ~2.5 months
+    earliest = timezone.now() - timedelta(days=150)  # ~5 months (past the high-churn window)
+    latest = timezone.now() - timedelta(days=60)  # ~2 months (just before churn spike)
     return UserSettings.objects.filter(
         upgraded=True,
         plan_type='monthly',
-        upgraded_date__lte=cutoff,
+        upgraded_date__range=(earliest, latest),
         upgrade_nudge_email_sent__isnull=True,
     ).select_related('user')
 
