@@ -23,6 +23,12 @@ class UserSettings(models.Model):
     upgraded_date = models.DateTimeField(blank=True, null=True, db_index=True)
     order_id = models.CharField(max_length=100, blank=True, null=True)
     order_email = models.CharField(max_length=100, blank=True, null=True)
+    PLAN_TYPE_CHOICES = [
+        ('monthly', 'monthly'),
+        ('yearly', 'yearly'),
+        ('lifetime', 'lifetime'),
+    ]
+    plan_type = models.CharField(max_length=20, choices=PLAN_TYPE_CHOICES, blank=True, null=True)
     upgraded_email_sent = models.BooleanField(default=False)
     orphaned_domain_warning_email_sent = models.DateTimeField(blank=True, null=True)
     discovery_hide_list = models.JSONField(default=dict, blank=True)

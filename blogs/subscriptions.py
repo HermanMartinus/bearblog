@@ -13,6 +13,19 @@ import json
 import hashlib
 import hmac
 
+
+def normalize_plan_type(variant_name):
+    if not variant_name:
+        return None
+    name = variant_name.lower()
+    if name.startswith('monthly'):
+        return 'monthly'
+    elif name.startswith('yearly'):
+        return 'yearly'
+    elif name.startswith('lifetime'):
+        return 'lifetime'
+    return None
+
 @csrf_exempt
 def lemon_webhook(request):
     digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode('utf-8'), msg=request.body, digestmod=hashlib.sha256).hexdigest()
@@ -38,12 +51,16 @@ def lemon_webhook(request):
         if user:
             user.settings.upgraded = True
             user.settings.upgraded_date = timezone.now()
+            variant_name = None
             if 'order_id' in data['data']['attributes']:
-                # If subscription object get order_id
+                # If subscription object get order_id and variant_name
                 user.settings.order_id = data['data']['attributes']['order_id']
+                variant_name = data['data']['attributes'].get('variant_name')
             else:
-                # If order object get id
+                # If order object get id and variant_name from first_order_item
                 user.settings.order_id = data['data']['id']
+                variant_name = data['data']['attributes'].get('first_order_item', {}).get('variant_name')
+            user.settings.plan_type = normalize_plan_type(variant_name)
             if 'user_email' in data['data']['attributes']:
                 user.settings.order_email = data['data']['attributes']['user_email']
             user.settings.save()
@@ -64,6 +81,7 @@ def lemon_webhook(request):
                 user_settings.upgraded = False
                 user_settings.upgraded_date = None
                 user_settings.order_id = None
+                user_settings.plan_type = None
                 user_settings.save()
                 return HttpResponse(f'Downgraded {user_settings}')
         except KeyError:
