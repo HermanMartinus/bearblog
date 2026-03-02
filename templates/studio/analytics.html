@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load custom_tags %}
 
 {% block title %}Analytics | Bear Blog{% endblock %}
 
@@ -55,7 +56,7 @@
 
 {% if request.user.settings.upgraded %}
 {% if post_filter %}
-    <small>Post: <b>{{ posts.0.title }}</b></small>
+    <small>Post: <b>{{ posts.0.title|safe_title }}</b></small>
     <a href="?days={{days_filter}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}"><button>Remove filter</button></a>
     <br>
 {% endif %}
@@ -74,10 +75,10 @@
                 <span>
                     {% if post.hit_count > 0 %}
                     <a href="?days={{days_filter}}&post={{post.slug}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">
-                        {{post.title}}
+                        {{post.title|safe_title}}
                     </a>
                     {% else %}
-                    {{post.title}}
+                    {{post.title|safe_title}}
                     {% endif %}
                     {% if post.title != "Home" %}
                     <small>(▵{{ post.upvotes }})</small>

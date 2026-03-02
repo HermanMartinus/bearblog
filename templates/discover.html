@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_tags %}
 
 {% block title %}{% if newest %}Most recent{% else %}Trending{% endif %} | Bear Blog{% endblock %}
 
@@ -93,7 +94,7 @@
         </span>
         <div>
             <a href="{{ post.blog.useful_domain }}/{{ post.slug }}/">
-                {{ post.title }}
+                {{ post.title|safe_title }}
             </a>
             <small>
                 <span>(<a href="{{ post.blog.useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>

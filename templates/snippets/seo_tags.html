@@ -1,10 +1,11 @@
+{% load custom_tags %}
 <!-- Primary Meta Tags -->
-<meta name="title" content="{{ title }}">
+<meta name="title" content="{{ title|plain_title }}">
 <meta name="description" content="{{ description }}">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:site_name" content="{{ site_name }}">
-<meta property="og:title" content="{{ title }}">
+<meta property="og:title" content="{{ title|plain_title }}">
 <meta property="og:type" content="{{ type }}">
 <meta property="og:url" content="{{ url }}">
 <meta property="og:description" content="{{ description }}">
@@ -14,7 +15,7 @@
 <!-- Twitter -->
 <meta property="twitter:card" content="summary">
 <meta property="twitter:url" content="{{ url }}">
-<meta property="twitter:title" content="{{ title }}">
+<meta property="twitter:title" content="{{ title|plain_title }}">
 <meta property="twitter:description" content="{{ description }}">
 <meta property="twitter:image" content="{% if image %}{{ image }}{% else %}https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556668-0.png{% endif %}">
 
@@ -25,8 +26,8 @@
   {
     "@context": "http://schema.org",
     "@type": "{{ type }}",
-    "name": "{{ title }}",
-    "headline": "{{ title }}",
+    "name": "{{ title|plain_title }}",
+    "headline": "{{ title|plain_title }}",
     "url": "{{ url }}",
     "description": "{{ description }}",
     "image": "{% if image %}{{ image }}{% else %}https://bear-images.sfo2.cdn.digitaloceanspaces.com/herman-1683556668-0.png{% endif %}"

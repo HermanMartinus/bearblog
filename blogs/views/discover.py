@@ -7,6 +7,7 @@ from django.db.models.functions import Length
 
 from blogs.models import Post, Blog
 from blogs.helpers import clean_text
+from blogs.templatetags.custom_tags import plain_title
 
 from feedgen.feed import FeedGenerator
 import mistune
@@ -188,7 +189,7 @@ def feed(request):
     for post in all_posts:
         fe = fg.add_entry()
         fe.id(f"{post.blog.useful_domain}/{post.slug}/")
-        fe.title(post.title)
+        fe.title(plain_title(post.title))
         fe.author({"name": post.blog.subdomain, "email": "hidden"})
         fe.link(href=f"{post.blog.useful_domain}/{post.slug}/")
         fe.content(

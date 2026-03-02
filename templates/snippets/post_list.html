@@ -8,13 +8,13 @@
                 {% include '../snippets/formatted_date.html' with date=post.published_date %}
             </i>
         </span>
-        <a href="/{{ post.slug }}/">{{ post.title }}</a>
+        <a href="/{{ post.slug }}/">{{ post.title|safe_title }}</a>
         {% if show_description %}
         <p>{{ post.meta_description }}</p>
         {% endif %}
 
         {% if show_image and post.meta_image %}
-        <img loading="lazy" src="{{ post.meta_image }}" alt="{{ post.title }}">
+        <img loading="lazy" src="{{ post.meta_image }}" alt="{{ post.title|plain_title }}">
         {% endif %}
 
         {% if show_content %}

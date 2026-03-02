@@ -37,7 +37,7 @@
             {% include '../snippets/formatted_date.html' with date=post.published_date %}
         </span>
         <a href="{% url 'post_edit' id=blog.subdomain  uid=post.uid %}">
-            {{ post.title }}
+            {{ post.title|safe_title }}
         </a>
         {% if not post.publish %}
             <small>(not published)</small>

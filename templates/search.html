@@ -33,7 +33,7 @@
     <li>
         <div>
             <a href="{{ post.blog.dynamic_useful_domain }}/{{ post.slug }}">
-                {{ post.title }}
+                {{ post.title|safe_title }}
             </a>
             <small>
                 <span>(<a href="{{ post.blog.dynamic_useful_domain }}">{{ post.blog.useful_domain }}</a>)</span>

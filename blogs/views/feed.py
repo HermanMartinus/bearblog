@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 
 from blogs.helpers import unmark
-from blogs.templatetags.custom_tags import markdown
+from blogs.templatetags.custom_tags import markdown, plain_title
 from blogs.views.blog import not_found, resolve_address
 
 from feedgen.feed import FeedGenerator
@@ -66,7 +66,7 @@ def generate_feed(blog, feed_type="atom", tag=None, page=0):
     for post in all_posts:
         fe = fg.add_entry()
         fe.id(f"{blog.useful_domain}/{post.slug}/")
-        fe.title(clean_string(post.title))
+        fe.title(clean_string(plain_title(post.title)))
         fe.author({'name': clean_string(blog.subdomain), 'email': 'hidden'})
         fe.link(href=f"{blog.useful_domain}/{post.slug}/")
         if post.meta_description:

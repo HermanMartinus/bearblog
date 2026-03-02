@@ -300,7 +300,7 @@ def element_replacement(markup, blog, post=None, tz=None):
     markup = markup.replace('{{ blog_link }}', f"{blog.useful_domain}")
 
     if post:
-        markup = markup.replace('{{ post_title }}', escape(post.title))
+        markup = markup.replace('{{ post_title }}', safe_title(post.title))
         markup = markup.replace('{{ post_description }}', escape(post.meta_description))
         markup = markup.replace('{{ post_published_date }}', render_to_string('snippets/formatted_date.html', {"date": post.published_date}))
         last_modified = post.last_modified or timezone.now()
@@ -346,6 +346,24 @@ def get_adjacent_posts(post, blog):
         'previous_slug': previous_post['slug'] if previous_post else None,
         'previous_title': previous_post['title'] if previous_post else None,
     }
+
+
+@register.filter
+def safe_title(title):
+    """Convert **bold** to <b>, *italic* to <i>, and &nbsp; to non-breaking spaces in titles."""
+    escaped = escape(title)
+    escaped = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', escaped)
+    escaped = re.sub(r'\*(.+?)\*', r'<i>\1</i>', escaped)
+    escaped = escaped.replace('&amp;nbsp;', '\u00a0')
+    return mark_safe(escaped)
+
+
+@register.filter
+def plain_title(title):
+    """Strip * markers and &nbsp; for plain-text contexts."""
+    title = title.replace('*', '')
+    title = title.replace('&nbsp;', ' ')
+    return title
 
 
 @register.filter
