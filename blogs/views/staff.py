@@ -204,7 +204,6 @@ def free_users_to_nudge():
         settings__upgraded=False,
         settings__contribution_nudge_email_sent__isnull=True,
     ).filter(
-        Q(last_login__gte=three_days_ago) |
         Q(blogs__last_posted__gte=three_days_ago) |
         Q(blogs__last_modified__gte=three_days_ago)
     ).distinct().select_related('settings')
