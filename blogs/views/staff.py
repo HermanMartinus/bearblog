@@ -4,8 +4,8 @@ from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.db.models import Q, F, Count
-from django.db.models.functions import Length, TruncWeek, TruncDate, TruncMonth, Length
+from django.db.models import Q, F, Count, Max
+from django.db.models.functions import Greatest, Length, TruncWeek, TruncDate, TruncMonth
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
@@ -206,7 +206,12 @@ def free_users_to_nudge():
     ).filter(
         Q(blogs__last_posted__gte=three_days_ago) |
         Q(blogs__last_modified__gte=three_days_ago)
-    ).distinct().select_related('settings')
+    ).distinct().select_related('settings').annotate(
+        latest_activity=Greatest(
+            Max('blogs__last_posted'),
+            Max('blogs__last_modified'),
+        )
+    )
 
 
 @staff_member_required

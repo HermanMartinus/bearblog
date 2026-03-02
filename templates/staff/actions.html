@@ -158,7 +158,7 @@ Staff Actions
             <tr>
                 <th>Email</th>
                 <th>Joined</th>
-                <th>Last login</th>
+                <th>Last active</th>
                 <th>Admin</th>
             </tr>
         </thead>
@@ -167,7 +167,7 @@ Staff Actions
             <tr>
                 <td>{{ user.email }}</td>
                 <td>{{ user.date_joined|date:"j M Y" }}</td>
-                <td>{{ user.last_login|date:"j M Y" }}</td>
+                <td>{{ user.latest_activity|date:"j M Y" }}</td>
                 <td><a href="/mothership/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
             </tr>
             {% endfor %}
