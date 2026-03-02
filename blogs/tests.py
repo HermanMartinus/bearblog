@@ -1,7 +1,12 @@
+import json
+
+from django.contrib.auth.models import User
 from django.test import TestCase
+from django.utils import timezone
 from django.utils.safestring import SafeString
 
-from blogs.templatetags.custom_tags import safe_title, plain_title
+from blogs.models import Blog, Post, Stylesheet
+from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title
 
 
 class SafeTitleTests(TestCase):
@@ -88,3 +93,57 @@ class PlainTitleTests(TestCase):
     def test_returns_plain_string(self):
         result = plain_title("*italic*")
         self.assertNotIsInstance(result, SafeString)
+
+
+class ApplyFiltersExcludeTagTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='testuser', password='pass')
+        self.blog = Blog.objects.create(user=self.user, title='Test Blog', subdomain='test-exclude')
+        now = timezone.now()
+
+        self.post_python = Post.objects.create(
+            blog=self.blog, uid='p1', title='Python Basics', slug='python-basics',
+            published_date=now, content='content',
+            all_tags=json.dumps(['python', 'tutorial']),
+        )
+        self.post_django = Post.objects.create(
+            blog=self.blog, uid='p2', title='Django Guide', slug='django-guide',
+            published_date=now, content='content',
+            all_tags=json.dumps(['python', 'django']),
+        )
+        self.post_personal = Post.objects.create(
+            blog=self.blog, uid='p3', title='My Day', slug='my-day',
+            published_date=now, content='content',
+            all_tags=json.dumps(['personal']),
+        )
+        self.post_draft = Post.objects.create(
+            blog=self.blog, uid='p4', title='Draft Ideas', slug='draft-ideas',
+            published_date=now, content='content',
+            all_tags=json.dumps(['personal', 'draft']),
+        )
+        self.all_posts = self.blog.posts.filter(publish=True)
+
+    def test_exclude_single_tag(self):
+        result = apply_filters(self.all_posts, tag='-personal')
+        titles = {p.title for p in result}
+        self.assertEqual(titles, {'Python Basics', 'Django Guide'})
+
+    def test_exclude_multiple_tags(self):
+        result = apply_filters(self.all_posts, tag='-personal,-tutorial')
+        titles = {p.title for p in result}
+        self.assertEqual(titles, {'Django Guide'})
+
+    def test_include_and_exclude(self):
+        result = apply_filters(self.all_posts, tag='python,-tutorial')
+        titles = {p.title for p in result}
+        self.assertEqual(titles, {'Django Guide'})
+
+    def test_exclude_only_keeps_non_matching(self):
+        result = apply_filters(self.all_posts, tag='-draft')
+        titles = {p.title for p in result}
+        self.assertEqual(titles, {'Python Basics', 'Django Guide', 'My Day'})
+
+    def test_bare_dash_ignored(self):
+        result = apply_filters(self.all_posts, tag='-')
+        self.assertEqual(len(result), 4)

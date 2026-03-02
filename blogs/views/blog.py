@@ -127,17 +127,21 @@ def posts(request, blog):
         is_page=False
     ).order_by('-published_date')
     
-    if tags:
-        # Filter posts that contain ALL specified tags
-        posts = [post for post in posts if all(tag in post.tags for tag in tags)]
+    include_tags = [t for t in tags if not t.startswith('-')]
+    exclude_tags = [t[1:] for t in tags if t.startswith('-') and len(t) > 1]
+
+    if include_tags or exclude_tags:
+        posts = [post for post in posts if
+            all(t in post.tags for t in include_tags) and
+            not any(t in post.tags for t in exclude_tags)]
         available_tags = set()
         for post in posts:
             available_tags.update(post.tags)
     else:
         available_tags = set(blog.tags)
-    
+
     # Only include tags that aren't already active and are available
-    tags_to_show = [tag for tag in blog.tags if tag not in tags and tag in available_tags]
+    tags_to_show = [tag for tag in blog.tags if tag not in tags and tag not in exclude_tags and tag in available_tags]
     
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
     blog_path_title = blog.blog_path.replace('-', ' ').capitalize() or 'Blog'

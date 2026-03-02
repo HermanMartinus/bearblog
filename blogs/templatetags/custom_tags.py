@@ -229,8 +229,12 @@ def apply_filters(posts, tag=None, limit=None, order=None):
     if tag:
         # Split tags by comma and strip whitespace
         tags = [t.strip() for t in tag.replace('"', '').split(',')]
-        if tags:
-            posts = [post for post in posts if all(tag in post.tags for tag in tags)]
+        include_tags = [t for t in tags if t and not t.startswith('-')]
+        exclude_tags = [t[1:] for t in tags if t.startswith('-') and len(t) > 1]
+        if include_tags or exclude_tags:
+            posts = [post for post in posts if
+                all(t in post.tags for t in include_tags) and
+                not any(t in post.tags for t in exclude_tags)]
     if limit is not None:
         try:
             limit = int(limit)
