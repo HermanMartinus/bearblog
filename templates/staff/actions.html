@@ -147,5 +147,39 @@ Staff Actions
     {% else %}
     <p>No overdue domains to remove.</p>
     {% endif %}
+
+    <hr>
+
+    <!-- Nudge free users to contribute -->
+    <h2>Nudge free users to contribute ({{ contribution_nudge_users|length }})</h2>
+    {% if contribution_nudge_users %}
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Joined</th>
+                <th>Last login</th>
+                <th>Admin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in contribution_nudge_users %}
+            <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.date_joined|date:"j M Y" }}</td>
+                <td>{{ user.last_login|date:"j M Y" }}</td>
+                <td><a href="/mothership/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form method="post" onsubmit="return confirm('Send contribution nudge to {{ contribution_nudge_users|length }} users?')">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="email_contribution_nudge">
+        <button type="submit">Send contribution nudge emails</button>
+    </form>
+    {% else %}
+    <p>No free users to nudge.</p>
+    {% endif %}
 </main>
 {% endblock %}

@@ -196,10 +196,25 @@ def monthly_users_to_upgrade():
     ).select_related('user')
 
 
+def free_users_to_nudge():
+    two_months_ago = timezone.now() - timedelta(days=60)
+    three_days_ago = timezone.now() - timedelta(days=3)
+    return User.objects.filter(
+        date_joined__lte=two_months_ago,
+        settings__upgraded=False,
+        settings__contribution_nudge_email_sent__isnull=True,
+    ).filter(
+        Q(last_login__gte=three_days_ago) |
+        Q(blogs__last_posted__gte=three_days_ago) |
+        Q(blogs__last_modified__gte=three_days_ago)
+    ).distinct().select_related('settings')
+
+
 @staff_member_required
 def actions(request):
     upgraded_users = list(new_upgrades().select_related('settings'))
     nudge_users = list(monthly_users_to_upgrade())
+    contribution_nudge_users = list(free_users_to_nudge())
     orphaned_blogs = list(blogs_with_orphaned_domains())
     cutoff = timezone.now() - timedelta(days=14)
     overdue_blogs = list(Blog.objects.filter(
@@ -267,6 +282,22 @@ def actions(request):
             for blog in orphaned_blogs:
                 orphaned_by_user.setdefault(blog.user, []).append(blog)
 
+        elif action == 'email_contribution_nudge':
+            count = 0
+            for user in contribution_nudge_users[:5]:
+                send_async_mail(
+                    "Supporting Bear Blog",
+                    render_to_string('emails/contribution_nudge.html'),
+                    'Herman Martinus <herman@mg.bearblog.dev>',
+                    [user.email],
+                    ['Herman Martinus <herman@bearblog.dev>'],
+                )
+                user.settings.contribution_nudge_email_sent = timezone.now()
+                user.settings.save()
+                count += 1
+            result = f"Emailed {count} free users about contributing."
+            contribution_nudge_users = list(free_users_to_nudge())
+
         elif action == 'remove_orphaned_domains':
             count = 0
             for blog in overdue_blogs:
@@ -289,6 +320,7 @@ def actions(request):
         'orphaned_blogs': orphaned_blogs,
         'orphaned_by_user': orphaned_by_user,
         'overdue_blogs': overdue_blogs,
+        'contribution_nudge_users': contribution_nudge_users,
         'result': result,
     })
 
