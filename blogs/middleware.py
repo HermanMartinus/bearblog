@@ -7,10 +7,17 @@ from django.middleware.csrf import (
     REASON_BAD_ORIGIN
 )
 
-import time
-from collections import defaultdict
-from ipaddr import client_ip
+import logging
 import os
+import time
+import threading
+from collections import defaultdict
+
+from django.core.cache import cache
+from django.core.management import call_command
+from ipaddr import client_ip
+
+logger = logging.getLogger(__name__)
 
 
 # This is a workaround to handle custom domains from Django 5.0 there's an explicit CSRF_TRUSTED_ORIGINS list
@@ -112,5 +119,77 @@ class ConditionalXFrameOptionsMiddleware:
         
         if host in main_domains:
             response['X-Frame-Options'] = 'DENY'
-        
+
         return response
+
+
+# Middleware-based task scheduler
+# Uses Redis to track last-run timestamps and atomic locks to prevent duplicate execution
+
+SCHEDULED_TASKS = []
+
+
+def register_task(name, interval_seconds):
+    def decorator(func):
+        SCHEDULED_TASKS.append({
+            'name': name,
+            'interval_seconds': interval_seconds,
+            'func': func,
+        })
+        return func
+    return decorator
+
+
+@register_task('hello_world', interval_seconds=60)
+def run_hello_world():
+    call_command('hello_world')
+
+
+# @register_task('invalidate_cache', interval_seconds=600)
+# def run_invalidate_cache():
+#     call_command('invalidate_cache')
+
+
+# @register_task('monitor_custom_domains', interval_seconds=60)
+# def run_monitor_custom_domains():
+#     call_command('monitor_custom_domains')
+
+
+def _run_task_in_thread(task):
+    try:
+        task['func']()
+    except Exception:
+        logger.exception("Scheduled task '%s' failed", task['name'])
+    finally:
+        cache.set(f"scheduler:last_run:{task['name']}", time.time(), timeout=86400)
+        cache.delete(f"scheduler:lock:{task['name']}")
+
+
+class TaskSchedulerMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        self._check_tasks()
+        return self.get_response(request)
+
+    def _check_tasks(self):
+        now = time.time()
+        for task in SCHEDULED_TASKS:
+            last_run = cache.get(f"scheduler:last_run:{task['name']}")
+            if last_run is not None and (now - last_run) < task['interval_seconds']:
+                continue
+
+            lock_key = f"scheduler:lock:{task['name']}"
+            lock_timeout = task['interval_seconds'] * 2
+            if not cache.add(lock_key, 1, timeout=lock_timeout):
+                continue
+
+            cache.set(f"scheduler:last_run:{task['name']}", now, timeout=86400)
+
+            thread = threading.Thread(
+                target=_run_task_in_thread,
+                args=(task,),
+                daemon=True,
+            )
+            thread.start()
