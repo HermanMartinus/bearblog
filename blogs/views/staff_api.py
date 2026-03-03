@@ -142,7 +142,6 @@ def unreviewed_blogs(request):
         user__is_active=True,
         to_review=False,
         flagged=False,
-        created_date__lte=timezone.now() - timedelta(days=1),
     ).select_related('user').prefetch_related('posts')
 
     qs = qs.annotate(
