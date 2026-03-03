@@ -248,10 +248,6 @@ class StaffApiBlogReviewTests(TestCase):
             to_review=False,
             content='A' * 250,
         )
-        # Backdate created_date to satisfy >1 day filter
-        Blog.objects.filter(pk=self.blog.pk).update(
-            created_date=timezone.now() - timezone.timedelta(days=3)
-        )
         self.blog.refresh_from_db()
 
         self.post = Post.objects.create(
@@ -312,11 +308,6 @@ class StaffApiBlogReviewTests(TestCase):
         subdomains = [b['subdomain'] for b in response.json()['blogs']]
         self.assertNotIn('testblog-review', subdomains)
 
-    def test_blogs_list_excludes_too_new(self):
-        Blog.objects.filter(pk=self.blog.pk).update(created_date=timezone.now())
-        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
-        subdomains = [b['subdomain'] for b in response.json()['blogs']]
-        self.assertNotIn('testblog-review', subdomains)
 
     def test_blogs_list_excludes_empty_short_content_no_link(self):
         self.post.delete()

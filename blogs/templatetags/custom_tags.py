@@ -365,7 +365,7 @@ def safe_title(title):
 @register.filter
 def plain_title(title):
     """Strip * markers and &nbsp; for plain-text contexts."""
-    title = title.replace('*', '')
+    title = re.sub(r'\*+(.+?)\*+', r'\1', title)
     title = title.replace('&nbsp;', ' ')
     return title
 
