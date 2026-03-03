@@ -71,17 +71,17 @@ def ping(request):
     domain = request.GET.get("domain", None)
 
     if not domain:
-        return HttpResponse('Invalid domain', status=422)
-    
+        return HttpResponse('Invalid domain', status=422, content_type='text/plain')
+
     try:
         if get_domain_id(domain):
             # print('Ping! Found correct blog. Issuing certificate for', domain)
-            return HttpResponse('Ping', status=200)
+            return HttpResponse('Ping', status=200, content_type='text/plain')
     except:
         pass
 
     # print("Ping! Invalid domain", domain)
-    return HttpResponse('Invalid domain', status=422)
+    return HttpResponse('Invalid domain', status=422, content_type='text/plain')
 
 
 def home(request):
@@ -256,11 +256,11 @@ def upvote(request):
         except Upvote.MultipleObjectsReturned:
             print("Not upvoting: Duplicate upvote")
 
-        response = HttpResponse(f'Upvoted {post.title}')
+        response = HttpResponse(f'Upvoted {post.title}', content_type='text/plain')
         response['X-Robots-Tag'] = 'noindex, nofollow'
         return response
 
-    return HttpResponse('Forbidden', 403)
+    return HttpResponse('Forbidden', status=403, content_type='text/plain')
 
 
 def public_analytics(request):

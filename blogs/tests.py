@@ -454,3 +454,128 @@ class DiscoverFeedMarkdownTests(TestCase):
         self._make_post('Published on {{ post_published_date }}')
         content = self._get_feed_content()
         self.assertNotIn('{{ post_published_date }}', content)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class ContentTypeTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='ctype_user', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='CT Blog',
+            subdomain='ctblog',
+        )
+        self.post = Post.objects.create(
+            blog=self.blog,
+            uid='ct1',
+            title='CT Post',
+            slug='ct-post',
+            published_date=timezone.now(),
+            content='Test content',
+        )
+
+    # --- ping() ---
+
+    def test_ping_valid_returns_text_plain(self):
+        self.blog.domain = 'example.com'
+        self.blog.save()
+        from django.core.cache import cache
+        cache.delete('domain_map')
+        response = self.client.get('/ping/', {'domain': 'example.com'})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    def test_ping_invalid_returns_text_plain(self):
+        response = self.client.get('/ping/', {'domain': 'nonexistent.com'})
+        self.assertEqual(response.status_code, 422)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    def test_ping_missing_domain_returns_text_plain(self):
+        response = self.client.get('/ping/')
+        self.assertEqual(response.status_code, 422)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    # --- upvote() ---
+
+    def test_upvote_success_returns_text_plain(self):
+        response = self.client.post('/upvote/', {'uid': 'ct1'})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    def test_upvote_forbidden_returns_text_plain(self):
+        response = self.client.post('/upvote/', {})
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    # --- hit() ---
+
+    def test_hit_forbidden_returns_text_plain(self):
+        response = self.client.get('/hit/')
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    @mock.patch('blogs.views.analytics.get_country', return_value={'country_name': 'Test'})
+    @mock.patch.dict(os.environ, {'SALT': 'test-salt'})
+    def test_hit_success_returns_text_plain(self, mock_country):
+        response = self.client.get('/hit/', {
+            'blog': 'ctblog',
+            'score': '100',
+            'token': '/',
+        }, HTTP_USER_AGENT='Mozilla/5.0')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    # --- email_subscribe() ---
+
+    def test_email_subscribe_dodgy_returns_text_plain(self):
+        response = self.client.post('/email-subscribe/', {})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    def test_email_subscribe_bad_email_returns_text_plain(self):
+        response = self.client.post(
+            '/email-subscribe/',
+            {'confirm': '829389c2a9f0402b8a3600e52f2ad4e1', 'email': 'not-an-email'},
+            SERVER_NAME='ctblog.testserver',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    def test_email_subscribe_success_returns_text_plain(self):
+        response = self.client.post(
+            '/email-subscribe/',
+            {'confirm': '829389c2a9f0402b8a3600e52f2ad4e1', 'email': 'test@example.com'},
+            SERVER_NAME='ctblog.testserver',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    # --- upload_image() ---
+
+    @mock.patch('blogs.views.media.upload_files', return_value=['https://example.com/test.png'])
+    def test_upload_image_success_returns_json(self, mock_upload):
+        self.user.settings.upgraded = True
+        self.user.settings.save()
+        self.client.login(username='ctype_user', password='pass')
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        f = SimpleUploadedFile('test.png', b'\x89PNG', content_type='image/png')
+        response = self.client.post('/ctblog/dashboard/upload-image/', {'file': f})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('application/json', response['Content-Type'])
+
+    def test_upload_image_failure_returns_text_plain(self):
+        self.client.login(username='ctype_user', password='pass')
+        response = self.client.post('/ctblog/dashboard/upload-image/')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('text/plain', response['Content-Type'])
+
+    # --- email_list() export-txt ---
+
+    def test_email_list_export_txt_returns_text_plain(self):
+        self.user.settings.upgraded = True
+        self.user.settings.save()
+        self.client.login(username='ctype_user', password='pass')
+        response = self.client.get('/ctblog/dashboard/email-list/', {'export-txt': '1'})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('text/plain', response['Content-Type'])

@@ -191,8 +191,8 @@ def hit(request):
             except Hit.MultipleObjectsReturned:
                 pass
 
-        response = HttpResponse("Logged hit")
+        response = HttpResponse("Logged hit", content_type='text/plain')
         response['X-Robots-Tag'] = 'noindex, nofollow'
         return response
-    
-    return HttpResponse('Forbidden', status=403)
+
+    return HttpResponse('Forbidden', status=403, content_type='text/plain')

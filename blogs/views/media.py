@@ -1,6 +1,6 @@
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.http import StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
@@ -98,8 +98,8 @@ def upload_image(request, id):
 
         file_links = upload_files(blog, file_list, optimise)
 
-        return HttpResponse(json.dumps(sorted(file_links)), 200)
-    return HttpResponse('Failed', 400)
+        return JsonResponse(sorted(file_links), safe=False)
+    return HttpResponse('Failed', status=400, content_type='text/plain')
 
 
 def upload_files(blog, file_list, optimise=True):
