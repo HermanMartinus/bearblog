@@ -392,3 +392,65 @@ class StaffApiBlogReviewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.blog.refresh_from_db()
         self.assertIsNotNone(self.blog.ignored_date)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class DiscoverFeedMarkdownTests(TestCase):
+    """Verify the discover feed uses the full markdown renderer (not bare mistune)."""
+
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='feedmduser', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Feed MD Blog',
+            subdomain='feedmd',
+            reviewed=True,
+            hidden=False,
+        )
+
+    def _make_post(self, content):
+        """Create a discoverable post with the given content (padded to 100+ chars)."""
+        # Pad content to meet the 100-char minimum length filter
+        padded = content + '\n\n' + ('x' * 150)
+        post = Post.objects.create(
+            blog=self.blog,
+            uid=f'fmd-{Post.objects.count()}',
+            title='Test Post',
+            slug=f'test-post-{Post.objects.count()}',
+            published_date=timezone.now(),
+            publish=True,
+            make_discoverable=True,
+            content=padded,
+        )
+        return post
+
+    def _get_feed_content(self):
+        response = self.client.get('/discover/feed/')
+        self.assertEqual(response.status_code, 200)
+        return response.content.decode()
+
+    def test_typographic_replacements(self):
+        """(c) should render as copyright symbol."""
+        self._make_post('Copyright (c) 2024')
+        content = self._get_feed_content()
+        self.assertIn('©', content)
+        self.assertNotIn('(c)', content)
+
+    def test_heading_ids(self):
+        """Headings should get slugified IDs from the custom renderer."""
+        self._make_post('## My Heading')
+        content = self._get_feed_content()
+        self.assertIn('id=my-heading', content)
+
+    def test_code_highlighting(self):
+        """Fenced code blocks should get Pygments syntax highlighting."""
+        self._make_post('```python\nprint("hello")\n```')
+        content = self._get_feed_content()
+        self.assertIn('class="highlight"', content)
+
+    def test_template_variable_replacement(self):
+        """{{ post_published_date }} should be replaced with the actual date."""
+        self._make_post('Published on {{ post_published_date }}')
+        content = self._get_feed_content()
+        self.assertNotIn('{{ post_published_date }}', content)
