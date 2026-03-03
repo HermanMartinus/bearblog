@@ -1,9 +1,13 @@
 import json
 import os
+from datetime import timedelta
 from functools import wraps
 
 from django.core.exceptions import ValidationError
+from django.db.models import Q, F, Count
+from django.db.models.functions import Length
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from blogs.models import Blog, Post
@@ -59,7 +63,7 @@ def post_data(p, full_content=False):
     }
 
 
-BLOG_UPDATABLE = {'hidden', 'flagged', 'reviewed', 'reviewer_note', 'permanent_ignore', 'to_review', 'domain'}
+BLOG_UPDATABLE = {'hidden', 'flagged', 'reviewed', 'reviewer_note', 'permanent_ignore', 'to_review', 'domain', 'ignored_date'}
 POST_UPDATABLE = {'hidden', 'make_discoverable', 'shadow_votes'}
 
 
@@ -83,6 +87,9 @@ def blog(request, subdomain):
             for field, value in data.items():
                 if field in BLOG_UPDATABLE:
                     setattr(b, field, value)
+                elif field == 'is_active':
+                    b.user.is_active = value
+                    b.user.save()
             b.save()
         except (TypeError, ValueError, ValidationError) as e:
             return JsonResponse({'error': f'Invalid value: {e}'}, status=400)
@@ -123,3 +130,31 @@ def post(request, pk):
 def most_recent_posts(request):
     qs = get_base_query().order_by('-published_date')[:160]
     return JsonResponse({'posts': [post_data(p) for p in qs]})
+
+
+@api_auth
+def unreviewed_blogs(request):
+    qs = Blog.objects.filter(
+        Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True),
+        permanent_ignore=False,
+        reviewed=False,
+        user__is_active=True,
+        to_review=False,
+        flagged=False,
+        created_date__lte=timezone.now() - timedelta(days=1),
+    ).select_related('user').prefetch_related('posts')
+
+    qs = qs.annotate(
+        num_posts=Count('posts'),
+        content_length=Length('content'),
+    ).exclude(
+        Q(num_posts__lte=0, content_length__lt=200) & ~Q(content__icontains="http")
+    ).order_by('created_date')[:100]
+
+    blogs = []
+    for b in qs:
+        data = blog_data(b)
+        data['posts'] = [post_data(p) for p in b.posts.all()]
+        blogs.append(data)
+
+    return JsonResponse({'blogs': blogs})

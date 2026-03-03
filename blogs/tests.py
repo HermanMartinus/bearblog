@@ -231,3 +231,173 @@ class DiscoverCSRFTests(TestCase):
         self._post_with_csrf('/discover/', {'subdomain': 'testblog', 'action': 'unhide'})
         self.regular_user.settings.refresh_from_db()
         self.assertNotIn('testblog', self.regular_user.settings.discovery_hide_list)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver', 'STAFF_API_KEY': 'test-key'})
+class StaffApiBlogReviewTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='bloguser', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Test Blog',
+            subdomain='testblog-review',
+            reviewed=False,
+            permanent_ignore=False,
+            flagged=False,
+            to_review=False,
+            content='A' * 250,
+        )
+        # Backdate created_date to satisfy >1 day filter
+        Blog.objects.filter(pk=self.blog.pk).update(
+            created_date=timezone.now() - timezone.timedelta(days=3)
+        )
+        self.blog.refresh_from_db()
+
+        self.post = Post.objects.create(
+            blog=self.blog,
+            uid='rev1',
+            title='Test Post',
+            slug='test-post',
+            published_date=timezone.now(),
+            content='B' * 500,
+        )
+        self.auth = {'HTTP_X_API_KEY': 'test-key'}
+
+    # --- GET /staff-api/unreviewed-blogs/ ---
+
+    def test_blogs_list_requires_auth(self):
+        response = self.client.get('/staff-api/unreviewed-blogs/')
+        self.assertEqual(response.status_code, 401)
+
+    def test_blogs_list_returns_unreviewed(self):
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        subdomains = [b['subdomain'] for b in data['blogs']]
+        self.assertIn('testblog-review', subdomains)
+
+    def test_blogs_list_excludes_reviewed(self):
+        self.blog.reviewed = True
+        self.blog.save()
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        subdomains = [b['subdomain'] for b in response.json()['blogs']]
+        self.assertNotIn('testblog-review', subdomains)
+
+    def test_blogs_list_excludes_flagged(self):
+        self.blog.flagged = True
+        self.blog.save()
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        subdomains = [b['subdomain'] for b in response.json()['blogs']]
+        self.assertNotIn('testblog-review', subdomains)
+
+    def test_blogs_list_excludes_permanent_ignore(self):
+        self.blog.permanent_ignore = True
+        self.blog.save()
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        subdomains = [b['subdomain'] for b in response.json()['blogs']]
+        self.assertNotIn('testblog-review', subdomains)
+
+    def test_blogs_list_excludes_inactive_user(self):
+        self.user.is_active = False
+        self.user.save()
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        subdomains = [b['subdomain'] for b in response.json()['blogs']]
+        self.assertNotIn('testblog-review', subdomains)
+
+    def test_blogs_list_excludes_to_review(self):
+        self.blog.to_review = True
+        self.blog.save()
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        subdomains = [b['subdomain'] for b in response.json()['blogs']]
+        self.assertNotIn('testblog-review', subdomains)
+
+    def test_blogs_list_excludes_too_new(self):
+        Blog.objects.filter(pk=self.blog.pk).update(created_date=timezone.now())
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        subdomains = [b['subdomain'] for b in response.json()['blogs']]
+        self.assertNotIn('testblog-review', subdomains)
+
+    def test_blogs_list_excludes_empty_short_content_no_link(self):
+        self.post.delete()
+        self.blog.content = 'Short'
+        self.blog.save()
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        subdomains = [b['subdomain'] for b in response.json()['blogs']]
+        self.assertNotIn('testblog-review', subdomains)
+
+    def test_blogs_list_includes_empty_with_link(self):
+        self.post.delete()
+        self.blog.content = 'Visit http://example.com'
+        self.blog.save()
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        subdomains = [b['subdomain'] for b in response.json()['blogs']]
+        self.assertIn('testblog-review', subdomains)
+
+    def test_blogs_list_includes_posts_preview(self):
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        blog_entry = [b for b in response.json()['blogs'] if b['subdomain'] == 'testblog-review'][0]
+        self.assertIn('posts', blog_entry)
+        self.assertEqual(len(blog_entry['posts']), 1)
+        # Content should be truncated to 300 chars
+        self.assertLessEqual(len(blog_entry['posts'][0]['content']), 300)
+
+    def test_blogs_list_ordered_by_created_date(self):
+        user2 = User.objects.create_user(username='bloguser2', password='pass')
+        blog2 = Blog.objects.create(
+            user=user2, title='Older Blog', subdomain='older-blog',
+            reviewed=False, permanent_ignore=False, flagged=False,
+            to_review=False, content='A' * 250,
+        )
+        Post.objects.create(
+            blog=blog2, uid='rev2', title='Older Post', slug='older-post',
+            published_date=timezone.now(), content='C' * 500,
+        )
+        # Backdate after post creation (Post.save triggers blog.save)
+        Blog.objects.filter(pk=blog2.pk).update(
+            created_date=timezone.now() - timezone.timedelta(days=10)
+        )
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        subdomains = [b['subdomain'] for b in response.json()['blogs']]
+        idx_older = subdomains.index('older-blog')
+        idx_newer = subdomains.index('testblog-review')
+        self.assertLess(idx_older, idx_newer)
+
+    # --- PATCH /staff-api/blog/<subdomain>/ with is_active ---
+
+    def test_patch_blog_deactivate_user(self):
+        response = self.client.patch(
+            '/staff-api/blog/testblog-review/',
+            json.dumps({'is_active': False}),
+            content_type='application/json',
+            **self.auth,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_active)
+
+    def test_patch_blog_activate_user(self):
+        self.user.is_active = False
+        self.user.save()
+        response = self.client.patch(
+            '/staff-api/blog/testblog-review/',
+            json.dumps({'is_active': True}),
+            content_type='application/json',
+            **self.auth,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_active)
+
+    # --- PATCH /staff-api/blog/<subdomain>/ with ignored_date ---
+
+    def test_patch_blog_set_ignored_date(self):
+        response = self.client.patch(
+            '/staff-api/blog/testblog-review/',
+            json.dumps({'ignored_date': timezone.now().isoformat()}),
+            content_type='application/json',
+            **self.auth,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.blog.refresh_from_db()
+        self.assertIsNotNone(self.blog.ignored_date)

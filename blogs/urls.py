@@ -43,6 +43,7 @@ urlpatterns = [
     
     # Staff API
     path('staff-api/posts/', main_site_only(staff_api.most_recent_posts), name='staff_api_posts'),
+    path('staff-api/unreviewed-blogs/', main_site_only(staff_api.unreviewed_blogs), name='staff_api_unreviewed_blogs'),
     path('staff-api/blog/<slug:subdomain>/', main_site_only(staff_api.blog), name='staff_api_blog'),
     path('staff-api/post/<int:pk>/', main_site_only(staff_api.post), name='staff_api_post'),
 
