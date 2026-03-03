@@ -1,7 +1,9 @@
 import json
+import os
+from unittest import mock
 
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.utils.safestring import SafeString
 
@@ -147,3 +149,85 @@ class ApplyFiltersExcludeTagTests(TestCase):
     def test_bare_dash_ignored(self):
         result = apply_filters(self.all_posts, tag='-')
         self.assertEqual(len(result), 4)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class DiscoverCSRFTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.staff_user = User.objects.create_user(username='staffuser', password='pass', is_staff=True)
+        self.regular_user = User.objects.create_user(username='regularuser', password='pass')
+
+        self.blog_owner = User.objects.create_user(username='blogowner', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.blog_owner,
+            title='Test Blog',
+            subdomain='testblog',
+            reviewed=True,
+            hidden=False,
+        )
+        self.post = Post.objects.create(
+            blog=self.blog,
+            uid='disc1',
+            title='Discoverable Post',
+            slug='discoverable-post',
+            published_date=timezone.now(),
+            publish=True,
+            make_discoverable=True,
+            content='x' * 200,
+        )
+
+    # --- Admin action tests ---
+
+    def test_staff_post_without_csrf_token_is_rejected(self):
+        """Staff POST without CSRF token should be rejected with 403."""
+        self.client.login(username='staffuser', password='pass')
+        response = self.client.post(
+            '/discover/',
+            {'hide-post': self.post.pk},
+            enforce_csrf_checks=True,
+        )
+        self.assertEqual(response.status_code, 403)
+        self.post.refresh_from_db()
+        self.assertFalse(self.post.hidden)
+
+    def _post_with_csrf(self, url, data):
+        """POST with a valid CSRF token via cookie + form field."""
+        self.client.get(url)  # sets csrftoken cookie
+        token = self.client.cookies['csrftoken'].value
+        data['csrfmiddlewaretoken'] = token
+        return self.client.post(url, data)
+
+    def test_staff_post_with_csrf_token_succeeds(self):
+        """Staff POST with valid CSRF token should hide the post."""
+        self.client.login(username='staffuser', password='pass')
+        response = self._post_with_csrf('/discover/', {'hide-post': self.post.pk})
+        self.assertEqual(response.status_code, 200)
+        self.post.refresh_from_db()
+        self.assertTrue(self.post.hidden)
+
+    def test_non_staff_post_does_not_execute_admin_action(self):
+        """Non-staff user POST should not execute admin actions."""
+        self.client.login(username='regularuser', password='pass')
+        self._post_with_csrf('/discover/', {'hide-post': self.post.pk})
+        self.post.refresh_from_db()
+        self.assertFalse(self.post.hidden)
+
+    # --- User hide list tests ---
+
+    def test_hide_adds_subdomain_to_hide_list(self):
+        """Authenticated user can hide a blog from their discover feed."""
+        self.client.login(username='regularuser', password='pass')
+        self._post_with_csrf('/discover/', {'subdomain': 'testblog', 'action': 'hide'})
+        self.regular_user.settings.refresh_from_db()
+        self.assertIn('testblog', self.regular_user.settings.discovery_hide_list)
+
+    def test_unhide_removes_subdomain_from_hide_list(self):
+        """Authenticated user can unhide a blog from their discover feed."""
+        self.regular_user.settings.discovery_hide_list = ['testblog']
+        self.regular_user.settings.save()
+
+        self.client.login(username='regularuser', password='pass')
+        self._post_with_csrf('/discover/', {'subdomain': 'testblog', 'action': 'unhide'})
+        self.regular_user.settings.refresh_from_db()
+        self.assertNotIn('testblog', self.regular_user.settings.discovery_hide_list)

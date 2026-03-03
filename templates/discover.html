@@ -132,6 +132,7 @@
                     </summary>
 
                     <form method="POST">
+                        {% csrf_token %}
                         <input hidden name="set-values" value="{{ post.pk }}">
                         <br>
                         <label>Shadow Votes: 
@@ -152,16 +153,19 @@
                     <hr>
 
                     <form method="POST">
+                        {% csrf_token %}
                         <input hidden name="hide-post" value="{{ post.pk }}">
                         <button onclick="event.preventDefault();if(confirm('Hide this post?')){this.form.submit()}">Hide Post</button>
                     </form>
 
                     <form method="POST">
+                        {% csrf_token %}
                         <input hidden name="hide-blog" value="{{ post.pk }}">
                         <button onclick="event.preventDefault();if(confirm('Hide this blog?')){this.form.submit()}">Hide Blog</button>
                     </form>
 
                     <form method="POST">
+                        {% csrf_token %}
                         <input hidden name="block-blog" value="{{ post.pk }}">
                         <button onclick="event.preventDefault();if(confirm('Block this blog?')){this.form.submit()}" style="color: red;">Block Blog</button>
                     </form>

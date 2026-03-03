@@ -1,6 +1,5 @@
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
-from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.utils import timezone
 from django.db.models.functions import Length
@@ -70,7 +69,6 @@ def admin_actions(request):
         
 
 
-@csrf_exempt
 def discover(request):
     admin_actions(request)
 
