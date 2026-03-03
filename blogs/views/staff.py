@@ -253,9 +253,9 @@ def actions(request):
 
         elif action == 'email_nudge_monthly':
             count = 0
-            for user_settings in nudge_users[:5]:
+            for user_settings in nudge_users:
                 send_async_mail(
-                    "Your Bear Blog subscription",
+                    "Your subscription",
                     render_to_string('emails/upgrade_from_monthly.html'),
                     'Herman Martinus <herman@mg.bearblog.dev>',
                     [user_settings.user.email],
@@ -269,9 +269,9 @@ def actions(request):
 
         elif action == 'email_domain_warnings':
             count = 0
-            for user, user_blogs in list(orphaned_by_user.items())[:20]:
+            for user, user_blogs in list(orphaned_by_user.items()):
                 send_async_mail(
-                    "Your custom domain on Bear Blog",
+                    "Your custom domain",
                     render_to_string('emails/domain_warning.html', {'blogs': user_blogs}),
                     'Herman Martinus <herman@mg.bearblog.dev>',
                     [user.email],
@@ -288,9 +288,9 @@ def actions(request):
 
         elif action == 'email_contribution_nudge':
             count = 0
-            for user in contribution_nudge_users[:5]:
+            for user in contribution_nudge_users:
                 send_async_mail(
-                    "Supporting Bear Blog",
+                    "Your support",
                     render_to_string('emails/contribution_nudge.html'),
                     'Herman Martinus <herman@mg.bearblog.dev>',
                     [user.email],
