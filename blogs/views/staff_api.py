@@ -134,6 +134,7 @@ def most_recent_posts(request):
 
 @api_auth
 def unreviewed_blogs(request):
+    # Includes dodgy blogs (high dodginess_score) — ordered by dodginess first
     qs = Blog.objects.filter(
         Q(ignored_date__lt=F('last_modified')) | Q(ignored_date__isnull=True),
         permanent_ignore=False,
@@ -149,7 +150,7 @@ def unreviewed_blogs(request):
         content_length=Length('content'),
     ).exclude(
         Q(num_posts__lte=0, content_length__lt=200) & ~Q(content__icontains="http")
-    ).order_by('created_date')[:100]
+    ).order_by('-dodginess_score', 'created_date')[:100]
 
     blogs = []
     for b in qs:
