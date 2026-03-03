@@ -140,19 +140,14 @@ def register_task(name, interval_seconds):
     return decorator
 
 
-@register_task('hello_world', interval_seconds=60)
-def run_hello_world():
-    call_command('hello_world')
+@register_task('invalidate_cache', interval_seconds=600)
+def run_invalidate_cache():
+    call_command('invalidate_cache')
 
 
-# @register_task('invalidate_cache', interval_seconds=600)
-# def run_invalidate_cache():
-#     call_command('invalidate_cache')
-
-
-# @register_task('monitor_custom_domains', interval_seconds=60)
-# def run_monitor_custom_domains():
-#     call_command('monitor_custom_domains')
+@register_task('monitor_custom_domains', interval_seconds=60)
+def run_monitor_custom_domains():
+    call_command('monitor_custom_domains')
 
 
 def _run_task_in_thread(task):
