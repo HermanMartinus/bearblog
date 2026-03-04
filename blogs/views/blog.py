@@ -359,8 +359,8 @@ def _generate_og_image(title, snippet):
     img = PILImage.new('RGB', (width, height), '#ffffff')
     draw = ImageDraw.Draw(img)
 
-    font_large = _load_font(bold=True, size=58)
-    font_small = _load_font(bold=False, size=32)
+    font_large = _load_font(bold=True, size=78)
+    font_small = _load_font(bold=False, size=43)
 
     # Bear ASCII art in bottom-right (half size)
     static_dir = Path(settings.STATICFILES_DIRS[0])
@@ -376,26 +376,26 @@ def _generate_og_image(title, snippet):
 
     # Draw title
     title_lines = _wrap_text(draw, title, font_large, max_text_width)
-    if len(title_lines) > 3:
-        title_lines = title_lines[:3]
+    if len(title_lines) > 2:
+        title_lines = title_lines[:2]
         title_lines[-1] = title_lines[-1].rstrip() + '...'
 
     y = 80
     for line in title_lines:
         draw.text((margin_x, y), line, fill='#333333', font=font_large)
-        y += 72
+        y += 97
 
     # Draw snippet
     y += 30
     snippet_lines = _wrap_text(draw, snippet, font_small, max_text_width)
-    max_snippet_lines = min(4, max(1, (height - y - 80) // 46))
+    max_snippet_lines = min(4, max(1, (height - y - 80) // 62))
     if len(snippet_lines) > max_snippet_lines:
         snippet_lines = snippet_lines[:max_snippet_lines]
         snippet_lines[-1] = snippet_lines[-1].rstrip() + '...'
 
     for line in snippet_lines:
         draw.text((margin_x, y), line, fill='#888888', font=font_small)
-        y += 46
+        y += 62
 
     buffer = io.BytesIO()
     img.save(buffer, format='PNG', optimize=True)
