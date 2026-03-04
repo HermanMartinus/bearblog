@@ -359,13 +359,14 @@ def _generate_og_image(title, snippet):
     img = PILImage.new('RGB', (width, height), '#ffffff')
     draw = ImageDraw.Draw(img)
 
-    font_large = _load_font(bold=True, size=48)
-    font_small = _load_font(bold=False, size=26)
+    font_large = _load_font(bold=True, size=58)
+    font_small = _load_font(bold=False, size=32)
 
-    # Bear ASCII art in bottom-right
+    # Bear ASCII art in bottom-right (half size)
     static_dir = Path(settings.STATICFILES_DIRS[0])
     try:
         bear = PILImage.open(static_dir / 'bear_ascii.png').convert('RGBA')
+        bear = bear.resize((bear.width // 2, bear.height // 2), PILImage.LANCZOS)
         img.paste(bear, (width - bear.width - 60, height - bear.height - 40), bear)
     except Exception:
         pass
@@ -382,19 +383,19 @@ def _generate_og_image(title, snippet):
     y = 80
     for line in title_lines:
         draw.text((margin_x, y), line, fill='#333333', font=font_large)
-        y += 60
+        y += 72
 
     # Draw snippet
     y += 30
     snippet_lines = _wrap_text(draw, snippet, font_small, max_text_width)
-    max_snippet_lines = min(4, max(1, (height - y - 80) // 38))
+    max_snippet_lines = min(4, max(1, (height - y - 80) // 46))
     if len(snippet_lines) > max_snippet_lines:
         snippet_lines = snippet_lines[:max_snippet_lines]
         snippet_lines[-1] = snippet_lines[-1].rstrip() + '...'
 
     for line in snippet_lines:
         draw.text((margin_x, y), line, fill='#888888', font=font_small)
-        y += 38
+        y += 46
 
     buffer = io.BytesIO()
     img.save(buffer, format='PNG', optimize=True)
