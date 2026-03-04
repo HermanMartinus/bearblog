@@ -2,7 +2,7 @@
 
 <ul class="{% if embed %}embedded {% endif %}blog-posts">
     {% for post in posts %}
-    <li>
+    <li data-tags="{{ post.tags|join:"," }}">
         <span>
             <i>
                 {% include '../snippets/formatted_date.html' with date=post.published_date %}

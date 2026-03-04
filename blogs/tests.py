@@ -211,6 +211,31 @@ class PostListTests(TestCase):
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class PostListDataTagsTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='datatagsuser', password='pass')
+        self.blog = Blog.objects.create(user=self.user, title='Tags Blog', subdomain='tags-blog')
+
+    def test_post_with_tags_has_data_tags_attribute(self):
+        Post.objects.create(
+            blog=self.blog, uid='dt1', title='Tagged', slug='tagged',
+            published_date=timezone.now(), content='x',
+            all_tags=json.dumps(['alpha', 'beta']),
+        )
+        response = self.client.get('/blog/', SERVER_NAME='tags-blog.testserver')
+        self.assertIn('data-tags="alpha,beta"', response.content.decode())
+
+    def test_post_without_tags_has_empty_data_tags(self):
+        Post.objects.create(
+            blog=self.blog, uid='dt2', title='Untagged', slug='untagged',
+            published_date=timezone.now(), content='x',
+        )
+        response = self.client.get('/blog/', SERVER_NAME='tags-blog.testserver')
+        self.assertIn('data-tags=""', response.content.decode())
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
 class DiscoverCSRFTests(TestCase):
     def setUp(self):
         Stylesheet.objects.create(title='Default', identifier='default', css='')
