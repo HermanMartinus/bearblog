@@ -4,9 +4,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
+
+from PIL import Image as PILImage, ImageDraw, ImageFont
+from pathlib import Path
+import io
 
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import salt_and_hash, unmark
+from blogs.templatetags.custom_tags import plain_title
 from blogs.views.analytics import render_analytics
 
 import os
@@ -100,7 +106,8 @@ def home(request):
         {
             'blog': blog,
             'posts': all_posts,
-            'meta_description': meta_description
+            'meta_description': meta_description,
+            'meta_image': blog.meta_image or f'{blog.useful_domain}/og-image.png',
         }
     )
 
@@ -153,6 +160,7 @@ def posts(request, blog):
             'blog': blog,
             'posts': posts,
             'meta_description': meta_description,
+            'meta_image': blog.meta_image or f'{blog.useful_domain}/og-image.png',
             'query': tag_param,
             'active_tags': tags,
             'available_tags': available_tags,
@@ -216,7 +224,7 @@ def post(request, slug):
         'full_path': full_path,
         'canonical_url': canonical_url,
         'meta_description': meta_description,
-        'meta_image': post.meta_image or blog.meta_image,
+        'meta_image': post.meta_image or blog.meta_image or f'{blog.useful_domain}/{post.slug}/og-image.png',
     }
 
     response = render(request, 'post.html', context)
@@ -303,6 +311,112 @@ def robots(request):
     response['Cache-Tag'] = blog.subdomain
     response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
     return response
+
+
+def og_image(request, post_slug=None):
+    blog = resolve_address(request)
+    if not blog:
+        raise Http404
+
+    if post_slug:
+        post = Post.objects.filter(blog=blog, slug__iexact=post_slug, publish=True).first()
+        if not post:
+            raise Http404
+        title = plain_title(post.title)
+        snippet = post.meta_description or unmark(post.content)[:250] + '...'
+    else:
+        title = plain_title(blog.title)
+        snippet = blog.meta_description or unmark(blog.content)[:250] + '...'
+
+    img_bytes = _generate_og_image(title, snippet)
+
+    response = HttpResponse(img_bytes, content_type='image/png')
+    response['Cache-Tag'] = blog.subdomain
+    response['Cache-Control'] = 'public, s-maxage=86400, max-age=3600'
+    return response
+
+
+def _load_font(bold=False, size=48):
+    """Load Verdana (Bear Blog default), falling back to DejaVu Sans, then Pillow default."""
+    font_paths = [
+        # macOS
+        f'/System/Library/Fonts/Supplemental/Verdana{" Bold" if bold else ""}.ttf',
+        f'/Library/Fonts/Verdana{" Bold" if bold else ""}.ttf',
+        # Linux
+        f'/usr/share/fonts/truetype/msttcorefonts/{"Verdana_Bold" if bold else "Verdana"}.ttf',
+        f'/usr/share/fonts/truetype/dejavu/DejaVuSans{"-Bold" if bold else ""}.ttf',
+    ]
+    for path in font_paths:
+        try:
+            return ImageFont.truetype(path, size)
+        except OSError:
+            continue
+    return ImageFont.load_default(size=size)
+
+
+def _generate_og_image(title, snippet):
+    width, height = 1200, 630
+    img = PILImage.new('RGB', (width, height), '#ffffff')
+    draw = ImageDraw.Draw(img)
+
+    font_large = _load_font(bold=True, size=48)
+    font_small = _load_font(bold=False, size=26)
+
+    # Bear ASCII art in bottom-right
+    static_dir = Path(settings.STATICFILES_DIRS[0])
+    try:
+        bear = PILImage.open(static_dir / 'bear_ascii.png').convert('RGBA')
+        img.paste(bear, (width - bear.width - 60, height - bear.height - 40), bear)
+    except Exception:
+        pass
+
+    margin_x = 80
+    max_text_width = width - margin_x * 2
+
+    # Draw title
+    title_lines = _wrap_text(draw, title, font_large, max_text_width)
+    if len(title_lines) > 3:
+        title_lines = title_lines[:3]
+        title_lines[-1] = title_lines[-1].rstrip() + '...'
+
+    y = 80
+    for line in title_lines:
+        draw.text((margin_x, y), line, fill='#333333', font=font_large)
+        y += 60
+
+    # Draw snippet
+    y += 30
+    snippet_lines = _wrap_text(draw, snippet, font_small, max_text_width)
+    max_snippet_lines = min(4, max(1, (height - y - 80) // 38))
+    if len(snippet_lines) > max_snippet_lines:
+        snippet_lines = snippet_lines[:max_snippet_lines]
+        snippet_lines[-1] = snippet_lines[-1].rstrip() + '...'
+
+    for line in snippet_lines:
+        draw.text((margin_x, y), line, fill='#888888', font=font_small)
+        y += 38
+
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG', optimize=True)
+    return buffer.getvalue()
+
+
+def _wrap_text(draw, text, font, max_width):
+    words = text.split()
+    lines = []
+    current_line = ''
+    for word in words:
+        test_line = f'{current_line} {word}'.strip()
+        bbox = draw.textbbox((0, 0), test_line, font=font)
+        if bbox[2] - bbox[0] <= max_width:
+            current_line = test_line
+        else:
+            if current_line:
+                lines.append(current_line)
+            current_line = word
+    if current_line:
+        lines.append(current_line)
+    return lines or ['']
 
 
 def favicon(request):
