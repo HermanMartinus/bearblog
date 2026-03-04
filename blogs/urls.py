@@ -125,10 +125,6 @@ urlpatterns = [
     path("rss.xml", feed.feed),
     path("index.xml", feed.feed),
 
-    # OG image generation
-    path('og-image.png', blog.og_image, name='og_image'),
-    path('<str:post_slug>/og-image.png', blog.og_image, name='og_image_post'),
-
     # Generic path endpoint for slugs
     path('<path:slug>/', blog.post, name='post'),
 ]
