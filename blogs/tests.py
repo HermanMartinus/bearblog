@@ -638,3 +638,43 @@ class ContentTypeTests(TestCase):
         response = self.client.get('/ctblog/dashboard/email-list/', {'export-txt': '1'})
         self.assertEqual(response.status_code, 200)
         self.assertIn('text/plain', response['Content-Type'])
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class FeedTagTitleTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='feedtag_user', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Feed Tag Blog',
+            subdomain='feedtagblog',
+        )
+        self.post = Post.objects.create(
+            blog=self.blog,
+            uid='ft1',
+            title='Tagged Post',
+            slug='tagged-post',
+            published_date=timezone.now(),
+            publish=True,
+            content='Some content',
+            all_tags=json.dumps(['news']),
+        )
+
+    def test_atom_feed_title_without_tag(self):
+        response = self.client.get('/feed/', SERVER_NAME='feedtagblog.testserver')
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertIn('<title>Feed Tag Blog</title>', content)
+
+    def test_atom_feed_title_with_tag(self):
+        response = self.client.get('/feed/?q=news', SERVER_NAME='feedtagblog.testserver')
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertIn('<title>Feed Tag Blog - news</title>', content)
+
+    def test_rss_feed_title_with_tag(self):
+        response = self.client.get('/rss/', {'q': 'news'}, SERVER_NAME='feedtagblog.testserver')
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertIn('<title>Feed Tag Blog - news</title>', content)

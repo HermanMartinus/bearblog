@@ -59,7 +59,10 @@ def generate_feed(blog, feed_type="atom", tag=None, page=0):
     fg = FeedGenerator()
     fg.id(blog.useful_domain)
     fg.author({'name': clean_string(blog.subdomain), 'email': 'hidden'})
-    fg.title(clean_string(blog.title))
+    if tag:
+        fg.title(clean_string(f"{blog.title} - {tag}"))
+    else:
+        fg.title(clean_string(blog.title))
     fg.subtitle(clean_string(blog.meta_description or unmark(blog.content)[:157] + '...' or blog.title))
     fg.link(href=f"{blog.useful_domain}/", rel='alternate')
 
