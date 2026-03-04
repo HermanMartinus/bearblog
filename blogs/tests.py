@@ -664,6 +664,72 @@ class ContentTypeTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('text/plain', response['Content-Type'])
 
+    # --- settings() export ---
+
+    def _get_export(self):
+        self.client.login(username='ctype_user', password='pass')
+        return self.client.get('/ctblog/dashboard/settings/', {'export-md': 'true'})
+
+    def _read_zip(self, response):
+        import zipfile, io
+        return zipfile.ZipFile(io.BytesIO(response.content))
+
+    def test_export_returns_zip(self):
+        response = self._get_export()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/zip')
+
+    def test_export_zip_contains_md_file(self):
+        response = self._get_export()
+        zf = self._read_zip(response)
+        self.assertIn('ct-post.md', zf.namelist())
+
+    def test_export_frontmatter_contains_title(self):
+        response = self._get_export()
+        zf = self._read_zip(response)
+        content = zf.read('ct-post.md').decode('utf-8')
+        self.assertIn('title: CT Post', content)
+
+    def test_export_contains_content_after_frontmatter(self):
+        response = self._get_export()
+        zf = self._read_zip(response)
+        content = zf.read('ct-post.md').decode('utf-8')
+        self.assertIn('Test content', content)
+
+    def test_export_excludes_sensitive_fields(self):
+        response = self._get_export()
+        zf = self._read_zip(response)
+        content = zf.read('ct-post.md').decode('utf-8')
+        self.assertNotIn('upvotes', content)
+        self.assertNotIn('shadow_votes', content)
+        self.assertNotIn('hidden', content)
+        self.assertNotIn('score', content)
+
+    def test_export_duplicate_slugs_get_suffix(self):
+        Post.objects.create(
+            blog=self.blog, uid='ct2', title='CT Post Dupe',
+            slug='ct-post', published_date=timezone.now(), content='Dupe',
+        )
+        response = self._get_export()
+        zf = self._read_zip(response)
+        names = zf.namelist()
+        self.assertIn('ct-post.md', names)
+        self.assertIn('ct-post-2.md', names)
+
+    def test_export_optional_fields_omitted_when_empty(self):
+        response = self._get_export()
+        zf = self._read_zip(response)
+        content = zf.read('ct-post.md').decode('utf-8')
+        self.assertNotIn('alias:', content)
+
+    def test_export_tags_comma_separated(self):
+        self.post.all_tags = '["python", "django"]'
+        self.post.save()
+        response = self._get_export()
+        zf = self._read_zip(response)
+        content = zf.read('ct-post.md').decode('utf-8')
+        self.assertIn('tags: django, python', content)
+
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
 class FeedTagTitleTests(TestCase):

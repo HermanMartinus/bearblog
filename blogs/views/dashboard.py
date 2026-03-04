@@ -3,9 +3,14 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 
+from django.http import HttpResponse
+
 from ipaddr import client_ip
 from unicodedata import lookup
 import djqscsv
+import io
+import json
+import zipfile
 
 from blogs.forms import NavForm, StyleForm
 from blogs.helpers import get_country, is_protected
@@ -195,15 +200,62 @@ def opt_in_review(request, id):
     return render(request, "dashboard/opt-in-review.html", {"blog": blog})
 
 
+def export_markdown_zip(blog):
+    buf = io.BytesIO()
+    seen = {}
+
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for post in blog.posts.all():
+            base = post.slug or 'untitled'
+            if base not in seen:
+                seen[base] = 1
+                filename = f'{base}.md'
+            else:
+                seen[base] += 1
+                filename = f'{base}-{seen[base]}.md'
+
+            lines = ['---']
+            lines.append(f'title: {post.title}')
+            lines.append(f'slug: {post.slug}')
+            if post.alias:
+                lines.append(f'alias: {post.alias}')
+            lines.append(f'published_date: {post.published_date.isoformat()}')
+            tags = sorted(json.loads(post.all_tags))
+            if tags:
+                lines.append(f'tags: {", ".join(tags)}')
+            lines.append(f'publish: {str(post.publish).lower()}')
+            lines.append(f'make_discoverable: {str(post.make_discoverable).lower()}')
+            lines.append(f'is_page: {str(post.is_page).lower()}')
+            if post.canonical_url:
+                lines.append(f'canonical_url: {post.canonical_url}')
+            if post.meta_description:
+                lines.append(f'meta_description: {post.meta_description}')
+            if post.meta_image:
+                lines.append(f'meta_image: {post.meta_image}')
+            if post.lang:
+                lines.append(f'lang: {post.lang}')
+            if post.class_name:
+                lines.append(f'class_name: {post.class_name}')
+            lines.append('---')
+
+            md_content = '\n'.join(lines) + '\n\n' + post.content
+            zf.writestr(filename, md_content)
+
+    buf.seek(0)
+    response = HttpResponse(buf.read(), content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="{blog.subdomain}-export.zip"'
+    return response
+
+
 @login_required
 def settings(request, id):
     if request.user.is_superuser:
         blog = get_object_or_404(Blog, subdomain=id)
     else:
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-    
+
     error_messages = []
-    
+
     if request.method == "POST":
         subdomain = request.POST.get('subdomain').lower().strip()
         lang = request.POST.get('lang', 'en')
@@ -219,13 +271,15 @@ def settings(request, id):
             else:
                 error_messages.append(f'The subdomain "{subdomain}" is reserved')
 
-    if request.GET.get("export", ""):
-        # Only export specified fields
-        fields = ['uid', 'title', 'slug', 'alias', 'published_date', 'all_tags', 
-                  'publish', 'make_discoverable', 'is_page', 'content', 
-                  'canonical_url', 'meta_description', 'meta_image', 'lang', 
+    if request.GET.get("export-csv", ""):
+        fields = ['uid', 'title', 'slug', 'alias', 'published_date', 'all_tags',
+                  'publish', 'make_discoverable', 'is_page', 'content',
+                  'canonical_url', 'meta_description', 'meta_image', 'lang',
                   'class_name', 'first_published_at']
         return djqscsv.render_to_csv_response(blog.posts.values(*fields))
+
+    if request.GET.get("export-md", ""):
+        return export_markdown_zip(blog)
     
     return render(request, "dashboard/settings.html", {
         "blog": blog,
