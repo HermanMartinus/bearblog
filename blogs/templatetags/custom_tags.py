@@ -221,11 +221,24 @@ def excluding_pre(markup, blog=None, post=None, tz=None):
     return markup
 
 
-def apply_filters(posts, tag=None, limit=None, order=None):
+def apply_filters(posts, tag=None, limit=None, order=None, from_date=None, to_date=None):
     if order == 'asc':
         posts = posts.order_by('published_date')
     else:
         posts = posts.order_by('-published_date')
+    if from_date:
+        try:
+            start = timezone.datetime.strptime(from_date, '%Y-%m-%d').replace(tzinfo=ZoneInfo('UTC'))
+            posts = posts.filter(published_date__gte=start)
+        except ValueError:
+            pass
+    if to_date:
+        try:
+            end = timezone.datetime.strptime(to_date, '%Y-%m-%d').replace(tzinfo=ZoneInfo('UTC'))
+            end += timezone.timedelta(days=1)
+            posts = posts.filter(published_date__lt=end)
+        except ValueError:
+            pass
     if tag:
         # Split tags by comma and strip whitespace
         tags = [t.strip() for t in tag.replace('"', '').split(',')]
@@ -251,9 +264,11 @@ def element_replacement(markup, blog, post=None, tz=None):
     def replace_with_filtered_posts(match):
         params_str = match.group(1) 
         tag, limit, order, description, image, content = None, None, None, False, False, False
-        
+        from_date = None
+        to_date = None
+
         # Extract and process parameters one by one
-        param_pattern = r'(tag:([^|}\s][^|}]*)|limit:(\d+)|order:(asc|desc)|description:(True)|image:(True)|content:(True))'
+        param_pattern = r'(tag:([^|}\s][^|}]*)|limit:(\d+)|order:(asc|desc)|description:(True)|image:(True)|content:(True)|from:(\d{4}-\d{2}-\d{2})|to:(\d{4}-\d{2}-\d{2}))'
         params = re.findall(param_pattern, params_str)
         for param in params:
             if 'tag:' in param[0]:
@@ -267,10 +282,14 @@ def element_replacement(markup, blog, post=None, tz=None):
             elif 'image:' in param[0]:
                 image  = param[5] == 'True'
             # Only show content if injection is on page or homepage
-            elif 'content:' in param[0] and not post or post.is_page:
+            elif 'content:' in param[0] and (not post or post.is_page):
                 content = param[6] == 'True'
+            elif 'from:' in param[0]:
+                from_date = param[7]
+            elif 'to:' in param[0]:
+                to_date = param[8]
 
-        filtered_posts = apply_filters(blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now()), tag, limit, order)
+        filtered_posts = apply_filters(blog.posts.filter(publish=True, is_page=False, published_date__lte=timezone.now()), tag, limit, order, from_date, to_date)
         context = {'blog': blog, 'posts': filtered_posts, 'embed': True, 'show_description': description, 'show_image': image, 'show_content': content, 'tz': tz}
         return render_to_string('snippets/post_list.html', context)
 

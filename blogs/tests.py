@@ -1,6 +1,7 @@
 import json
 import os
 from unittest import mock
+from zoneinfo import ZoneInfo
 
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
@@ -97,58 +98,116 @@ class PlainTitleTests(TestCase):
         self.assertNotIsInstance(result, SafeString)
 
 
-class ApplyFiltersExcludeTagTests(TestCase):
+class PostListTests(TestCase):
     def setUp(self):
         Stylesheet.objects.create(title='Default', identifier='default', css='')
         self.user = User.objects.create_user(username='testuser', password='pass')
-        self.blog = Blog.objects.create(user=self.user, title='Test Blog', subdomain='test-exclude')
-        now = timezone.now()
 
+        # Blog with tagged posts for tag filtering tests
+        self.tag_blog = Blog.objects.create(user=self.user, title='Tag Blog', subdomain='test-tags')
+        now = timezone.now()
         self.post_python = Post.objects.create(
-            blog=self.blog, uid='p1', title='Python Basics', slug='python-basics',
+            blog=self.tag_blog, uid='p1', title='Python Basics', slug='python-basics',
             published_date=now, content='content',
             all_tags=json.dumps(['python', 'tutorial']),
         )
         self.post_django = Post.objects.create(
-            blog=self.blog, uid='p2', title='Django Guide', slug='django-guide',
+            blog=self.tag_blog, uid='p2', title='Django Guide', slug='django-guide',
             published_date=now, content='content',
             all_tags=json.dumps(['python', 'django']),
         )
         self.post_personal = Post.objects.create(
-            blog=self.blog, uid='p3', title='My Day', slug='my-day',
+            blog=self.tag_blog, uid='p3', title='My Day', slug='my-day',
             published_date=now, content='content',
             all_tags=json.dumps(['personal']),
         )
         self.post_draft = Post.objects.create(
-            blog=self.blog, uid='p4', title='Draft Ideas', slug='draft-ideas',
+            blog=self.tag_blog, uid='p4', title='Draft Ideas', slug='draft-ideas',
             published_date=now, content='content',
             all_tags=json.dumps(['personal', 'draft']),
         )
-        self.all_posts = self.blog.posts.filter(publish=True)
+        self.tag_posts = self.tag_blog.posts.filter(publish=True)
+
+        # Blog with dated posts for date range tests
+        self.date_blog = Blog.objects.create(user=self.user, title='Date Blog', subdomain='test-dates')
+        self.post_jan = Post.objects.create(
+            blog=self.date_blog, uid='d1', title='January Post', slug='jan-post',
+            published_date=timezone.datetime(2024, 1, 15, tzinfo=ZoneInfo('UTC')),
+            content='content',
+        )
+        self.post_jun = Post.objects.create(
+            blog=self.date_blog, uid='d2', title='June Post', slug='jun-post',
+            published_date=timezone.datetime(2024, 6, 15, tzinfo=ZoneInfo('UTC')),
+            content='content',
+        )
+        self.post_dec = Post.objects.create(
+            blog=self.date_blog, uid='d3', title='December Post', slug='dec-post',
+            published_date=timezone.datetime(2024, 12, 31, 23, 59, tzinfo=ZoneInfo('UTC')),
+            content='content',
+        )
+        self.date_posts = self.date_blog.posts.filter(publish=True)
+
+    # --- Tag filtering ---
 
     def test_exclude_single_tag(self):
-        result = apply_filters(self.all_posts, tag='-personal')
+        result = apply_filters(self.tag_posts, tag='-personal')
         titles = {p.title for p in result}
         self.assertEqual(titles, {'Python Basics', 'Django Guide'})
 
     def test_exclude_multiple_tags(self):
-        result = apply_filters(self.all_posts, tag='-personal,-tutorial')
+        result = apply_filters(self.tag_posts, tag='-personal,-tutorial')
         titles = {p.title for p in result}
         self.assertEqual(titles, {'Django Guide'})
 
     def test_include_and_exclude(self):
-        result = apply_filters(self.all_posts, tag='python,-tutorial')
+        result = apply_filters(self.tag_posts, tag='python,-tutorial')
         titles = {p.title for p in result}
         self.assertEqual(titles, {'Django Guide'})
 
     def test_exclude_only_keeps_non_matching(self):
-        result = apply_filters(self.all_posts, tag='-draft')
+        result = apply_filters(self.tag_posts, tag='-draft')
         titles = {p.title for p in result}
         self.assertEqual(titles, {'Python Basics', 'Django Guide', 'My Day'})
 
     def test_bare_dash_ignored(self):
-        result = apply_filters(self.all_posts, tag='-')
+        result = apply_filters(self.tag_posts, tag='-')
         self.assertEqual(len(result), 4)
+
+    # --- Date range ---
+
+    def test_from_date_only(self):
+        result = apply_filters(self.date_posts, from_date='2024-06-01')
+        titles = {p.title for p in result}
+        self.assertEqual(titles, {'June Post', 'December Post'})
+
+    def test_to_date_only(self):
+        result = apply_filters(self.date_posts, to_date='2024-06-30')
+        titles = {p.title for p in result}
+        self.assertEqual(titles, {'January Post', 'June Post'})
+
+    def test_from_and_to_date(self):
+        result = apply_filters(self.date_posts, from_date='2024-02-01', to_date='2024-11-30')
+        titles = {p.title for p in result}
+        self.assertEqual(titles, {'June Post'})
+
+    def test_to_date_inclusive_of_full_day(self):
+        """to:2024-12-31 should include a post at 23:59 on that day."""
+        result = apply_filters(self.date_posts, to_date='2024-12-31')
+        titles = {p.title for p in result}
+        self.assertIn('December Post', titles)
+
+    def test_invalid_date_ignored(self):
+        """Malformed dates should be silently ignored, returning all posts."""
+        result = apply_filters(self.date_posts, from_date='not-a-date')
+        self.assertEqual(len(list(result)), 3)
+
+    def test_date_range_with_tag(self):
+        """Date range should compose with tag filtering."""
+        self.post_jun.all_tags = json.dumps(['python'])
+        self.post_jun.save()
+        result = apply_filters(self.date_posts, tag='python', from_date='2024-01-01', to_date='2024-12-31')
+        titles = {p.title for p in result}
+        self.assertEqual(titles, {'June Post'})
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
