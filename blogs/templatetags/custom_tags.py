@@ -83,9 +83,8 @@ def replace_inline_latex(text):
     latex_exp_inline = re.compile(r'\$\$([^\n]*?)\$\$')
     replaced_text = latex_exp_inline.sub(r'$\1$', text)
 
-    # Escape dollar signs followed by digits (currency like $30)
-    # so they aren't matched as inline math delimiters
-    replaced_text = re.sub(r'\$(\d)', r'\\$\1', replaced_text)
+    # Escape currency $ pairs like "$30...$50"
+    replaced_text = re.sub(r'\$(\d[^$\n]*?)\$(?=\d)', r'\\$\1\\$', replaced_text)
 
     return replaced_text
 

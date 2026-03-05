@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.safestring import SafeString
 
 from blogs.models import Blog, Post, Stylesheet
-from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer
+from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer, replace_inline_latex
 
 
 class SafeTitleTests(TestCase):
@@ -876,3 +876,39 @@ class FeedTagTitleTests(TestCase):
         self.assertEqual(response.status_code, 200)
         content = response.content.decode()
         self.assertIn('<title>Feed Tag Blog - news</title>', content)
+
+
+class InlineLatexTests(TestCase):
+    """Tests for replace_inline_latex and currency vs math rendering."""
+
+    def test_currency_pair_does_not_break_markdown_links(self):
+        text = 'are [Bazqux](https://bazqux.com/), which is $30/year, and [Feedbin](https://feedbin.com/), which is $50/year.'
+        result = markdown_renderer(replace_inline_latex(text))
+        self.assertIn('Feedbin</a>', result)
+        self.assertIn('Bazqux</a>', result)
+
+    def test_math_starting_with_digit_preserved(self):
+        text = r'approximately $3 \times 10^8$ m/s.'
+        result = markdown_renderer(replace_inline_latex(text))
+        self.assertIn('math', result)
+
+    def test_simple_inline_math_preserved(self):
+        text = '$E=mc^2$'
+        result = markdown_renderer(replace_inline_latex(text))
+        self.assertIn('math', result)
+
+    def test_variable_math_preserved(self):
+        text = '$E$ is the energy'
+        result = markdown_renderer(replace_inline_latex(text))
+        self.assertIn('math', result)
+
+    def test_old_double_dollar_inline_converted(self):
+        text = '$$E=mc^2$$'
+        result = markdown_renderer(replace_inline_latex(text))
+        self.assertIn('math', result)
+
+    def test_single_currency_no_pair(self):
+        text = 'It costs $50.'
+        result = replace_inline_latex(text)
+        self.assertIn('$50', result)
+        self.assertNotIn('\\$', result)
