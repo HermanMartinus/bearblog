@@ -17,8 +17,6 @@ from blogs.models import Blog, PersistentStore, Post, UserSettings
 from statistics import mean
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
-import pygal
-from pygal.style import LightColorizedStyle
 import json
 import os
 from datetime import datetime
@@ -74,16 +72,10 @@ def dashboard(request):
             p_str = signup['p'].strftime("%Y-%m-%d")
             if p_str in user_dict:
                 user_dict[p_str] = signup['c']
-    # Generate chart
-    chart_data = []
+    # Generate chart data
+    signup_chart_data = []
     for date, count in user_dict.items():
-        chart_data.append({'date': date, 'signups': count})
-    chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
-    chart.force_uri_protocol = 'http'
-    mark_list = [x['signups'] for x in chart_data]
-    chart.add('Signups', mark_list)
-    chart.x_labels = [label_format(x['date']) for x in chart_data]
-    signup_chart = chart.render_data_uri()
+        signup_chart_data.append({'date': date, 'count': count})
     # Upgrades
     upgraded_users = User.objects.filter(settings__upgraded=True, settings__upgraded_date__gte=start_date).order_by('settings__upgraded_date')
     upgrades_count = upgraded_users.annotate(p=trunc('settings__upgraded_date')).values('p').annotate(c=Count('id')).order_by('p')
@@ -99,16 +91,10 @@ def dashboard(request):
             p_str = upgrade['p'].strftime("%Y-%m-%d")
             if p_str in user_dict:
                 user_dict[p_str] = upgrade['c']
-    # Generate chart
-    chart_data = []
+    # Generate chart data
+    upgrade_chart_data = []
     for date, count in user_dict.items():
-        chart_data.append({'date': date, 'upgrades': count})
-    chart = pygal.Bar(height=300, show_legend=False, style=LightColorizedStyle)
-    chart.force_uri_protocol = 'http'
-    mark_list = [x['upgrades'] for x in chart_data]
-    chart.add('Upgrades', mark_list)
-    chart.x_labels = [label_format(x['date']) for x in chart_data]
-    upgrade_chart = chart.render_data_uri()
+        upgrade_chart_data.append({'date': date, 'count': count})
     # Calculate signups and upgrades for the period
     signups = users.count()
     upgrades = User.objects.filter(settings__upgraded=True, settings__upgraded_date__gte=start_date).count()
@@ -131,8 +117,8 @@ def dashboard(request):
             'total_upgrades': total_upgrades,
             'conversion_rate': formatted_conversion_rate,
             'total_conversion_rate': formatted_total_conversion_rate,
-            'signup_chart': signup_chart,
-            'upgrade_chart': upgrade_chart,
+            'signup_chart_data': json.dumps(signup_chart_data),
+            'upgrade_chart_data': json.dumps(upgrade_chart_data),
             'start_date': start_date,
             'end_date': end_date,
             'opt_in_blogs_count': opt_in_blogs_count,

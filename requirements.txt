@@ -16,7 +16,6 @@ latex2mathml==3.77.0
 mistune==3.2.0
 Pillow==12.1.1
 psycopg2==2.9.10
-pygal==3.0.5
 python-dotenv==1.0.0
 redis==7.1.0
 requests==2.32.5

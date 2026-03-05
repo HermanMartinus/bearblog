@@ -67,13 +67,13 @@ Staff dashboard  ʕง•ᴥ•ʔง
         </ul>
     </p>
     <h2>Signups</h2>
-    <embed type="image/svg+xml" src= {{ signup_chart|safe }} />
+    <canvas id="signupChart"></canvas>
     <span class="helptext" style="display: flex; justify-content:space-between;">
         <span>{{ start_date|date:"j F Y" }}</span>
         <span>{{ end_date|date:"j F Y" }}</span>
     </span>
     <h2>Upgrades</h2>
-    <embed type="image/svg+xml" src= {{ upgrade_chart|safe }} />
+    <canvas id="upgradeChart"></canvas>
     <span class="helptext" style="display: flex; justify-content:space-between;">
         <span>{{ start_date|date:"j F Y" }}</span>
         <span>{{ end_date|date:"j F Y" }}</span>
@@ -138,4 +138,35 @@ Staff dashboard  ʕง•ᴥ•ʔง
 
 {% block footer %}
 Be a good warden of Bear <span class="bear" role="img" aria-label="ASCII bear saluting">ʕ•ᴥ•ʔゝ</span>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function makeBarChart(canvasId, data, label) {
+        const period = '{{ period }}';
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(item => {
+                    if (period === 'days') return item.date.split('-')[2];
+                    if (period === 'months') return item.date.slice(0, 7);
+                    return item.date.slice(5);
+                }),
+                datasets: [{
+                    label: label,
+                    data: data.map(item => item.count),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+    makeBarChart('signupChart', {{ signup_chart_data|safe }}, 'Signups');
+    makeBarChart('upgradeChart', {{ upgrade_chart_data|safe }}, 'Upgrades');
+</script>
 {% endblock %}
