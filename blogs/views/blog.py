@@ -9,8 +9,6 @@ from blogs.helpers import salt_and_hash, unmark
 from blogs.views.analytics import render_analytics
 
 import os
-import tldextract
-
 def resolve_address(request):
     http_host = request.get_host()
 
@@ -19,14 +17,15 @@ def resolve_address(request):
     if any(http_host == site for site in sites):
         # Homepage
         return None
-    elif any(site in http_host for site in sites):
-        # Subdomained blog
-        subdomain = tldextract.extract(http_host).subdomain.lower()
 
-        return get_object_or_404(Blog.objects.select_related('user').select_related('user__settings'), subdomain=subdomain, user__is_active=True)
-    else:
-        # Custom domain blog
-        return get_blog_with_domain(http_host)
+    for site in sites:
+        if http_host.endswith('.' + site):
+            # Subdomained blog
+            subdomain = http_host[:-(len(site) + 1)].lower()
+            return get_object_or_404(Blog.objects.select_related('user').select_related('user__settings'), subdomain=subdomain, user__is_active=True)
+
+    # Custom domain blog
+    return get_blog_with_domain(http_host)
 
 
 def get_blog_with_domain(domain):

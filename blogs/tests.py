@@ -803,6 +803,42 @@ class ContentTypeTests(TestCase):
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class ResolveAddressTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='resolveuser', password='pass')
+        self.blog = Blog.objects.create(user=self.user, title='Resolve Blog', subdomain='myblog')
+
+    @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+    def test_main_site_returns_none(self):
+        from blogs.views.blog import resolve_address
+        request = self.client.get('/').wsgi_request
+        request.META['HTTP_HOST'] = 'testserver'
+        request.META['SERVER_NAME'] = 'testserver'
+        self.assertIsNone(resolve_address(request))
+
+    @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+    def test_subdomain_returns_blog(self):
+        response = self.client.get('/', SERVER_NAME='myblog.testserver')
+        self.assertEqual(response.status_code, 200)
+
+    @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+    def test_nonexistent_subdomain_returns_404(self):
+        response = self.client.get('/', SERVER_NAME='nosuchblog.testserver')
+        self.assertEqual(response.status_code, 404)
+
+    @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+    def test_feed_with_subdomain(self):
+        response = self.client.get('/feed/', SERVER_NAME='myblog.testserver')
+        self.assertEqual(response.status_code, 200)
+
+    @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+    def test_robots_with_subdomain(self):
+        response = self.client.get('/robots.txt', SERVER_NAME='myblog.testserver')
+        self.assertEqual(response.status_code, 200)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
 class FeedTagTitleTests(TestCase):
     def setUp(self):
         Stylesheet.objects.create(title='Default', identifier='default', css='')
