@@ -587,6 +587,29 @@ class ScriptTagTests(TestCase):
         self.assertNotIn('BEAR_SCRIPT', result)
         self.assertIn('alert', result)
 
+    def test_script_template_variables_replaced(self):
+        """{{ blog_title }} and {{ post_title }} inside <script> should be replaced."""
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        user = User.objects.create_user(username='scriptvar', password='pass')
+        blog = Blog.objects.create(user=user, title='My Blog', subdomain='scriptvar')
+        user.settings.upgraded = True
+        user.settings.save()
+        post = Post.objects.create(
+            blog=blog,
+            uid='sv-1',
+            title='My Post',
+            slug='my-post',
+            published_date=timezone.now(),
+            publish=True,
+            content='placeholder',
+        )
+        content = '<script>var title = "{{ blog_title }}"; var post = "{{ post_title }}";</script>'
+        result = markdown(content, blog=blog, post=post)
+        self.assertNotIn('{{ blog_title }}', result)
+        self.assertNotIn('{{ post_title }}', result)
+        self.assertIn('My Blog', result)
+        self.assertIn('My Post', result)
+
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
 class ContentTypeTests(TestCase):
