@@ -52,7 +52,6 @@ Reviewed blog content (posts + blog metadata as CSV) is backed up to a separate 
 | **Mailgun** | Transactional email (SMTP via `smtp.eu.mailgun.org`) |
 | **Sentry** | Error tracking (production only, low sample rate) |
 | **JudoScale** | Heroku autoscaling — passive unless under load |
-| **Akismet** | Spam detection (secondary to dodginess score) |
 | **GeoIP2** | Geolocation for analytics |
 
 ## Scheduled Tasks

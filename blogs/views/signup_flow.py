@@ -6,9 +6,7 @@ from django.contrib.auth import get_user_model, login
 
 from blogs.models import Blog
 
-from akismet import Akismet
 import random
-import os
 
 
 def signup(request):
@@ -107,27 +105,6 @@ def honeypot_check(request):
 
     return False
 
-
-def spam_check(title, content, email, user_ip, user_agent):
-    akismet_api = Akismet(os.getenv('AKISMET_KEY'), 'https://bearblog.dev')
-
-    is_spam = akismet_api.check(
-        user_ip=user_ip,
-        user_agent=user_agent,
-        comment_author=title,
-        comment_author_email=email,
-        comment_content=content,
-        comment_type='signup',
-    )
-
-    # Only discard blatant spam (2), possible spam is allowed (1)
-    if is_spam == 2:
-        print("Spam (blatant):", content)
-        return True
-    if is_spam == 1:
-        print("Spam (possible):", content)
-        return False
-    return False
 
 
 def random_error_message():
