@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.safestring import SafeString
 
 from blogs.models import Blog, Post, Stylesheet
-from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title
+from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer
 
 
 class SafeTitleTests(TestCase):
@@ -538,6 +538,54 @@ class DiscoverFeedMarkdownTests(TestCase):
         self._make_post('Published on {{ post_published_date }}')
         content = self._get_feed_content()
         self.assertNotIn('{{ post_published_date }}', content)
+
+
+class ScriptTagTests(TestCase):
+    """Verify that <script> blocks are not corrupted by markdown text processing."""
+
+    def test_inline_script_no_br(self):
+        """Backslash-n in inline script should NOT be converted to <br>."""
+        content = r'text <script>var msg = "hi\nthere";</script>'
+        result = markdown_renderer(content)
+        self.assertNotIn('<br>', result)
+        self.assertIn(r'\n', result)
+
+    def test_inline_script_no_typographic_replacements(self):
+        """(c) inside inline script should NOT become a copyright symbol."""
+        content = 'text <script>var x = "(c) 2024";</script>'
+        result = markdown_renderer(content)
+        self.assertNotIn('\u00a9', result)
+        self.assertIn('(c)', result)
+
+    def test_block_script_preserved(self):
+        """Block-level script content should be preserved as-is."""
+        content = '<script>\nvar x = "(c)";\nvar y = "hello\\nworld";\n</script>'
+        result = markdown_renderer(content)
+        self.assertIn('(c)', result)
+        self.assertNotIn('\u00a9', result)
+        self.assertNotIn('<br>', result)
+
+    def test_script_with_surrounding_markdown(self):
+        """Script blocks should not break surrounding markdown rendering."""
+        content = '# Hello\n\ntext <script>var x = 1;</script>\n\n**bold**'
+        result = markdown_renderer(content)
+        self.assertIn('<h1', result)
+        self.assertIn('<strong>bold</strong>', result)
+        self.assertIn('<script>var x = 1;</script>', result)
+
+    def test_multiple_scripts(self):
+        """Multiple script blocks should all be protected."""
+        content = 'a <script>var x = "(c)";</script> b <script>var y = "hi\\nthere";</script>'
+        result = markdown_renderer(content)
+        self.assertNotIn('\u00a9', result)
+        self.assertNotIn('<br>', result)
+
+    def test_script_in_fenced_code_block_not_extracted(self):
+        """Script tags inside fenced code blocks should render as code, not be extracted."""
+        content = '```html\n<div>\n    <script>alert("test\\n");</script>\n</div>\n```'
+        result = markdown_renderer(content)
+        self.assertNotIn('BEAR_SCRIPT', result)
+        self.assertIn('alert', result)
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})

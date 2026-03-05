@@ -160,13 +160,47 @@ class MyRenderer(HTMLRenderer):
         return highlighted_code
 
 
-markdown_renderer = create_markdown(
+_mistune_renderer = create_markdown(
     renderer=MyRenderer(),
     plugins=['math', 'strikethrough', 'footnotes', 'table', 'superscript', 'subscript', 'mark', 'task_lists', 'abbr', RSTDirective([
         Admonition(),
         TableOfContents(),
     ]),],
     escape=False)
+
+
+def markdown_renderer(content):
+    """Render markdown with script blocks protected from text processing."""
+    # Protect fenced code blocks from script extraction
+    code_placeholders = {}
+
+    def replace_code(match):
+        key = f"BEAR_CODE_{len(code_placeholders)}"
+        code_placeholders[key] = match.group(0)
+        return key
+
+    content = re.sub(r'(```[^\n]*\n.*?```|~~~[^\n]*\n.*?~~~)', replace_code, content, flags=re.DOTALL)
+
+    # Extract script blocks (now only those outside code fences)
+    script_placeholders = {}
+
+    def replace_script(match):
+        key = f"<!--BEAR_SCRIPT_{len(script_placeholders)}-->"
+        script_placeholders[key] = match.group(0)
+        return key
+
+    content = re.sub(r'<script\b[^>]*>.*?</script>', replace_script, content, flags=re.DOTALL | re.IGNORECASE)
+
+    # Restore code blocks before rendering
+    for key, code in code_placeholders.items():
+        content = content.replace(key, code)
+
+    result = _mistune_renderer(content)
+
+    for key, script in script_placeholders.items():
+        result = result.replace(key, script)
+
+    return result
 
 
 @register.simple_tag(takes_context=False)
