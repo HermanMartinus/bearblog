@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 
-from blogs.helpers import send_async_mail
+from blogs.helpers import send_async_mail, check_connection
 from blogs.models import Blog, PersistentStore, Post, UserSettings
 
 from statistics import mean
@@ -206,6 +206,8 @@ def actions(request):
     nudge_users = list(monthly_users_to_upgrade())
     contribution_nudge_users = list(free_users_to_nudge())
     orphaned_blogs = list(blogs_with_orphaned_domains())
+    for blog in orphaned_blogs:
+        blog.is_connected = check_connection(blog)
     cutoff = timezone.now() - timedelta(days=14)
     overdue_blogs = list(Blog.objects.filter(
         user__settings__upgraded=False,

@@ -83,7 +83,8 @@ def check_connection(blog):
         return
     else:
         try:
-            response = requests.request("GET", blog.useful_domain, allow_redirects=False, timeout=10)
+            user_agent = os.environ.get("ADMIN_USER_AGENT", "")
+            response = requests.request("GET", blog.useful_domain, headers={"User-Agent": user_agent}, allow_redirects=False, timeout=10)
             return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities">' in response.text)
         except ConnectionError:
             return False
