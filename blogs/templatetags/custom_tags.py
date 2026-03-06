@@ -170,6 +170,9 @@ _mistune_renderer = create_markdown(
         TableOfContents(),
     ]),],
     escape=False)
+# Remove 8-spaces for code block functionality
+_mistune_renderer.block.rules.remove('indent_code')
+_mistune_renderer.block.compile_sc()
 
 
 def markdown_renderer(content):
