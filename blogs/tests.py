@@ -949,7 +949,12 @@ class FaviconViewTests(TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertIn('/static/favicon.ico', response['Location'])
 
-    def test_favicon_fallback_redirects_to_svg(self):
+    def test_apple_touch_icon_redirects_to_png(self):
         response = self.client.get('/apple-touch-icon.png', SERVER_NAME='favblog.testserver')
+        self.assertEqual(response.status_code, 301)
+        self.assertIn('/static/favicon.png', response['Location'])
+
+    def test_favicon_fallback_redirects_to_svg(self):
+        response = self.client.get('/favicons/site.webmanifest', SERVER_NAME='favblog.testserver')
         self.assertEqual(response.status_code, 301)
         self.assertIn('/static/favicon.svg', response['Location'])
