@@ -912,3 +912,44 @@ class InlineLatexTests(TestCase):
         result = replace_inline_latex(text)
         self.assertIn('$50', result)
         self.assertNotIn('\\$', result)
+
+
+class FaviconSvgTests(TestCase):
+    """Verify the SVG favicon supports dark mode via prefers-color-scheme."""
+
+    def test_favicon_svg_uses_current_color(self):
+        svg_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'favicon.svg')
+        with open(svg_path) as f:
+            content = f.read()
+        self.assertIn('currentColor', content)
+
+    def test_favicon_svg_has_dark_mode_media_query(self):
+        svg_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'favicon.svg')
+        with open(svg_path) as f:
+            content = f.read()
+        self.assertIn('prefers-color-scheme:dark', content)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class FaviconViewTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='favuser', password='pass')
+        self.blog = Blog.objects.create(user=self.user, title='Fav Blog', subdomain='favblog')
+
+    def test_base_template_has_svg_favicon(self):
+        """The main site base template should reference favicon.svg."""
+        response = self.client.get('/discover/')
+        content = response.content.decode()
+        self.assertIn('favicon.svg', content)
+        self.assertIn('image/svg+xml', content)
+
+    def test_favicon_ico_redirects_to_ico(self):
+        response = self.client.get('/favicon.ico', SERVER_NAME='favblog.testserver')
+        self.assertEqual(response.status_code, 301)
+        self.assertIn('/static/favicon.ico', response['Location'])
+
+    def test_favicon_fallback_redirects_to_svg(self):
+        response = self.client.get('/apple-touch-icon.png', SERVER_NAME='favblog.testserver')
+        self.assertEqual(response.status_code, 301)
+        self.assertIn('/static/favicon.svg', response['Location'])

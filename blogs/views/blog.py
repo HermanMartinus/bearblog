@@ -312,4 +312,4 @@ def favicon(request):
 
     if '.ico' in request.path:
         return redirect('/static/favicon.ico', permanent=True)
-    return redirect('/static/logo.png', permanent=True)
+    return redirect('/static/favicon.svg', permanent=True)
