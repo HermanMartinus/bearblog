@@ -527,6 +527,14 @@ class DiscoverFeedMarkdownTests(TestCase):
         content = self._get_feed_content()
         self.assertIn('id=my-heading', content)
 
+    def test_duplicate_heading_ids(self):
+        """Duplicate headings should get suffixed IDs."""
+        self._make_post('## My Heading\n## My Heading\n## My Heading')
+        content = self._get_feed_content()
+        self.assertIn('id=my-heading', content)
+        self.assertIn('id=my-heading-1', content)
+        self.assertIn('id=my-heading-2', content)
+
     def test_code_highlighting(self):
         """Fenced code blocks should get Pygments syntax highlighting."""
         self._make_post('```python\nprint("hello")\n```')

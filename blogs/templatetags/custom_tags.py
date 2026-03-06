@@ -104,8 +104,21 @@ def fix_links(text):
     return fixed_text
 
 class MyRenderer(HTMLRenderer):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._heading_ids = {}
+
+    def reset_heading_ids(self):
+        self._heading_ids = {}
+
     def heading(self, text, level, **attrs):
-        return f'<h{level} id={slugify(text)}>{text}</h{level}>'
+        slug = slugify(text)
+        if slug in self._heading_ids:
+            self._heading_ids[slug] += 1
+            slug = f'{slug}-{self._heading_ids[slug]}'
+        else:
+            self._heading_ids[slug] = 0
+        return f'<h{level} id={slug}>{text}</h{level}>'
     
     def link(self, text, url, title=None):
         if title:
@@ -201,6 +214,7 @@ def markdown_renderer(content):
     for key, code in code_placeholders.items():
         content = content.replace(key, code)
 
+    _mistune_renderer.renderer.reset_heading_ids()
     result = _mistune_renderer(content)
 
     for key, script in script_placeholders.items():
