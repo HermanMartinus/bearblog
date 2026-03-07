@@ -184,8 +184,8 @@ _mistune_renderer = create_markdown(
     ]),],
     escape=False)
 # Remove 8-spaces for code block functionality
-# _mistune_renderer.block.rules.remove('indent_code')
-# _mistune_renderer.block.compile_sc()
+_mistune_renderer.block.rules.remove('indent_code')
+_mistune_renderer.block.compile_sc()
 
 
 def markdown_renderer(content):
@@ -194,7 +194,7 @@ def markdown_renderer(content):
     code_placeholders = {}
 
     def replace_code(match):
-        key = f"BEAR_CODE_{len(code_placeholders)}"
+        key = f"<!--BEAR_CODE_{len(code_placeholders)}-->"
         code_placeholders[key] = match.group(0)
         return key
 

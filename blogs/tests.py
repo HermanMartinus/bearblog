@@ -595,6 +595,18 @@ class ScriptTagTests(TestCase):
         self.assertNotIn('BEAR_SCRIPT', result)
         self.assertIn('alert', result)
 
+    def test_many_code_blocks_no_corruption(self):
+        """10+ code blocks should not suffer placeholder substring collision."""
+        blocks = []
+        for i in range(12):
+            lang = 'python' if i % 2 == 0 else ''
+            blocks.append(f'```{lang}\nblock_content_{i}\n```')
+        content = '\n\nsome text\n\n'.join(blocks)
+        result = markdown_renderer(content)
+        for i in range(12):
+            self.assertIn(f'block_content_{i}', result)
+        self.assertNotIn('BEAR_CODE', result)
+
     def test_script_template_variables_replaced(self):
         """{{ blog_title }} and {{ post_title }} inside <script> should be replaced."""
         Stylesheet.objects.create(title='Default', identifier='default', css='')
