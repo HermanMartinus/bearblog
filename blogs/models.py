@@ -189,7 +189,7 @@ class Blog(models.Model):
 
     def invalidate_cloudflare_cache(self):
         if os.getenv('ENVIRONMENT') == 'dev':
-            print("Invalidating cache for", self.subdomain)
+            # Don't invalidate on dev
             return
 
         cloudflare_api_key = os.getenv('CLOUDFLARE_API_KEY')

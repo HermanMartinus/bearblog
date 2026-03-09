@@ -12,6 +12,7 @@ import os
 import time
 import threading
 from collections import defaultdict
+from datetime import datetime, timezone
 
 from django.core.cache import cache
 from django.core.management import call_command
@@ -129,11 +130,12 @@ class ConditionalXFrameOptionsMiddleware:
 SCHEDULED_TASKS = []
 
 
-def register_task(name, interval_seconds):
+def register_task(name, interval_seconds=None, run_at=None):
     def decorator(func):
         SCHEDULED_TASKS.append({
             'name': name,
             'interval_seconds': interval_seconds,
+            'run_at': run_at,
             'func': func,
         })
         return func
@@ -145,9 +147,15 @@ def run_invalidate_cache():
     call_command('invalidate_cache')
 
 
+
 @register_task('monitor_custom_domains', interval_seconds=60)
 def run_monitor_custom_domains():
     call_command('monitor_custom_domains')
+
+
+@register_task('send_emails', run_at="10:00")
+def run_send_emails():
+    call_command('send_emails')
 
 
 def _run_task_in_thread(task):
@@ -165,18 +173,31 @@ class TaskSchedulerMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        self._check_tasks()
+        if os.environ.get('ENVIRONMENT') != 'dev':
+            self._check_tasks()
         return self.get_response(request)
 
     def _check_tasks(self):
         now = time.time()
         for task in SCHEDULED_TASKS:
             last_run = cache.get(f"scheduler:last_run:{task['name']}")
-            if last_run is not None and (now - last_run) < task['interval_seconds']:
-                continue
+
+            if task['run_at']:
+                utc_now = datetime.now(timezone.utc)
+                hour, minute = map(int, task['run_at'].split(':'))
+                target = utc_now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+                if utc_now < target:
+                    continue
+                target_ts = target.timestamp()
+                if last_run is not None and last_run >= target_ts:
+                    continue
+                lock_timeout = 7200
+            else:
+                if last_run is not None and (now - last_run) < task['interval_seconds']:
+                    continue
+                lock_timeout = task['interval_seconds'] * 2
 
             lock_key = f"scheduler:lock:{task['name']}"
-            lock_timeout = task['interval_seconds'] * 2
             if not cache.add(lock_key, 1, timeout=lock_timeout):
                 continue
 
