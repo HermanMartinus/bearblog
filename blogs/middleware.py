@@ -153,7 +153,7 @@ def run_monitor_custom_domains():
     call_command('monitor_custom_domains')
 
 
-@register_task('send_emails', run_at="10:00")
+@register_task('send_emails', run_at="20:00")
 def run_send_emails():
     call_command('send_emails')
 
