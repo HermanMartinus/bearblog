@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.safestring import SafeString
 
 from blogs.models import Blog, Post, Stylesheet
-from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer, replace_inline_latex
+from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer, replace_inline_latex, escape_currency
 
 
 class SafeTitleTests(TestCase):
@@ -903,14 +903,22 @@ class InlineLatexTests(TestCase):
 
     def test_currency_pair_does_not_break_markdown_links(self):
         text = 'are [Bazqux](https://bazqux.com/), which is $30/year, and [Feedbin](https://feedbin.com/), which is $50/year.'
-        result = markdown_renderer(replace_inline_latex(text))
+        result = markdown_renderer(escape_currency(replace_inline_latex(text)))
         self.assertIn('Feedbin</a>', result)
         self.assertIn('Bazqux</a>', result)
 
     def test_math_starting_with_digit_preserved(self):
         text = r'approximately $3 \times 10^8$ m/s.'
-        result = markdown_renderer(replace_inline_latex(text))
+        result = markdown_renderer(escape_currency(replace_inline_latex(text)))
         self.assertIn('math', result)
+
+    def test_currency_and_math_together(self):
+        text = r'$c$ is the speed of light (approximately $3 \times 10^8$ m/s). It costs $30/year and $50/year.'
+        result = markdown_renderer(escape_currency(replace_inline_latex(text)))
+        self.assertIn('math', result)
+        self.assertNotIn('30/year', result.split('math')[0] if 'math' in result else '')
+        self.assertIn('$30', result)
+        self.assertIn('$50', result)
 
     def test_simple_inline_math_preserved(self):
         text = '$E=mc^2$'

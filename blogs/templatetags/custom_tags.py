@@ -85,6 +85,10 @@ def replace_inline_latex(text):
 
     return replaced_text
 
+def escape_currency(text):
+    # Escape $<digit> (currency) but not when followed by a LaTeX command like $3 \times.
+    return re.sub(r'(?<!\\)\$(\d)(?!\d*\s*\\)', r'\$\1', text)
+
 def fix_links(text):
     parentheses_pattern = r'\[([^\]]+)\]\(((?:tab:)?https?://[^\)]+\([^\)]*\)[^\)]*)\)'
 
@@ -145,8 +149,6 @@ class MyRenderer(HTMLRenderer):
     
     def inline_math(self, text):
         # Skip rendering if there's a space before the closing dollar sign
-        if text.endswith(' '):
-            return f'${text}$'
         try:
             return latex2mathml.converter.convert(text)
         except Exception as e:
@@ -228,6 +230,8 @@ def markdown(content, blog=None, post=None, tz=None):
 
     # Removes old formatted inline LaTeX
     content = replace_inline_latex(content)
+    # Escape currency symbols so $30 isn't treated as math
+    content = escape_currency(content)
     # Find urls with parentheses and escape them
     content = fix_links(content)
 
