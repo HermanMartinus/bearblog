@@ -56,7 +56,12 @@ class RateLimitMiddleware:
         self.banned_ips = {}
 
     def __call__(self, request):
+        # Reject requests with NUL characters
+        if '\x00' in request.get_full_path():
+            return JsonResponse({"error": "Bad Request"}, status=400)
+
         # Skip rate limiting for ping and feed endpoints
+        # TODO: Investigate whether rate limit should be on feed
         if 'ping' in request.path or 'feed' in request.path:
             return self.get_response(request)
 
@@ -77,7 +82,7 @@ class RateLimitMiddleware:
         if 'pot-of-honey' in full_path:
             print("Banned: Caught in the honeypot")
             self.banned_ips[client_ip_address] = current_time + self.BAN_DURATION
-        
+
 
         # Ban SQL injection attacks
         if 'sysdate(' in  full_path or 'sleep(' in full_path or 'waitfor%20delay' in full_path:

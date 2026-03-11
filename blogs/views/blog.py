@@ -165,9 +165,6 @@ def posts(request, blog):
 
 
 def post(request, slug):
-    # Prevent null characters in path
-    slug = slug.replace('\x00', '')
-
     if slug[0] == '/' and slug[-1] == '/':
         slug = slug[1:-1]
 
