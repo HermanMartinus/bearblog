@@ -60,9 +60,8 @@ class RateLimitMiddleware:
         if '\x00' in request.get_full_path():
             return JsonResponse({"error": "Bad Request"}, status=400)
 
-        # Skip rate limiting for ping and feed endpoints
-        # TODO: Investigate whether rate limit should be on feed
-        if 'ping' in request.path or 'feed' in request.path:
+        # Skip rate limiting for ping (Caddy)
+        if 'ping' in request.path:
             return self.get_response(request)
 
         client_ip_address = client_ip(request)
