@@ -193,7 +193,7 @@ def markdown_renderer(content):
     code_placeholders = {}
 
     def replace_code(match):
-        key = f"<!--BEAR_CODE_{len(code_placeholders)}-->"
+        key = f"<!--EXCLUDE_CODE_{len(code_placeholders)}-->"
         code_placeholders[key] = match.group(0)
         return key
 
@@ -203,7 +203,7 @@ def markdown_renderer(content):
     script_placeholders = {}
 
     def replace_script(match):
-        key = f"<!--BEAR_SCRIPT_{len(script_placeholders)}-->"
+        key = f"<!--EXCLUDE_SCRIPT_{len(script_placeholders)}-->"
         script_placeholders[key] = match.group(0)
         return key
 
@@ -228,12 +228,26 @@ def markdown(content, blog=None, post=None, tz=None):
     if not content:
         return ''
 
+    # Protect code blocks and inline code from currency/latex escaping
+    code_placeholders = {}
+    def _protect_code(match):
+        key = f"<!--EXCLUDE_BLOCK_{len(code_placeholders)}-->"
+        code_placeholders[key] = match.group(0)
+        return key
+    content = re.sub(r'```.*?```|`[^`\n]+`|<script[\s>].*?</script>', _protect_code, content, flags=re.DOTALL)
+
     # Removes old formatted inline LaTeX
     content = replace_inline_latex(content)
     # Escape currency symbols so $30 isn't treated as math
     content = escape_currency(content)
     # Find urls with parentheses and escape them
     content = fix_links(content)
+
+    # Restore code blocks
+    for key, code in code_placeholders.items():
+        content = content.replace(key, code)
+
+
 
     try:
         processed_markup = markdown_renderer(content)
@@ -256,22 +270,22 @@ def excluding_pre(markup, blog=None, post=None, tz=None):
     placeholders = {}
 
     def placeholder_div(match):
-        key = f"PLACEHOLDER_{len(placeholders)}"
+        key = f"<!--EXCLUDE_BLOCK_{len(placeholders)}-->"
         placeholders[key] = match.group(0)
         return key
 
     markup = re.sub(r'(<pre.*?>.*?</pre>|<code.*?>.*?</code>)', placeholder_div, markup, flags=re.DOTALL)
 
     if blog:
-        if post: 
+        if post:
             markup = element_replacement(markup, blog, post, tz=tz)
         else:
             markup = element_replacement(markup, blog, tz=tz)
     else:
         markup = element_replacement(markup, tz=tz)
 
-    for key in sorted(placeholders.keys(), reverse=True):
-        markup = markup.replace(key, placeholders[key])
+    for key, value in placeholders.items():
+        markup = markup.replace(key, value)
 
     return markup
 

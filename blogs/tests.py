@@ -941,6 +941,17 @@ class InlineLatexTests(TestCase):
         self.assertIn('$50', result)
         self.assertNotIn('\\$', result)
 
+    def test_dollar_not_escaped_in_code_block(self):
+        text = '```sql\nPREPARE my_query (integer) AS\nSELECT * FROM foo WHERE bar IS NOT DISTINCT FROM $1;\n\nEXECUTE my_query(1);\n```'
+        result = markdown(text)
+        self.assertNotIn('\\$', result)
+
+    def test_double_dollar_not_removed_in_code_block(self):
+        text = "```\n$$ some latex shouldn't render here $$\n```"
+        result = markdown(text)
+        self.assertNotIn('math', result)
+        self.assertIn('$$', result)
+
 
 class FaviconSvgTests(TestCase):
     """Verify the SVG favicon supports dark mode via prefers-color-scheme."""
