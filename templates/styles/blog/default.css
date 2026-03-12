@@ -113,10 +113,6 @@ footer {
     font-size: 1.5em;
 }
 
-.inline {
-    width: auto !important;
-}
-
 .highlight, .code {
     padding: 1px 15px;
     background-color: var(--code-background-color);

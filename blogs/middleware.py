@@ -151,7 +151,6 @@ def run_invalidate_cache():
     call_command('invalidate_cache')
 
 
-
 @register_task('monitor_custom_domains', interval_seconds=60)
 def run_monitor_custom_domains():
     call_command('monitor_custom_domains')
