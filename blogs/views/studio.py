@@ -57,9 +57,20 @@ def list(request):
                 subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal']
                 upgrade_subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal_update_subscription']
                 variant = subscription['data'][0]['attributes']['variant_name']
+                status = subscription['data'][0]['attributes']['status']
                 plan_type = normalize_plan_type(variant)
                 if plan_type and request.user.settings.plan_type != plan_type:
                     request.user.settings.plan_type = plan_type
+                    request.user.settings.save()
+
+                if status in ('expired', 'paused') and request.user.settings.upgraded:
+                    request.user.settings.upgraded = False
+                    request.user.settings.upgraded_date = None
+                    request.user.settings.order_id = None
+                    request.user.settings.plan_type = None
+                    request.user.settings.save()
+                elif status == 'active' and not request.user.settings.upgraded:
+                    request.user.settings.upgraded = True
                     request.user.settings.save()
             else:
                 request.user.settings.plan_type = 'lifetime'
