@@ -1,8 +1,11 @@
-.PHONY: dev shell logs 404 migrate makemigrations
+.PHONY: dev caddy shell logs 404 migrate makemigrations
 
 dev:
 	echo localhost:1414
 	python manage.py runserver 0:1414
+
+caddy:
+	caddy run --config Caddyfile.dev
 
 migrate:
 	python manage.py migrate

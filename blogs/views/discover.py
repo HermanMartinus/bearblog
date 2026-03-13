@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.utils import timezone
 from django.db.models.functions import Length
+from django.contrib.postgres.search import SearchQuery
 
 from blogs.models import Post, Blog
 from blogs.helpers import clean_text
@@ -212,8 +213,25 @@ def search(request):
                 Q(title__icontains=search_string) |
                 Q(all_tags__icontains=search_string)
             )
-            .order_by('-upvotes')
-            .select_related("blog")[0:20]
+            .order_by('-upvotes')[0:20]
+        )
+
+    return render(request, "search.html", {
+        "posts": posts,
+        "search_string": search_string,
+    })
+
+
+def search_v2(request):
+    search_string = request.POST.get('query', "") if request.method == "POST" else ""
+    posts = None
+
+    if search_string:
+        posts = (
+            get_base_query().filter(
+                search_vector=SearchQuery(search_string, search_type='websearch')
+            )
+            .order_by('-upvotes')[0:20]
         )
 
     return render(request, "search.html", {

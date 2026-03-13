@@ -1,5 +1,6 @@
 from django.utils import timezone
-from django.db import models
+from django.db import models, connection
+from django.contrib.postgres.search import SearchVectorField
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -290,6 +291,7 @@ class Post(models.Model):
     shadow_votes = models.IntegerField(default=0, db_index=True)
     score = models.FloatField(default=0, db_index=True)
     hidden = models.BooleanField(default=False, db_index=True)
+    search_vector = SearchVectorField(null=True)
 
     @property
     def contains_code(self):
@@ -349,6 +351,14 @@ class Post(models.Model):
 
         # Save the post
         super(Post, self).save(*args, **kwargs)
+
+        # Update search vector via SQL to handle large content
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE blogs_post
+                SET search_vector = to_tsvector('english', COALESCE(title, '') || ' ' || COALESCE(all_tags, '') || ' ' || LEFT(COALESCE(content, ''), 50000))
+                WHERE id = %s
+            """, [self.pk])
 
         # Save blog to trigger a few other things (unless skipped)
         if not skip_blog_save:

@@ -93,6 +93,7 @@ urlpatterns = [
     path('discover/', main_site_only(discover.discover), name='discover'),
     path('discover/feed/', main_site_only(discover.feed), name='discover_feed'),
     path('discover/search/', main_site_only(discover.search), name='search'),
+    path('discover/search-v2/', main_site_only(discover.search_v2), name='search_v2'),
 
     # Blog
     path('ping/', blog.ping, name='ping'),

@@ -115,3 +115,4 @@ sync_data.sh
 *.mdc
 CLAUDE.md
 .claude*
+Caddyfile.dev
