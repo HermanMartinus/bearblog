@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.utils import timezone
 from django.db.models.functions import Length
-from django.contrib.postgres.search import SearchQuery, SearchRank
+from django.contrib.postgres.search import SearchQuery
 
 from blogs.models import Post, Blog
 from blogs.helpers import clean_text
@@ -216,11 +216,11 @@ def search(request):
     posts_to = posts_from + posts_per_page
 
     if search_string:
-        query = SearchQuery(search_string, search_type='websearch')
         posts = (
-            get_base_query().filter(search_vector=query)
-            .annotate(rank=SearchRank('search_vector', query))
-            .order_by('-rank', '-upvotes')[posts_from:posts_to]
+            get_base_query().filter(
+                search_vector=SearchQuery(search_string, search_type='websearch')
+            )
+            .order_by('-upvotes')[posts_from:posts_to]
         )
 
     return render(request, "search.html", {
