@@ -204,18 +204,28 @@ def feed(request):
 
 
 def search(request):
-    search_string = request.POST.get('query', "") if request.method == "POST" else ""
+    search_string = request.GET.get('query', "")
     posts = None
+
+    try:
+        page = int(request.GET.get("page", 0) or 0)
+    except ValueError:
+        page = 0
+
+    posts_from = page * posts_per_page
+    posts_to = posts_from + posts_per_page
 
     if search_string:
         query = SearchQuery(search_string, search_type='websearch')
         posts = (
             get_base_query().filter(search_vector=query)
             .annotate(rank=SearchRank('search_vector', query))
-            .order_by('-rank', '-upvotes')[0:20]
+            .order_by('-rank', '-upvotes')[posts_from:posts_to]
         )
 
     return render(request, "search.html", {
         "posts": posts,
         "search_string": search_string,
+        "previous_page": page - 1,
+        "next_page": page + 1,
     })

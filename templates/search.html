@@ -22,8 +22,7 @@
     
 </nav>
 <p>
-    <form method="POST">
-        {% csrf_token %}
+    <form method="GET">
         <input type="text" name="query" placeholder="Search..." value="{{ search_string }}">
         <input type="submit">
     </form>
@@ -64,6 +63,17 @@
     </li>
     {% endfor %}
 </ul>
+
+{% if search_string %}
+<p>
+    {% if previous_page >= 0 %}
+    <a href="?query={{ search_string|urlencode }}&page={{ previous_page }}">&laquo; Previous</a> |
+    {% endif %}
+    {% if posts %}
+    <a href="?query={{ search_string|urlencode }}&page={{ next_page }}">Next &raquo;</a>
+    {% endif %}
+</p>
+{% endif %}
 {% endblock %}
 
 {% block footer %}
