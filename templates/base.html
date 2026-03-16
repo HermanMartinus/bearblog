@@ -2,8 +2,6 @@
 <html lang="{% block lang %}en{% endblock %}">
 {% if blog %}
 <!-- Powered by Bear Blog -->
-<!-- ID: {{ blog.subdomain }} -->
-<!-- {% if blog.user.settings.upgraded %}🐻{% else %}🌱{% endif %} -->
 {% endif %}
 <head>
   {% block referrer %}
@@ -127,4 +125,6 @@
     </script>
     {% endif %}
 </body>
+<!-- ID: {{ blog.subdomain }} -->
+<!-- {% if blog.user.settings.upgraded %}🐻{% else %}🌱{% endif %} -->
 </html>
