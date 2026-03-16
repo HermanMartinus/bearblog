@@ -86,8 +86,8 @@ def replace_inline_latex(text):
     return replaced_text
 
 def escape_currency(text):
-    # Escape $<digit> (currency) but not when followed by a LaTeX command like $3 \times.
-    return re.sub(r'(?<!\\)\$(\d)(?!\d*\s*\\)', r'\$\1', text)
+    # Escape pairs of $<digit> as currency, e.g. "$5 ... $10" → "\$5 ... \$10"
+    return re.sub(r'(?<!\\)(\$\d[^$]*?)(?<!\\)(\$\d)', r'\\\1\\\2', text)
 
 def fix_links(text):
     parentheses_pattern = r'\[([^\]]+)\]\(((?:tab:)?https?://[^\)]+\([^\)]*\)[^\)]*)\)'

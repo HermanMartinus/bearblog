@@ -952,6 +952,21 @@ class InlineLatexTests(TestCase):
         self.assertNotIn('math', result)
         self.assertIn('$$', result)
 
+    def test_7th_renders_as_latex(self):
+        text = r'This should render as 7^th^: $7^\text{th}$'
+        result = markdown_renderer(escape_currency(replace_inline_latex(text)))
+        self.assertIn('math', result)
+
+    def test_already_escaped_currency_not_double_escaped(self):
+        text = r'$20 is good money, but \$50 is not.'
+        result = escape_currency(text)
+        self.assertNotIn('\\\\$', result)
+
+    def test_decimal_latex_preserved(self):
+        text = '$3.14$'
+        result = markdown_renderer(escape_currency(replace_inline_latex(text)))
+        self.assertIn('math', result)
+
 
 class FaviconSvgTests(TestCase):
     """Verify the SVG favicon supports dark mode via prefers-color-scheme."""
