@@ -39,6 +39,7 @@ def blog_data(b):
         'created_date': b.created_date.isoformat(),
         'last_posted': b.last_posted.isoformat() if b.last_posted else None,
         'posts_in_last_12_hours': b.posts_in_last_12_hours,
+        'upgraded': b.user.settings.upgraded if hasattr(b.user, 'settings') else False,
         'user': {
             'email': b.user.email,
             'name': f"{b.user.first_name} {b.user.last_name}".strip() or b.subdomain,
@@ -52,6 +53,7 @@ def post_data(p, full_content=False):
         'title': p.title,
         'slug': p.slug,
         'blog': p.blog.subdomain,
+        'upgraded': p.blog.user.settings.upgraded if hasattr(p.blog.user, 'settings') else False,
         'url': f"{p.blog.useful_domain}/{p.slug}/",
         'published_date': p.published_date.isoformat(),
         'hidden': p.hidden,
@@ -71,7 +73,7 @@ POST_UPDATABLE = {'hidden', 'make_discoverable', 'shadow_votes'}
 @api_auth
 def blog(request, subdomain):
     try:
-        b = Blog.objects.select_related('user').get(subdomain=subdomain)
+        b = Blog.objects.select_related('user', 'user__settings').get(subdomain=subdomain)
     except Blog.DoesNotExist:
         return JsonResponse({'error': 'Not found'}, status=404)
 
@@ -102,7 +104,7 @@ def blog(request, subdomain):
 @api_auth
 def post(request, pk):
     try:
-        p = Post.objects.select_related('blog__user').get(pk=pk)
+        p = Post.objects.select_related('blog__user', 'blog__user__settings').get(pk=pk)
     except Post.DoesNotExist:
         return JsonResponse({'error': 'Not found'}, status=404)
 
@@ -128,7 +130,7 @@ def post(request, pk):
 
 @api_auth
 def most_recent_posts(request):
-    qs = get_base_query().order_by('-published_date')[:160]
+    qs = get_base_query().select_related('blog__user__settings').order_by('-published_date')[:160]
     return JsonResponse({'posts': [post_data(p) for p in qs]})
 
 
@@ -142,7 +144,7 @@ def unreviewed_blogs(request):
         user__is_active=True,
         to_review=False,
         flagged=False,
-    ).select_related('user').prefetch_related('posts')
+    ).select_related('user', 'user__settings').prefetch_related('posts')
 
     qs = qs.annotate(
         num_posts=Count('posts'),
