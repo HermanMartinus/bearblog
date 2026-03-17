@@ -1963,3 +1963,58 @@ class ExcludingPreTests(TestCase):
         content = '```\n{{ blog_title }}\n```'
         result = markdown(content, blog=self.blog, post=self.post)
         self.assertNotIn('ExPre Blog', str(result))
+
+
+class RandomLinkTests(TestCase):
+    """Tests for {{ random_post_link }} and {{ random_blog_link }} embeds."""
+
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='randlinkuser', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Discoverable Blog',
+            subdomain='discblog',
+            reviewed=True,
+            hidden=False,
+        )
+        self.post = Post.objects.create(
+            blog=self.blog,
+            uid='rl1',
+            title='Discoverable Post',
+            slug='discoverable-post',
+            published_date=timezone.now(),
+            publish=True,
+            make_discoverable=True,
+            hidden=False,
+            content='x' * 150,
+        )
+
+    def test_random_post_link_replaced(self):
+        result = str(markdown('{{ random_post_link }}', blog=self.blog))
+        self.assertNotIn('{{ random_post_link }}', result)
+        self.assertIn('https://', result)
+
+    def test_random_blog_link_replaced(self):
+        result = str(markdown('{{ random_blog_link }}', blog=self.blog))
+        self.assertNotIn('{{ random_blog_link }}', result)
+        self.assertIn('https://', result)
+
+    def test_random_post_link_in_markdown_link(self):
+        content = '[random post]({{ random_post_link }})'
+        result = str(markdown(content, blog=self.blog, post=self.post))
+        self.assertIn("href='https://", result)
+        self.assertIn('random post', result)
+        self.assertNotIn('{{ random_post_link }}', result)
+
+    def test_random_blog_link_in_markdown_link(self):
+        content = '[random blog]({{ random_blog_link }})'
+        result = str(markdown(content, blog=self.blog, post=self.post))
+        self.assertIn("href='https://", result)
+        self.assertIn('random blog', result)
+        self.assertNotIn('{{ random_blog_link }}', result)
+
+    def test_random_post_link_not_replaced_in_code_block(self):
+        content = '```\n{{ random_post_link }}\n```'
+        result = str(markdown(content, blog=self.blog, post=self.post))
+        self.assertIn('{{ random_post_link }}', result)

@@ -19,7 +19,7 @@ import geoip2
 from ipaddr import client_ip
 import hashlib
 
-from blogs.models import Post
+from blogs.models import Blog, Post
 
 
 def is_protected(subdomain):
@@ -221,20 +221,32 @@ def send_async_mail(subject, html_message, from_email, recipient_list, reply_to=
 
 
 def random_post_link():
-    count = Post.objects.filter(
-            blog__reviewed=True,
-            publish=True,
-            published_date__lte=timezone.now(),
-            make_discoverable=True,
-            content__isnull=False
-        ).count()
-    random_index = random.randint(0, count - 1)
-    post = Post.objects.filter(
+    qs = Post.objects.filter(
         blog__reviewed=True,
+        blog__hidden=False,
         publish=True,
         published_date__lte=timezone.now(),
         make_discoverable=True,
-        content__isnull=False
-    )[random_index]
-
+        hidden=False,
+        content__isnull=False,
+    )
+    count = qs.count()
+    if count == 0:
+        return ''
+    random_index = random.randint(0, count - 1)
+    post = qs.select_related('blog')[random_index]
     return f"{post.blog.useful_domain}/{post.slug}"
+
+
+def random_blog_link():
+    qs = Blog.objects.filter(
+        reviewed=True,
+        hidden=False,
+        user__is_active=True,
+    )
+    count = qs.count()
+    if count == 0:
+        return ''
+    random_index = random.randint(0, count - 1)
+    blog = qs[random_index]
+    return blog.useful_domain

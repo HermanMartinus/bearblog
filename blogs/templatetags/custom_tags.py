@@ -21,7 +21,7 @@ from zoneinfo import ZoneInfo
 import latex2mathml.converter
 import re
 
-from blogs.helpers import unmark
+from blogs.helpers import unmark, random_post_link, random_blog_link
 from blogs.models import Post
 
 
@@ -243,11 +243,16 @@ def markdown(content, blog=None, post=None, tz=None):
     # Find urls with parentheses and escape them
     content = fix_links(content)
 
+    # Replace URL variables before markdown rendering so they work inside markdown links
+    if blog:
+        if '{{ random_post_link }}' in content:
+            content = content.replace('{{ random_post_link }}', random_post_link())
+        if '{{ random_blog_link }}' in content:
+            content = content.replace('{{ random_blog_link }}', random_blog_link())
+
     # Restore code blocks
     for key, code in code_placeholders.items():
         content = content.replace(key, code)
-
-
 
     try:
         processed_markup = markdown_renderer(content)
