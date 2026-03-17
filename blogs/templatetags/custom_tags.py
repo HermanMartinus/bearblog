@@ -422,6 +422,14 @@ def element_replacement(markup, blog, post=None, tz=None):
 
 
 def get_adjacent_posts(post, blog):
+    if not post.published_date:
+        return {
+            'next_slug': None,
+            'next_title': None,
+            'previous_slug': None,
+            'previous_title': None,
+        }
+
     base_qs = Post.objects.filter(
         blog=blog,
         is_page=False,
