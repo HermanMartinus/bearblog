@@ -221,39 +221,45 @@ def send_async_mail(subject, html_message, from_email, recipient_list, reply_to=
     EmailThread(subject, html_message, from_email, recipient_list, reply_to).start()
 
 
+def _get_random_post_pool():
+    pool = cache.get('random_post_pool')
+    if pool is None:
+        posts = Post.objects.filter(
+            blog__reviewed=True,
+            blog__hidden=False,
+            publish=True,
+            published_date__lte=timezone.now(),
+            make_discoverable=True,
+            hidden=False,
+            content__isnull=False,
+        ).select_related('blog')[:50]
+        pool = [f"{post.blog.useful_domain}/{post.slug}" for post in posts]
+        cache.set('random_post_pool', pool, timeout=300)
+    return pool
+
+
 def random_post_link():
-    qs = Post.objects.filter(
-        blog__reviewed=True,
-        blog__hidden=False,
-        publish=True,
-        published_date__lte=timezone.now(),
-        make_discoverable=True,
-        hidden=False,
-        content__isnull=False,
-    )
-    count = cache.get('random_post_count')
-    if count is None:
-        count = qs.count()
-        cache.set('random_post_count', count, timeout=1800)
-    if count == 0:
+    pool = _get_random_post_pool()
+    if not pool:
         return ''
-    random_index = random.randint(0, count - 1)
-    post = qs.select_related('blog')[random_index]
-    return f"{post.blog.useful_domain}/{post.slug}"
+    return random.choice(pool)
+
+
+def _get_random_blog_pool():
+    pool = cache.get('random_blog_pool')
+    if pool is None:
+        blogs = Blog.objects.filter(
+            reviewed=True,
+            hidden=False,
+            user__is_active=True,
+        )[:50]
+        pool = [blog.useful_domain for blog in blogs]
+        cache.set('random_blog_pool', pool, timeout=300)
+    return pool
 
 
 def random_blog_link():
-    qs = Blog.objects.filter(
-        reviewed=True,
-        hidden=False,
-        user__is_active=True,
-    )
-    count = cache.get('random_blog_count')
-    if count is None:
-        count = qs.count()
-        cache.set('random_blog_count', count, timeout=1800)
-    if count == 0:
+    pool = _get_random_blog_pool()
+    if not pool:
         return ''
-    random_index = random.randint(0, count - 1)
-    blog = qs[random_index]
-    return blog.useful_domain
+    return random.choice(pool)
