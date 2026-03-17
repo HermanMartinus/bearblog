@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.core.cache import cache
 from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 from django.contrib.gis.geoip2 import GeoIP2
 from django.conf import settings
@@ -230,7 +231,10 @@ def random_post_link():
         hidden=False,
         content__isnull=False,
     )
-    count = qs.count()
+    count = cache.get('random_post_count')
+    if count is None:
+        count = qs.count()
+        cache.set('random_post_count', count, timeout=1800)
     if count == 0:
         return ''
     random_index = random.randint(0, count - 1)
@@ -244,7 +248,10 @@ def random_blog_link():
         hidden=False,
         user__is_active=True,
     )
-    count = qs.count()
+    count = cache.get('random_blog_count')
+    if count is None:
+        count = qs.count()
+        cache.set('random_blog_count', count, timeout=1800)
     if count == 0:
         return ''
     random_index = random.randint(0, count - 1)
