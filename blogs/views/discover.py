@@ -6,7 +6,7 @@ from django.db.models.functions import Length
 from django.contrib.postgres.search import SearchQuery
 
 from blogs.models import Post, Blog
-from blogs.helpers import clean_text
+from blogs.helpers import clean_text, random_post_link, random_blog_link
 from blogs.templatetags.custom_tags import markdown, plain_title
 
 from feedgen.feed import FeedGenerator
@@ -229,3 +229,17 @@ def search(request):
         "previous_page": page - 1,
         "next_page": page + 1,
     })
+
+
+def random_post(request):
+    url = random_post_link()
+    if not url:
+        return redirect('/discover/')
+    return redirect(url)
+
+
+def random_blog(request):
+    url = random_blog_link()
+    if not url:
+        return redirect('/discover/')
+    return redirect(url)

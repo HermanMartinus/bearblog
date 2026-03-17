@@ -1965,8 +1965,9 @@ class ExcludingPreTests(TestCase):
         self.assertNotIn('ExPre Blog', str(result))
 
 
-class RandomLinkTests(TestCase):
-    """Tests for {{ random_post_link }} and {{ random_blog_link }} embeds."""
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class RandomRedirectTests(TestCase):
+    """Tests for /random-post and /random-blog redirect endpoints."""
 
     def setUp(self):
         Stylesheet.objects.create(title='Default', identifier='default', css='')
@@ -1990,31 +1991,12 @@ class RandomLinkTests(TestCase):
             content='x' * 150,
         )
 
-    def test_random_post_link_replaced(self):
-        result = str(markdown('{{ random_post_link }}', blog=self.blog))
-        self.assertNotIn('{{ random_post_link }}', result)
-        self.assertIn('https://', result)
+    def test_random_post_redirects(self):
+        response = self.client.get('/discover/random-post/')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('https://', response.url)
 
-    def test_random_blog_link_replaced(self):
-        result = str(markdown('{{ random_blog_link }}', blog=self.blog))
-        self.assertNotIn('{{ random_blog_link }}', result)
-        self.assertIn('https://', result)
-
-    def test_random_post_link_in_markdown_link(self):
-        content = '[random post]({{ random_post_link }})'
-        result = str(markdown(content, blog=self.blog, post=self.post))
-        self.assertIn("href='https://", result)
-        self.assertIn('random post', result)
-        self.assertNotIn('{{ random_post_link }}', result)
-
-    def test_random_blog_link_in_markdown_link(self):
-        content = '[random blog]({{ random_blog_link }})'
-        result = str(markdown(content, blog=self.blog, post=self.post))
-        self.assertIn("href='https://", result)
-        self.assertIn('random blog', result)
-        self.assertNotIn('{{ random_blog_link }}', result)
-
-    def test_random_post_link_not_replaced_in_code_block(self):
-        content = '```\n{{ random_post_link }}\n```'
-        result = str(markdown(content, blog=self.blog, post=self.post))
-        self.assertIn('{{ random_post_link }}', result)
+    def test_random_blog_redirects(self):
+        response = self.client.get('/discover/random-blog/')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('https://', response.url)
