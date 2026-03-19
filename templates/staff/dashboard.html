@@ -79,16 +79,176 @@ Staff dashboard  ʕง•ᴥ•ʔง
         <span>{{ end_date|date:"j F Y" }}</span>
     </span>
 
-    <h2>Check spam blog</h2>
-    <form method="post" action="{% url 'check_spam' %}" target="_blank" class="full-width">
+    <h2>Blog lookup</h2>
+    <form id="blog-lookup-form" class="full-width">
         {% csrf_token %}
-        <input type="text" name="query" placeholder="Blog subdomain or email address...">
-        <label>
-            <input type="checkbox" name="unblock"> Unblock
-        </label>
-        <br>
-        <button type="submit">Check</button>
+        <input type="text" id="blog-lookup-query" placeholder="Blog subdomain or email address...">
+        <button type="submit">Lookup</button>
     </form>
+    <div id="blog-lookup-results" style="max-height: 600px; overflow-y: auto; border: 1px dashed; padding: 10px; margin-top: 10px; display: none;"></div>
+    <script>
+    (function() {
+        const form = document.getElementById('blog-lookup-form');
+        const results = document.getElementById('blog-lookup-results');
+        const queryInput = document.getElementById('blog-lookup-query');
+
+        function timeAgo(isoDate) {
+            if (!isoDate) return 'Never';
+            const diff = Date.now() - new Date(isoDate).getTime();
+            const mins = Math.floor(diff / 60000);
+            if (mins < 60) return mins + ' minutes ago';
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return hours + ' hours ago';
+            const days = Math.floor(hours / 24);
+            if (days < 30) return days + ' days ago';
+            const months = Math.floor(days / 30);
+            return months + ' months ago';
+        }
+
+        function el(tag, text) {
+            const e = document.createElement(tag);
+            if (text !== undefined) e.textContent = text;
+            return e;
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            results.innerHTML = '';
+            results.style.display = 'none';
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            const formData = new FormData();
+            formData.append('query', query);
+            formData.append('csrfmiddlewaretoken', form.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            try {
+                const resp = await fetch('{% url "check_spam" %}', { method: 'POST', body: formData });
+                const data = await resp.json();
+
+                if (data.error) {
+                    results.appendChild(el('p', data.error));
+                    results.style.display = 'block';
+                    return;
+                }
+
+                // Header: title + links
+                const h3 = el('h3', data.title);
+                results.appendChild(h3);
+
+                const links = document.createElement('p');
+                const blogLink = el('a', data.useful_domain);
+                blogLink.href = data.useful_domain;
+                blogLink.target = '_blank';
+                links.appendChild(blogLink);
+                links.appendChild(document.createTextNode(' | '));
+                const adminBlogLink = el('a', 'Edit blog');
+                adminBlogLink.href = data.admin_blog_url;
+                adminBlogLink.target = '_blank';
+                links.appendChild(adminBlogLink);
+                links.appendChild(document.createTextNode(' | '));
+                const adminUserLink = el('a', 'User settings');
+                adminUserLink.href = data.admin_usersettings_url;
+                adminUserLink.target = '_blank';
+                links.appendChild(adminUserLink);
+                results.appendChild(links);
+
+                // Metadata
+                const meta = document.createElement('p');
+                meta.appendChild(el('b', 'Subdomain: ')); meta.appendChild(document.createTextNode(data.subdomain)); meta.appendChild(document.createElement('br'));
+                if (data.domain) { meta.appendChild(el('b', 'Domain: ')); meta.appendChild(document.createTextNode(data.domain)); meta.appendChild(document.createElement('br')); }
+                meta.appendChild(el('b', 'Email: ')); meta.appendChild(document.createTextNode(data.email)); meta.appendChild(document.createElement('br'));
+                meta.appendChild(el('b', 'Created: ')); meta.appendChild(document.createTextNode(timeAgo(data.created_date))); meta.appendChild(document.createElement('br'));
+                meta.appendChild(el('b', 'Last modified: ')); meta.appendChild(document.createTextNode(timeAgo(data.last_modified))); meta.appendChild(document.createElement('br'));
+                meta.appendChild(el('b', 'Last posted: ')); meta.appendChild(document.createTextNode(timeAgo(data.last_posted))); meta.appendChild(document.createElement('br'));
+                results.appendChild(meta);
+
+                // Status
+                const status = document.createElement('p');
+                const flags = [
+                    ['Upgraded', data.upgraded],
+                    ['Active', data.is_active],
+                    ['Reviewed', data.reviewed],
+                    ['Flagged', data.flagged],
+                    ['Hidden', data.hidden],
+                ];
+                flags.forEach(function(f) {
+                    const badge = el('span', f[0] + ': ' + (f[1] ? 'Yes' : 'No'));
+                    badge.style.marginRight = '12px';
+                    if (f[1] && (f[0] === 'Flagged' || f[0] === 'Hidden')) badge.style.color = 'red';
+                    if (!f[1] && f[0] === 'Active') badge.style.color = 'red';
+                    status.appendChild(badge);
+                });
+                status.appendChild(document.createElement('br'));
+                status.appendChild(el('b', 'Dodginess: ')); status.appendChild(document.createTextNode(data.dodginess_score));
+                results.appendChild(status);
+
+                // Reviewer note
+                if (data.reviewer_note) {
+                    const note = el('p', 'Reviewer note: ' + data.reviewer_note);
+                    note.style.color = 'darkgreen';
+                    results.appendChild(note);
+                }
+
+                // Robots.txt
+                if (data.robots_txt) {
+                    results.appendChild(el('b', 'robots.txt:'));
+                    const pre = el('pre', data.robots_txt);
+                    pre.style.background = '#f5f5f5';
+                    pre.style.padding = '5px';
+                    results.appendChild(pre);
+                }
+
+                // Homepage content
+                results.appendChild(document.createElement('hr'));
+                results.appendChild(el('h4', 'Homepage content'));
+                const homeContent = el('div', data.content);
+                homeContent.style.whiteSpace = 'pre-wrap';
+                homeContent.style.padding = '5px';
+                homeContent.style.background = '#f5f5f5';
+                results.appendChild(homeContent);
+
+                // Posts
+                if (data.posts.length > 0) {
+                    results.appendChild(document.createElement('hr'));
+                    results.appendChild(el('h4', 'Posts (' + data.posts.length + ')'));
+                    data.posts.forEach(function(post) {
+                        const postDiv = document.createElement('div');
+                        postDiv.style.marginBottom = '15px';
+                        postDiv.style.borderBottom = '1px solid #eee';
+                        postDiv.style.paddingBottom = '10px';
+
+                        const titleLine = document.createElement('p');
+                        titleLine.appendChild(el('strong', post.title));
+                        if (post.published_date) {
+                            titleLine.appendChild(document.createTextNode(' — ' + timeAgo(post.published_date)));
+                        }
+                        if (!post.make_discoverable) {
+                            const badge = el('span', ' [hidden from discovery]');
+                            badge.style.color = 'gray';
+                            titleLine.appendChild(badge);
+                        }
+                        postDiv.appendChild(titleLine);
+
+                        const postContent = el('div', post.content);
+                        postContent.style.whiteSpace = 'pre-wrap';
+                        postContent.style.padding = '5px';
+                        postContent.style.background = '#f5f5f5';
+                        postContent.style.fontSize = '0.9em';
+                        postDiv.appendChild(postContent);
+
+                        results.appendChild(postDiv);
+                    });
+                }
+
+                results.style.display = 'block';
+            } catch (err) {
+                results.appendChild(el('p', 'Error: ' + err.message));
+                results.style.display = 'block';
+            }
+        });
+    })();
+    </script>
 
     <h2>Import posts from CSV backup</h2>
     <form method="post" action="{% url 'import_posts' %}" enctype="multipart/form-data">

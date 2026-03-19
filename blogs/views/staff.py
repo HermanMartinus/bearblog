@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.db.models import Q, F, Count, Max
 from django.db.models.functions import Greatest, Length, TruncWeek, TruncDate, TruncMonth
@@ -320,26 +320,66 @@ def actions(request):
 @staff_member_required
 def check_spam(request):
     if request.method == "POST":
-        query = request.POST.get('query')
+        query = request.POST.get('query', '').strip()
 
         if not query:
-            return HttpResponse("Either email or subdomain must be provided.")
-        
+            return JsonResponse({'error': 'Either email or subdomain must be provided.'}, status=400)
+
+        # Clean subdomain input: strip protocol and .bearblog.dev suffix
+        cleaned = query.lower()
+        for prefix in ['https://', 'http://']:
+            if cleaned.startswith(prefix):
+                cleaned = cleaned[len(prefix):]
+        cleaned = cleaned.rstrip('/')
+        for suffix in ['.bearblog.dev', '.lh.co']:
+            if cleaned.endswith(suffix):
+                cleaned = cleaned[:-len(suffix)]
+
+        # Look up by email first, then by cleaned subdomain
         user = User.objects.filter(email=query).first()
         if user:
             blog = user.blogs.first()
         else:
-            blog = Blog.objects.filter(subdomain=query).first()
-        
-        if not user and not blog:
-            return HttpResponse("User or blog not found.")
-        
-        if request.POST.get('unblock'):
-            blog.user.is_active = True
-            blog.user.save()
-            return redirect(blog.useful_domain)
+            blog = Blog.objects.filter(subdomain=cleaned).first()
 
-        return redirect(f"{blog.useful_domain}")
+        if not blog:
+            return JsonResponse({'error': 'Blog not found.'}, status=404)
+
+        posts = []
+        for post in blog.posts.all().order_by('-published_date'):
+            posts.append({
+                'title': post.title,
+                'slug': post.slug,
+                'published_date': post.published_date.isoformat() if post.published_date else None,
+                'content': post.content,
+                'make_discoverable': post.make_discoverable,
+            })
+
+        data = {
+            'title': blog.title,
+            'subdomain': blog.subdomain,
+            'domain': blog.domain or '',
+            'email': blog.user.email,
+            'useful_domain': blog.useful_domain,
+            'bear_domain': blog.bear_domain,
+            'created_date': blog.created_date.isoformat(),
+            'last_modified': blog.last_modified.isoformat(),
+            'last_posted': blog.last_posted.isoformat() if blog.last_posted else None,
+            'upgraded': blog.user.settings.upgraded,
+            'is_active': blog.user.is_active,
+            'reviewed': blog.reviewed,
+            'flagged': blog.flagged,
+            'hidden': blog.hidden,
+            'dodginess_score': blog.dodginess_score,
+            'reviewer_note': blog.reviewer_note,
+            'robots_txt': blog.robots_txt,
+            'content': blog.content,
+            'posts': posts,
+            'admin_usersettings_url': f'/mothership/blogs/usersettings/{blog.user.settings.pk}/change/',
+            'admin_blog_url': f'/mothership/blogs/blog/{blog.pk}/change/',
+        }
+
+        return JsonResponse(data)
 
 
 @staff_member_required  
