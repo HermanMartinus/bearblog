@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from django.http import HttpResponse
 from django.db import connection
-from django.db.models import DateField, Count, Sum, Q, Min
+from django.db.models import DateField, Count, Sum, Q
 from django.db.models.functions import Cast
 
 from blogs.models import Blog, Hit, Post
@@ -58,24 +58,31 @@ def render_analytics(request, blog, public=False):
         base_hits = base_hits.filter(referrer=referrer_filter)
 
     hits = base_hits
-    min_date = base_hits.aggregate(m=Min('created_date'))['m']
-    if min_date:
-        start_date = min_date.date()
 
-    unique_reads = base_hits.count()
-    unique_visitors = base_hits.values('hash_id').distinct().count()
-    on_site = hits.filter(created_date__gt=now-timedelta(minutes=4)).count()
-
-    # Build chart data
+    # Chart data query — also derives unique_reads, unique_visitors, and min_date
+    # Since hash_id = sha256(IP + date + SALT), hash_ids are unique per day,
+    # so summing daily COUNT(DISTINCT hash_id) equals the global distinct count.
     hit_dict = hits.annotate(
         date=Cast('created_date', output_field=DateField())
     ).values('date').annotate(
-        c=Count('date')
+        c=Count('date'),
+        v=Count('hash_id', distinct=True)
     ).order_by('date')
+
+    hit_date_count = {}
+    unique_reads = 0
+    unique_visitors = 0
+    for hit in hit_dict:
+        hit_date_count[hit['date']] = hit['c']
+        unique_reads += hit['c']
+        unique_visitors += hit['v']
+
+    if hit_date_count:
+        start_date = min(hit_date_count.keys())
+    on_site = hits.filter(created_date__gt=now-timedelta(minutes=4)).count()
 
     chart_data = []
     date_range = [start_date + timedelta(days=x) for x in range((end_date - start_date).days + 1)]
-    hit_date_count = {hit['date']: hit['c'] for hit in hit_dict}
 
     for date in date_range:
         date_str = date.strftime('%Y-%m-%d')
