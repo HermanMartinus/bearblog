@@ -14,7 +14,6 @@ from django.shortcuts import render
 from blogs.helpers import send_async_mail, check_connection
 from blogs.models import Blog, PersistentStore, Post, UserSettings
 
-from statistics import mean
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 import json
