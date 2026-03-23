@@ -257,7 +257,7 @@ def random_post_link():
         return ''
     url = f"{post.blog.useful_domain}/{post.slug}"
     _random_post_cache['url'] = url
-    _random_post_cache['expires'] = time() + 180
+    _random_post_cache['expires'] = time() + 60
     return url
 
 
@@ -276,5 +276,5 @@ def random_blog_link():
         return ''
     url = blog.useful_domain
     _random_blog_cache['url'] = url
-    _random_blog_cache['expires'] = time() + 180
+    _random_blog_cache['expires'] = time() + 60
     return url
