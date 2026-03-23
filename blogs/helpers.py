@@ -221,45 +221,41 @@ def send_async_mail(subject, html_message, from_email, recipient_list, reply_to=
     EmailThread(subject, html_message, from_email, recipient_list, reply_to).start()
 
 
-def _get_random_post_pool():
-    pool = cache.get('random_post_pool')
-    if pool is None:
-        posts = Post.objects.filter(
-            blog__reviewed=True,
-            blog__hidden=False,
-            publish=True,
-            published_date__lte=timezone.now(),
-            make_discoverable=True,
-            hidden=False,
-            content__isnull=False,
-        ).select_related('blog')[:50]
-        pool = [f"{post.blog.useful_domain}/{post.slug}" for post in posts]
-        cache.set('random_post_pool', pool, timeout=300)
-    return pool
+_random_post_cache = {'url': '', 'expires': 0}
+_random_blog_cache = {'url': '', 'expires': 0}
 
 
 def random_post_link():
-    pool = _get_random_post_pool()
-    if not pool:
+    if time() < _random_post_cache['expires'] and _random_post_cache['url']:
+        return _random_post_cache['url']
+    post = Post.objects.filter(
+        blog__reviewed=True,
+        blog__hidden=False,
+        publish=True,
+        published_date__lte=timezone.now(),
+        make_discoverable=True,
+        hidden=False,
+        content__isnull=False,
+    ).select_related('blog').order_by('?').first()
+    if not post:
         return ''
-    return random.choice(pool)
-
-
-def _get_random_blog_pool():
-    pool = cache.get('random_blog_pool')
-    if pool is None:
-        blogs = Blog.objects.filter(
-            reviewed=True,
-            hidden=False,
-            user__is_active=True,
-        )[:50]
-        pool = [blog.useful_domain for blog in blogs]
-        cache.set('random_blog_pool', pool, timeout=300)
-    return pool
+    url = f"{post.blog.useful_domain}/{post.slug}"
+    _random_post_cache['url'] = url
+    _random_post_cache['expires'] = time() + 180
+    return url
 
 
 def random_blog_link():
-    pool = _get_random_blog_pool()
-    if not pool:
+    if time() < _random_blog_cache['expires'] and _random_blog_cache['url']:
+        return _random_blog_cache['url']
+    blog = Blog.objects.filter(
+        reviewed=True,
+        hidden=False,
+        user__is_active=True,
+    ).order_by('?').first()
+    if not blog:
         return ''
-    return random.choice(pool)
+    url = blog.useful_domain
+    _random_blog_cache['url'] = url
+    _random_blog_cache['expires'] = time() + 180
+    return url
