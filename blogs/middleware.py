@@ -36,6 +36,22 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
                 return self._reject(request, reason)
 
 
+# Prevent clickjacking on root domiains
+class ConditionalXFrameOptionsMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        host = request.get_host().lower()
+        main_domains = {'bearblog.dev', 'www.bearblog.dev', 'lh.co'}
+        
+        if host in main_domains:
+            response['X-Frame-Options'] = 'DENY'
+
+        return response
+
+
 class RateLimitMiddleware:
     RATE_LIMIT = 10  # max requests per thread
     if os.getenv('ENVIRONMENT') == 'dev':
@@ -105,17 +121,3 @@ class RateLimitMiddleware:
         return self.get_response(request)
 
 
-# Prevent clickjacking on root domiains
-class ConditionalXFrameOptionsMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        response = self.get_response(request)
-        host = request.get_host().lower()
-        main_domains = {'bearblog.dev', 'www.bearblog.dev', 'lh.co'}
-        
-        if host in main_domains:
-            response['X-Frame-Options'] = 'DENY'
-
-        return response

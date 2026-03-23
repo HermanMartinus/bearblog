@@ -25,7 +25,7 @@ class Command(BaseCommand):
             count += 1
         self.stdout.write(f"Emailed {count} new upgrades.")
 
-        # Nudge monthly users
+        # Email monthly users
         count = 0
         for user_settings in monthly_users_to_upgrade():
             send_async_mail(
@@ -40,7 +40,7 @@ class Command(BaseCommand):
             count += 1
         self.stdout.write(f"Emailed {count} monthly users to upgrade.")
 
-        # Nudge free users to contribute
+        # Email free users
         count = 0
         for user in free_users_to_nudge():
             send_async_mail(
