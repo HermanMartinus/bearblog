@@ -4,6 +4,7 @@ from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
 from django.contrib.gis.geoip2 import GeoIP2
 from django.conf import settings
 from django.db import connection
+from django.db.models import Max, Min
 from django.utils.text import slugify
 
 import re
@@ -225,18 +226,33 @@ _random_post_cache = {'url': '', 'expires': 0}
 _random_blog_cache = {'url': '', 'expires': 0}
 
 
+def _random_by_id(queryset, model):
+    agg = model.objects.aggregate(max_id=Max('id'), min_id=Min('id'))
+    if not agg['max_id']:
+        return None
+    for _ in range(10):
+        rand_id = random.randint(agg['min_id'], agg['max_id'])
+        obj = queryset.filter(id__gte=rand_id).first()
+        if obj:
+            return obj
+    return queryset.first()
+
+
 def random_post_link():
     if time() < _random_post_cache['expires'] and _random_post_cache['url']:
         return _random_post_cache['url']
-    post = Post.objects.filter(
-        blog__reviewed=True,
-        blog__hidden=False,
-        publish=True,
-        published_date__lte=timezone.now(),
-        make_discoverable=True,
-        hidden=False,
-        content__isnull=False,
-    ).select_related('blog').order_by('?').first()
+    post = _random_by_id(
+        Post.objects.filter(
+            blog__reviewed=True,
+            blog__hidden=False,
+            publish=True,
+            published_date__lte=timezone.now(),
+            make_discoverable=True,
+            hidden=False,
+            content__isnull=False,
+        ).select_related('blog'),
+        Post,
+    )
     if not post:
         return ''
     url = f"{post.blog.useful_domain}/{post.slug}"
@@ -248,11 +264,14 @@ def random_post_link():
 def random_blog_link():
     if time() < _random_blog_cache['expires'] and _random_blog_cache['url']:
         return _random_blog_cache['url']
-    blog = Blog.objects.filter(
-        reviewed=True,
-        hidden=False,
-        user__is_active=True,
-    ).order_by('?').first()
+    blog = _random_by_id(
+        Blog.objects.filter(
+            reviewed=True,
+            hidden=False,
+            user__is_active=True,
+        ),
+        Blog,
+    )
     if not blog:
         return ''
     url = blog.useful_domain
