@@ -7,18 +7,11 @@ from django.middleware.csrf import (
     REASON_BAD_ORIGIN
 )
 
-import logging
 import os
 import time
-import threading
 from collections import defaultdict
-from datetime import datetime, timezone
 
-from django.core.cache import cache
-from django.core.management import call_command
 from ipaddr import client_ip
-
-logger = logging.getLogger(__name__)
 
 
 # This is a workaround to handle custom domains from Django 5.0 there's an explicit CSRF_TRUSTED_ORIGINS list
@@ -126,110 +119,3 @@ class ConditionalXFrameOptionsMiddleware:
             response['X-Frame-Options'] = 'DENY'
 
         return response
-
-
-# Middleware-based task scheduler — currently disabled, pending redesign
-# import uuid
-#
-# SCHEDULED_TASKS = []
-# _last_run = {}
-# _leader_thread = None
-# _leader_id = str(uuid.uuid4())
-#
-# LEADER_KEY = "scheduler:leader"
-# LEASE_TTL = 120
-# LEASE_RENEW = 60
-# TICK_INTERVAL = 10
-#
-#
-# def register_task(name, interval_seconds=None, run_at=None):
-#     def decorator(func):
-#         SCHEDULED_TASKS.append({
-#             'name': name,
-#             'interval_seconds': interval_seconds,
-#             'run_at': run_at,
-#             'func': func,
-#         })
-#         return func
-#     return decorator
-#
-#
-# @register_task('invalidate_cache', interval_seconds=600)
-# def run_invalidate_cache():
-#     call_command('invalidate_cache')
-#
-#
-# @register_task('monitor_custom_domains', interval_seconds=60)
-# def run_monitor_custom_domains():
-#     call_command('monitor_custom_domains')
-#
-#
-# @register_task('send_emails', run_at="20:00")
-# def run_send_emails():
-#     call_command('send_emails')
-#
-#
-# def _is_task_due(task, now):
-#     last_run = _last_run.get(task['name'])
-#     if task['run_at']:
-#         utc_now = datetime.now(timezone.utc)
-#         hour, minute = map(int, task['run_at'].split(':'))
-#         target = utc_now.replace(hour=hour, minute=minute, second=0, microsecond=0)
-#         if utc_now < target:
-#             return False
-#         target_ts = target.timestamp()
-#         if last_run is not None and last_run >= target_ts:
-#             return False
-#         return True
-#     else:
-#         if last_run is not None and (now - last_run) < task['interval_seconds']:
-#             return False
-#         return True
-#
-#
-# def _scheduler_loop():
-#     last_renew = time.time()
-#     logger.info("Scheduler leader elected: %s", _leader_id)
-#
-#     while True:
-#         try:
-#             # Renew lease
-#             now = time.time()
-#             if now - last_renew >= LEASE_RENEW:
-#                 current = cache.get(LEADER_KEY)
-#                 if current != _leader_id:
-#                     logger.info("Scheduler lost leadership, exiting loop")
-#                     break
-#                 cache.set(LEADER_KEY, _leader_id, timeout=LEASE_TTL)
-#                 last_renew = now
-#
-#             # Check and run tasks
-#             for task in SCHEDULED_TASKS:
-#                 if _is_task_due(task, now):
-#                     try:
-#                         logger.info("Running scheduled task: %s", task['name'])
-#                         task['func']()
-#                     except Exception:
-#                         logger.exception("Scheduled task '%s' failed", task['name'])
-#                     finally:
-#                         _last_run[task['name']] = time.time()
-#
-#         except Exception:
-#             logger.exception("Scheduler loop error")
-#
-#         time.sleep(TICK_INTERVAL)
-#
-#
-# def _try_become_leader():
-#     global _leader_thread
-#     if cache.add(LEADER_KEY, _leader_id, timeout=LEASE_TTL):
-#         _leader_thread = threading.Thread(target=_scheduler_loop, daemon=True)
-#         _leader_thread.start()
-
-
-class TaskSchedulerMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        return self.get_response(request)
