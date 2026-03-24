@@ -1,6 +1,6 @@
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
-from django.db.models import Q
+from django.db.models import Q, Max, Min
 from django.utils import timezone
 from django.db.models.functions import Length
 from django.contrib.postgres.search import SearchQuery
@@ -9,6 +9,7 @@ from blogs.models import Post, Blog
 from blogs.helpers import clean_text, random_post_link, random_blog_link
 from blogs.templatetags.custom_tags import markdown, plain_title
 
+import random
 from feedgen.feed import FeedGenerator
 
 posts_per_page = 20
@@ -101,6 +102,7 @@ def discover(request):
     posts_to = (page * posts_per_page) + posts_per_page
 
     newest = request.GET.get("newest")
+    random_feed = request.GET.get("random")
 
     base_query = get_base_query(request.user)
     
@@ -121,12 +123,35 @@ def discover(request):
             (Q(lang='') & Q(blog__lang__startswith=lang) & ~Q(blog__lang=''))
         )
 
-    if newest:
+    if random_feed:
+        probe_langs = {'en', 'pt', 'es', 'zh', 'fr', 'de'}
+        use_probes = not lang or lang in probe_langs
+
+        if use_probes:
+            # Fast path: random ID probes for common languages.
+            agg = Post.objects.aggregate(max_id=Max('id'), min_id=Min('id'))
+            results = []
+            found_ids = set()
+            if agg['max_id']:
+                for _ in range(posts_per_page * 10):
+                    rand_id = random.randint(agg['min_id'], agg['max_id'])
+                    post = base_query.filter(id__gte=rand_id).first()
+                    if post and post.id not in found_ids:
+                        found_ids.add(post.id)
+                        results.append(post)
+                    if len(results) >= posts_per_page:
+                        break
+            posts = results
+        else:
+            # Slow fallback: ORDER BY random() for rare languages where probes have too low a hit rate
+            posts = list(base_query.order_by('?')[:posts_per_page])
+    elif newest:
         posts = base_query.order_by("-published_date")
     else:
         posts = base_query.order_by("-score")
 
-    posts = posts[posts_from:posts_to]
+    if not random_feed:
+        posts = posts[posts_from:posts_to]
 
     return render(request, "discover.html", {
         "lang": lang,
@@ -136,6 +161,7 @@ def discover(request):
         "next_page": page + 1,
         "posts_from": posts_from,
         "newest": newest,
+        "random": random_feed,
         "hide_list": hide_list
     })
 

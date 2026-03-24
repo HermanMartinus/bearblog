@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load custom_tags %}
 
-{% block title %}{% if newest %}Most recent{% else %}Trending{% endif %} | Bear Blog{% endblock %}
+{% block title %}{% if random %}Random{% elif newest %}Most recent{% else %}Trending{% endif %} | Bear Blog{% endblock %}
 
 {% block seo %}
 <meta name="robots" content="nofollow">
@@ -22,13 +22,9 @@
 </h1>
 
 <nav>
-    {% if not newest %}
-    <b><a href="/discover/">Trending</a></b>
-    <a href="/discover/?newest=true">Most recent</a>
-    {% else %}
-    <a href="/discover/">Trending</a>
-    <b><a href="/discover/?newest=true">Most recent</a></b>
-    {% endif %}
+    {% if not newest and not random %}<b>{% endif %}<a href="/discover/">Trending</a>{% if not newest and not random %}</b>{% endif %}
+    {% if newest %}<b>{% endif %}<a href="/discover/?newest=true">Most recent</a>{% if newest %}</b>{% endif %}
+    {% if random %}<b>{% endif %}<a href="/discover/?random=true">Random</a>{% if random %}</b>{% endif %}
     <a href="/discover/search/">Search</a>
 </nav>
 
@@ -40,10 +36,10 @@
         <hr>
         Language:
         <br>
-        <a href="{{ request.path }}" onclick="document.cookie='lang=; path=/discover/; expires=Fri, 31 Dec 9999 23:59:59 GMT';">None</a>
+        <a href="{{ request.path }}{% if newest %}?newest=true{% elif random %}?random=true{% endif %}" onclick="document.cookie='lang=; path=/discover/; expires=Fri, 31 Dec 9999 23:59:59 GMT';">None</a>
         {% for language in available_languages %}
         {% if language %}
-        <a href="{{ request.path }}" onclick="document.cookie='lang={{ language }}; path=/discover/; expires=Fri, 31 Dec 9999 23:59:59 GMT';">{{ language }}</a>
+        <a href="{{ request.path }}{% if newest %}?newest=true{% elif random %}?random=true{% endif %}" onclick="document.cookie='lang={{ language }}; path=/discover/; expires=Fri, 31 Dec 9999 23:59:59 GMT';">{{ language }}</a>
         {% endif %}
         {% endfor %}
     
@@ -188,6 +184,11 @@
     {% endfor %}
 </ul>
 
+{% if random %}
+<p>
+    <a href="?random=true">More random posts</a>
+</p>
+{% else %}
 <p>
     {% if previous_page >= 0 %}
     <a href="?page={{ previous_page }}{% if newest %}&newest=true{% endif %}">&laquo; Previous</a> |
@@ -196,6 +197,8 @@
     <a href="?page={{ next_page }}{% if newest %}&newest=true{% endif %}">Next &raquo;</a>
     {% endif %}
 </p>
+{% endif %}
+{% if not random %}
 <p>
     <i>
         Subscribe to the
@@ -212,7 +215,8 @@
         {% endif %}
     </i>
 </p>
-{% if not newest %}
+{% endif %}
+{% if not newest and not random %}
 <p>
     <small>
         <pre class="code">

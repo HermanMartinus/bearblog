@@ -317,6 +317,65 @@ class DiscoverCSRFTests(TestCase):
         self.assertNotIn('testblog', self.regular_user.settings.discovery_hide_list)
 
 
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class DiscoverRandomFeedTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='randomuser', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Random Blog',
+            subdomain='randomblog',
+            reviewed=True,
+            hidden=False,
+        )
+        for i in range(3):
+            Post.objects.create(
+                blog=self.blog,
+                uid=f'rand{i}',
+                title=f'Random Post {i}',
+                slug=f'random-post-{i}',
+                published_date=timezone.now(),
+                publish=True,
+                make_discoverable=True,
+                content='x' * 200,
+            )
+
+    def test_random_feed_returns_200(self):
+        response = self.client.get('/discover/?random=true')
+        self.assertEqual(response.status_code, 200)
+
+    def test_random_feed_contains_posts(self):
+        response = self.client.get('/discover/?random=true')
+        self.assertEqual(len(response.context['posts']), 3)
+
+    def test_random_context_variable_set(self):
+        response = self.client.get('/discover/?random=true')
+        self.assertTrue(response.context['random'])
+
+    def test_random_not_set_on_default(self):
+        response = self.client.get('/discover/')
+        self.assertFalse(response.context.get('random'))
+
+    def test_random_tab_in_nav(self):
+        response = self.client.get('/discover/?random=true')
+        content = response.content.decode()
+        self.assertIn('<b><a href="/discover/?random=true">Random</a></b>', content)
+
+    def test_random_tab_not_bold_on_trending(self):
+        response = self.client.get('/discover/')
+        content = response.content.decode()
+        self.assertIn('<a href="/discover/?random=true">Random</a>', content)
+        self.assertNotIn('<b><a href="/discover/?random=true">Random</a></b>', content)
+
+    def test_random_shows_more_link(self):
+        response = self.client.get('/discover/?random=true')
+        content = response.content.decode()
+        self.assertIn('More random posts', content)
+        self.assertNotIn('Next', content)
+        self.assertNotIn('Previous', content)
+
+
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver', 'STAFF_API_KEY': 'test-key'})
 class StaffApiBlogReviewTests(TestCase):
     def setUp(self):
