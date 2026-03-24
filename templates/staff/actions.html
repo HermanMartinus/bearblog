@@ -125,6 +125,7 @@ Staff Actions
                 <th>Email</th>
                 <th>Domain</th>
                 <th>Warning sent</th>
+                <th>Last active</th>
                 <th>Admin</th>
             </tr>
         </thead>
@@ -134,6 +135,7 @@ Staff Actions
                 <td>{{ blog.user.email }}</td>
                 <td>{{ blog.domain }}</td>
                 <td>{{ blog.user.settings.orphaned_domain_warning_email_sent|date:"j M Y" }}</td>
+                <td>{% if blog.last_posted %}{{ blog.last_posted|date:"j M Y" }}{% else %}{{ blog.last_modified|date:"j M Y" }}{% endif %}</td>
                 <td><a href="/mothership/blogs/usersettings/{{ blog.user.settings.pk }}/change/" target="_blank">view</a></td>
             </tr>
             {% endfor %}
