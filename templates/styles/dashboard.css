@@ -132,6 +132,12 @@ button#toggle-full-screen {
     padding: 3px 0;
 }
 
+@media (max-width: 768px) {
+    .helptext.sticky {
+        position: static;
+    }
+}
+
 @media (prefers-color-scheme: dark) {
     .helptext.sticky,
     .sticky-controls {
