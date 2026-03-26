@@ -1,21 +1,13 @@
 from django.utils import timezone
-from django.core.cache import cache
-from django.core.mail import send_mail, get_connection, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.contrib.gis.geoip2 import GeoIP2
-from django.conf import settings
-from django.db import connection
 from django.db.models import Max, Min
-from django.utils.text import slugify
-
 import re
-import string
 import os
 import random
 import threading
 from requests.exceptions import ConnectionError, ReadTimeout
 import requests
-import subprocess
-from datetime import timedelta
 from time import time
 import geoip2
 from ipaddr import client_ip
@@ -73,13 +65,6 @@ def is_protected(subdomain):
     return subdomain in protected_subdomains
 
 
-def check_records(domain):
-    if not domain:
-        return
-    verification_string = subprocess.Popen(["dig", "-t", "txt", domain, '+short'], stdout=subprocess.PIPE).communicate()[0]
-    return ('look-for-the-bear-necessities' in str(verification_string))
-
-
 def check_connection(blog):
     if not blog.domain:
         return
@@ -94,31 +79,6 @@ def check_connection(blog):
             return False
         except SystemExit:
             return False
-
-
-def create_cache_key(host, path=None, tag=None):
-    cache_key = host.replace('.', '_')
-    if path:
-        cache_key += f"_{path}"
-    if tag:
-        cache_key += f"_{tag}" 
-    cache_key = slugify(cache_key).replace('-', '_')
-
-    return cache_key
-
-
-def pseudo_word(length=5):
-    vowels = "aeiou"
-    consonants = "".join(set(string.ascii_lowercase) - set(vowels))
-    
-    word = ""
-    for i in range(length):
-        if i % 2 == 0:
-            word += random.choice(consonants)
-        else:
-            word += random.choice(vowels)
-    
-    return word
 
 
 def salt_and_hash(request, duration='day'):
@@ -175,21 +135,6 @@ def valid_xml_char_ordinal(c):
         0xE000 <= codepoint <= 0xFFFD or
         0x10000 <= codepoint <= 0x10FFFF
     )
-
-
-def daterange(start_date, end_date):
-    for n in range(int((end_date - start_date).days)):
-        yield start_date + timedelta(n)
-
-
-def send_mass_html_mail(datatuple, fail_silently=False, user=None, password=None, connection=None):
-    connection = connection or get_connection(username=user, password=password, fail_silently=fail_silently)
-    messages = []
-    for subject, text, html, from_email, recipient in datatuple:
-        message = EmailMultiAlternatives(subject, text, from_email, recipient)
-        message.attach_alternative(html, 'text/html')
-        messages.append(message)
-    return connection.send_messages(messages)
 
 
 class EmailThread(threading.Thread):

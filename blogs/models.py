@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from allauth.account.models import EmailAddress
 
 from zoneinfo import ZoneInfo
 import os
@@ -87,9 +86,6 @@ class Blog(models.Model):
     # TODO: Deprecate this
     public_analytics = models.BooleanField(default=False)
 
-    # Add blog to hits in legacy hits
-    analytics_update = models.BooleanField(default=False)
-
     post_template = models.TextField(blank=True)
     robots_txt = models.TextField(blank=True, default="User-agent: *\nAllow: /")
     rss_alias = models.CharField(max_length=100, blank=True)
@@ -107,18 +103,10 @@ class Blog(models.Model):
     posts_in_last_12_hours = models.IntegerField(default=0, db_index=True)
 
     @property
-    def older_than_one_day(self):
-        return (timezone.now() - self.created_date).days > 1
-
-    @property
     def is_after_cutoff(self):
         cutoff_date = timezone.datetime(2025, 4, 20, tzinfo=ZoneInfo('UTC'))
         return self.created_date > cutoff_date
     
-    @property
-    def user_email_verified(self):
-        return EmailAddress.objects.filter(user=self.user, verified=True).exists()
-
     @property
     def contains_code(self):
         return "```" in self.content
