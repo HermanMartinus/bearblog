@@ -18,7 +18,7 @@ Pillow==12.1.1
 psycopg2==2.9.10
 python-dotenv==1.0.0
 redis==7.1.0
-requests==2.32.5
+requests==2.33.0
 sentry-sdk==2.19.0
 tzdata>=2025.1 # Keeps the timezone data up to date
 whitenoise==5.0.1
