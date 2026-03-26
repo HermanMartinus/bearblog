@@ -36,7 +36,7 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
                 return self._reject(request, reason)
 
 
-# Prevent clickjacking on root domiains
+# Prevent clickjacking on root domains
 class ConditionalXFrameOptionsMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -44,7 +44,7 @@ class ConditionalXFrameOptionsMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
         host = request.get_host().lower()
-        main_domains = {'bearblog.dev', 'www.bearblog.dev', 'lh.co'}
+        main_domains = set(os.getenv('MAIN_SITE_HOSTS', '').split(','))
         
         if host in main_domains:
             response['X-Frame-Options'] = 'DENY'
