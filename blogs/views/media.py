@@ -1,7 +1,6 @@
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
-from django.http import StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -16,7 +15,6 @@ import re
 import json
 import os
 import boto3
-import requests
 import threading
 
 from blogs.models import Blog, Media
@@ -314,21 +312,3 @@ def delete_selected_media(request, id):
     return redirect('media_center', id=id)
 
 
-def image_proxy(request, img):
-    # Construct the DigitalOcean Spaces URL
-    remote_url = f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/{img}'
-    
-    # Stream the content from the remote URL
-    response = requests.get(remote_url, stream=True, timeout=10)
-    
-    # Define a generator to yield chunks of the response content
-    def generate():
-        for chunk in response.iter_content(chunk_size=8192):
-            yield chunk
-    
-    # Return a StreamingHttpResponse
-    return StreamingHttpResponse(
-        generate(),
-        status=response.status_code,
-        content_type=response.headers['Content-Type']
-    )
