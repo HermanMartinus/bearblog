@@ -57,7 +57,8 @@ HOST_WHITELIST = [
     'embed.ente.io',
     'app.hearthis.at',
     'datawrapper.de',
-    'datawrapper.dwcdn.net'
+    'datawrapper.dwcdn.net',
+    'guestbooks.kamiscorner.xyz'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
