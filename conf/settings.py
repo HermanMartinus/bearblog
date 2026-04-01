@@ -2,7 +2,7 @@ import sentry_sdk
 import os
 import dj_database_url
 from pathlib import Path
-from dotenv import load_dotenv
+from conf.env_loader import load_dotenv
 
 load_dotenv()
 
