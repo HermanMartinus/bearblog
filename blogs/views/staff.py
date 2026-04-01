@@ -204,7 +204,9 @@ def actions(request):
     upgraded_users = list(new_upgrades().select_related('settings'))
     nudge_users = list(monthly_users_to_upgrade())
     contribution_nudge_users = list(free_users_to_nudge())
-    orphaned_blogs = [blog for blog in blogs_with_orphaned_domains() if check_connection(blog)]
+    orphaned_blogs = list(blogs_with_orphaned_domains())
+    for blog in orphaned_blogs:
+        blog.is_connected = check_connection(blog)
     cutoff = timezone.now() - timedelta(days=14)
     overdue_blogs = list(Blog.objects.filter(
         user__settings__upgraded=False,
@@ -213,8 +215,11 @@ def actions(request):
 
     # Group orphaned blogs by user
     orphaned_by_user = {}
+    disconnected_count = 0
     for blog in orphaned_blogs:
         orphaned_by_user.setdefault(blog.user, []).append(blog)
+        if not blog.is_connected:
+            disconnected_count += 1
 
     result = None
     if request.method == 'POST':
@@ -267,9 +272,34 @@ def actions(request):
                 count += 1
             result = f"Emailed {count} users about orphaned domains."
             orphaned_blogs = list(blogs_with_orphaned_domains())
+            for blog in orphaned_blogs:
+                blog.is_connected = check_connection(blog)
             orphaned_by_user = {}
+            disconnected_count = 0
             for blog in orphaned_blogs:
                 orphaned_by_user.setdefault(blog.user, []).append(blog)
+                if not blog.is_connected:
+                    disconnected_count += 1
+
+        elif action == 'remove_disconnected_domains':
+            count = 0
+            for blog in orphaned_blogs:
+                if not blog.is_connected:
+                    blog.domain = ''
+                    blog.save()
+                    count += 1
+            if count:
+                cache.delete('domain_map')
+            result = f"Removed {count} disconnected domains."
+            orphaned_blogs = list(blogs_with_orphaned_domains())
+            for blog in orphaned_blogs:
+                blog.is_connected = check_connection(blog)
+            orphaned_by_user = {}
+            disconnected_count = 0
+            for blog in orphaned_blogs:
+                orphaned_by_user.setdefault(blog.user, []).append(blog)
+                if not blog.is_connected:
+                    disconnected_count += 1
 
         elif action == 'email_contribution_nudge':
             count = 0
@@ -310,6 +340,7 @@ def actions(request):
         'orphaned_by_user': orphaned_by_user,
         'overdue_blogs': overdue_blogs,
         'contribution_nudge_users': contribution_nudge_users,
+        'disconnected_count': disconnected_count,
         'result': result,
     })
 

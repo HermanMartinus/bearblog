@@ -133,17 +133,24 @@ Staff Actions
             {% for user, blogs in orphaned_by_user.items %}
             <tr>
                 <td>{{ user.email }}</td>
-                <td>{% for blog in blogs %}{{ blog.domain }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                <td>{% for blog in blogs %}{{ blog.domain }}{% if not blog.is_connected %} [not connected]{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                 <td><a href="/mothership/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <form method="post" onsubmit="return confirm('Send domain warning to {{ orphaned_by_user|length }} users?')">
+    <form method="post" onsubmit="return confirm('Send domain warning to {{ orphaned_by_user|length }} users?')" style="display: inline">
         {% csrf_token %}
         <input type="hidden" name="action" value="email_domain_warnings">
         <button type="submit">Send domain warnings</button>
     </form>
+    {% if disconnected_count %}
+    <form method="post" onsubmit="return confirm('Remove {{ disconnected_count }} disconnected domains?')" style="display: inline">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="remove_disconnected_domains">
+        <button type="submit">Remove non-connected domains ({{ disconnected_count }})</button>
+    </form>
+    {% endif %}
     {% else %}
     <p>No orphaned domains to warn about.</p>
     {% endif %}
