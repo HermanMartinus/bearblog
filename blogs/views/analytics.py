@@ -15,7 +15,6 @@ from datetime import timedelta
 from ipaddr import client_ip
 from urllib.parse import urlparse
 import httpagentparser
-import djqscsv
 
 
 def get_int(value, default):
@@ -31,10 +30,6 @@ def analytics(request, id):
         blog = get_object_or_404(Blog, subdomain=id)
     else:
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-
-    if request.GET.get('export', False):
-        hits = Hit.objects.filter(post__blog=blog).order_by('created_date')
-        return djqscsv.render_to_csv_response(hits)
 
     return render_analytics(request, blog)
 

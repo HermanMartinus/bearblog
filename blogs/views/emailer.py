@@ -1,7 +1,6 @@
-from curses.ascii import HT
 import re
 
-import djqscsv
+from blogs.csv_utils import render_to_csv_response
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -26,7 +25,7 @@ def email_list(request, id):
 
     if request.GET.get("export-csv", ""):
         subscribers = subscribers.values('email_address', 'subscribed_date')
-        return djqscsv.render_to_csv_response(subscribers)
+        return render_to_csv_response(subscribers)
 
     if request.GET.get("export-txt", ""):
         subscribers = subscribers.values('email_address')

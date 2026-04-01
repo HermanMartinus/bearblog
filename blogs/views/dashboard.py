@@ -7,7 +7,7 @@ from django.http import HttpResponse
 
 from ipaddr import client_ip
 from unicodedata import lookup
-import djqscsv
+from blogs.csv_utils import render_to_csv_response
 import io
 import json
 import zipfile
@@ -276,7 +276,7 @@ def settings(request, id):
                   'publish', 'make_discoverable', 'is_page', 'content',
                   'canonical_url', 'meta_description', 'meta_image', 'lang',
                   'class_name', 'first_published_at']
-        return djqscsv.render_to_csv_response(blog.posts.values(*fields))
+        return render_to_csv_response(blog.posts.values(*fields))
 
     if request.GET.get("export-md", ""):
         return export_markdown_zip(blog)

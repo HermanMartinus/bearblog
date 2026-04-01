@@ -3,7 +3,7 @@ from django.utils import timezone
 import os
 import boto3
 from io import BytesIO
-import djqscsv
+from blogs.csv_utils import write_csv
 from threading import Thread
 
 
@@ -43,7 +43,7 @@ def backup_blog(blog):
         if blog.posts.count() > 0:
             # Create posts CSV in memory
             posts_csv_buffer = BytesIO()
-            djqscsv.write_csv(blog.posts.values(), posts_csv_buffer)
+            write_csv(blog.posts.values(), posts_csv_buffer)
             
             # Upload posts CSV
             posts_csv_buffer.seek(0)
@@ -56,7 +56,7 @@ def backup_blog(blog):
 
         # Create a queryset with just this blog
         blog_queryset = type(blog).objects.filter(pk=blog.pk)
-        djqscsv.write_csv(blog_queryset.values(), blog_csv_buffer)
+        write_csv(blog_queryset.values(), blog_csv_buffer)
         
         # Upload blog CSV
         blog_csv_buffer.seek(0)
