@@ -204,14 +204,12 @@ def actions(request):
     upgraded_users = list(new_upgrades().select_related('settings'))
     nudge_users = list(monthly_users_to_upgrade())
     contribution_nudge_users = list(free_users_to_nudge())
-    orphaned_blogs = list(blogs_with_orphaned_domains())
-    for blog in orphaned_blogs:
-        blog.is_connected = check_connection(blog)
+    orphaned_blogs = [blog for blog in blogs_with_orphaned_domains() if check_connection(blog)]
     cutoff = timezone.now() - timedelta(days=14)
     overdue_blogs = list(Blog.objects.filter(
         user__settings__upgraded=False,
         user__settings__orphaned_domain_warning_email_sent__lte=cutoff,
-    ).exclude(domain='').exclude(domain__isnull=True).select_related('user', 'user__settings')[:20])
+    ).exclude(domain='').exclude(domain__isnull=True).select_related('user', 'user__settings'))
 
     # Group orphaned blogs by user
     orphaned_by_user = {}
