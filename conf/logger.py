@@ -12,6 +12,6 @@ def logger_test(request):
 @staff_member_required
 def timout_test(request):
     time.sleep(31)
-    return HttpResponse("Hello, world. You're at the timeout test.")
+    return HttpResponse("You're at the timeout test.")
 
 
