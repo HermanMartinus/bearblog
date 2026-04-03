@@ -6,7 +6,7 @@ Bear is a Django-based blogging platform. Users get a subdomain at `*.bearblog.d
 
 - **Framework:** Django 5.2, Python 3.13
 - **Server:** Gunicorn (`conf.wsgi`), 24s timeout, max 10k requests per worker
-- **Database:** Heroku Postgres (via `dj-database-url`). SQLite used locally.
+- **Database:** Heroku Postgres. SQLite used as fallback locally.
 - **Cache / Sessions:** RedisCloud (TLS). Falls back to no cache in dev.
 - **Static files:** WhiteNoise (GZip compressed)
 
