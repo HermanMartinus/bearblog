@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load pygmentify_tags %}
+{% load static %}
 {% load custom_tags %}
 
 {% block page_type %}home{% endblock %}
@@ -27,7 +27,7 @@
 {% if blog.user.settings.upgraded %}{{ blog.header_directive | safe }}{% endif %}
 
 {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
-{% if blog.contains_code %}<link rel="stylesheet" href="{% pygmentify_css minify='false' %}">{% endif %}
+{% if blog.contains_code %}<link rel="stylesheet" href="{% static 'highlight.css' %}">{% endif %}
 {% endblock %}
 
 {% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}

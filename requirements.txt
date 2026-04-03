@@ -3,7 +3,6 @@ Django==5.2.12
 django-allauth==65.14.3
 django-debug-toolbar==5.0.1
 django-ip==1.0.2
-django-pygmentify==0.3.7
 feedgen==0.9.0
 geoip2==4.6.0
 gunicorn==23.0.0
