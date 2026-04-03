@@ -3,7 +3,7 @@ from django.utils import timezone
 import os
 import boto3
 from io import BytesIO
-from blogs.csv_utils import write_csv
+from blogs.utils.csv import write_csv
 from threading import Thread
 
 

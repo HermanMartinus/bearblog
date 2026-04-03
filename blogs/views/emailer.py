@@ -1,6 +1,6 @@
 import re
 
-from blogs.csv_utils import render_to_csv_response
+from blogs.utils.csv import render_to_csv_response
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
