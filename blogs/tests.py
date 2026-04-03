@@ -473,8 +473,68 @@ class StaffApiBlogReviewTests(TestCase):
         blog_entry = [b for b in response.json()['blogs'] if b['subdomain'] == 'testblog-review'][0]
         self.assertIn('posts', blog_entry)
         self.assertEqual(len(blog_entry['posts']), 1)
-        # Content should be truncated to 300 chars
-        self.assertLessEqual(len(blog_entry['posts'][0]['content']), 300)
+        # Content should be truncated to 2000 chars
+        self.assertLessEqual(len(blog_entry['posts'][0]['content']), 2000)
+
+    def test_blogs_list_includes_blog_content(self):
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        blog_entry = [b for b in response.json()['blogs'] if b['subdomain'] == 'testblog-review'][0]
+        self.assertIn('content', blog_entry)
+        self.assertEqual(blog_entry['content'], 'A' * 250)
+
+    def test_blogs_list_truncates_long_content(self):
+        self.blog.content = 'X' * 3000
+        self.blog.save()
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        blog_entry = [b for b in response.json()['blogs'] if b['subdomain'] == 'testblog-review'][0]
+        self.assertEqual(len(blog_entry['content']), 2000)
+
+    def test_blogs_list_includes_post_count(self):
+        for i in range(4):
+            Post.objects.create(
+                blog=self.blog, uid=f'cnt-{i}', title=f'Count Post {i}',
+                slug=f'count-post-{i}', published_date=timezone.now(), content='C' * 100,
+            )
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        blog_entry = [b for b in response.json()['blogs'] if b['subdomain'] == 'testblog-review'][0]
+        self.assertEqual(blog_entry['post_count'], 5)  # 1 from setUp + 4 new
+
+    def test_blogs_list_limits_posts_to_three(self):
+        for i in range(4):
+            Post.objects.create(
+                blog=self.blog, uid=f'lim-{i}', title=f'Limit Post {i}',
+                slug=f'limit-post-{i}', published_date=timezone.now(), content='C' * 100,
+            )
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        blog_entry = [b for b in response.json()['blogs'] if b['subdomain'] == 'testblog-review'][0]
+        self.assertEqual(len(blog_entry['posts']), 3)
+
+    def test_blogs_list_posts_are_most_recent(self):
+        now = timezone.now()
+        self.post.published_date = now - timezone.timedelta(hours=10)
+        self.post.save()
+        recent_titles = []
+        for i in range(3):
+            p = Post.objects.create(
+                blog=self.blog, uid=f'rec-{i}', title=f'Recent Post {i}',
+                slug=f'recent-post-{i}',
+                published_date=now - timezone.timedelta(hours=i),
+                content='D' * 100,
+            )
+            recent_titles.append(p.title)
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        blog_entry = [b for b in response.json()['blogs'] if b['subdomain'] == 'testblog-review'][0]
+        returned_titles = [p['title'] for p in blog_entry['posts']]
+        for title in recent_titles:
+            self.assertIn(title, returned_titles)
+        self.assertNotIn('Test Post', returned_titles)
+
+    def test_blogs_list_post_content_truncated_to_2000(self):
+        self.post.content = 'Z' * 3000
+        self.post.save()
+        response = self.client.get('/staff-api/unreviewed-blogs/', **self.auth)
+        blog_entry = [b for b in response.json()['blogs'] if b['subdomain'] == 'testblog-review'][0]
+        self.assertEqual(len(blog_entry['posts'][0]['content']), 2000)
 
     def test_blogs_list_ordered_by_created_date(self):
         user2 = User.objects.create_user(username='bloguser2', password='pass')
@@ -535,6 +595,78 @@ class StaffApiBlogReviewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.blog.refresh_from_db()
         self.assertIsNotNone(self.blog.ignored_date)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver', 'STAFF_API_KEY': 'test-key'})
+class StaffApiDiscoverPostsTests(TestCase):
+    """Tests for the /staff-api/discover-posts/ endpoint."""
+
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='discoveruser', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Discoverable Blog',
+            subdomain='discoblog',
+            reviewed=True,
+            hidden=False,
+        )
+        self.long_content = 'A' * 1500
+        self.post = Post.objects.create(
+            blog=self.blog,
+            uid='disco1',
+            title='Discover Post',
+            slug='discover-post',
+            published_date=timezone.now(),
+            publish=True,
+            make_discoverable=True,
+            hidden=False,
+            content=self.long_content,
+        )
+        self.auth = {'HTTP_X_API_KEY': 'test-key'}
+
+    def test_discover_posts_requires_auth(self):
+        response = self.client.get('/staff-api/discover-posts/')
+        self.assertEqual(response.status_code, 401)
+
+    def test_discover_posts_returns_content_up_to_2000_chars(self):
+        response = self.client.get('/staff-api/discover-posts/', **self.auth)
+        self.assertEqual(response.status_code, 200)
+        post_entry = [p for p in response.json()['posts'] if p['pk'] == self.post.pk][0]
+        self.assertEqual(post_entry['content'], self.long_content)
+        self.assertEqual(len(post_entry['content']), 1500)
+
+    def test_discover_posts_truncates_long_content(self):
+        self.post.content = 'B' * 3000
+        self.post.save()
+        response = self.client.get('/staff-api/discover-posts/', **self.auth)
+        post_entry = [p for p in response.json()['posts'] if p['pk'] == self.post.pk][0]
+        self.assertEqual(len(post_entry['content']), 2000)
+
+    def test_discover_posts_returns_expected_fields(self):
+        response = self.client.get('/staff-api/discover-posts/', **self.auth)
+        post_entry = [p for p in response.json()['posts'] if p['pk'] == self.post.pk][0]
+        expected_keys = {
+            'pk', 'title', 'slug', 'blog', 'upgraded', 'url',
+            'published_date', 'hidden', 'make_discoverable',
+            'score', 'upvotes', 'shadow_votes', 'content',
+        }
+        self.assertEqual(set(post_entry.keys()), expected_keys)
+
+    def test_discover_posts_excludes_non_discoverable(self):
+        non_disc = Post.objects.create(
+            blog=self.blog,
+            uid='disco2',
+            title='Hidden Post',
+            slug='hidden-post',
+            published_date=timezone.now(),
+            publish=True,
+            make_discoverable=False,
+            content='C' * 200,
+        )
+        response = self.client.get('/staff-api/discover-posts/', **self.auth)
+        pks = [p['pk'] for p in response.json()['posts']]
+        self.assertNotIn(non_disc.pk, pks)
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})

@@ -47,7 +47,7 @@ def blog_data(b):
     }
 
 
-def post_data(p, full_content=False):
+def post_data(p, content_limit=300):
     return {
         'pk': p.pk,
         'title': p.title,
@@ -61,7 +61,7 @@ def post_data(p, full_content=False):
         'score': p.score,
         'upvotes': p.upvotes,
         'shadow_votes': p.shadow_votes,
-        'content': p.content if full_content else p.content[:300],
+        'content': p.content if content_limit is None else p.content[:content_limit],
     }
 
 
@@ -109,7 +109,7 @@ def post(request, pk):
         return JsonResponse({'error': 'Not found'}, status=404)
 
     if request.method == 'GET':
-        return JsonResponse(post_data(p, full_content=True))
+        return JsonResponse(post_data(p, content_limit=None))
 
     if request.method == 'PATCH':
         try:
@@ -123,15 +123,15 @@ def post(request, pk):
             p.save()
         except (TypeError, ValueError, ValidationError) as e:
             return JsonResponse({'error': f'Invalid value: {e}'}, status=400)
-        return JsonResponse(post_data(p, full_content=True))
+        return JsonResponse(post_data(p, content_limit=None))
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
 @api_auth
-def most_recent_posts(request):
+def discover_posts(request):
     qs = get_base_query().select_related('blog__user__settings').order_by('-published_date')[:160]
-    return JsonResponse({'posts': [post_data(p) for p in qs]})
+    return JsonResponse({'posts': [post_data(p, content_limit=2000) for p in qs]})
 
 
 @api_auth
@@ -144,7 +144,7 @@ def unreviewed_blogs(request):
         user__is_active=True,
         to_review=False,
         flagged=False,
-    ).select_related('user', 'user__settings').prefetch_related('posts')
+    ).select_related('user', 'user__settings')
 
     qs = qs.annotate(
         num_posts=Count('posts'),
@@ -156,7 +156,9 @@ def unreviewed_blogs(request):
     blogs = []
     for b in qs:
         data = blog_data(b)
-        data['posts'] = [post_data(p) for p in b.posts.all()]
+        data['content'] = b.content[:2000]
+        data['post_count'] = b.num_posts
+        data['posts'] = [post_data(p, content_limit=2000) for p in b.posts.order_by('-published_date')[:3]]
         blogs.append(data)
 
     return JsonResponse({'blogs': blogs})
