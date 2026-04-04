@@ -587,7 +587,7 @@ def opt_in_blogs():
 
 def dodgy_blogs():
     to_review = Blog.objects.filter(
-        reviewed=False, user__is_active=True, to_review=False, flagged=False, dodginess_score__gt=2, ignored_date__isnull=True
+        reviewed=False, user__is_active=True, to_review=False, flagged=False, dodginess_score__gt=2, ignored_date__isnull=True, permanent_ignore=False
     ).prefetch_related('posts')
 
     return to_review
