@@ -133,7 +133,7 @@ Staff Actions
             {% for user, blogs in orphaned_by_user.items %}
             <tr>
                 <td>{{ user.email }}</td>
-                <td>{% for blog in blogs %}{{ blog.domain }}{% if not blog.is_connected %} [not connected]{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                <td>{% for blog in blogs %}<a href="http://{{ blog.domain }}" target="_blank">{{ blog.domain }}</a>{% if not blog.is_connected %} [not connected]{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                 <td><a href="/mothership/blogs/usersettings/{{ user.settings.pk }}/change/" target="_blank">view</a></td>
             </tr>
             {% endfor %}
@@ -174,7 +174,7 @@ Staff Actions
             {% for blog in overdue_blogs %}
             <tr>
                 <td>{{ blog.user.email }}</td>
-                <td>{{ blog.domain }}</td>
+                <td><a href="http://{{ blog.domain }}" target="_blank">{{ blog.domain }}</a></td>
                 <td>{{ blog.user.settings.orphaned_domain_warning_email_sent|date:"j M Y" }}</td>
                 <td>{% if blog.last_posted %}{{ blog.last_posted|date:"j M Y" }}{% else %}{{ blog.last_modified|date:"j M Y" }}{% endif %}</td>
                 <td><a href="/mothership/blogs/usersettings/{{ blog.user.settings.pk }}/change/" target="_blank">view</a></td>

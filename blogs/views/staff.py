@@ -204,7 +204,7 @@ def actions(request):
     upgraded_users = list(new_upgrades().select_related('settings'))
     nudge_users = list(monthly_users_to_upgrade())
     contribution_nudge_users = list(free_users_to_nudge())
-    orphaned_blogs = list(blogs_with_orphaned_domains())
+    orphaned_blogs = list(blogs_with_orphaned_domains()[:10])
     for blog in orphaned_blogs:
         blog.is_connected = check_connection(blog)
     cutoff = timezone.now() - timedelta(days=14)
