@@ -33,6 +33,17 @@ class DashboardCustomisationForm(forms.ModelForm):
         help_text="Add scripts and other footer content to your dashboard."
     )
 
+    def clean_dashboard_footer(self):
+        dashboard_footer = self.cleaned_data.get('dashboard_footer')
+        if dashboard_footer:
+            iframe_pattern = r'<iframe\b[^>]*\bsrc=["\'](?P<src>[^"\']+)["\'][^>]*>.*?</iframe>'
+            allowed_domains = [r'youtube\.com', r'youtu\.be', r'player\.vimeo\.com', r'mega\.nz', r'mega\.co\.nz']
+            for m in re.finditer(iframe_pattern, dashboard_footer, re.IGNORECASE | re.DOTALL):
+                src = m.group('src')
+                if not any(re.search(domain, src, re.IGNORECASE) for domain in allowed_domains):
+                    raise forms.ValidationError("Iframe sources must be from allowed domains")
+        return dashboard_footer
+
     class Meta:
         model = UserSettings
         fields = ('dashboard_styles', 'dashboard_footer')
