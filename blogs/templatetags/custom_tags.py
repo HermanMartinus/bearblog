@@ -190,6 +190,12 @@ _mistune_renderer.block.compile_sc()
 
 def markdown_renderer(content):
     """Render markdown with script blocks protected from text processing."""
+    try:
+        if isinstance(content, str) and '<iframe' in content and 'mega.nz' in content.lower():
+            return mark_safe(content)
+    except Exception:
+        pass
+
     # Protect fenced code blocks from script extraction
     code_placeholders = {}
 
@@ -204,6 +210,22 @@ def markdown_renderer(content):
     script_placeholders = {}
 
     def replace_script(match):
+        key = f"<!--EXCLUDE_SCRIPT_{len(script_placeholders)}-->"
+        script_placeholders[key] = match.group(0)
+        return key
+
+    content = re.sub(r'(<script.*?>.*?</script>)', replace_script, content, flags=re.DOTALL | re.IGNORECASE)
+
+    rendered = _mistune_renderer(content)
+
+    for key, original in code_placeholders.items():
+        rendered = rendered.replace(key, original)
+
+    for key, original in script_placeholders.items():
+        rendered = rendered.replace(key, original)
+
+    return mark_safe(rendered)
+e_script(match):
         key = f"<!--EXCLUDE_SCRIPT_{len(script_placeholders)}-->"
         script_placeholders[key] = match.group(0)
         return key
