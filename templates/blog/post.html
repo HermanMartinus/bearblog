@@ -1,0 +1,18 @@
+{% load blog_tags %}
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>{{ post.title }}</title>
+</head>
+<body>
+ <main>
+    <article>
+      <h1>{{ post.title }}</h1>
+      {{ post.content|embed_tweets|safe }}
+    </article>
+ </main>
+ {% twitter_widget_script %}
+</body>
+</html>
