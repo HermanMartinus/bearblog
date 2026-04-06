@@ -201,7 +201,7 @@ class Blog(models.Model):
         }
         
         try:
-            response = requests.post(url, headers=headers, json=data)
+            response = requests.post(url, headers=headers, json=data, timeout=5)
             response.raise_for_status()
             response_data = response.json()
             if response_data.get('success') == True:

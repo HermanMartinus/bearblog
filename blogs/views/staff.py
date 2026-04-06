@@ -271,7 +271,7 @@ def actions(request):
                 user.settings.save()
                 count += 1
             result = f"Emailed {count} users about orphaned domains."
-            orphaned_blogs = list(blogs_with_orphaned_domains())
+            orphaned_blogs = list(blogs_with_orphaned_domains()[:10])
             for blog in orphaned_blogs:
                 blog.is_connected = check_connection(blog)
             orphaned_by_user = {}
@@ -291,7 +291,7 @@ def actions(request):
             if count:
                 cache.delete('domain_map')
             result = f"Removed {count} disconnected domains."
-            orphaned_blogs = list(blogs_with_orphaned_domains())
+            orphaned_blogs = list(blogs_with_orphaned_domains()[:10])
             for blog in orphaned_blogs:
                 blog.is_connected = check_connection(blog)
             orphaned_by_user = {}
