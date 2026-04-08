@@ -186,7 +186,7 @@ def feed(request):
     else:
         feed_method = fg.atom_str
     
-    base_query = get_base_query()
+    base_query = get_base_query().select_related('blog__user__settings')
     if lang:
         base_query = base_query.filter(
             (Q(lang__startswith=lang) & ~Q(lang='')) |
