@@ -226,7 +226,9 @@ def feed(request):
     # Generate the feed string
     feed_str = feed_method(pretty=True)
 
-    return HttpResponse(feed_str, content_type=f"application/xml")
+    response = HttpResponse(feed_str, content_type="application/xml")
+    response['Cache-Control'] = "public, s-maxage=3600, max-age=0"
+    return response
 
 
 def search(request):

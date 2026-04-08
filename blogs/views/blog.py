@@ -193,7 +193,7 @@ def post(request, slug):
 
             response = render(request, '404.html', {'blog': blog}, status=404)
             response['Cache-Tag'] = blog.subdomain
-            response['Cache-Control'] = "max-age=43200"
+            response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
             return response
 
     meta_description = post.meta_description or unmark(post.content)[:157] + '...'
