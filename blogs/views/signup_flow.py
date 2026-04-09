@@ -13,7 +13,7 @@ def signup(request):
     title = request.POST.get('title', '')
     subdomain = slugify(request.POST.get('subdomain', '')).replace('_', '-')
     content = request.POST.get('content', '')
-    email = request.POST.get('email', '')
+    email = request.POST.get('email', '').strip().lower()
     password = request.POST.get('password', '')
 
     error_messages = []
