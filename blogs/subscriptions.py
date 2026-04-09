@@ -45,7 +45,7 @@ def lemon_webhook(request):
             print(f'Found user with user_id {user}, upgrading account...')
         except KeyError:
             email = str(data['data']['attributes']['user_email'])
-            user = User.objects.get(email=email)
+            user = User.objects.get(email__iexact=email)
             print(f'Found user with email address {email}, upgrading account...')
 
         if user:

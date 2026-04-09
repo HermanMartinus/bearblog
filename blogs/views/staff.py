@@ -333,7 +333,7 @@ def check_spam(request):
                 cleaned = cleaned[:-len(suffix)]
 
         # Look up by email first, then by cleaned subdomain
-        user = User.objects.filter(email=query).first()
+        user = User.objects.filter(email__iexact=query).first()
         if user:
             blog = user.blogs.first()
         else:
@@ -698,7 +698,7 @@ def migrate_blog(request):
         if not email or not subdomain:
             return HttpResponse("Both email and subdomain must be provided.")
         
-        user = User.objects.filter(email=email).first()
+        user = User.objects.filter(email__iexact=email).first()
         if not user:
             return HttpResponse("User not found.")
         message += f"Found user: {user}...<br>"
