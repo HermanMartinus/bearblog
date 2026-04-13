@@ -414,6 +414,8 @@ def preview(request, id):
                 elif name == 'alias':
                     post.alias = value
                 elif name == 'published_date':
+                    if not isinstance(value, str):
+                        continue
                     # Check if previously posted 'now'
                     value = value.replace('/', '-')
                     if not str(post.published_date).startswith(value):
