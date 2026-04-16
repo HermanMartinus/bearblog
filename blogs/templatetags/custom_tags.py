@@ -58,7 +58,8 @@ HOST_WHITELIST = [
     'app.hearthis.at',
     'datawrapper.de',
     'datawrapper.dwcdn.net',
-    'guestbooks.kamiscorner.xyz'
+    'guestbooks.kamiscorner.xyz',
+    'lastfm-embed.vercel.app'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
