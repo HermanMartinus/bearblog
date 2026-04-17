@@ -2,7 +2,6 @@ from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q, Max, Min
 from django.utils import timezone
-from django.db.models.functions import Length
 from django.contrib.postgres.search import SearchQuery
 
 from blogs.models import Post, Blog
@@ -23,10 +22,6 @@ def get_base_query(user=None):
         make_discoverable=True,
         published_date__lte=timezone.now(),
         blog__posts_in_last_12_hours__lte=3
-    ).annotate(
-        content_length=Length('content')
-    ).filter(
-        content_length__gte=100
     )
 
     if user and user.is_authenticated:
@@ -167,7 +162,7 @@ def discover(request):
 
 
 def get_available_languages():
-    return ["cs", "de", "el", "en", "es", "fi", "fr", "hu", "id", "it", "ja", "ko", "nl", "pl", "pt", "ru", "sv", "tr", "uk", "zh"]
+    return ["ar", "cs", "de", "el", "en", "es", "fi", "fr", "hu", "id", "it", "ja", "ko", "nl", "pl", "pt", "ru", "sv", "tr", "uk", "zh"]
 
 
 # RSS/Atom feed
