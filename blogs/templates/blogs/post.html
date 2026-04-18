@@ -1,0 +1,50 @@
+{% extends 'blogs/base.html' %}
+{% load custom_tags %}
+
+{% block content %}
+<div class="post">
+    {% if not post.published %}
+    <p class="warning">This post is unpublished.</p>
+    {% endif %}
+
+    <h1>{{ post.title }}</h1>
+    <p class="meta">
+        {% if post.published_date %}
+        {{ post.published_date }}
+        {% endif %}
+        &mdash;
+        <a href="{{ post.blog.url }}">{{ post.blog.subdomain }}</a>
+    </p>
+
+    {{ post.content|safe }}
+
+    <hr>
+
+    <div class="upvote">
+        {% if upvoted %}
+        <p>&#9650; {{ post.upvotes }} upvotes</p>
+        {% else %}
+        <form action="/upvote/{{ post.slug }}/" method="post">
+            {% csrf_token %}
+            <button title="Upvote this post" type="submit">&#9650; {{ post.upvotes }} upvotes</button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if post.blog.comments_on %}
+    <hr>
+    <h3>Comments</h3>
+    <form action="/comment/{{ post.slug }}/" method="post">
+        {% csrf_token %}
+        <textarea name="content" placeholder="Leave a comment..."></textarea>
+        <input type="submit" value="Comment">
+    </form>
+    {% for comment in comments %}
+    <div class="comment">
+        <p>{{ comment.content }}</p>
+        <p class="meta">{{ comment.created_date }}</p>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
