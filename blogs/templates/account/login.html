@@ -1,0 +1,38 @@
+{% extends "account/base.html" %}
+
+{% block head_title %}Sign in{% endblock %}
+
+{% block content %}
+<h1>Sign in</h1>
+
+<form class="login" method="POST" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ redirect_field_value }}" />
+
+    <label for="id_login">Email address</label>
+    <input
+        type="email"
+        name="login"
+        id="id_login"
+        autocomplete="email"
+        required
+    />
+
+    <label for="id_password">Password</label>
+    <input
+        type="password"
+        name="password"
+        id="id_password"
+        autocomplete="current-password"
+        required
+    />
+
+    <div>
+        <a href="{% url 'account_reset_password' %}">Forgot Password?</a>
+    </div>
+
+    <button type="submit">Sign in</button>
+</form>
+
+<p>Don't have an account? <a href="{% url 'account_signup' %}">Sign up</a></p>
+{% endblock %}
