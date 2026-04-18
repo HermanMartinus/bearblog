@@ -13,6 +13,7 @@ from math import log
 import random
 import string
 import hashlib
+import secrets
 import requests
 
 
@@ -59,6 +60,7 @@ class Blog(models.Model):
     subdomain = models.SlugField(max_length=100, unique=True, db_index=True)
     domain = models.CharField(max_length=128, blank=True, null=True, db_index=True)
     auth_token = models.CharField(max_length=128, blank=True)
+    api_token = models.CharField(max_length=64, blank=True, db_index=True)
 
     nav = models.TextField(default="[Home](/) [Blog](/blog/)", blank=True)
     content = models.TextField(default="Hello World!", blank=True)
@@ -144,6 +146,10 @@ class Blog(models.Model):
     def tags(self):
         return sorted(json.loads(self.all_tags))
     
+    def rotate_api_token(self):
+        self.api_token = secrets.token_urlsafe(32)
+        self.save(update_fields=['api_token'])
+
     def generate_auth_token(self):
         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
         self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(30))
