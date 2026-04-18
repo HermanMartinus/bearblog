@@ -1,0 +1,30 @@
+<button
+    class="upvote{% if already_upvoted %} active{% endif %}"
+    onclick="handleUpvote(this, '{{ post.slug }}')"
+    aria-label="{% if already_upvoted %}Remove upvote{% else %}Upvote{% endif %}"
+>
+    &#x2191; <span class="upvote-count">{{ post.upvotes }}</span>
+</button>
+
+<script>
+function handleUpvote(btn, slug) {
+    fetch('/upvote/' + slug + '/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)[1],
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        btn.querySelector('.upvote-count').textContent = data.upvotes;
+        if (data.upvoted) {
+            btn.classList.add('active');
+            btn.setAttribute('aria-label', 'Remove upvote');
+        } else {
+            btn.classList.remove('active');
+            btn.setAttribute('aria-label', 'Upvote');
+        }
+    });
+}
+</script>
