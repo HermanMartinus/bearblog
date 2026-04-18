@@ -179,6 +179,7 @@ def post(request, slug):
 
     # Find by post slug
     post = Post.objects.filter(blog=blog, slug__iexact=slug).first()
+    last_modified = getattr(post, 'last_modified', None) or getattr(post, 'published_date', None) if post else None
 
     if not post:
         # Find by post alias
