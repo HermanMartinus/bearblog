@@ -2,6 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
+from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 from django.http import HttpResponse
 
@@ -15,6 +17,15 @@ import zipfile
 from blogs.forms import NavForm, StyleForm
 from blogs.helpers import get_country, is_protected
 from blogs.models import Blog, Post, Stylesheet
+
+
+@login_required
+@require_POST
+def rotate_api_token(request, id):
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    token = blog.rotate_api_token()
+    messages.success(request, token)
+    return redirect('dashboard', id=blog.subdomain)
 
 
 @login_required
