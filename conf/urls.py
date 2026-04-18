@@ -8,6 +8,7 @@ urlpatterns = [
     path('mothership/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('blogs.urls')),
+    path('api/', include('blogs.api_urls')),
 ]
 
 if settings.DEBUG:
