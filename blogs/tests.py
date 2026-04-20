@@ -685,9 +685,9 @@ class DiscoverFeedMarkdownTests(TestCase):
         )
 
     def _make_post(self, content):
-        """Create a discoverable post with the given content (padded to 100+ chars)."""
-        # Pad content to meet the 100-char minimum length filter
-        padded = content + '\n\n' + ('x' * 150)
+        """Create a discoverable post with the given content (padded to 150+ chars)."""
+        # Pad content to meet the 150-char minimum length filter
+        padded = content + '\n\n' + ('x' * 200)
         post = Post.objects.create(
             blog=self.blog,
             uid=f'fmd-{Post.objects.count()}',
@@ -2228,3 +2228,76 @@ class RandomRedirectTests(TestCase):
         response = self.client.get('/discover/random-blog/')
         self.assertEqual(response.status_code, 302)
         self.assertIn('https://', response.url)
+
+
+class PostContentLengthTests(TestCase):
+    """Tests for the content_length field on Post."""
+
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='cluser', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='CL Blog',
+            subdomain='clblog',
+        )
+
+    def test_content_length_set_on_create(self):
+        post = Post.objects.create(
+            blog=self.blog, uid='cl1', title='Test', slug='test',
+            published_date=timezone.now(), content='A' * 200,
+        )
+        self.assertEqual(post.content_length, 200)
+
+    def test_content_length_updates_on_save(self):
+        post = Post.objects.create(
+            blog=self.blog, uid='cl2', title='Test', slug='test2',
+            published_date=timezone.now(), content='A' * 200,
+        )
+        post.content = 'B' * 50
+        post.save()
+        self.assertEqual(post.content_length, 50)
+
+    def test_content_length_persisted_to_db(self):
+        post = Post.objects.create(
+            blog=self.blog, uid='cl3', title='Test', slug='test3',
+            published_date=timezone.now(), content='A' * 300,
+        )
+        post.refresh_from_db()
+        self.assertEqual(post.content_length, 300)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class DiscoverContentLengthFilterTests(TestCase):
+    """Tests that the discovery feed excludes posts with content < 150 chars."""
+
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='dcfuser', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='DCF Blog',
+            subdomain='dcfblog',
+            reviewed=True,
+            hidden=False,
+        )
+
+    def test_discover_excludes_short_posts(self):
+        Post.objects.create(
+            blog=self.blog, uid='short1', title='Short', slug='short',
+            published_date=timezone.now(), publish=True,
+            make_discoverable=True, hidden=False,
+            content='A' * 100,
+        )
+        response = self.client.get('/discover/')
+        self.assertNotContains(response, 'Short')
+
+    def test_discover_includes_long_posts(self):
+        Post.objects.create(
+            blog=self.blog, uid='long1', title='Long Post Title', slug='long',
+            published_date=timezone.now(), publish=True,
+            make_discoverable=True, hidden=False,
+            content='A' * 200,
+        )
+        response = self.client.get('/discover/')
+        self.assertContains(response, 'Long Post Title')

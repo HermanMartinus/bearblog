@@ -279,6 +279,7 @@ class Post(models.Model):
     shadow_votes = models.IntegerField(default=0, db_index=True)
     score = models.FloatField(default=0, db_index=True)
     hidden = models.BooleanField(default=False, db_index=True)
+    content_length = models.IntegerField(default=0, db_index=True)
     search_vector = SearchVectorField(null=True)
 
     @property
@@ -336,6 +337,8 @@ class Post(models.Model):
         # Update the score for the discover feed
         if self.pk:
             self.update_score()
+
+        self.content_length = len(self.content) if self.content else 0
 
         # Save the post
         super(Post, self).save(*args, **kwargs)
