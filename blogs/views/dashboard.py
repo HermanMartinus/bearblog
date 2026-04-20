@@ -134,7 +134,8 @@ def post_delete(request, id, uid):
         blog.save()
         if is_page:
             return redirect('pages_edit', id=blog.subdomain)
-    return redirect('posts_edit', id=blog.subdomain)
+        return redirect('posts_edit', id=blog.subdomain)
+    return redirect('posts_edit', id=id)
 
 
 @login_required
