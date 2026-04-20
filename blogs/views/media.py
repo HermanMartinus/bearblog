@@ -250,7 +250,7 @@ def extract_date_from_url(url):
         dt = datetime.fromtimestamp(timestamp, tz=ZoneInfo("UTC"))
         return dt
     else:
-        raise ValueError("Invalid URL format")
+        return timezone.now()
     
 
 def get_uploaded_images(blog):
