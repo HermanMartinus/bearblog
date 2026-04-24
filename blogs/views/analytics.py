@@ -38,7 +38,7 @@ def render_analytics(request, blog, public=False):
     now = timezone.now()
     post_filter = request.GET.get('post', False)
     referrer_filter = request.GET.get('referrer', False)
-    days_filter = get_int(request.GET.get('days', 7), 7)
+    days_filter = min(get_int(request.GET.get('days', 7), 7), 3650)
     start_date = (now - timedelta(days=days_filter)).date()
     end_date = now.date()
 
