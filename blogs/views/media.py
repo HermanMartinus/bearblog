@@ -19,7 +19,7 @@ import threading
 
 from blogs.models import Blog, Media
 
-bucket_name = 'bear-images'
+bucket_name = os.getenv('SPACES_BUCKET', 'bear-images')
 
 
 image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic']
