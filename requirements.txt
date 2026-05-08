@@ -1,5 +1,5 @@
 boto3==1.36.24
-Django==6.0.4
+Django==6.0.5
 django-allauth==65.14.3
 django-debug-toolbar==5.0.1
 django-ip==1.0.2
