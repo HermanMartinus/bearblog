@@ -99,7 +99,7 @@ urlpatterns = [
     path('ping/', main_site_only(blog.ping), name='ping'),
 
     # Blog
-    
+    path('llms.txt', blog.serve_llms_txt, name='llms-txt'),
     # Icons
     path('favicon.ico', blog.favicon, name='favicon'),
     path("apple-touch-icon.png", blog.favicon),
