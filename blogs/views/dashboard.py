@@ -13,6 +13,7 @@ import json
 import zipfile
 
 from blogs.forms import NavForm, StyleForm
+from blogs.models import Blog, Post, Stylesheet
 from blogs.helpers import get_country, is_protected
 from blogs.models import Blog, Post, Stylesheet
 
@@ -134,7 +135,8 @@ def post_delete(request, id, uid):
         blog.save()
         if is_page:
             return redirect('pages_edit', id=blog.subdomain)
-    return redirect('posts_edit', id=blog.subdomain)
+        return redirect('posts_edit', id=blog.subdomain)
+    return redirect('posts_edit', id=id)
 
 
 @login_required
