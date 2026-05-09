@@ -108,6 +108,13 @@ class AdvancedSettingsForm(forms.ModelForm):
         help_text="Set the content of your robots.txt file. Cache updates every 20 minutes."
     )
 
+    llms_txt = forms.CharField(
+        widget=forms.Textarea(),
+        label="llms.txt content",
+        required=False,
+        help_text="Set the content of your llms.txt file."
+    )
+
     def clean_meta_tag(self):
         meta_tag = self.cleaned_data.get('meta_tag')
         if meta_tag:
@@ -118,7 +125,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('analytics_active', 'date_format', 'fathom_site_id', 'blog_path', 'rss_alias', 'meta_tag', 'robots_txt')
+        fields = ('analytics_active', 'date_format', 'fathom_site_id', 'blog_path', 'rss_alias', 'meta_tag', 'robots_txt', 'llms_txt')
 
 
 class PostTemplateForm(forms.ModelForm):
