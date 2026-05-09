@@ -92,7 +92,7 @@ def escape_currency(text):
     return re.sub(r'(?<!\\)(\$\d[^$]*?)(?<!\\)(\$\d)', r'\\\1\\\2', text)
 
 def fix_links(text):
-    parentheses_pattern = r'\[([^\]]+)\]\(((?:tab:)?https?://[^\)]+\([^\)]*\)[^\)]*)\)'
+    parentheses_pattern = r'\$([^\]]+)\$\((?:tab:)?https?://[^\)]+\([^\)]*\)[^\)]*\)\)'
 
     def escape_parentheses(match):
         label = match.group(1)
@@ -105,6 +105,21 @@ def fix_links(text):
     
 
     return fixed_text
+
+def process_wikilinks(text, blog=None):
+    """Convert [[Page Title]] syntax to HTML links"""
+    def replace_wikilink(match):
+        page_title = match.group(1)
+        if blog:
+            try:
+                post = Post.objects.filter(blog=blog, title=page_title).first()
+                if post:
+                    return f'<a href="/{post.slug}/">{page_title}</a>'
+            except:
+                pass
+        return f'<a href="#">{page_title}</a>'
+    
+    return re.sub(r'\[\[(.*?)\]\]', replace_wikilink, text)
 
 class MyRenderer(HTMLRenderer):
     def __init__(self, **kwargs):
@@ -189,8 +204,11 @@ _mistune_renderer.block.rules.remove('indent_code')
 _mistune_renderer.block.compile_sc()
 
 
-def markdown_renderer(content):
+def markdown_renderer(content, blog=None):
     """Render markdown with script blocks protected from text processing."""
+    # Process wikilinks first
+    content = process_wikilinks(content, blog)
+    
     # Protect fenced code blocks from script extraction
     code_placeholders = {}
 
