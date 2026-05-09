@@ -164,6 +164,19 @@ def posts(request, blog):
     return response
 
 
+def llms_txt(request):
+    blog = resolve_address(request)
+    if not blog:
+        return HttpResponse('Blog not found', status=404, content_type='text/plain')
+    
+    if not blog.llms_txt:
+        return HttpResponse('LLMs.txt not configured', status=404, content_type='text/plain')
+    
+    response = HttpResponse(blog.llms_txt, content_type='text/plain')
+    response['Cache-Control'] = 'public, s-maxage=43200, max-age=0'
+    response['Cache-Tag'] = blog.subdomain
+    return response
+
 def post(request, slug):
     if slug[0] == '/' and slug[-1] == '/':
         slug = slug[1:-1]
