@@ -6,7 +6,7 @@ import time
 
 @staff_member_required
 def logger_test(request):
-    x = 100/0
+    return HttpResponse("Logger test endpoint - no operation performed.")
 
 
 @staff_member_required
