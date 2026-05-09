@@ -9,6 +9,8 @@ from blogs.helpers import salt_and_hash, unmark
 from blogs.views.analytics import render_analytics
 
 import os
+import xml.etree.ElementTree as ET
+from django.template.loader import render_to_string
 def resolve_address(request):
     http_host = request.get_host()
 
@@ -92,15 +94,13 @@ def home(request):
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
     
-    response = render(
-        request,
-        'home.html',
-        {
-            'blog': blog,
-            'posts': all_posts,
-            'meta_description': meta_description
-        }
-    )
+    # Generate Atom XML
+    atom_xml = generate_atom_feed(blog, all_posts)
+    
+    # Transform XML to HTML using XSLT
+    html_content = transform_atom_to_html(atom_xml, 'home.xsl')
+    
+    response = HttpResponse(html_content, content_type='text/html')
 
     response['Cache-Tag'] = blog.subdomain
     response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
@@ -144,21 +144,14 @@ def posts(request, blog):
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
     blog_path_title = blog.blog_path.replace('-', ' ').capitalize() or 'Blog'
     
-    response = render(
-        request,
-        'posts.html',
-        {
-            'blog': blog,
-            'posts': posts,
-            'meta_description': meta_description,
-            'query': tag_param,
-            'active_tags': tags,
-            'available_tags': available_tags,
-            'blog_path_title': blog_path_title,
-            'tags_to_show': tags_to_show,
-        }
-    )
+    # Generate Atom XML
+    atom_xml = generate_atom_feed(blog, posts)
     
+    # Transform XML to HTML using XSLT
+    html_content = transform_atom_to_html(atom_xml, 'posts.xsl')
+    
+    response = HttpResponse(html_content, content_type='text/html')
+
     response['Cache-Tag'] = blog.subdomain
     response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
     return response
