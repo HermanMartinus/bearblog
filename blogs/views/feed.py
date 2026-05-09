@@ -60,7 +60,7 @@ def generate_feed(blog, feed_type="atom", tag=None, page=0):
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain)
-    fg.author({'name': clean_string(blog.subdomain), 'email': 'hidden'})
+    fg.author({'name': clean_string(blog.subdomain)})
     if tag:
         fg.title(clean_string(f"{blog.title} - {tag}"))
     else:
@@ -89,6 +89,7 @@ def generate_feed(blog, feed_type="atom", tag=None, page=0):
 
     if feed_type == "atom":
         fg.link(href=f"{blog.useful_domain}/feed/", rel='self')
+        fg.language('en')
         return fg.atom_str(pretty=True)
     elif feed_type == "rss":
         fg.link(href=f"{blog.useful_domain}/feed/?type=rss", rel='self', type='application/rss+xml')
