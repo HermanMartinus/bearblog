@@ -108,6 +108,12 @@ class AdvancedSettingsForm(forms.ModelForm):
         help_text="Set the content of your robots.txt file. Cache updates every 20 minutes."
     )
 
+    redirect_to_https = forms.BooleanField(
+        label="Redirect to HTTPS",
+        required=False,
+        help_text="Enable to automatically redirect HTTP requests to HTTPS"
+    )
+
     def clean_meta_tag(self):
         meta_tag = self.cleaned_data.get('meta_tag')
         if meta_tag:
@@ -118,7 +124,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     class Meta:
         model = Blog
-        fields = ('analytics_active', 'date_format', 'fathom_site_id', 'blog_path', 'rss_alias', 'meta_tag', 'robots_txt')
+        fields = ('analytics_active', 'date_format', 'fathom_site_id', 'blog_path', 'rss_alias', 'meta_tag', 'robots_txt', 'redirect_to_https')
 
 
 class PostTemplateForm(forms.ModelForm):
