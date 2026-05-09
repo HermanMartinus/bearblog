@@ -99,7 +99,8 @@ urlpatterns = [
     path('ping/', main_site_only(blog.ping), name='ping'),
 
     # Blog
-    
+    path('<slug:subdomain>/gemini/', blog.gemini, name='blog_gemini'),
+    path('<slug:subdomain>/<slug:slug>/gemini/', blog.post_gemini, name='post_gemini'),
     # Icons
     path('favicon.ico', blog.favicon, name='favicon'),
     path("apple-touch-icon.png", blog.favicon),
