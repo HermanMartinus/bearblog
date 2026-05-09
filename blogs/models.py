@@ -146,6 +146,14 @@ class Blog(models.Model):
     
     def generate_auth_token(self):
         allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
+
+    def get_post_by_title(self, title):
+        """Find a post by its title within this blog."""
+        return self.posts.filter(title=title).first()
+
+    def get_post_by_slug(self, slug):
+        """Find a post by its slug within this blog."""
+        return self.posts.filter(slug=slug).first()place('l', '')
         self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(30))
         self.save()
 
@@ -279,6 +287,7 @@ class Post(models.Model):
     shadow_votes = models.IntegerField(default=0, db_index=True)
     score = models.FloatField(default=0, db_index=True)
     hidden = models.BooleanField(default=False, db_index=True)
+    content_length = models.IntegerField(default=0, db_index=True)
     search_vector = SearchVectorField(null=True)
 
     @property
@@ -336,6 +345,8 @@ class Post(models.Model):
         # Update the score for the discover feed
         if self.pk:
             self.update_score()
+
+        self.content_length = len(self.content) if self.content else 0
 
         # Save the post
         super(Post, self).save(*args, **kwargs)
