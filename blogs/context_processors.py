@@ -5,5 +5,10 @@ def extra(request):
     return {
         'tz': request.COOKIES.get('timezone', 'UTC'),
         'admin_passport': request.COOKIES.get('admin_passport') == os.getenv('ADMIN_PASSPORT'),
-        'bear_root': 'http://' + os.getenv('MAIN_SITE_HOSTS').split(',')[0]
+        'bear_root': 'http://' + os.getenv('MAIN_SITE_HOSTS').split(',')[0],
+        'xml_data': {
+            'tz': request.COOKIES.get('timezone', 'UTC'),
+            'admin_passport': request.COOKIES.get('admin_passport') == os.getenv('ADMIN_PASSPORT'),
+            'bear_root': 'http://' + os.getenv('MAIN_SITE_HOSTS').split(',')[0]
+        }
     }
