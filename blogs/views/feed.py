@@ -60,7 +60,7 @@ def generate_feed(blog, feed_type="atom", tag=None, page=0):
 
     fg = FeedGenerator()
     fg.id(blog.useful_domain)
-    fg.author({'name': clean_string(blog.subdomain), 'email': 'hidden'})
+    fg.author({'name': clean_string(blog.subdomain)})
     if tag:
         fg.title(clean_string(f"{blog.title} - {tag}"))
     else:
@@ -89,8 +89,22 @@ def generate_feed(blog, feed_type="atom", tag=None, page=0):
 
     if feed_type == "atom":
         fg.link(href=f"{blog.useful_domain}/feed/", rel='self')
-        return fg.atom_str(pretty=True)
+        atom_feed = fg.atom_str(pretty=True)
+        # Add XSLT stylesheet processing instruction for Atom
+        atom_feed_str = atom_feed.decode('utf-8')
+        if atom_feed_str.startswith('<?xml version="1.0" encoding="utf-8"?>'):
+            atom_feed_str = '<?xml version="1.0" encoding="utf-8"?>\n<?xml-stylesheet type="text/xsl" href="/static/atom.xsl"?>' + atom_feed_str[38:]
+        else:
+            atom_feed_str = '<?xml-stylesheet type="text/xsl" href="/static/atom.xsl"?>\n' + atom_feed_str
+        return atom_feed_str.encode('utf-8')
     elif feed_type == "rss":
         fg.link(href=f"{blog.useful_domain}/feed/?type=rss", rel='self', type='application/rss+xml')
         fg.link(href=f"{blog.useful_domain}", rel='self')
-        return fg.rss_str(pretty=True)
+        rss_feed = fg.rss_str(pretty=True)
+        # Add XSLT stylesheet processing instruction for RSS
+        rss_feed_str = rss_feed.decode('utf-8')
+        if rss_feed_str.startswith('<?xml version="1.0" encoding="utf-8"?>'):
+            rss_feed_str = '<?xml version="1.0" encoding="utf-8"?>\n<?xml-stylesheet type="text/xsl" href="/static/rss.xsl"?>' + rss_feed_str[38:]
+        else:
+            rss_feed_str = '<?xml-stylesheet type="text/xsl" href="/static/rss.xsl"?>\n' + rss_feed_str
+        return rss_feed_str.encode('utf-8')
