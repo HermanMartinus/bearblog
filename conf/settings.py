@@ -202,6 +202,18 @@ USE_I18N = True
 
 USE_TZ = True
 
+# XSLT and XML processing settings
+XSLT_PROCESSING_ENABLED = True
+XSLT_STYLESHEET_DIRS = [
+    os.path.join(BASE_DIR, 'xsl'),
+]
+
+# MIME types for XML responses
+CONTENT_TYPES = {
+    'xml': 'application/xml',
+    'xsl': 'application/xslt+xml',
+}
+
 # Static files
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = "static/"
