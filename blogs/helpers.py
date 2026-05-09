@@ -118,6 +118,8 @@ def unmark(content):
     content = re.sub(r'^\s{0,3}\d+\.\s+(.*)$', r'\1', content, flags=re.MULTILINE)
     content = re.sub(r'^\s*\|(.*?)\|\s*$', '\1', content, flags=re.MULTILINE)
     content = re.sub(r'^\s*[:-]{3,}\s*$', '', content, flags=re.MULTILINE)
+    # Parse wikilinks [[title]] or [[link|title]]
+    content = re.sub(r'\[\[(.*?)(\|(.*))?\]\]', r'<a href="\1">\3</a>' if '\\3' else r'<a href="\1">\1</a>', content)
 
     return content
 
