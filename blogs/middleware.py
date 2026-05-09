@@ -36,6 +36,38 @@ class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
                 return self._reject(request, reason)
 
 
+# Handle custom domain redirects
+from django.shortcuts import redirect
+from django.contrib.sites.models import Site
+
+class CustomDomainRedirectMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        host = request.get_host().lower()
+        
+        # Check if this is a custom domain request
+        if not any(main_domain in host for main_domain in os.getenv('MAIN_SITE_HOSTS', '').split(',')):
+            # Look up the site to see if there's a preferred domain
+            try:
+                site = Site.objects.get(domain__iexact=host)
+                
+                # Check if there's a preferred redirect setting
+                if hasattr(site, 'custom_domain') and site.custom_domain:
+                    preferred_domain = site.custom_domain.preferred_domain.lower()
+                    
+                    # Redirect if request doesn't match preferred domain
+                    if preferred_domain and host != preferred_domain:
+                        # Build redirect URL preserving path and query parameters
+                        redirect_url = f"https://{preferred_domain}{request.get_full_path()}"
+                        return redirect(redirect_url, permanent=True)
+            except Site.DoesNotExist:
+                pass
+        
+        return self.get_response(request)
+
+
 # Prevent clickjacking on root domains
 class ConditionalXFrameOptionsMiddleware:
     def __init__(self, get_response):
