@@ -58,6 +58,7 @@ class Blog(models.Model):
     last_posted = models.DateTimeField(blank=True, null=True, db_index=True)
     subdomain = models.SlugField(max_length=100, unique=True, db_index=True)
     domain = models.CharField(max_length=128, blank=True, null=True, db_index=True)
+    custom_domain_redirect_to_www = models.BooleanField(default=False, help_text="Redirect base domain to www, otherwise redirect www to base domain")
     auth_token = models.CharField(max_length=128, blank=True)
 
     nav = models.TextField(default="[Home](/) [Blog](/blog/)", blank=True)
@@ -279,6 +280,7 @@ class Post(models.Model):
     shadow_votes = models.IntegerField(default=0, db_index=True)
     score = models.FloatField(default=0, db_index=True)
     hidden = models.BooleanField(default=False, db_index=True)
+    content_length = models.IntegerField(default=0, db_index=True)
     search_vector = SearchVectorField(null=True)
 
     @property
@@ -336,6 +338,8 @@ class Post(models.Model):
         # Update the score for the discover feed
         if self.pk:
             self.update_score()
+
+        self.content_length = len(self.content) if self.content else 0
 
         # Save the post
         super(Post, self).save(*args, **kwargs)
