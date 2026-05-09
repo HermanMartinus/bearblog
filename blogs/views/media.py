@@ -19,7 +19,7 @@ import threading
 
 from blogs.models import Blog, Media
 
-bucket_name = 'bear-images'
+bucket_name = os.getenv('SPACES_BUCKET', 'bear-images')
 
 
 image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic']
@@ -27,8 +27,9 @@ video_types = ['mp4', 'webm', 'mkv']
 audio_types = ['mp3', 'ogg', 'wav', 'opus', 'flac']
 document_types = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'rtf', 'epub', 'ps', 'odt', 'ods', 'odp', 'odg', 'odf', 'mml', 'odb', 'uot', 'uos', 'uop', 'css']
 font_types = ['woff', 'woff2', 'ttf', 'otf']
+javascript_types = ['js']
 
-file_types = image_types + video_types + audio_types + document_types + font_types
+file_types = image_types + video_types + audio_types + document_types + font_types + javascript_types
 
 file_size_limit = 10 * 1024 * 1024 # 10MB in bytes
 
@@ -250,7 +251,7 @@ def extract_date_from_url(url):
         dt = datetime.fromtimestamp(timestamp, tz=ZoneInfo("UTC"))
         return dt
     else:
-        raise ValueError("Invalid URL format")
+        return timezone.now()
     
 
 def get_uploaded_images(blog):
