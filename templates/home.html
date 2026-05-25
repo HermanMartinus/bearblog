@@ -27,7 +27,7 @@
 {% if blog.user.settings.upgraded %}{{ blog.header_directive | safe }}{% endif %}
 
 {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
-{% if blog.contains_code %}<link rel="stylesheet" href="{% static 'highlight.css' %}">{% endif %}
+{% if blog.contains_code %}<link rel="stylesheet" href="{% static 'highlight.css' %}" media="print" onload="this.media='all'">{% endif %}
 {% endblock %}
 
 {% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
