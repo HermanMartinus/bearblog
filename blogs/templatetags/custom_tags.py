@@ -30,6 +30,7 @@ register = template.Library()
 HOST_WHITELIST = [
     'www.youtube.com',
     'www.youtube-nocookie.com',
+    'calendar.google.com',
     'www.slideshare.net',
     'player.vimeo.com',
     'w.soundcloud.com',
