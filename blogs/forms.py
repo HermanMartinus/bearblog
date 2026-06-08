@@ -129,6 +129,14 @@ class PostTemplateForm(forms.ModelForm):
         help_text="This will pre-populate on all new posts. Separate header and body content with ___ (3 underscores)."
     )
 
+    def clean_post_template(self):
+        post_template = self.cleaned_data.get('post_template')
+        if post_template and "___" not in post_template:
+            raise forms.ValidationError(
+                "Post template must contain ___ (3 underscores) to separate the header from the body."
+            )
+        return post_template
+
     class Meta:
         model = Blog
         fields = ('post_template',)
