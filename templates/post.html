@@ -7,7 +7,7 @@
 
 {% block favicon %}{% include 'snippets/favicon.html' with blog=blog %}{% endblock %}
 
-{% block title %}{{ post.title|plain_title }} | {{ blog.title }}{% endblock %}
+{% block title %}{{ post.title|plain_title }} – {{ blog.title }}{% endblock %}
 
 {% block canonical %}<link rel="canonical" href="{{ canonical_url }}">{% endblock %}
 
