@@ -124,19 +124,25 @@ def discover(request):
         use_probes = not lang or lang in probe_langs
 
         if use_probes:
-            # Fast path: random ID probes for common languages.
+            # Fast path: random ID probes for common languages,
+            # batched into UNION queries to avoid sequential round-trips
             agg = Post.objects.aggregate(max_id=Max('id'), min_id=Min('id'))
             results = []
             found_ids = set()
             if agg['max_id']:
-                for _ in range(posts_per_page * 10):
-                    rand_id = random.randint(agg['min_id'], agg['max_id'])
-                    post = base_query.filter(id__gte=rand_id).first()
-                    if post and post.id not in found_ids:
-                        found_ids.add(post.id)
-                        results.append(post)
-                    if len(results) >= posts_per_page:
+                for _ in range(10):
+                    probes = [
+                        base_query.filter(
+                            id__gte=random.randint(agg['min_id'], agg['max_id'])
+                        ).order_by('id').values('id')[:1]
+                        for _ in range(posts_per_page)
+                    ]
+                    for row in probes[0].union(*probes[1:]):
+                        found_ids.add(row['id'])
+                    if len(found_ids) >= posts_per_page:
                         break
+                results = list(base_query.filter(id__in=list(found_ids)[:posts_per_page]))
+                random.shuffle(results)
             posts = results
         else:
             # Slow fallback: ORDER BY random() for rare languages where probes have too low a hit rate

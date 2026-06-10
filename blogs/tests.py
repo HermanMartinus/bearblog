@@ -375,6 +375,35 @@ class DiscoverRandomFeedTests(TestCase):
         self.assertNotIn('Next', content)
         self.assertNotIn('Previous', content)
 
+    def test_random_probes_are_batched(self):
+        """ID probes run as batched UNION queries, not one query per probe (N+1)."""
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+        with CaptureQueriesContext(connection) as ctx:
+            response = self.client.get('/discover/?random=true')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['posts']), 3)
+        # Old code ran up to 200 probe queries; batched it's at most
+        # 10 UNION queries plus a handful of others
+        self.assertLess(len(ctx.captured_queries), 20)
+        # Queries must stay parseable by sqlparse (debug toolbar runs every
+        # query through it, which raises above 10000 tokens)
+        import sqlparse
+        for query in ctx.captured_queries:
+            sqlparse.parse(query['sql'])
+
+    def test_random_posts_have_blog_preloaded(self):
+        """select_related('blog') survives the UNION — accessing post.blog
+        must not trigger extra queries."""
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+        response = self.client.get('/discover/?random=true')
+        posts = response.context['posts']
+        with CaptureQueriesContext(connection) as ctx:
+            titles = [post.blog.title for post in posts]
+        self.assertEqual(titles, ['Random Blog'] * 3)
+        self.assertEqual(len(ctx.captured_queries), 0)
+
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver', 'STAFF_API_KEY': 'test-key'})
 class StaffApiBlogReviewTests(TestCase):
@@ -1089,6 +1118,41 @@ class FeedTagTitleTests(TestCase):
         self.assertIn('<title>Feed Tag Blog - news</title>', content)
 
 
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class FeedNavDirectiveTests(TestCase):
+    """The feed strips {{ next_post }}/{{ previous_post }} instead of
+    running 2 adjacent-post queries per entry (N+1)."""
+
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='feednav_user', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Feed Nav Blog',
+            subdomain='feednavblog',
+        )
+        for i in range(3):
+            Post.objects.create(
+                blog=self.blog,
+                uid=f'fn{i}',
+                title=f'Post {i}',
+                slug=f'post-{i}',
+                published_date=timezone.now() - timezone.timedelta(days=i),
+                publish=True,
+                content=f'Body {i}\n\n{{{{ previous_post }}}} {{{{ next_post }}}}',
+            )
+
+    def test_feed_has_no_nav_links_or_adjacent_post_queries(self):
+        with mock.patch('blogs.templatetags.custom_tags.get_adjacent_posts') as mock_adjacent:
+            response = self.client.get('/rss/', SERVER_NAME='feednavblog.testserver')
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertNotIn('next-post', content)
+        self.assertNotIn('previous-post', content)
+        self.assertNotIn('{{ next_post }}', content)
+        mock_adjacent.assert_not_called()
+
+
 class InlineLatexTests(TestCase):
     """Tests for replace_inline_latex and currency vs math rendering."""
 
@@ -1451,18 +1515,18 @@ class CodeBlockTests(TestCase):
 
 
 class HighlightCssTests(TestCase):
-    """Tests for the highlight CSS static file."""
+    """Tests for the inlined highlight CSS template include."""
 
     def test_highlight_css_exists(self):
-        """The highlight.css static file should exist."""
+        """The highlight.css template include should exist."""
         import os
-        css_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'highlight.css')
+        css_path = os.path.join(os.path.dirname(__file__), '..', 'templates', 'styles', 'blog', 'highlight.css')
         self.assertTrue(os.path.exists(css_path))
 
     def test_highlight_css_contains_scoped_selectors(self):
         """The CSS file should contain .highlight-scoped Pygments selectors."""
         import os
-        css_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'highlight.css')
+        css_path = os.path.join(os.path.dirname(__file__), '..', 'templates', 'styles', 'blog', 'highlight.css')
         with open(css_path) as f:
             css = f.read()
         self.assertIn('.highlight', css)

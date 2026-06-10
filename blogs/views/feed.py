@@ -80,7 +80,11 @@ def generate_feed(blog, feed_type="atom", tag=None, page=0):
         if post.meta_description:
             fe.summary(clean_string(post.meta_description))
 
+        # Strip nav directives: their relative links break in feed readers
+        # and each one costs 2 adjacent-post queries per entry
         post_content = post.content.replace('{{ email-signup }}', '')
+        post_content = post_content.replace('{{ next_post }}', '')
+        post_content = post_content.replace('{{ previous_post }}', '')
 
         fe.content(clean_string(markdown(post_content, blog, post)), type="html")
 
