@@ -14,6 +14,7 @@ import random
 import string
 import hashlib
 import requests
+from threading import Thread
 
 
 class UserSettings(models.Model):
@@ -169,14 +170,17 @@ class Blog(models.Model):
         self.dodginess_score = dodgy_term_count + blacklisted_term_count * 10
 
     def update_all_tags(self):
-        all_tags = []
+        all_tags = set()
         if self.pk:
-            for post in Post.objects.filter(blog=self, publish=True, is_page=False, published_date__lt=timezone.now()):
-                all_tags.extend(json.loads(post.all_tags))
-                all_tags = list(set(all_tags))
-        self.all_tags = json.dumps(all_tags)
+            for tags_json in Post.objects.filter(blog=self, publish=True, is_page=False, published_date__lt=timezone.now()).values_list('all_tags', flat=True):
+                all_tags.update(json.loads(tags_json))
+        self.all_tags = json.dumps(sorted(all_tags))
 
     def invalidate_cloudflare_cache(self):
+        # Purge in a background thread so the network round-trip doesn't block the save
+        Thread(target=self._purge_cloudflare_cache).start()
+
+    def _purge_cloudflare_cache(self):
         if os.getenv('ENVIRONMENT') == 'dev':
             # Don't invalidate on dev
             return
