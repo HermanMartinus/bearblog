@@ -257,19 +257,32 @@
 					}
 				});
 			} else {
-				// Handle error, replace placeholder with error message
-				const currentText = $textarea.value;
-				const start = currentText.indexOf(placeholder);
-				if (start !== -1) {
-					$textarea.value = currentText.substring(0, start) + `![Upload of ${file.name} failed]\n` + currentText.substring(start + placeholder.length);
-					$textarea.selectionStart = $textarea.selectionEnd = start + `![Upload of ${file.name} failed]\n`.length;
-				}
+				replacePlaceholderWithError();
 			}
 
+			nextFile();
+		};
+
+		xhr.onerror = xhr.ontimeout = function() {
+			replacePlaceholderWithError();
+			nextFile();
+		};
+
+		function replacePlaceholderWithError() {
+			// Handle error, replace placeholder with error message
+			const currentText = $textarea.value;
+			const start = currentText.indexOf(placeholder);
+			if (start !== -1) {
+				$textarea.value = currentText.substring(0, start) + `![Upload of ${file.name} failed]\n` + currentText.substring(start + placeholder.length);
+				$textarea.selectionStart = $textarea.selectionEnd = start + `![Upload of ${file.name} failed]\n`.length;
+			}
+		}
+
+		function nextFile() {
 			if (index < files.length - 1) {
 				uploadNextFile(index + 1, files);
 			}
-		};
+		}
 	}
 	{% else %}
 	$uploadButton.onclick = event => {

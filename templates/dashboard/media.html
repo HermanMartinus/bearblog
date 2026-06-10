@@ -132,19 +132,28 @@ function uploadNextFile(index, files) {
     xhr.open("POST", target, true);
     xhr.send(formData);
 
-    xhr.onload = function() {
-        if (this.status === 200) {
-            console.log('uploaded')
-        }
-        else {
-            console.log('failed')
-        }
-
+    function nextOrReload() {
         if (index < files.length - 1) {
             uploadNextFile(index + 1, files);
         } else {
             location.reload()
         }
+    }
+
+    xhr.onload = function() {
+        if (this.status === 200) {
+            console.log('uploaded')
+        }
+        else {
+            alert(`Upload of ${file.name} failed. This may be due to a slow connection. Consider resizing it and trying again.`);
+        }
+
+        nextOrReload();
+    }
+
+    xhr.onerror = xhr.ontimeout = function() {
+        alert(`Upload of ${file.name} failed. This may be due to a slow connection. Consider resizing it and trying again.`);
+        nextOrReload();
     }
 }
 

@@ -47,7 +47,9 @@ if not DEBUG:
         traces_sample_rate=0.001,
         profiles_sample_rate=0.001,
         send_default_pii=True,
-        before_send=before_send
+        before_send=before_send,
+        # Gunicorn aborts workers with sys.exit(1) when a slow client exceeds --timeout
+        ignore_errors=[SystemExit]
     )
 
     # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
