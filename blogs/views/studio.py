@@ -288,7 +288,10 @@ def post(request, id, uid=None):
                 elif name == 'canonical_url':
                     post.canonical_url = value
                 elif name == 'lang':
-                    post.lang = value
+                    if len(str(value)) > 10:
+                        error_messages.append('lang code is too long (max 10 characters)')
+                    else:
+                        post.lang = value
                 elif name == 'meta_description':
                     post.meta_description = value
                 elif name == 'meta_image':

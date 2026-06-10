@@ -90,10 +90,10 @@ def discover(request):
                 return redirect(request.get_full_path())
 
     try:
-        page = int(request.GET.get("page", 0) or 0)
+        page = max(int(request.GET.get("page", 0) or 0), 0)
     except ValueError:
         page = 0
-    
+
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page
 
@@ -232,7 +232,7 @@ def search(request):
     posts = None
 
     try:
-        page = int(request.GET.get("page", 0) or 0)
+        page = max(int(request.GET.get("page", 0) or 0), 0)
     except ValueError:
         page = 0
 

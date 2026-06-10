@@ -19,7 +19,10 @@ def feed(request):
     tag = request.GET.get('q')
     if tag:
         tag = clean_string(tag)
-    page = int(request.GET.get('page', 0))
+    try:
+        page = max(int(request.GET.get('page', 0)), 0)
+    except ValueError:
+        page = 0
 
     if "rss" in request.GET.get('type', 'atom') or "rss" in request.path:
         feed_type = "rss"

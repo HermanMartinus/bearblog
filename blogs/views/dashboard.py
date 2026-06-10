@@ -259,9 +259,11 @@ def settings(request, id):
 
     if request.method == "POST":
         subdomain = request.POST.get('subdomain').lower().strip()
-        lang = request.POST.get('lang', 'en')
+        lang = request.POST.get('lang', 'en').strip()
 
-        if subdomain:
+        if len(lang) > 10:
+            error_messages.append(f'The language code "{lang}" is too long (max 10 characters)')
+        elif subdomain:
             subdomain = slugify(subdomain.split('.')[0]).replace('_', '-')
             if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).exists() and not is_protected(subdomain):
                 blog.invalidate_cloudflare_cache() # Gets rid of the cached version on old subdomain
