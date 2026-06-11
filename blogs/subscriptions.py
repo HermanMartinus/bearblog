@@ -1,10 +1,13 @@
+from django.db.models import F
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.conf import settings
 
+from blogs.helpers import send_async_mail
 from blogs.models import UserSettings
 
 import requests
@@ -12,6 +15,7 @@ import os
 import json
 import hashlib
 import hmac
+import sentry_sdk
 
 
 def normalize_plan_type(variant_name):
@@ -26,6 +30,37 @@ def normalize_plan_type(variant_name):
         return 'lifetime'
     return None
 
+def find_user_for_order(data):
+    # Prefer the user_id passed through checkout custom data
+    user_id = (data.get('meta', {}).get('custom_data') or {}).get('user_id')
+    if user_id:
+        try:
+            user = User.objects.filter(id=str(user_id)).first()
+        except ValueError:
+            user = None
+        if user:
+            print(f'Found user with user_id {user}, upgrading account...')
+            return user
+
+    email = data['data']['attributes'].get('user_email')
+    if not email:
+        return None
+
+    # Fall back on account email, then linked allauth addresses, then the
+    # email used on a previous order. Most recently active user wins.
+    candidates = (
+        User.objects.filter(email__iexact=email),
+        User.objects.filter(emailaddress__email__iexact=email),
+        User.objects.filter(settings__order_email__iexact=email),
+    )
+    for queryset in candidates:
+        user = queryset.order_by(F('last_login').desc(nulls_last=True)).first()
+        if user:
+            print(f'Found user with email address {email}, upgrading account...')
+            return user
+    return None
+
+
 @csrf_exempt
 def lemon_webhook(request):
     digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode('utf-8'), msg=request.body, digestmod=hashlib.sha256).hexdigest()
@@ -38,15 +73,7 @@ def lemon_webhook(request):
     
     # Account upgrade
     if request.META.get('HTTP_X_EVENT_NAME') in ('order_created', 'subscription_resumed', 'subscription_unpaused'):
-        user = None
-        try:
-            user_id = str(data['meta']['custom_data']['user_id'])
-            user = get_object_or_404(User, id=user_id)
-            print(f'Found user with user_id {user}, upgrading account...')
-        except KeyError:
-            email = str(data['data']['attributes']['user_email'])
-            user = User.objects.get(email__iexact=email)
-            print(f'Found user with email address {email}, upgrading account...')
+        user = find_user_for_order(data)
 
         if user:
             user.settings.upgraded = True
@@ -68,6 +95,21 @@ def lemon_webhook(request):
                 blog.reviewed = True
                 blog.save()
             return HttpResponse(f'Upgraded {user}')
+
+        # No account matched; ask the purchaser to get in touch
+        email = data['data']['attributes'].get('user_email')
+        order_number = data['data']['attributes'].get('order_number') or data['data'].get('id')
+        print(f'Could not match order {order_number} to a user (email: {email})')
+        if email:
+            send_async_mail(
+                "Your Bear Blog upgrade",
+                render_to_string('emails/upgrade_unmatched.html'),
+                'Herman Martinus <herman@mg.bearblog.dev>',
+                [email],
+                ['Herman Martinus <herman@bearblog.dev>'],
+            )
+        sentry_sdk.capture_message(f'Lemon Squeezy order {order_number} could not be matched to a user (email: {email})')
+        return HttpResponse('No matching user found; purchaser notified')
 
     # Account downgrade
     # This only happens on order id, not on email to prevent old sub overwriting new one

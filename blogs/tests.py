@@ -2365,3 +2365,140 @@ class DiscoverContentLengthFilterTests(TestCase):
         )
         response = self.client.get('/discover/')
         self.assertContains(response, 'Long Post Title')
+
+
+class LemonWebhookTests(TestCase):
+    SECRET = 'test-secret'
+
+    def setUp(self):
+        from django.test import RequestFactory
+        self.factory = RequestFactory()
+
+    def _post(self, payload, event_name='order_created'):
+        import hashlib
+        import hmac as hmac_lib
+        from django.test import override_settings
+        from blogs.subscriptions import lemon_webhook
+
+        body = json.dumps(payload).encode('utf-8')
+        signature = hmac_lib.new(self.SECRET.encode('utf-8'), msg=body, digestmod=hashlib.sha256).hexdigest()
+        request = self.factory.post(
+            '/lemon-webhook/',
+            data=body,
+            content_type='application/json',
+            HTTP_X_SIGNATURE=signature,
+            HTTP_X_EVENT_NAME=event_name,
+        )
+        with override_settings(LEMONSQUEEZY_SIGNATURE=self.SECRET):
+            with mock.patch('blogs.subscriptions.send_async_mail') as mock_mail, \
+                    mock.patch('blogs.subscriptions.sentry_sdk') as mock_sentry:
+                response = lemon_webhook(request)
+        return response, mock_mail, mock_sentry
+
+    @staticmethod
+    def _order_payload(user_id=None, user_email='buyer@example.com', variant_name='Yearly'):
+        payload = {
+            'meta': {'custom_data': {'user_id': user_id} if user_id is not None else {}},
+            'data': {
+                'id': '9001',
+                'attributes': {
+                    'order_number': 1234,
+                    'first_order_item': {'variant_name': variant_name},
+                },
+            },
+        }
+        if user_email is not None:
+            payload['data']['attributes']['user_email'] = user_email
+        return payload
+
+    def test_invalid_signature_rejected(self):
+        from blogs.subscriptions import lemon_webhook
+        from django.test import override_settings
+        request = self.factory.post(
+            '/lemon-webhook/',
+            data=b'{}',
+            content_type='application/json',
+            HTTP_X_SIGNATURE='bogus',
+            HTTP_X_EVENT_NAME='order_created',
+        )
+        with override_settings(LEMONSQUEEZY_SIGNATURE=self.SECRET):
+            response = lemon_webhook(request)
+        self.assertEqual(response.status_code, 403)
+
+    def test_upgrade_via_custom_data_user_id(self):
+        user = User.objects.create(username='alice', email='alice@example.com')
+        response, mock_mail, _ = self._post(self._order_payload(user_id=user.id))
+        self.assertEqual(response.status_code, 200)
+        user.settings.refresh_from_db()
+        self.assertTrue(user.settings.upgraded)
+        self.assertEqual(user.settings.plan_type, 'yearly')
+        self.assertEqual(user.settings.order_id, '9001')
+        self.assertEqual(user.settings.order_email, 'buyer@example.com')
+        mock_mail.assert_not_called()
+
+    def test_stale_user_id_falls_back_to_email(self):
+        user = User.objects.create(username='bob', email='buyer@example.com')
+        response, _, _ = self._post(self._order_payload(user_id=999999))
+        self.assertEqual(response.status_code, 200)
+        user.settings.refresh_from_db()
+        self.assertTrue(user.settings.upgraded)
+
+    def test_non_numeric_user_id_falls_back_to_email(self):
+        user = User.objects.create(username='carol', email='buyer@example.com')
+        response, _, _ = self._post(self._order_payload(user_id='not-a-number'))
+        self.assertEqual(response.status_code, 200)
+        user.settings.refresh_from_db()
+        self.assertTrue(user.settings.upgraded)
+
+    def test_upgrade_via_account_email_case_insensitive(self):
+        user = User.objects.create(username='dave', email='Buyer@Example.com')
+        response, _, _ = self._post(self._order_payload())
+        self.assertEqual(response.status_code, 200)
+        user.settings.refresh_from_db()
+        self.assertTrue(user.settings.upgraded)
+
+    def test_upgrade_via_allauth_email_address(self):
+        from allauth.account.models import EmailAddress
+        user = User.objects.create(username='erin', email='erin@example.com')
+        EmailAddress.objects.create(user=user, email='buyer@example.com', verified=True)
+        response, _, _ = self._post(self._order_payload())
+        self.assertEqual(response.status_code, 200)
+        user.settings.refresh_from_db()
+        self.assertTrue(user.settings.upgraded)
+
+    def test_upgrade_via_previous_order_email(self):
+        user = User.objects.create(username='frank', email='frank@example.com')
+        user.settings.order_email = 'buyer@example.com'
+        user.settings.save()
+        response, _, _ = self._post(self._order_payload())
+        self.assertEqual(response.status_code, 200)
+        user.settings.refresh_from_db()
+        self.assertTrue(user.settings.upgraded)
+
+    def test_duplicate_email_picks_most_recently_active(self):
+        old = User.objects.create(username='old', email='buyer@example.com',
+                                  last_login=timezone.now() - timezone.timedelta(days=400))
+        recent = User.objects.create(username='recent', email='buyer@example.com',
+                                     last_login=timezone.now())
+        never = User.objects.create(username='never', email='buyer@example.com', last_login=None)
+        response, _, _ = self._post(self._order_payload())
+        self.assertEqual(response.status_code, 200)
+        recent.settings.refresh_from_db()
+        old.settings.refresh_from_db()
+        never.settings.refresh_from_db()
+        self.assertTrue(recent.settings.upgraded)
+        self.assertFalse(old.settings.upgraded)
+        self.assertFalse(never.settings.upgraded)
+
+    def test_unmatched_order_emails_purchaser_and_reports(self):
+        response, mock_mail, mock_sentry = self._post(self._order_payload())
+        self.assertEqual(response.status_code, 200)
+        mock_mail.assert_called_once()
+        self.assertEqual(mock_mail.call_args[0][3], ['buyer@example.com'])
+        mock_sentry.capture_message.assert_called_once()
+
+    def test_unmatched_order_without_email_sends_nothing(self):
+        response, mock_mail, mock_sentry = self._post(self._order_payload(user_email=None))
+        self.assertEqual(response.status_code, 200)
+        mock_mail.assert_not_called()
+        mock_sentry.capture_message.assert_called_once()
