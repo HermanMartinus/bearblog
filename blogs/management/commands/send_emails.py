@@ -3,7 +3,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from blogs.helpers import send_async_mail
-from blogs.views.staff import new_upgrades, monthly_users_to_upgrade, free_users_to_nudge
+from blogs.views.staff import new_upgrades, monthly_users_to_upgrade, free_users_to_nudge, blogs_with_orphaned_domains
 
 
 class Command(BaseCommand):
@@ -54,3 +54,21 @@ class Command(BaseCommand):
             user.settings.save()
             count += 1
         self.stdout.write(f"Emailed {count} free users about contributing.")
+
+        # Warn about orphaned domains
+        orphaned_by_user = {}
+        for blog in blogs_with_orphaned_domains()[:10]:
+            orphaned_by_user.setdefault(blog.user, []).append(blog)
+        count = 0
+        for user, user_blogs in orphaned_by_user.items():
+            send_async_mail(
+                "Your custom domain",
+                render_to_string('emails/domain_warning.html', {'blogs': user_blogs}),
+                'Herman Martinus <herman@mg.bearblog.dev>',
+                [user.email],
+                ['Herman Martinus <herman@bearblog.dev>'],
+            )
+            user.settings.orphaned_domain_warning_email_sent = timezone.now()
+            user.settings.save()
+            count += 1
+        self.stdout.write(f"Emailed {count} users about orphaned domains.")
