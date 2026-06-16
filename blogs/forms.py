@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.text import slugify
 
 from .models import Blog, UserSettings
 
@@ -6,12 +7,20 @@ import re
 
 
 class BlogForm(forms.ModelForm):
+    subdomain = forms.CharField(max_length=100)
+
     def __init__(self, *args, **kwargs):
         super(BlogForm, self).__init__(*args, **kwargs)
         self.fields['title'].widget.attrs.update({'placeholder': 'A title for your blog...'})
         self.fields['title'].label = False
         self.fields['subdomain'].widget.attrs.update({'placeholder': 'Preferred subdomain...'})
         self.fields['subdomain'].label = False
+
+    def clean_subdomain(self):
+        subdomain = slugify(self.cleaned_data['subdomain'].split('.')[0]).replace('_', '-')
+        if not subdomain:
+            raise forms.ValidationError('Please enter a valid subdomain.')
+        return subdomain
 
     class Meta:
         model = Blog
