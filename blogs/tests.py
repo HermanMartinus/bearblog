@@ -8,6 +8,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.utils.safestring import SafeString
 
+from blogs.forms import BlogForm
 from blogs.models import Blog, Post, Stylesheet
 from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer, replace_inline_latex, escape_currency, fix_links, clean, element_replacement, excluding_pre
 
@@ -2502,3 +2503,54 @@ class LemonWebhookTests(TestCase):
         self.assertEqual(response.status_code, 200)
         mock_mail.assert_not_called()
         mock_sentry.capture_message.assert_called_once()
+
+
+class BlogFormSubdomainTests(TestCase):
+    def _clean(self, raw):
+        form = BlogForm({'title': 'A blog', 'subdomain': raw})
+        return form
+
+    def test_plain_subdomain_unchanged(self):
+        form = self._clean('myblog')
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['subdomain'], 'myblog')
+
+    def test_uppercase_lowercased(self):
+        form = self._clean('MyBlog')
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['subdomain'], 'myblog')
+
+    def test_spaces_become_hyphens(self):
+        form = self._clean('my cool blog')
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['subdomain'], 'my-cool-blog')
+
+    def test_underscores_become_hyphens(self):
+        form = self._clean('my_cool_blog')
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['subdomain'], 'my-cool-blog')
+
+    def test_full_domain_uses_first_label(self):
+        form = self._clean('myblog.bearblog.dev')
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['subdomain'], 'myblog')
+
+    def test_invalid_characters_stripped(self):
+        form = self._clean('My Blog!!! 2024')
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['subdomain'], 'my-blog-2024')
+
+    def test_only_invalid_characters_rejected(self):
+        form = self._clean('!!!')
+        self.assertFalse(form.is_valid())
+        self.assertIn('subdomain', form.errors)
+
+    def test_leading_dot_rejected(self):
+        form = self._clean('.com')
+        self.assertFalse(form.is_valid())
+        self.assertIn('subdomain', form.errors)
+
+    def test_blank_subdomain_rejected(self):
+        form = self._clean('')
+        self.assertFalse(form.is_valid())
+        self.assertIn('subdomain', form.errors)
