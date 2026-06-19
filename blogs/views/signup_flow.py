@@ -5,6 +5,7 @@ from django.utils.text import slugify
 from django.contrib.auth import get_user_model, login
 
 from blogs.models import Blog
+from blogs.helpers import is_protected
 
 import random
 
@@ -28,6 +29,11 @@ def signup(request):
 
     # Check subdomain unique
     if subdomain and Blog.objects.filter(subdomain=subdomain).count():
+        error_messages.append('This subdomain has already been taken')
+        subdomain = ''
+
+    # Check subdomain not protected
+    if subdomain and is_protected(subdomain):
         error_messages.append('This subdomain has already been taken')
         subdomain = ''
 
