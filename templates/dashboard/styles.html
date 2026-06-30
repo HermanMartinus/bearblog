@@ -12,13 +12,41 @@
 
 {% block content %}
 <h1>Themes</h1>
-<div style="width: 100%;text-align:right;">→</div>
-<div
-  style="display: grid;grid-template-columns: 150px 150px 150px 150px 150px 150px 150px;grid-gap: 27px;overflow-x: scroll;padding-bottom: 20px;"
-  id="themes"
->
+<style>
+  #themes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 18px;
+    height: 480px;
+    overflow-y: scroll;
+    margin-bottom: 30px;
+    padding-right: 1px;
+  }
+
+  #themes::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  #themes::-webkit-scrollbar-track {
+    background: #eceff4;
+    border-radius: 5px;
+  }
+
+  #themes::-webkit-scrollbar-thumb {
+    background: #c0c4cc;
+    border-radius: 5px;
+  }
+
+  #themes > div {
+    box-sizing: border-box;
+    background-color: #eceff4;
+    padding: 8px;
+    text-align: center;
+  }
+</style>
+<div id="themes">
   {% for style in stylesheets %}
-  <div style="width:100%; background-color: #eceff4; padding: 3px; text-align: center;">
+  <div>
     <img src="{{ style.image }}" height=100>
     <br>
     <b style="color: #444">{{ style.title }}</b>
@@ -40,7 +68,6 @@
   </div>
   {% endfor %}
 </div>
-<div style="width: 100%;text-align:right;">→</div>
 
 <form method="POST" class="post-form full-width">
   <p class="sticky-controls">
