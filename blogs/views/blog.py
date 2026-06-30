@@ -138,8 +138,12 @@ def posts(request, blog):
     else:
         available_tags = set(blog.tags)
 
-    # Only include tags that aren't already active and are available
-    tags_to_show = [tag for tag in blog.tags if tag not in tags and tag not in exclude_tags and tag in available_tags]
+    # Only include tags that aren't already active and are available.
+    # Stop offering more tags once 3 are selected.
+    if len(tags) >= 3:
+        tags_to_show = []
+    else:
+        tags_to_show = [tag for tag in blog.tags if tag not in tags and tag not in exclude_tags and tag in available_tags]
     
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
     blog_path_title = blog.blog_path.replace('-', ' ').capitalize() or 'Blog'
