@@ -8,7 +8,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.utils.safestring import SafeString
 
-from blogs.forms import BlogForm
+from blogs.forms import BlogForm, AdvancedSettingsForm
 from blogs.models import Blog, Post, Stylesheet
 from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer, replace_inline_latex, escape_currency, fix_links, clean, element_replacement, excluding_pre
 
@@ -2554,3 +2554,48 @@ class BlogFormSubdomainTests(TestCase):
         form = self._clean('')
         self.assertFalse(form.is_valid())
         self.assertIn('subdomain', form.errors)
+
+
+class MetaTagValidationTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='metauser', password='pass')
+        self.blog = Blog.objects.create(user=self.user, title='Meta Blog', subdomain='meta-blog')
+
+    def _meta_tag_valid(self, value):
+        # Field cleans run independently, so meta_tag's own validity is
+        # reflected by whether it appears in form.errors, regardless of
+        # other required fields.
+        form = AdvancedSettingsForm(data={'meta_tag': value}, instance=self.blog)
+        form.is_valid()
+        return 'meta_tag' not in form.errors
+
+    # --- Should stay valid ---
+
+    def test_valid_meta_tag_accepted(self):
+        self.assertTrue(self._meta_tag_valid('<meta name="google-site-verification" content="abc123">'))
+
+    def test_self_closing_meta_tag_accepted(self):
+        self.assertTrue(self._meta_tag_valid('<meta name="x" content="y" />'))
+
+    def test_empty_is_valid(self):
+        self.assertTrue(self._meta_tag_valid(''))
+
+    def test_surrounding_whitespace_accepted(self):
+        self.assertTrue(self._meta_tag_valid('\n  <meta name="x" content="y">  \n'))
+
+    # --- Should stay invalid (blocklist / shape) ---
+
+    def test_plain_text_rejected(self):
+        self.assertFalse(self._meta_tag_valid('not a meta tag'))
+
+    def test_javascript_scheme_inside_tag_rejected(self):
+        self.assertFalse(self._meta_tag_valid('<meta name="x" content="javascript:alert(1)">'))
+
+    # --- Bypasses that fullmatch closes (fail before, pass after) ---
+
+    def test_content_before_meta_tag_rejected(self):
+        self.assertFalse(self._meta_tag_valid('<script>alert(1)</script><meta name="x" content="y">'))
+
+    def test_content_after_meta_tag_rejected(self):
+        self.assertFalse(self._meta_tag_valid('<meta name="x" content="y"><img src=x onload=alert(1)>'))

@@ -118,10 +118,10 @@ class AdvancedSettingsForm(forms.ModelForm):
     )
 
     def clean_meta_tag(self):
-        meta_tag = self.cleaned_data.get('meta_tag')
+        meta_tag = (self.cleaned_data.get('meta_tag') or '').strip()
         if meta_tag:
             pattern = r'<meta\s+((?!\b(?:javascript|script|url|onerror)\b)[^>])*?>'
-            if not re.search(pattern, meta_tag, re.IGNORECASE):
+            if not re.fullmatch(pattern, meta_tag, re.IGNORECASE):
                 raise forms.ValidationError("Invalid meta tag")
         return meta_tag
 

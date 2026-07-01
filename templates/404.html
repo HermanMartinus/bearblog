@@ -4,6 +4,8 @@
 
 {% block page_type %}not-found{% endblock %}
 
+{% block seo %}{% if blog %}{{ blog.meta_tag | safe }}{% endif %}{% endblock %}
+
 {% block custom_styles %}{% include 'snippets/styles.html' with blog=blog %}{% endblock %}
 
 {% block heading %}{{ blog.title }}{% endblock %}
