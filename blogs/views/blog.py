@@ -8,7 +8,10 @@ from blogs.models import Blog, Post, Upvote
 from blogs.helpers import salt_and_hash, unmark
 from blogs.views.analytics import render_analytics
 
+import json
 import os
+
+
 def resolve_address(request):
     http_host = request.get_host()
 
@@ -129,6 +132,9 @@ def posts(request, blog):
     exclude_tags = [t[1:] for t in tags if t.startswith('-') and len(t) > 1]
 
     if include_tags or exclude_tags:
+        # SQL prefilter to only fetch candidate rows; the Python check below stays exact
+        for t in include_tags:
+            posts = posts.filter(all_tags__contains=json.dumps(t))
         posts = [post for post in posts if
             all(t in post.tags for t in include_tags) and
             not any(t in post.tags for t in exclude_tags)]

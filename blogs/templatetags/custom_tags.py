@@ -18,6 +18,7 @@ from mistune.directives import FencedDirective, RSTDirective
 from mistune.directives import Admonition, TableOfContents
 from zoneinfo import ZoneInfo
 
+import json
 import latex2mathml.converter
 import re
 
@@ -315,6 +316,9 @@ def apply_filters(posts, tag=None, limit=None, order=None, from_date=None, to_da
         include_tags = [t for t in tags if t and not t.startswith('-')]
         exclude_tags = [t[1:] for t in tags if t.startswith('-') and len(t) > 1]
         if include_tags or exclude_tags:
+            # SQL prefilter to only fetch candidate rows; the Python check below stays exact
+            for t in include_tags:
+                posts = posts.filter(all_tags__contains=json.dumps(t))
             posts = [post for post in posts if
                 all(t in post.tags for t in include_tags) and
                 not any(t in post.tags for t in exclude_tags)]
