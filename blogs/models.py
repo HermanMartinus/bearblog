@@ -413,6 +413,9 @@ class Hit(models.Model):
             
             # For country aggregation
             models.Index(fields=['blog', 'created_date', 'country'], name='hit_blog_date_country'),
+
+            # For the get_or_create dedupe lookup in the hit endpoint
+            models.Index(fields=['blog', 'hash_id', 'post'], name='hit_blog_hash_post'),
         ]
 
     def __str__(self):
