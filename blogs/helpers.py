@@ -92,11 +92,16 @@ def salt_and_hash(request, duration='day'):
     return hash_id
 
 
+_geoip = None
+
+
 def get_country(user_ip):
     # user_ip = '45.222.31.178'
+    global _geoip
     try:
-        g = GeoIP2()
-        country = g.country(user_ip)
+        if _geoip is None:
+            _geoip = GeoIP2()
+        country = _geoip.country(user_ip)
 
         return country
     except geoip2.errors.AddressNotFoundError:
