@@ -259,6 +259,13 @@ class Blog(models.Model):
         return f'{self.title} ({self.useful_domain})'
 
 
+class PostManager(models.Manager):
+    # search_vector is only ever written via raw SQL and used as a filter,
+    # never read as a value — don't fetch it by default
+    def get_queryset(self):
+        return super().get_queryset().defer('search_vector')
+
+
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='posts')
     uid = models.CharField(max_length=200, db_index=True)
@@ -285,6 +292,8 @@ class Post(models.Model):
     hidden = models.BooleanField(default=False, db_index=True)
     content_length = models.IntegerField(default=0, db_index=True)
     search_vector = SearchVectorField(null=True)
+
+    objects = PostManager()
 
     @property
     def contains_code(self):

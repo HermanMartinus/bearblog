@@ -95,7 +95,7 @@ def posts_edit(request, id):
     else:
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
-    posts = Post.objects.filter(blog=blog, is_page=False).order_by('-published_date')
+    posts = Post.objects.filter(blog=blog, is_page=False).defer('content').order_by('-published_date')
 
     return render(request, 'dashboard/posts.html', {
         'pages': False,
@@ -111,7 +111,7 @@ def pages_edit(request, id):
     else:
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
-    posts = Post.objects.filter(blog=blog, is_page=True).order_by('-published_date')
+    posts = Post.objects.filter(blog=blog, is_page=True).defer('content').order_by('-published_date')
 
     return render(request, 'dashboard/posts.html', {
         'pages': True,

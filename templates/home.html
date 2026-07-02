@@ -44,12 +44,6 @@
 {% include "snippets/post_list.html" %}
 {% endif %}
 
-{% if posts.empty %}
-<p>
-    No posts yet
-</p>
-{% endif %}
-
 {% if blog.analytics_active %}
     <script>
     window.addEventListener("load", () => {

@@ -88,7 +88,7 @@ def home(request):
         # Don't cache here because of dashboard
         return render(request, 'landing.html')
 
-    all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).order_by('-published_date')
+    all_posts = blog.posts.filter(publish=True, published_date__lte=timezone.now(), is_page=False).defer('content').order_by('-published_date')
 
     meta_description = blog.meta_description or unmark(blog.content)[:157] + '...'
     
@@ -119,11 +119,11 @@ def posts(request, blog):
     tags = [t for t in tags if t]  # Remove empty strings
     
     posts = blog.posts.filter(
-        blog=blog, 
-        publish=True, 
-        published_date__lte=timezone.now(), 
+        blog=blog,
+        publish=True,
+        published_date__lte=timezone.now(),
         is_page=False
-    ).order_by('-published_date')
+    ).defer('content').order_by('-published_date')
     
     include_tags = [t for t in tags if not t.startswith('-')]
     exclude_tags = [t[1:] for t in tags if t.startswith('-') and len(t) > 1]
