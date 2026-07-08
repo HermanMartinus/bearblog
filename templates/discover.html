@@ -193,7 +193,7 @@
     {% if previous_page >= 0 %}
     <a href="?page={{ previous_page }}{% if newest %}&newest=true{% endif %}">&laquo; Previous</a> |
     {% endif %}
-    {% if posts %}
+    {% if posts and next_page %}
     <a href="?page={{ next_page }}{% if newest %}&newest=true{% endif %}">Next &raquo;</a>
     {% endif %}
 </p>

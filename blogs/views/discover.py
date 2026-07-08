@@ -12,6 +12,7 @@ import random
 from feedgen.feed import FeedGenerator
 
 posts_per_page = 20
+max_page = 5000
 
 
 def get_base_query(user=None):
@@ -93,6 +94,7 @@ def discover(request):
         page = max(int(request.GET.get("page", 0) or 0), 0)
     except ValueError:
         page = 0
+    page = min(page, max_page)
 
     posts_from = page * posts_per_page
     posts_to = (page * posts_per_page) + posts_per_page
@@ -160,7 +162,7 @@ def discover(request):
         "available_languages": get_available_languages(),
         "posts": posts,
         "previous_page": page - 1,
-        "next_page": page + 1,
+        "next_page": page + 1 if page < max_page else None,
         "posts_from": posts_from,
         "newest": newest,
         "random": random_feed,
@@ -241,6 +243,7 @@ def search(request):
         page = max(int(request.GET.get("page", 0) or 0), 0)
     except ValueError:
         page = 0
+    page = min(page, max_page)
 
     posts_from = page * posts_per_page
     posts_to = posts_from + posts_per_page
@@ -257,7 +260,7 @@ def search(request):
         "posts": posts,
         "search_string": search_string,
         "previous_page": page - 1,
-        "next_page": page + 1,
+        "next_page": page + 1 if page < max_page else None,
     })
 
 

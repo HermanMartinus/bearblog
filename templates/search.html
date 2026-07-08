@@ -69,7 +69,7 @@
     {% if previous_page >= 0 %}
     <a href="?query={{ search_string|urlencode }}&page={{ previous_page }}">&laquo; Previous</a> |
     {% endif %}
-    {% if posts %}
+    {% if posts and next_page %}
     <a href="?query={{ search_string|urlencode }}&page={{ next_page }}">Next &raquo;</a>
     {% endif %}
 </p>
