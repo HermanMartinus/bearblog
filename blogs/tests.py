@@ -4,7 +4,9 @@ from unittest import mock
 from zoneinfo import ZoneInfo
 
 from django.contrib.auth.models import User
+from django.core import mail
 from django.test import TestCase, override_settings
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import SafeString
 
@@ -2599,3 +2601,40 @@ class MetaTagValidationTests(TestCase):
 
     def test_content_after_meta_tag_rejected(self):
         self.assertFalse(self._meta_tag_valid('<meta name="x" content="y"><img src=x onload=alert(1)>'))
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class HostHeaderInjectionTests(TestCase):
+    """Auth email links must be pinned to the canonical host, never an
+    attacker-supplied X-Forwarded-Host (host header poisoning)."""
+
+    def setUp(self):
+        from allauth.account.models import EmailAddress
+        self.user = User.objects.create_user(
+            username='victim', email='victim@example.com', password='pass')
+        EmailAddress.objects.create(
+            user=self.user, email='victim@example.com',
+            verified=True, primary=True)
+        self.reset_url = reverse('account_reset_password')
+
+    def _request_reset(self, **extra):
+        self.client.get(self.reset_url)  # sets csrftoken cookie
+        token = self.client.cookies['csrftoken'].value
+        return self.client.post(
+            self.reset_url,
+            {'email': 'victim@example.com', 'csrfmiddlewaretoken': token},
+            **extra,
+        )
+
+    def test_reset_link_ignores_forwarded_host(self):
+        response = self._request_reset(HTTP_X_FORWARDED_HOST='attacker.com')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        body = mail.outbox[0].body
+        self.assertNotIn('attacker.com', body)
+        self.assertIn('https://testserver/', body)
+
+    def test_reset_link_uses_canonical_host_normally(self):
+        self._request_reset()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('https://testserver/', mail.outbox[0].body)

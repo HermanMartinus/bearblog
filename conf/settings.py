@@ -138,6 +138,7 @@ if not DEBUG:
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*']
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+ACCOUNT_ADAPTER = 'blogs.adapters.AccountAdapter'
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 90 # 90 days
 
 # Database
