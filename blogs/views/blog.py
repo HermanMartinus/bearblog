@@ -2,8 +2,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from django.core.cache import cache
-from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from blogs.models import Blog, Post, Upvote
 from blogs.helpers import salt_and_hash, unmark
 from blogs.views.analytics import render_analytics
@@ -35,36 +34,20 @@ def get_blog_with_domain(domain):
     if not domain:
         return False
 
-    pk = get_domain_id(domain)
-    if not pk:
+    # Indexed lookup on domain, matching with and without the www. prefix
+    blog = Blog.objects.select_related('user').select_related('user__settings').filter(
+        Q(domain=clean_domain(domain)) | Q(domain=f'www.{clean_domain(domain)}'),
+        user__is_active=True
+    ).first()
+
+    if not blog:
         raise Http404
 
-    try:
-        # Single PK lookup
-        return Blog.objects.select_related('user').select_related('user__settings').get(pk=pk, user__is_active=True)
-    except ObjectDoesNotExist:
-        raise Http404
+    return blog
 
 
-def get_domain_id(check):
-    if not check:
-        return None
-    
-    domain_map = cache.get('domain_map')
-
-    if domain_map is None:
-        domain_map = {
-            domain.strip().lower().removeprefix('www.'): pk
-            for domain, pk in Blog.objects
-                .exclude(domain__isnull=True)
-                .exclude(domain='')
-                .values_list('domain', 'pk')
-        }
-        cache.set('domain_map', domain_map, timeout=3600)
-
-    clean = check.strip().lower().removeprefix('www.')
-
-    return domain_map.get(clean)
+def clean_domain(domain):
+    return domain.strip().lower().removeprefix('www.')
 
 
 @csrf_exempt
@@ -75,7 +58,7 @@ def ping(request):
         return HttpResponse('Invalid domain', status=422, content_type='text/plain')
 
     try:
-        if get_domain_id(domain):
+        if Blog.objects.filter(Q(domain=clean_domain(domain)) | Q(domain=f'www.{clean_domain(domain)}')).exists():
             # print('Ping! Found correct blog. Issuing certificate for', domain)
             return HttpResponse('Ping', status=200, content_type='text/plain')
     except:

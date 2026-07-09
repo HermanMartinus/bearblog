@@ -7,7 +7,6 @@ from django.http import HttpResponseBadRequest
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import URLValidator
-from django.core.cache import cache
 
 from zoneinfo import ZoneInfo
 from datetime import datetime
@@ -520,18 +519,12 @@ def custom_domain_edit(request, id):
                 validator('http://' + custom_domain)
                 blog.domain = custom_domain
                 blog.save()
-
-                # Invalidate domain_map cache
-                cache.delete('domain_map')
             except ValidationError:
                 error_messages.append(f'{custom_domain} is an invalid domain')
                 print("error")
         elif not custom_domain:
             blog.domain = ''
             blog.save()
-
-            # Invalidate domain_map cache
-            cache.delete('domain_map')
         else:
             error_messages.append(f"{custom_domain} is already registered with another blog")
 
@@ -552,8 +545,6 @@ def remove_domain(request, id):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
     blog.domain = ""
     blog.save()
-    # Invalidate domain_map cache
-    cache.delete('domain_map')
     blog.user.settings.orphaned_domain_warning_email_sent = None
     blog.user.settings.save()
     return redirect('dashboard', id=blog.subdomain)

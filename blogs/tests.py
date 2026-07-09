@@ -878,8 +878,6 @@ class ContentTypeTests(TestCase):
     def test_ping_valid_returns_text_plain(self):
         self.blog.domain = 'example.com'
         self.blog.save()
-        from django.core.cache import cache
-        cache.delete('domain_map')
         response = self.client.get('/ping/', {'domain': 'example.com'})
         self.assertEqual(response.status_code, 200)
         self.assertIn('text/plain', response['Content-Type'])
@@ -1079,6 +1077,30 @@ class ResolveAddressTests(TestCase):
     def test_robots_with_subdomain(self):
         response = self.client.get('/robots.txt', SERVER_NAME='myblog.testserver')
         self.assertEqual(response.status_code, 200)
+
+
+class RateLimitMiddlewareTests(TestCase):
+    def _middleware(self):
+        from django.http import HttpResponse
+        from blogs.middleware import RateLimitMiddleware
+        middleware = RateLimitMiddleware(lambda request: HttpResponse('ok'))
+        middleware.RATE_LIMIT = 5
+        return middleware
+
+    def _flood(self, middleware, path):
+        from django.test import RequestFactory
+        factory = RequestFactory()
+        responses = [middleware(factory.get(path)) for _ in range(middleware.RATE_LIMIT * 2)]
+        return responses[-1]
+
+    def test_ping_path_exempt_from_rate_limit(self):
+        for path in ('/ping/', '/ping'):
+            response = self._flood(self._middleware(), path)
+            self.assertEqual(response.status_code, 200)
+
+    def test_path_containing_ping_is_rate_limited(self):
+        response = self._flood(self._middleware(), '/shipping-update/')
+        self.assertEqual(response.status_code, 429)
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})

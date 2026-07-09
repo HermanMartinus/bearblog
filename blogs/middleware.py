@@ -70,7 +70,7 @@ class RateLimitMiddleware:
             return JsonResponse({"error": "Bad Request"}, status=400)
 
         # Skip rate limiting for ping (Caddy)
-        if 'ping' in request.path:
+        if request.path in ('/ping', '/ping/'):
             return self.get_response(request)
 
         client_ip_address = client_ip(request)

@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.cache import cache
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, JsonResponse
@@ -295,8 +294,6 @@ def actions(request):
                 blog.user.settings.orphaned_domain_warning_email_sent = None
                 blog.user.settings.save()
                 count += 1
-            if count:
-                cache.delete('domain_map')
             result = f"Removed domains from {count} blogs."
             overdue_blogs = list(Blog.objects.filter(
                 user__settings__upgraded=False,
