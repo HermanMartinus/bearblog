@@ -23,6 +23,11 @@ There is **no staging server**.
 ### bearblog.dev subdomains
 Cloudflare handles DNS and SSL for `*.bearblog.dev`. Cloudflare also does the heavy lifting for caching and bot deterrence. Cache is invalidated per-blog using Cloudflare cache tags (keyed on subdomain) whenever a blog or post is saved.
 
+Cloudflare→Heroku traffic runs on **Full (Strict)** SSL (since 2026-07-10), backed by a Cloudflare Origin CA certificate for `bearblog.dev` + `*.bearblog.dev` uploaded to Heroku (`heroku certs -a bear-blog`).
+
+- **The cert expires 2041-07-06 and must be renewed manually.** Cloudflare does NOT send expiry warnings for Origin CA certs (only for custom edge certs), and Heroku doesn't either for manually uploaded certs. If it lapses, all `bearblog.dev` traffic 526s. Renew via Cloudflare dashboard → SSL/TLS → Origin Server → Create Certificate, then `heroku certs:update`.
+- Cloudflare DNS records must point at the per-domain `herokudns.com` DNS targets (listed by `heroku domains -a bear-blog`), never at `bear-blog.herokuapp.com` — the shared endpoint doesn't serve the custom cert, so strict validation would fail.
+
 ### Custom domains
 A **Caddy** server running on a Digital Ocean droplet handles custom domain SSL and reverse proxies to `https://bearblog.dev`. It uses on-demand TLS, verifying domains by querying `https://bearblog.dev/ping/` before issuing a cert.
 
@@ -88,4 +93,3 @@ Post scores use an HN-style algorithm (log of upvotes + time decay, capped at 30
 2. `ConditionalXFrameOptionsMiddleware` — `X-Frame-Options: DENY` on main domains only
 3. GZip, Security, WhiteNoise, Sessions, DebugToolbar, Common
 4. `AllowAnyDomainCsrfMiddleware` — custom CSRF handling to support custom domains
-

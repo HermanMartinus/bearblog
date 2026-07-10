@@ -116,3 +116,6 @@ sync_data.sh
 CLAUDE.md
 .claude*
 Caddyfile.dev
+.agents
+AGENTS.md
+.codex
