@@ -1,39 +1,11 @@
 from django.db import connection
 from django.http import JsonResponse
-from django.middleware.csrf import (
-    CsrfViewMiddleware,
-    REASON_NO_CSRF_COOKIE,
-    REASON_CSRF_TOKEN_MISSING,
-    REASON_BAD_ORIGIN
-)
 
 import os
 import time
 from collections import defaultdict
 
 from ipaddr import client_ip
-
-
-# This is a workaround to handle custom domains from Django 5.0 there's an explicit CSRF_TRUSTED_ORIGINS list
-class AllowAnyDomainCsrfMiddleware(CsrfViewMiddleware):
-    def process_view(self, request, callback, callback_args, callback_kwargs):
-        if getattr(callback, 'csrf_exempt', False):
-            return None
-
-        if request.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
-            # Only check token for unsafe methods
-            try:
-                return self._check_token(request)
-            except Exception as e:
-                # Determine the appropriate reason based on the error message
-                if 'CSRF cookie not set' in str(e):
-                    reason = REASON_NO_CSRF_COOKIE
-                elif 'CSRF token missing' in str(e):
-                    reason = REASON_CSRF_TOKEN_MISSING
-                else:
-                    reason = REASON_BAD_ORIGIN
-                
-                return self._reject(request, reason)
 
 
 # Prevent clickjacking on root domains

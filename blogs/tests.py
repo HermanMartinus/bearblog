@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 from django.contrib.auth.models import User
 from django.core import mail
-from django.test import TestCase, override_settings
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import SafeString
@@ -268,11 +268,11 @@ class DiscoverCSRFTests(TestCase):
 
     def test_staff_post_without_csrf_token_is_rejected(self):
         """Staff POST without CSRF token should be rejected with 403."""
-        self.client.login(username='staffuser', password='pass')
-        response = self.client.post(
+        client = Client(enforce_csrf_checks=True)
+        client.login(username='staffuser', password='pass')
+        response = client.post(
             '/discover/',
             {'hide-post': self.post.pk},
-            enforce_csrf_checks=True,
         )
         self.assertEqual(response.status_code, 403)
         self.post.refresh_from_db()

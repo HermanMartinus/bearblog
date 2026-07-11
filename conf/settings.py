@@ -57,7 +57,7 @@ if not DEBUG:
 
 # Host & proxy settings
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://*.bearblog.dev', 'https://bearblog.dev']
+CSRF_TRUSTED_ORIGINS = ['https://bearblog.dev', 'https://www.bearblog.dev']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
@@ -99,7 +99,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'blogs.middleware.AllowAnyDomainCsrfMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -140,6 +140,10 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 ACCOUNT_ADAPTER = 'blogs.adapters.AccountAdapter'
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 90 # 90 days
+# TODO: Deploy this at the same time as removing redis
+# if not DEBUG:
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
