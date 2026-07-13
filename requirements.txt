@@ -13,7 +13,6 @@ mistune==3.2.1
 Pillow==12.2.0
 Pygments==2.20.0
 psycopg2==2.9.10
-redis==7.1.0
 requests==2.33.0
 sentry-sdk==2.19.0
 tzdata>=2025.1 # Keeps the timezone data up to date

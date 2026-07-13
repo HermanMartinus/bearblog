@@ -4,10 +4,10 @@ Bear is a Django-based blogging platform. Users get a subdomain at `*.bearblog.d
 
 ## Stack
 
-- **Framework:** Django 5.2, Python 3.13
+- **Framework:** Django 6.0, Python 3.13
 - **Server:** Gunicorn (`conf.wsgi`), 24s timeout, max 10k requests per worker
 - **Database:** Heroku Postgres. SQLite used as fallback locally.
-- **Cache / Sessions:** RedisCloud (TLS). Falls back to no cache in dev.
+- **Sessions:** Database-backed (`django_session` table)
 - **Static files:** WhiteNoise (GZip compressed)
 
 ## Deployment
@@ -50,7 +50,6 @@ Reviewed blog content (posts + blog metadata as CSV) is backed up to a separate 
 |---------|---------|
 | **Cloudflare** | DNS, SSL (`.bearblog.dev`), caching, bot deterrence |
 | **Heroku Postgres** | Primary database |
-| **RedisCloud** | Cache + session store |
 | **Digital Ocean Spaces** | Image CDN + blog content backups |
 | **Digital Ocean Droplet** | Caddy reverse proxy for custom domains |
 | **LemonSqueezy** | Subscription payments. Webhooks upgrade/downgrade `UserSettings`. |
