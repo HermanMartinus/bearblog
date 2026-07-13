@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -318,6 +319,163 @@ class DiscoverCSRFTests(TestCase):
         self._post_with_csrf('/discover/', {'subdomain': 'testblog', 'action': 'unhide'})
         self.regular_user.settings.refresh_from_db()
         self.assertNotIn('testblog', self.regular_user.settings.discovery_hide_list)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'lh.co,localhost'})
+class PreviewCSRFTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='preview-user', password='pass')
+        self.user.settings.upgraded = True
+        self.user.settings.save()
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Preview Blog',
+            subdomain='preview-blog',
+        )
+        self.client = Client(enforce_csrf_checks=True)
+        self.client.login(username='preview-user', password='pass')
+        self.editor_url = '/preview-blog/dashboard/posts/new/'
+        self.preview_url = '/preview-blog/dashboard/preview/?type=post'
+        self.preview_data = {
+            'header_content': 'title: Preview',
+            'body_content': '<script>alert(1)</script>',
+        }
+
+    def _csrf_token_from_editor(self):
+        response = self.client.get(self.editor_url, HTTP_HOST='lh.co')
+        self.assertEqual(response.status_code, 200)
+        return self.client.cookies['csrftoken'].value, response
+
+    def test_cross_site_preview_is_rejected_even_with_matching_token(self):
+        token, _ = self._csrf_token_from_editor()
+        response = self.client.post(
+            self.preview_url,
+            {**self.preview_data, 'csrfmiddlewaretoken': token},
+            HTTP_HOST='lh.co',
+            HTTP_ORIGIN='http://attacker.lh.co',
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_same_origin_preview_works_with_editor_token(self):
+        token, editor_response = self._csrf_token_from_editor()
+        self.assertContains(editor_response, 'previewForm.appendChild(csrfToken)')
+
+        response = self.client.post(
+            self.preview_url,
+            {**self.preview_data, 'csrfmiddlewaretoken': token},
+            HTTP_HOST='lh.co',
+            HTTP_ORIGIN='http://lh.co',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<script>alert(1)</script>', html=True)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'lh.co,localhost'})
+class UploadCSRFTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='upload-user', password='pass')
+        self.user.settings.upgraded = True
+        self.user.settings.save()
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Upload Blog',
+            subdomain='upload-blog',
+        )
+        self.client = Client(enforce_csrf_checks=True)
+        self.client.login(username='upload-user', password='pass')
+        self.editor_url = '/upload-blog/dashboard/posts/new/'
+        self.upload_url = '/upload-blog/dashboard/upload-image/'
+
+    def _csrf_token_from_editor(self):
+        response = self.client.get(self.editor_url, HTTP_HOST='lh.co')
+        self.assertEqual(response.status_code, 200)
+        return self.client.cookies['csrftoken'].value, response
+
+    @mock.patch('blogs.views.media.upload_files')
+    def test_cross_site_upload_is_rejected_even_with_matching_token(self, mock_upload):
+        token, _ = self._csrf_token_from_editor()
+        response = self.client.post(
+            self.upload_url,
+            {'file': SimpleUploadedFile('attack.svg', b'<svg/>', content_type='image/svg+xml')},
+            HTTP_HOST='lh.co',
+            HTTP_ORIGIN='http://attacker.lh.co',
+            HTTP_X_CSRFTOKEN=token,
+        )
+
+        self.assertEqual(response.status_code, 403)
+        mock_upload.assert_not_called()
+
+    @mock.patch('blogs.views.media.upload_files', return_value=['https://example.com/test.svg'])
+    def test_same_origin_upload_works_with_editor_token(self, mock_upload):
+        token, editor_response = self._csrf_token_from_editor()
+        self.assertContains(editor_response, 'xhr.setRequestHeader("X-CSRFToken"')
+
+        response = self.client.post(
+            self.upload_url,
+            {'file': SimpleUploadedFile('test.svg', b'<svg/>', content_type='image/svg+xml')},
+            HTTP_HOST='lh.co',
+            HTTP_ORIGIN='http://lh.co',
+            HTTP_X_CSRFTOKEN=token,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        mock_upload.assert_called_once()
+
+    @mock.patch('blogs.views.media.prefill_blog_media')
+    def test_media_page_upload_includes_csrf_header(self, mock_prefill):
+        response = self.client.get('/upload-blog/dashboard/media/', HTTP_HOST='lh.co')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'xhr.setRequestHeader("X-CSRFToken"')
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'lh.co,localhost'})
+class DeleteEmptyCSRFTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='staff-delete-user',
+            password='pass',
+            is_staff=True,
+        )
+        self.client = Client(enforce_csrf_checks=True)
+        self.client.login(username='staff-delete-user', password='pass')
+        self.url = '/staff/dashboard/delete-empty/'
+
+    @mock.patch('blogs.views.staff.empty_blogs')
+    def test_get_is_rejected_without_deleting(self, mock_empty_blogs):
+        response = self.client.get(self.url, HTTP_HOST='lh.co')
+
+        self.assertEqual(response.status_code, 405)
+        mock_empty_blogs.assert_not_called()
+
+    @mock.patch('blogs.views.staff.empty_blogs')
+    def test_post_without_csrf_token_is_rejected(self, mock_empty_blogs):
+        response = self.client.post(self.url, HTTP_HOST='lh.co')
+
+        self.assertEqual(response.status_code, 403)
+        mock_empty_blogs.assert_not_called()
+
+    @mock.patch('blogs.views.staff.empty_blogs')
+    def test_post_with_csrf_token_deletes_empty_blogs(self, mock_empty_blogs):
+        empty_blog = mock.Mock()
+        mock_empty_blogs.return_value = [empty_blog]
+        token_response = self.client.get('/accounts/delete/', HTTP_HOST='lh.co')
+        token = self.client.cookies['csrftoken'].value
+
+        response = self.client.post(
+            self.url,
+            {'csrfmiddlewaretoken': token},
+            HTTP_HOST='lh.co',
+            HTTP_ORIGIN='http://lh.co',
+        )
+
+        self.assertEqual(token_response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
+        empty_blog.delete.assert_called_once_with()
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})

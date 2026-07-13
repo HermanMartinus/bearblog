@@ -130,6 +130,7 @@ function uploadNextFile(index, files) {
     const eventSource = xhr.upload || xhr;
 
     xhr.open("POST", target, true);
+    xhr.setRequestHeader("X-CSRFToken", document.querySelector('#deleteForm [name="csrfmiddlewaretoken"]').value);
     xhr.send(formData);
 
     function nextOrReload() {

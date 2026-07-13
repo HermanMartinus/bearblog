@@ -230,6 +230,7 @@
 		const eventSource = xhr.upload || xhr;
 
 		xhr.open("POST", target, true);
+		xhr.setRequestHeader("X-CSRFToken", $form.querySelector('[name="csrfmiddlewaretoken"]').value);
 		xhr.send(formData);
 
 		xhr.onload = function() {

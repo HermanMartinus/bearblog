@@ -1,7 +1,6 @@
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -80,7 +79,6 @@ def media_center(request, id):
     })
 
 
-@csrf_exempt
 @login_required
 def upload_image(request, id):
     if request.user.is_superuser:
@@ -310,5 +308,4 @@ def delete_selected_media(request, id):
             
         
     return redirect('media_center', id=id)
-
 

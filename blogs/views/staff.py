@@ -511,8 +511,9 @@ def import_posts_from_csv(subdomain, csv_file):
 
 @staff_member_required
 def delete_empty(request):
-    for blog in empty_blogs():
-        blog.delete()
+    if request.method == "POST":
+        for blog in empty_blogs():
+            blog.delete()
 
     return redirect('staff_dashboard')
 
