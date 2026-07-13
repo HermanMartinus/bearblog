@@ -8,6 +8,21 @@ from collections import defaultdict
 from ipaddr import client_ip
 
 
+# Block auth and admin paths on non-main domains
+class MainSitePathProtectionMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        host = request.get_host().lower()
+        main_domains = set(os.getenv('MAIN_SITE_HOSTS', '').split(','))
+
+        if host not in main_domains and request.path.startswith(('/accounts/', '/mothership/')):
+            return JsonResponse({"error": "Bad Request"}, status=400)
+
+        return self.get_response(request)
+
+
 # Prevent clickjacking on root domains
 class ConditionalXFrameOptionsMiddleware:
     def __init__(self, get_response):
@@ -17,7 +32,7 @@ class ConditionalXFrameOptionsMiddleware:
         response = self.get_response(request)
         host = request.get_host().lower()
         main_domains = set(os.getenv('MAIN_SITE_HOSTS', '').split(','))
-        
+
         if host in main_domains:
             response['X-Frame-Options'] = 'DENY'
 
