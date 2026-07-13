@@ -135,6 +135,8 @@
 		previewForm.target = "print_popup"
 		previewForm.method = "POST"
 		previewForm.action = "/{{ blog.subdomain }}/dashboard/preview/?type={% if post %}post{% else %}homepage{% endif %}"
+		const csrfToken = $form.querySelector('input[name="csrfmiddlewaretoken"]').cloneNode()
+		previewForm.appendChild(csrfToken)
 
 		const headerContent = document.createElement("input");
 		headerContent.type = "hidden"

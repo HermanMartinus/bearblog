@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.db import DataError
 from django.forms import ValidationError
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponseBadRequest
 from django.utils import timezone
@@ -373,7 +372,6 @@ def unique_slug(blog, post, new_slug):
     return slug
 
 
-@csrf_exempt
 @login_required
 def preview(request, id):
     if request.user.is_superuser:
