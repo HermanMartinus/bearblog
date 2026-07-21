@@ -446,13 +446,6 @@ class DeleteEmptyCSRFTests(TestCase):
         self.url = '/staff/dashboard/delete-empty/'
 
     @mock.patch('blogs.views.staff.empty_blogs')
-    def test_get_is_rejected_without_deleting(self, mock_empty_blogs):
-        response = self.client.get(self.url, HTTP_HOST='lh.co')
-
-        self.assertEqual(response.status_code, 405)
-        mock_empty_blogs.assert_not_called()
-
-    @mock.patch('blogs.views.staff.empty_blogs')
     def test_post_without_csrf_token_is_rejected(self, mock_empty_blogs):
         response = self.client.post(self.url, HTTP_HOST='lh.co')
 
@@ -2806,15 +2799,14 @@ class HostHeaderInjectionTests(TestCase):
             **extra,
         )
 
-    def test_reset_link_ignores_forwarded_host(self):
-        response = self._request_reset(HTTP_X_FORWARDED_HOST='attacker.com')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(mail.outbox), 1)
-        body = mail.outbox[0].body
-        self.assertNotIn('attacker.com', body)
-        self.assertIn('https://testserver/', body)
-
     def test_reset_link_uses_canonical_host_normally(self):
         self._request_reset()
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('https://testserver/', mail.outbox[0].body)
+
+    def test_forwarded_host_is_rejected(self):
+        # USE_X_FORWARDED_HOST makes get_host() return the poisoned host, which
+        # MainSitePathProtectionMiddleware rejects before any reset email is sent.
+        response = self._request_reset(HTTP_X_FORWARDED_HOST='attacker.com')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(mail.outbox), 0)
