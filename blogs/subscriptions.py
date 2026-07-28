@@ -63,9 +63,13 @@ def find_user_for_order(data):
 
 @csrf_exempt
 def lemon_webhook(request):
+    if not settings.LEMONSQUEEZY_SIGNATURE:
+        return HttpResponseForbidden('Invalid signature')
+
     digest = hmac.new(settings.LEMONSQUEEZY_SIGNATURE.encode('utf-8'), msg=request.body, digestmod=hashlib.sha256).hexdigest()
 
-    if request.META.get('HTTP_X_SIGNATURE') != digest:
+    provided = request.META.get('HTTP_X_SIGNATURE', '')
+    if not hmac.compare_digest(provided.encode('utf-8'), digest.encode('utf-8')):
         return HttpResponseForbidden('Invalid signature')
 
     data = json.loads(request.body, strict=False)

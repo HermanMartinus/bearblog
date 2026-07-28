@@ -1,3 +1,4 @@
+import hmac
 import json
 import os
 from datetime import timedelta
@@ -18,7 +19,10 @@ def api_auth(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         key = request.headers.get('X-API-Key')
-        if not key or key != os.getenv('STAFF_API_KEY'):
+        expected = os.getenv('STAFF_API_KEY')
+
+        if not key or not expected or not hmac.compare_digest(
+                key.encode('utf-8'), expected.encode('utf-8')):
             return JsonResponse({'error': 'Unauthorized'}, status=401)
         return view_func(request, *args, **kwargs)
     return wrapper
