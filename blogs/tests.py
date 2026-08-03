@@ -1996,6 +1996,70 @@ class CleanSecurityTests(TestCase):
         self.assertEqual(result, html)
 
 
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class CustomStylesBreakoutTests(TestCase):
+    """blog.custom_styles is emitted raw inside base.html's <style> block, so a
+    </style> in it escapes into body HTML. It never passes through clean()."""
+
+    BREAKOUT = '</style><script>alert("pwned")</script>'
+
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='styleuser', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user, title='Style Blog', subdomain='styleblog', content='hello')
+
+    def _render(self):
+        return self.client.get('/', SERVER_NAME='styleblog.testserver').content.decode()
+
+    def test_free_blog_cannot_break_out_of_style_block(self):
+        self.blog.custom_styles = 'body { color: red; }' + self.BREAKOUT
+        self.blog.save()
+        html = self._render()
+        self.assertNotIn('alert("pwned")', html)
+        self.assertNotIn('</style><script>', html)
+
+    def test_free_blog_keeps_css_before_the_breakout(self):
+        """The CSS a browser actually applies today must be unchanged."""
+        self.blog.custom_styles = 'body { color: red; }' + self.BREAKOUT
+        self.blog.save()
+        self.assertIn('body { color: red; }', self._render())
+
+    def test_free_blog_ordinary_css_untouched(self):
+        css = ':root { --width: 800px; }\n@import url("https://fonts.example/x.css");'
+        self.blog.custom_styles = css
+        self.blog.save()
+        self.assertIn(css, self._render())
+
+    def test_free_blog_css_mentioning_style_untouched(self):
+        css = '.style-guide { content: "style"; }'
+        self.blog.custom_styles = css
+        self.blog.save()
+        self.assertIn(css, self._render())
+
+    def test_breakout_variants_blocked(self):
+        for payload in (
+            '</style ><script>alert("pwned")</script>',
+            '</STYLE><script>alert("pwned")</script>',
+            '</style\n><script>alert("pwned")</script>',
+            '</style><img src=x onerror=alert("pwned")>',
+        ):
+            with self.subTest(payload=payload):
+                self.blog.custom_styles = 'body{}' + payload
+                self.blog.save()
+                html = self._render()
+                self.assertNotIn('pwned', html)
+
+    def test_upgraded_blog_unaffected(self):
+        """Upgraded blogs already get raw header_directive, so nothing is gained by
+        changing what they render."""
+        self.user.settings.upgraded = True
+        self.user.settings.save()
+        self.blog.custom_styles = 'body{}' + self.BREAKOUT
+        self.blog.save()
+        self.assertIn('alert("pwned")', self._render())
+
+
 class ScriptCodeProtectionTests(TestCase):
     """Tests for script/code placeholder extraction in markdown_renderer()."""
 

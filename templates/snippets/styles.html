@@ -1,2 +1,2 @@
-{% if not blog or not blog.overwrite_styles %}{% include 'styles/blog/default.css' %}{% endif %}
-{{ blog.custom_styles | safe }}
+{% load custom_tags %}{% if not blog or not blog.overwrite_styles %}{% include 'styles/blog/default.css' %}{% endif %}
+{{ blog|blog_styles }}

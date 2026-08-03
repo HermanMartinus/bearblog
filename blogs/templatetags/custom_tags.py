@@ -494,6 +494,19 @@ def clean(markup):
     return cleaned_markup
 
 
+STYLE_BREAKOUT_RE = re.compile(r'</\s*style', re.IGNORECASE)
+
+
+@register.filter
+def blog_styles(blog):
+    if not blog or not blog.custom_styles:
+        return ''
+    css = blog.custom_styles
+    if not blog.user.settings.upgraded:
+        css = STYLE_BREAKOUT_RE.split(css, maxsplit=1)[0]
+    return mark_safe(css)
+
+
 @register.filter
 def remove_markup(content):
     return unmark(content)[:400] + '...'
