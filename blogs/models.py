@@ -1,6 +1,5 @@
 from django.utils import timezone
-from django.db import models, connection
-from django.contrib.postgres.search import SearchVectorField
+from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -259,13 +258,6 @@ class Blog(models.Model):
         return f'{self.title} ({self.useful_domain})'
 
 
-class PostManager(models.Manager):
-    # search_vector is only ever written via raw SQL and used as a filter,
-    # never read as a value — don't fetch it by default
-    def get_queryset(self):
-        return super().get_queryset().defer('search_vector')
-
-
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='posts')
     uid = models.CharField(max_length=200, db_index=True)
@@ -291,9 +283,6 @@ class Post(models.Model):
     score = models.FloatField(default=0, db_index=True)
     hidden = models.BooleanField(default=False, db_index=True)
     content_length = models.IntegerField(default=0, db_index=True)
-    search_vector = SearchVectorField(null=True)
-
-    objects = PostManager()
 
     @property
     def contains_code(self):
@@ -352,14 +341,6 @@ class Post(models.Model):
 
         # Save the post
         super(Post, self).save(*args, **kwargs)
-
-        # Update search vector via SQL to handle large content
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                UPDATE blogs_post
-                SET search_vector = to_tsvector('english', COALESCE(title, '') || ' ' || COALESCE(all_tags, '') || ' ' || LEFT(COALESCE(content, ''), 50000))
-                WHERE id = %s
-            """, [self.pk])
 
         # Save blog to trigger a few other things
         self.blog.save()

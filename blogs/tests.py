@@ -2810,3 +2810,109 @@ class HostHeaderInjectionTests(TestCase):
         response = self._request_reset(HTTP_X_FORWARDED_HOST='attacker.com')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(len(mail.outbox), 0)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+class SearchTests(TestCase):
+    """Search matches post titles, tags, and blog domains — never post content."""
+
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='searchuser', password='pass')
+        self.blog = Blog.objects.create(
+            user=self.user, title='Bear Tracks', subdomain='beartracks',
+            reviewed=True, hidden=False,
+        )
+        self.custom = Blog.objects.create(
+            user=self.user, title='Custom', subdomain='customsub',
+            domain='example.com', reviewed=True, hidden=False,
+        )
+
+    def make_post(self, title='A Post', blog=None, slug=None, tags=None, content=None):
+        slug = slug or title.lower().replace(' ', '-')
+        post = Post.objects.create(
+            blog=blog or self.blog,
+            uid=slug, title=title, slug=slug,
+            published_date=timezone.now(),
+            publish=True, make_discoverable=True, hidden=False,
+            all_tags=json.dumps(tags or []),
+            content=content if content is not None else 'A' * 200,
+        )
+        # The feed's anti-flooding filter would otherwise hide a blog once the
+        # test creates more than three posts on it
+        Blog.objects.filter(pk=post.blog_id).update(posts_in_last_12_hours=0)
+        return post
+
+    def search(self, query):
+        return self.client.get('/discover/search/', {'query': query})
+
+    def test_matches_title_substring(self):
+        self.make_post('Learning Rust Slowly')
+        self.assertContains(self.search('rust'), 'Learning Rust Slowly')
+
+    def test_matches_partial_word(self):
+        # The point of icontains over full-text search: prefixes and infixes match
+        self.make_post('Photography Basics')
+        self.assertContains(self.search('photog'), 'Photography Basics')
+
+    def test_matches_tag(self):
+        self.make_post('Tagged Post', tags=['gardening'])
+        self.assertContains(self.search('gardening'), 'Tagged Post')
+
+    def test_matches_subdomain(self):
+        self.make_post('Post On Bear Tracks')
+        self.assertContains(self.search('beartracks'), 'Post On Bear Tracks')
+
+    def test_matches_custom_domain(self):
+        self.make_post('Custom Domain Post', blog=self.custom)
+        self.assertContains(self.search('example.com'), 'Custom Domain Post')
+
+    def test_does_not_match_content(self):
+        self.make_post('Unrelated Title', content='chrysanthemum ' * 20)
+        self.assertNotContains(self.search('chrysanthemum'), 'Unrelated Title')
+
+    def test_multiple_terms_all_must_match(self):
+        self.make_post('Async Rust Patterns')
+        self.make_post('Async Python Patterns')
+        response = self.search('async rust')
+        self.assertContains(response, 'Async Rust Patterns')
+        self.assertNotContains(response, 'Async Python Patterns')
+
+    def test_terms_match_across_different_fields(self):
+        self.make_post('Pruning Roses', tags=['gardening'])
+        self.assertContains(self.search('roses gardening'), 'Pruning Roses')
+
+    def test_exact_domain_outranks_title_match(self):
+        self.make_post('Why I Left Beartracks', blog=self.custom)
+        self.make_post('Ordinary Post')
+        content = self.search('beartracks').content.decode()
+        self.assertLess(content.index('Ordinary Post'), content.index('Why I Left Beartracks'))
+
+    def test_exact_tag_outranks_incidental_match(self):
+        self.make_post('Nothing To See', tags=['python'])
+        self.make_post('Python Is Mentioned Here Only In The Title')
+        content = self.search('python').content.decode()
+        self.assertLess(content.index('Nothing To See'), content.index('Python Is Mentioned'))
+
+    def test_excludes_unreviewed_blogs(self):
+        unreviewed = Blog.objects.create(
+            user=self.user, title='Unreviewed', subdomain='unreviewed', reviewed=False)
+        self.make_post('Hidden Rust Post', blog=unreviewed)
+        self.assertNotContains(self.search('rust'), 'Hidden Rust Post')
+
+    def test_excludes_hidden_posts(self):
+        post = self.make_post('Hidden Rust Result')
+        Post.objects.filter(pk=post.pk).update(hidden=True)
+        self.assertNotContains(self.search('rust'), 'Hidden Rust Result')
+
+    def test_no_next_link_on_last_page(self):
+        self.make_post('Only Rust Result')
+        self.assertNotContains(self.search('rust'), 'Next &raquo;')
+
+    def test_next_link_when_more_results(self):
+        for i in range(25):
+            self.make_post(f'Rust Post Number {i}')
+        self.assertContains(self.search('rust'), 'Next &raquo;')
+
+    def test_empty_query_renders(self):
+        self.assertEqual(self.search('').status_code, 200)

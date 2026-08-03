@@ -1,8 +1,7 @@
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
-from django.db.models import Q, Max, Min
+from django.db.models import Q, Max, Min, Case, When, Value, IntegerField
 from django.utils import timezone
-from django.contrib.postgres.search import SearchQuery
 
 from blogs.models import Post, Blog
 from blogs.helpers import clean_text, random_post_link, random_blog_link
@@ -236,8 +235,9 @@ def feed(request):
 
 
 def search(request):
-    search_string = request.GET.get('query', "")
+    search_string = request.GET.get('query', "").strip()
     posts = None
+    has_more = False
 
     try:
         page = max(int(request.GET.get("page", 0) or 0), 0)
@@ -249,18 +249,53 @@ def search(request):
     posts_to = posts_from + posts_per_page
 
     if search_string:
-        posts = (
-            get_base_query().filter(
-                search_vector=SearchQuery(search_string, search_type='websearch')
+        queryset = get_base_query(request.user)
+
+        # Every term has to match somewhere, so "rust async" finds posts with
+        # both words regardless of the order they appear in
+        for term in search_string.split()[:10]:
+            queryset = queryset.filter(
+                Q(title__icontains=term) |
+                Q(all_tags__icontains=term) |
+                Q(blog__subdomain__icontains=term) |
+                Q(blog__domain__icontains=term)
             )
-            .order_by('-upvotes')[posts_from:posts_to]
+
+        # Rank by how precisely the whole query matched, then fall back to the
+        # existing popularity ordering
+        whole = search_string
+        queryset = queryset.annotate(
+            relevance=Case(
+                When(
+                    Q(blog__subdomain__iexact=whole) | Q(blog__domain__iexact=whole),
+                    then=Value(4)
+                ),
+                # all_tags is a JSON list, so a quoted term is an exact tag
+                When(
+                    Q(title__iexact=whole) | Q(all_tags__icontains=f'"{whole}"'),
+                    then=Value(3)
+                ),
+                When(
+                    Q(title__istartswith=whole) | Q(blog__subdomain__istartswith=whole),
+                    then=Value(2)
+                ),
+                default=Value(1),
+                output_field=IntegerField(),
+            )
         )
+
+        # Fetch one extra row to tell whether a next page actually exists
+        results = list(
+            queryset.order_by('-relevance', '-upvotes', '-published_date')[posts_from:posts_to + 1]
+        )
+        has_more = len(results) > posts_per_page
+        posts = results[:posts_per_page]
 
     return render(request, "search.html", {
         "posts": posts,
         "search_string": search_string,
         "previous_page": page - 1,
-        "next_page": page + 1 if page < max_page else None,
+        "next_page": page + 1 if has_more and page < max_page else None,
     })
 
 
