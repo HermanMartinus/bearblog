@@ -12,7 +12,6 @@ from django.utils import timezone
 from django.utils.safestring import SafeString
 
 from blogs.forms import BlogForm, AdvancedSettingsForm
-from blogs.helpers import resolve_client_ip
 from blogs.models import Blog, Post, Stylesheet
 from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer, replace_inline_latex, escape_currency, fix_links, clean, element_replacement, excluding_pre
 
@@ -1253,69 +1252,6 @@ class RateLimitMiddlewareTests(TestCase):
     def test_path_containing_ping_is_rate_limited(self):
         response = self._flood(self._middleware(), '/shipping-update/')
         self.assertEqual(response.status_code, 429)
-
-
-DROPLET_IP = '2604:a880:4:1d0::30e:7000'
-
-
-@mock.patch.dict(os.environ, {'CADDY_PROXY_IPS': DROPLET_IP})
-class ClientIPResolutionTests(TestCase):
-    # Chain shapes below are the ones actually observed in the Heroku router logs.
-    def _request(self, **headers):
-        from django.test import RequestFactory
-        return RequestFactory().get('/', **{'REMOTE_ADDR': '10.1.2.3', **headers})
-
-    def test_direct_request_ignores_spoofed_forwarded_for(self):
-        # [visitor, CF-edge]: attacker prepends their own X-Forwarded-For entry
-        request = self._request(
-            HTTP_CF_CONNECTING_IP='178.93.184.10',
-            HTTP_X_FORWARDED_FOR='1.2.3.4, 178.93.184.10, 104.22.31.5',
-        )
-        self.assertEqual(resolve_client_ip(request), '178.93.184.10')
-
-    def test_caddy_request_uses_real_ip(self):
-        # [visitor, droplet, CF-edge]: custom domain via Caddy
-        request = self._request(
-            HTTP_CF_CONNECTING_IP=DROPLET_IP,
-            HTTP_X_REAL_IP='110.179.80.20',
-            HTTP_X_FORWARDED_FOR=f'1.2.3.4, 110.179.80.20, {DROPLET_IP}, 104.22.17.9',
-        )
-        self.assertEqual(resolve_client_ip(request), '110.179.80.20')
-
-    def test_droplet_matched_in_expanded_ipv6_form(self):
-        request = self._request(
-            HTTP_CF_CONNECTING_IP='2604:a880:4:1d0:0:0:30e:7000',
-            HTTP_X_REAL_IP='110.179.80.20',
-        )
-        self.assertEqual(resolve_client_ip(request), '110.179.80.20')
-
-    def test_real_ip_ignored_when_not_from_caddy(self):
-        # Direct request spoofing X-Real-IP: only trusted behind the droplet
-        request = self._request(
-            HTTP_CF_CONNECTING_IP='178.93.184.10',
-            HTTP_X_REAL_IP='1.2.3.4',
-        )
-        self.assertEqual(resolve_client_ip(request), '178.93.184.10')
-
-    def test_caddy_ping_without_real_ip_falls_back_to_droplet(self):
-        # [droplet, CF-edge]: Caddy's own on-demand TLS /ping/ asks
-        request = self._request(HTTP_CF_CONNECTING_IP=DROPLET_IP)
-        self.assertEqual(resolve_client_ip(request), DROPLET_IP)
-
-    def test_invalid_real_ip_falls_back_to_droplet(self):
-        request = self._request(HTTP_CF_CONNECTING_IP=DROPLET_IP, HTTP_X_REAL_IP='not-an-ip')
-        self.assertEqual(resolve_client_ip(request), DROPLET_IP)
-
-    def test_request_not_via_cloudflare_uses_remote_addr(self):
-        request = self._request(HTTP_X_FORWARDED_FOR='1.2.3.4')
-        self.assertEqual(resolve_client_ip(request), '10.1.2.3')
-
-    def test_unset_caddy_proxy_ips_collapses_custom_domains(self):
-        # Documents the deploy blocker: without CADDY_PROXY_IPS every custom-domain
-        # visitor resolves to the droplet, i.e. one shared rate-limit bucket.
-        request = self._request(HTTP_CF_CONNECTING_IP=DROPLET_IP, HTTP_X_REAL_IP='110.179.80.20')
-        with mock.patch.dict(os.environ, {'CADDY_PROXY_IPS': ''}):
-            self.assertEqual(resolve_client_ip(request), DROPLET_IP)
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})

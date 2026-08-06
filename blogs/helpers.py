@@ -10,7 +10,6 @@ from requests.exceptions import ConnectionError, ReadTimeout
 import requests
 from time import time
 import geoip2
-import ipaddress
 from ipaddr import client_ip
 import hashlib
 
@@ -80,30 +79,6 @@ def check_connection(blog):
             return False
         except SystemExit:
             return False
-
-
-def normalise_ip(value):
-    try:
-        return ipaddress.ip_address(value.strip()).compressed
-    except ValueError:
-        return ''
-
-
-def resolve_client_ip(request):
-    # Cloudflare overwrites CF-Connecting-IP at the edge, so unlike the leftmost
-    # X-Forwarded-For entry the client can't set it. Custom domains reach
-    # Cloudflare via the Caddy droplet, so for those CF-Connecting-IP is the
-    # droplet and the visitor is in X-Real-IP, which only Caddy sets.
-    cf_ip = normalise_ip(request.META.get('HTTP_CF_CONNECTING_IP', ''))
-    if not cf_ip:
-        # Didn't arrive via Cloudflare
-        return normalise_ip(request.META.get('REMOTE_ADDR', ''))
-
-    caddy_ips = {normalise_ip(ip) for ip in os.getenv('CADDY_PROXY_IPS', '').split(',')}
-    if cf_ip in caddy_ips:
-        return normalise_ip(request.META.get('HTTP_X_REAL_IP', '')) or cf_ip
-
-    return cf_ip
 
 
 def salt_and_hash(request, duration='day'):

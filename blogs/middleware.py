@@ -2,13 +2,10 @@ from django.db import connection
 from django.http import JsonResponse
 
 import os
-import random
 import time
 from collections import defaultdict
 
 from ipaddr import client_ip
-
-from blogs.helpers import resolve_client_ip
 
 
 # Block auth and admin paths on non-main domains
@@ -48,9 +45,6 @@ class RateLimitMiddleware:
         RATE_LIMIT = 100
     TIME_WINDOW = 10  # seconds
     BAN_DURATION = 60  # seconds
-    # Temporary: log how resolve_client_ip() would differ from client_ip() before
-    # switching the call sites over. Set IP_DEBUG_SAMPLE=N to log 1 in N requests.
-    IP_DEBUG_SAMPLE = int(os.getenv('IP_DEBUG_SAMPLE') or 0)
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -68,17 +62,6 @@ class RateLimitMiddleware:
 
         client_ip_address = client_ip(request)
         current_time = time.time()
-
-        if self.IP_DEBUG_SAMPLE and random.randrange(self.IP_DEBUG_SAMPLE) == 0:
-            resolved = resolve_client_ip(request)
-            print(
-                f"IPDEBUG match={resolved == client_ip_address} "
-                f"old={client_ip_address} new={resolved or '-'} "
-                f"cf={request.META.get('HTTP_CF_CONNECTING_IP') or '-'} "
-                f"real={request.META.get('HTTP_X_REAL_IP') or '-'} "
-                f"remote={request.META.get('REMOTE_ADDR') or '-'} "
-                f"xff={request.META.get('HTTP_X_FORWARDED_FOR') or '-'}"
-            )
 
         full_path = request.get_full_path()
 
