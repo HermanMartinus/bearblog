@@ -1,18 +1,21 @@
 import json
 import os
+from datetime import timedelta
 from unittest import mock
 from zoneinfo import ZoneInfo
 
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase, override_settings
+from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import SafeString
 
 from blogs.forms import BlogForm, AdvancedSettingsForm
-from blogs.models import Blog, Post, Stylesheet
+from blogs.helpers import salt_and_hash
+from blogs.models import Blog, Post, Stylesheet, Upvote
+from blogs.views.upvotes import UPVOTE_TOKEN_MAX_AGE, upvote_signer
 from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer, replace_inline_latex, escape_currency, fix_links, clean, element_replacement, excluding_pre
 
 
@@ -1005,6 +1008,11 @@ class ScriptTagTests(TestCase):
         self.assertIn('My Post', result)
 
 
+def upvote_token(uid):
+    # Tokens are bound to the requester's hash, so mint one for the test client's identity
+    return upvote_signer.sign(f"{uid}:{salt_and_hash(RequestFactory().get('/'), 'year')}")
+
+
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
 class ContentTypeTests(TestCase):
     def setUp(self):
@@ -1046,13 +1054,16 @@ class ContentTypeTests(TestCase):
     # --- upvote() ---
 
     def test_upvote_success_returns_text_plain(self):
-        response = self.client.post('/upvote/', {'uid': 'ct1'})
+        response = self.client.post('/upvote/', {
+            'uid': 'ct1',
+            'token': upvote_token('ct1'),
+        })
         self.assertEqual(response.status_code, 200)
         self.assertIn('text/plain', response['Content-Type'])
 
-    def test_upvote_forbidden_returns_text_plain(self):
+    def test_upvote_rejected_returns_text_plain(self):
         response = self.client.post('/upvote/', {})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
         self.assertIn('text/plain', response['Content-Type'])
 
     # --- hit() ---
@@ -1194,6 +1205,71 @@ class ContentTypeTests(TestCase):
         self.assertIn('tags: django, python', content)
 
 
+class UpvoteProtectionTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='upvote_user', password='pass')
+        self.blog = Blog.objects.create(user=self.user, title='Upvote Blog', subdomain='upvoteblog')
+        self.post = Post.objects.create(
+            blog=self.blog,
+            uid='uv1',
+            title='Upvote Post',
+            slug='upvote-post',
+            published_date=timezone.now(),
+            content='Test content',
+        )
+
+    def _post(self, **overrides):
+        data = {'uid': 'uv1', 'token': upvote_token('uv1')}
+        data.update(overrides)
+        return self.client.post('/upvote/', data)
+
+    def _assert_silently_rejected(self, response):
+        # Rejections must be indistinguishable from a successful upvote
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'Upvoted')
+        self.assertFalse(Upvote.objects.filter(post=self.post).exists())
+
+    def test_valid_submission_records_upvote(self):
+        response = self._post()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'Upvoted')
+        self.assertTrue(Upvote.objects.filter(post=self.post).exists())
+
+    def test_filled_honeypot_rejected(self):
+        self._assert_silently_rejected(self._post(title='Upvote Post'))
+
+    def test_missing_token_rejected(self):
+        self._assert_silently_rejected(self._post(token=''))
+
+    def test_unsigned_token_rejected(self):
+        self._assert_silently_rejected(self._post(token='uv1'))
+
+    def test_token_for_another_post_rejected(self):
+        self._assert_silently_rejected(self._post(token=upvote_token('someotheruid')))
+
+    def test_token_for_another_visitor_rejected(self):
+        # A token minted for one IP must not work from another, so rotating
+        # IPs costs a fresh /upvote-info/ fetch per upvote
+        info = self.client.get('/upvote-info/uv1/', HTTP_X_FORWARDED_FOR='203.0.113.9').json()
+        self._assert_silently_rejected(self._post(token=info['token']))
+
+    def test_expired_token_rejected(self):
+        stale = timezone.now() - timedelta(seconds=UPVOTE_TOKEN_MAX_AGE + 60)
+        with mock.patch('django.core.signing.time.time', return_value=stale.timestamp()):
+            token = upvote_token('uv1')
+        self._assert_silently_rejected(self._post(token=token))
+
+    def test_unknown_post_rejected(self):
+        self._assert_silently_rejected(self._post(uid='nosuchuid', token=upvote_token('nosuchuid')))
+
+    def test_upvote_info_issues_usable_token(self):
+        info = self.client.get('/upvote-info/uv1/').json()
+        response = self._post(token=info['token'])
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Upvote.objects.filter(post=self.post).exists())
+
+
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
 class ResolveAddressTests(TestCase):
     def setUp(self):
@@ -1252,6 +1328,30 @@ class RateLimitMiddlewareTests(TestCase):
     def test_path_containing_ping_is_rate_limited(self):
         response = self._flood(self._middleware(), '/shipping-update/')
         self.assertEqual(response.status_code, 429)
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'bearblog.dev'})
+class MainSitePathProtectionMiddlewareTests(TestCase):
+    def _middleware(self):
+        from django.http import HttpResponse
+        from blogs.middleware import MainSitePathProtectionMiddleware
+        return MainSitePathProtectionMiddleware(lambda request: HttpResponse('ok'))
+
+    def _get(self, path, host):
+        return self._middleware()(RequestFactory().get(path, HTTP_HOST=host))
+
+    def test_protected_paths_blocked_off_main_domain(self):
+        for path in ('/accounts/login/', '/mothership/'):
+            response = self._get(path, 'someblog.bearblog.dev')
+            self.assertEqual(response.status_code, 400)
+
+    def test_protected_path_allowed_on_main_domain(self):
+        response = self._get('/accounts/login/', 'bearblog.dev')
+        self.assertEqual(response.status_code, 200)
+
+    def test_unprotected_path_allowed_off_main_domain(self):
+        response = self._get('/upvote-info/abc/', 'someblog.bearblog.dev')
+        self.assertEqual(response.status_code, 200)
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})

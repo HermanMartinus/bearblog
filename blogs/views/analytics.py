@@ -9,19 +9,12 @@ from django.db.models import DateField, Count, Sum, Q
 from django.db.models.functions import Cast
 
 from blogs.models import Blog, Hit, Post
-from blogs.helpers import get_country, salt_and_hash
+from blogs.helpers import get_country, get_int, salt_and_hash
 
 from datetime import timedelta
 from ipaddr import client_ip
 from urllib.parse import urlparse
 import httpagentparser
-
-
-def get_int(value, default):
-    try:
-        return int(value)
-    except (ValueError, TypeError):
-        return default
 
 
 @login_required

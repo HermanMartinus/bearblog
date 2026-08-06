@@ -16,6 +16,13 @@ import hashlib
 from blogs.models import Blog, Post
 
 
+def get_int(value, default):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
+
 def is_protected(subdomain):
     protected_subdomains = [
         'login',

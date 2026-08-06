@@ -1,10 +1,10 @@
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.db.models import Q
-from blogs.models import Blog, Post, Upvote
-from blogs.helpers import salt_and_hash, unmark
+from blogs.models import Blog, Post
+from blogs.helpers import unmark
 from blogs.views.analytics import render_analytics
 
 import json
@@ -214,41 +214,6 @@ def post(request, slug):
         response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
 
     return response
-
-
-def get_upvote_info(request, uid):
-    post = get_object_or_404(Post.objects.only('upvotes'), uid=uid)
-    hash_id = salt_and_hash(request, 'year')
-    upvoted = post.upvote_set.filter(hash_id=hash_id).exists()
-    
-    response = JsonResponse({
-        "upvoted": upvoted,
-        "upvote_count": post.upvotes,
-    })
-    response['X-Robots-Tag'] = 'noindex, nofollow'
-    return response
-
-
-@csrf_exempt
-def upvote(request):
-    if request.POST.get("uid", "") and not request.POST.get("title", False):
-        hash_id = salt_and_hash(request, 'year')
-        post = get_object_or_404(Post, uid=request.POST.get("uid", ""))
-        try:
-            upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
-        
-            if created:
-                print("Upvoting", post)
-            else:
-                print("Not upvoting: Duplicate upvote")
-        except Upvote.MultipleObjectsReturned:
-            print("Not upvoting: Duplicate upvote")
-
-        response = HttpResponse(f'Upvoted {post.title}', content_type='text/plain')
-        response['X-Robots-Tag'] = 'noindex, nofollow'
-        return response
-
-    return HttpResponse('Forbidden', status=403, content_type='text/plain')
 
 
 def public_analytics(request):

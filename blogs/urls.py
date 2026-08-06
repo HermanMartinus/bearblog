@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media, staff_api
+from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media, staff_api, upvotes
 from blogs import subscriptions
 from conf import logger
 
@@ -110,8 +110,8 @@ urlpatterns = [
     path('robots.txt', blog.robots, name='robots'),
     # TODO: Deprecate
     path('public-analytics/', blog.public_analytics, name="public_analytics"),
-    path('upvote/', blog.upvote, name='upvote'),
-    path('upvote-info/<uid>/', blog.get_upvote_info, name='get_upvote_info'),
+    path('upvote/', upvotes.upvote, name='upvote'),
+    path('upvote-info/<uid>/', upvotes.get_upvote_info, name='get_upvote_info'),
     path('hit/', analytics.hit, name='hit'),
     path('subscribe/', emailer.subscribe, name='subscribe'),
     path('email-subscribe/', emailer.email_subscribe, name='email_subscribe'),
