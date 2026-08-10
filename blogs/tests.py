@@ -1014,6 +1014,7 @@ def upvote_token(uid):
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
+@mock.patch('blogs.views.upvotes._tor_exit_ips', new=lambda: frozenset())
 class ContentTypeTests(TestCase):
     def setUp(self):
         Stylesheet.objects.create(title='Default', identifier='default', css='')
@@ -1205,6 +1206,7 @@ class ContentTypeTests(TestCase):
         self.assertIn('tags: django, python', content)
 
 
+@mock.patch('blogs.views.upvotes._tor_exit_ips', new=lambda: frozenset({'185.220.101.1'}))
 class UpvoteProtectionTests(TestCase):
     def setUp(self):
         Stylesheet.objects.create(title='Default', identifier='default', css='')
@@ -1266,6 +1268,40 @@ class UpvoteProtectionTests(TestCase):
     def test_upvote_info_issues_usable_token(self):
         info = self.client.get('/upvote-info/uv1/').json()
         response = self._post(token=info['token'])
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Upvote.objects.filter(post=self.post).exists())
+
+    def test_tor_exit_in_xff_rejected(self):
+        # Custom-domain (Caddy) path: the real exit sits in X-Forwarded-For. Token is
+        # minted for that same IP so the only possible cause of rejection is the Tor check.
+        token = upvote_signer.sign(
+            f"uv1:{salt_and_hash(RequestFactory().get('/', HTTP_X_FORWARDED_FOR='185.220.101.1'), 'year')}"
+        )
+        response = self.client.post(
+            '/upvote/', {'uid': 'uv1', 'token': token}, HTTP_X_FORWARDED_FOR='185.220.101.1')
+        self._assert_silently_rejected(response)
+
+    def test_tor_exit_in_cf_connecting_ip_rejected(self):
+        # Direct path: XFF[0] is spoofable but CF-Connecting-IP is not
+        response = self.client.post(
+            '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1')},
+            HTTP_CF_CONNECTING_IP='185.220.101.1')
+        self._assert_silently_rejected(response)
+
+    def test_non_tor_ip_records_upvote(self):
+        response = self.client.post(
+            '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1')},
+            HTTP_CF_CONNECTING_IP='203.0.113.9')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Upvote.objects.filter(post=self.post).exists())
+
+    def test_fails_open_when_exit_list_unavailable(self):
+        # Identical to the CF-Connecting-IP rejection, but with an empty list the same
+        # request succeeds — proving the block is the only differentiator and it fails open
+        with mock.patch('blogs.views.upvotes._tor_exit_ips', new=lambda: frozenset()):
+            response = self.client.post(
+                '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1')},
+                HTTP_CF_CONNECTING_IP='185.220.101.1')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Upvote.objects.filter(post=self.post).exists())
 

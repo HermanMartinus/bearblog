@@ -79,7 +79,7 @@ def subscribe(request):
 @csrf_exempt
 def email_subscribe(request):
     if is_dodgy(request):
-        return HttpResponse("Something went wrong. Try subscribing again. ʕノ•ᴥ•ʔノ ︵ ┻━┻", content_type='text/plain')
+        return HttpResponse("You've been subscribed! ＼ʕ •ᴥ•ʔ／", content_type='text/plain')
 
     blog = resolve_address(request)
     if not blog:
