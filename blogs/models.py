@@ -258,6 +258,12 @@ class Blog(models.Model):
         return f'{self.title} ({self.useful_domain})'
 
 
+# Discover feed scoring. Buoyancy is the number of days of age that a 10x upvote
+# advantage buys, so lower values make posts sink faster.
+BUOYANCY = 3
+UPVOTE_CAP = 60
+
+
 class Post(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='posts')
     uid = models.CharField(max_length=200, db_index=True)
@@ -301,11 +307,11 @@ class Post(models.Model):
         upvotes = self.upvotes
 
         if upvotes > 1: 
-            # Cap upvotes at 30 so they don't stick to the top forever
-            if upvotes > 30:
-                upvotes = 30
+            # Cap upvotes so vote rings can't buy an unbounded stay at the top
+            if upvotes > UPVOTE_CAP:
+                upvotes = UPVOTE_CAP
 
-            upvotes += self.shadow_votes
+            upvotes = max(upvotes + self.shadow_votes, 1)
 
             log_of_upvotes = log(upvotes, 10)
 
@@ -313,9 +319,7 @@ class Post(models.Model):
 
             seconds = posted_at.timestamp()
             if seconds > 0:
-                # Lower buoyancy means posts sink faster with time
-                buoyancy = 14
-                score = (log_of_upvotes) + ((seconds - 1577811600) / (buoyancy * 86400))
+                score = (log_of_upvotes) + ((seconds - 1577811600) / (BUOYANCY * 86400))
                 self.score = score
     
     def save(self, *args, **kwargs):
