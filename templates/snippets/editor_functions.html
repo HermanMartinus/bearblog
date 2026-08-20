@@ -101,7 +101,7 @@
 		if (selection.length > 0) {
 			const pastedText = (e.clipboardData || window.clipboardData).getData('text');
 			
-			if (isUrl(pastedText)) {
+			if (isUrl(pastedText) & !isUrl(selection)) {
 				e.preventDefault();
 				
 				const linkMarkdown = `[${selection}](${pastedText})`;
