@@ -76,10 +76,11 @@ def caddy_proxy_ips():
     return {ip.strip() for ip in os.getenv('CADDY_PROXY_IPS', '').split(',') if ip.strip()}
 
 
+# The visitor's real IP, on both subdomains and custom domains
 def trusted_client_ip(request):
     ip = request.META.get('HTTP_CF_CONNECTING_IP', '').strip()
     if not ip:
-        return request.META.get('REMOTE_ADDR', '')
+        return client_ip(request) or request.META.get('REMOTE_ADDR', '')
 
     proxies = caddy_proxy_ips()
     if ip in proxies:
@@ -108,10 +109,10 @@ def check_connection(blog):
 
 
 def salt_and_hash(request, duration='day'):
-    ip_date_salt_string = f"{client_ip(request)}-{timezone.now().date()}-{os.getenv('SALT')}"
+    ip_date_salt_string = f"{trusted_client_ip(request)}-{timezone.now().date()}-{os.getenv('SALT')}"
     
     if duration == 'year':
-        ip_date_salt_string = f"{client_ip(request)}-{timezone.now().year}-{os.getenv('SALT')}"
+        ip_date_salt_string = f"{trusted_client_ip(request)}-{timezone.now().year}-{os.getenv('SALT')}"
 
     hash_id = hashlib.sha256(ip_date_salt_string.encode('utf-8')).hexdigest()
 

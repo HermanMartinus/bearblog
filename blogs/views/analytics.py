@@ -9,10 +9,9 @@ from django.db.models import DateField, Count, Sum, Q
 from django.db.models.functions import Cast
 
 from blogs.models import Blog, Hit, Post
-from blogs.helpers import get_country, get_int, salt_and_hash
+from blogs.helpers import get_country, get_int, salt_and_hash, trusted_client_ip
 
 from datetime import timedelta
-from ipaddr import client_ip
 from urllib.parse import urlparse
 import httpagentparser
 
@@ -154,7 +153,7 @@ def hit(request):
         # Prevent duplicates with ip hash + date
         hash_id = salt_and_hash(request)
 
-        country = get_country(client_ip(request)).get('country_name', '')
+        country = get_country(trusted_client_ip(request)).get('country_name', '')
         device = user_agent.get('platform', {}).get('name', '')
         browser = user_agent.get('browser', {}).get('name', '')
         

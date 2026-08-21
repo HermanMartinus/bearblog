@@ -61,8 +61,7 @@ class IPDiagnosticMiddleware:
         )
 
 
-# TEMPORARY: reports traffic reaching the dyno without going through Cloudflare.
-# Logs only for now — swap the print for a 400 once the logs come back clean.
+# Reject traffic reaching the dyno without going through Cloudflare.
 class BlockHerokuAppMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -76,6 +75,7 @@ class BlockHerokuAppMiddleware:
                 f"path={request.path!r} fwd_host={request.META.get('HTTP_X_FORWARDED_HOST', '')!r} "
                 f"ua={request.META.get('HTTP_USER_AGENT', '')!r}"
             )
+            return JsonResponse({"error": "Bad Request"}, status=400)
 
         return self.get_response(request)
 
@@ -132,7 +132,7 @@ class RateLimitMiddleware:
         if request.path in ('/ping', '/ping/'):
             return self.get_response(request)
 
-        client_ip_address = client_ip(request)
+        client_ip_address = trusted_client_ip(request)
         current_time = time.time()
 
         full_path = request.get_full_path()

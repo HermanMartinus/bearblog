@@ -5,7 +5,6 @@ from django.utils.text import slugify
 
 from django.http import HttpResponse
 
-from ipaddr import client_ip
 from unicodedata import lookup
 from blogs.utils.csv import render_to_csv_response
 import io
@@ -13,7 +12,7 @@ import json
 import zipfile
 
 from blogs.forms import NavForm, StyleForm
-from blogs.helpers import get_country, is_protected
+from blogs.helpers import get_country, is_protected, trusted_client_ip
 from blogs.models import Blog, Post, Stylesheet
 
 
@@ -140,7 +139,7 @@ def post_delete(request, id, uid):
 
 @login_required
 def upgrade(request):
-    country = get_country(client_ip(request))
+    country = get_country(trusted_client_ip(request))
     country_name = ''
     country_emoji = ''
     promo_code = ''

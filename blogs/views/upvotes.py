@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.signing import BadSignature, TimestampSigner
 
 from blogs.models import Post, Upvote
-from blogs.helpers import salt_and_hash
+from blogs.helpers import salt_and_hash, trusted_client_ip
 
 
 upvote_signer = TimestampSigner(salt='upvote')
@@ -110,10 +110,4 @@ def _request_from_tor(request):
     if not exit_ips:
         return False
 
-    candidates = {request.META.get('HTTP_CF_CONNECTING_IP', '').strip()}
-    candidates.update(
-        part.strip() for part in request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
-    )
-    candidates.discard('')
-
-    return any(ip in exit_ips for ip in candidates)
+    return trusted_client_ip(request) in exit_ips
