@@ -80,8 +80,14 @@ def trusted_client_ip(request):
     ip = request.META.get('HTTP_CF_CONNECTING_IP', '').strip()
     if not ip:
         return request.META.get('REMOTE_ADDR', '')
-    if ip in caddy_proxy_ips():
-        return request.META.get('HTTP_X_REAL_IP', '').strip() or ip
+
+    proxies = caddy_proxy_ips()
+    if ip in proxies:
+        chain = [p.strip() for p in request.META.get('HTTP_X_FORWARDED_FOR', '').split(',') if p.strip()]
+        hits = [i for i, part in enumerate(chain) if part in proxies]
+        if hits and hits[-1] > 0:
+            return chain[hits[-1] - 1]
+
     return ip
 
 
