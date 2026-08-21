@@ -1008,9 +1008,10 @@ class ScriptTagTests(TestCase):
         self.assertIn('My Post', result)
 
 
-def upvote_token(uid):
+def upvote_token(uid, ip=None):
     # Tokens are bound to the requester's hash, so mint one for the test client's identity
-    return upvote_signer.sign(f"{uid}:{salt_and_hash(RequestFactory().get('/'), 'year')}")
+    headers = {'HTTP_CF_CONNECTING_IP': ip} if ip else {}
+    return upvote_signer.sign(f"{uid}:{salt_and_hash(RequestFactory().get('/', **headers), 'year')}")
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
@@ -1253,7 +1254,7 @@ class UpvoteProtectionTests(TestCase):
     def test_token_for_another_visitor_rejected(self):
         # A token minted for one IP must not work from another, so rotating
         # IPs costs a fresh /upvote-info/ fetch per upvote
-        info = self.client.get('/upvote-info/uv1/', HTTP_X_FORWARDED_FOR='203.0.113.9').json()
+        info = self.client.get('/upvote-info/uv1/', HTTP_CF_CONNECTING_IP='203.0.113.9').json()
         self._assert_silently_rejected(self._post(token=info['token']))
 
     def test_expired_token_rejected(self):
@@ -1271,26 +1272,16 @@ class UpvoteProtectionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Upvote.objects.filter(post=self.post).exists())
 
-    def test_tor_exit_in_xff_rejected(self):
-        # Custom-domain (Caddy) path: the real exit sits in X-Forwarded-For. Token is
-        # minted for that same IP so the only possible cause of rejection is the Tor check.
-        token = upvote_signer.sign(
-            f"uv1:{salt_and_hash(RequestFactory().get('/', HTTP_X_FORWARDED_FOR='185.220.101.1'), 'year')}"
-        )
-        response = self.client.post(
-            '/upvote/', {'uid': 'uv1', 'token': token}, HTTP_X_FORWARDED_FOR='185.220.101.1')
-        self._assert_silently_rejected(response)
-
     def test_tor_exit_in_cf_connecting_ip_rejected(self):
         # Direct path: XFF[0] is spoofable but CF-Connecting-IP is not
         response = self.client.post(
-            '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1')},
+            '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1', '185.220.101.1')},
             HTTP_CF_CONNECTING_IP='185.220.101.1')
         self._assert_silently_rejected(response)
 
     def test_non_tor_ip_records_upvote(self):
         response = self.client.post(
-            '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1')},
+            '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1', '203.0.113.9')},
             HTTP_CF_CONNECTING_IP='203.0.113.9')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Upvote.objects.filter(post=self.post).exists())
@@ -1300,7 +1291,7 @@ class UpvoteProtectionTests(TestCase):
         # request succeeds — proving the block is the only differentiator and it fails open
         with mock.patch('blogs.views.upvotes._tor_exit_ips', new=lambda: frozenset()):
             response = self.client.post(
-                '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1')},
+                '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1', '185.220.101.1')},
                 HTTP_CF_CONNECTING_IP='185.220.101.1')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Upvote.objects.filter(post=self.post).exists())

@@ -1,64 +1,10 @@
-from django.db import connection
 from django.http import JsonResponse
 
 import os
 import time
 from collections import defaultdict
 
-from ipaddr import client_ip
-
-from blogs.helpers import caddy_proxy_ips, trusted_client_ip
-
-
-# TEMPORARY: confirms how IPs actually arrive before we swap client_ip out for
-# trusted_client_ip. Remove once confirmed.
-class IPDiagnosticMiddleware:
-    SAMPLE_RATE = 200  # log 1 in N agreeing requests; divergences always log
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-        self.counter = 0
-
-    def __call__(self, request):
-        # Every local request is route=no-cf, which would otherwise always log
-        if os.getenv('ENVIRONMENT') != 'dev':
-            self.counter += 1
-            try:
-                self.log(request)
-            except Exception as e:
-                # Diagnostics must never take the site down
-                print(f"IPDIAG error: {e}")
-        return self.get_response(request)
-
-    def log(self, request):
-        meta = request.META
-        cf = meta.get('HTTP_CF_CONNECTING_IP', '').strip()
-        xff = meta.get('HTTP_X_FORWARDED_FOR', '').strip()
-        real = meta.get('HTTP_X_REAL_IP', '').strip()
-        remote = meta.get('REMOTE_ADDR', '').strip()
-
-        if not cf:
-            route = 'no-cf'  # bypassed Cloudflare entirely
-        elif cf in caddy_proxy_ips():
-            route = 'droplet'
-        else:
-            route = 'direct'
-
-        old = client_ip(request)
-        new = trusted_client_ip(request)
-        agree = old == new
-
-        # Agreeing requests are the expected case, so only sample them
-        if agree and route != 'no-cf' and self.counter % self.SAMPLE_RATE:
-            return
-
-        print(
-            f"IPDIAG route={route} agree={agree} old={old!r} new={new!r} "
-            f"cf={cf!r} xff={xff!r} real={real!r} remote={remote!r} "
-            f"host={meta.get('HTTP_HOST', '')!r} fwd_host={meta.get('HTTP_X_FORWARDED_HOST', '')!r} "
-            f"get_host={request.get_host()!r} cf_country={meta.get('HTTP_CF_IPCOUNTRY', '')!r} "
-            f"path={request.path!r}"
-        )
+from blogs.helpers import trusted_client_ip
 
 
 # Reject traffic reaching the dyno without going through Cloudflare.
