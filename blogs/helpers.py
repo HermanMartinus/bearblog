@@ -72,6 +72,19 @@ def is_protected(subdomain):
     return subdomain in protected_subdomains
 
 
+def caddy_proxy_ips():
+    return {ip.strip() for ip in os.getenv('CADDY_PROXY_IPS', '').split(',') if ip.strip()}
+
+
+def trusted_client_ip(request):
+    ip = request.META.get('HTTP_CF_CONNECTING_IP', '').strip()
+    if not ip:
+        return request.META.get('REMOTE_ADDR', '')
+    if ip in caddy_proxy_ips():
+        return request.META.get('HTTP_X_REAL_IP', '').strip() or ip
+    return ip
+
+
 def check_connection(blog):
     if not blog.domain:
         return

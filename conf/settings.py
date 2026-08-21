@@ -91,6 +91,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE = [
+    'blogs.middleware.IPDiagnosticMiddleware',
+    'blogs.middleware.BlockHerokuAppMiddleware',
     'blogs.middleware.RateLimitMiddleware',
     'blogs.middleware.MainSitePathProtectionMiddleware',
     'blogs.middleware.ConditionalXFrameOptionsMiddleware',
