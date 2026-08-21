@@ -10,6 +10,7 @@ from blogs.utils.csv import render_to_csv_response
 import io
 import json
 import zipfile
+import os
 
 from blogs.forms import NavForm, StyleForm
 from blogs.helpers import get_country, is_protected, trusted_client_ip
@@ -164,13 +165,13 @@ def upgrade(request):
                   'NG', 'NI', 'NP', 'PH', 'PK', 'PY', 'RU', 'RW', 'SL', 'SO', 'SR', 'TH', 'TJ', 'TL', 'TN', 'TR', 'TZ', 'UA', 'UG', 'UZ', 'VN', 'ZM']
 
         if country_code in tier_2:
-            promo_code = 'PADDINGTON'
+            promo_code = os.getenv('PROMO_CODE_TIER_2', '')
             discount = 15
         if country_code in tier_3:
-            promo_code = 'YOGI'
+            promo_code = os.getenv('PROMO_CODE_TIER_3', '')
             discount = 30
         if country_code in tier_4:
-            promo_code = 'BALOO'
+            promo_code = os.getenv('PROMO_CODE_TIER_4', '')
             discount = 50
 
     return render(request, "dashboard/upgrade.html", {
