@@ -61,7 +61,8 @@ HOST_WHITELIST = [
     'datawrapper.de',
     'datawrapper.dwcdn.net',
     'guestbooks.kamiscorner.xyz',
-    'lastfm-embed.vercel.app'
+    'lastfm-embed.vercel.app',
+    'ext.nicovideo.jp'
 ]
 
 TYPOGRAPHIC_REPLACEMENTS = [
