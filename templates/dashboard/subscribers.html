@@ -37,6 +37,22 @@
     <small>One email address per line</small>
 </form>
 
+<script>
+    const $importForm = document.getElementById('import-contacts');
+    const $emailAddresses = $importForm.querySelector('textarea');
+    const findEmails = text => new Set(text.match(/[a-z0-9.+_-]+@[a-z0-9.+_-]+\.[a-z]+/g) || []);
+    const original = findEmails($emailAddresses.defaultValue);
+
+    $importForm.addEventListener('submit', event => {
+        const remaining = findEmails($emailAddresses.value);
+        const removed = [...original].filter(email => !remaining.has(email)).length;
+
+        if (removed > 5 && !confirm(`This will remove ${removed} of your ${original.size} subscribers. Are you sure?`)) {
+            event.preventDefault();
+        }
+    });
+</script>
+
 {{ request.user.settings.dashboard_footer | safe }}
 
 {% endblock %}
