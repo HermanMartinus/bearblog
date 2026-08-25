@@ -12,7 +12,7 @@
 	// Draft recovery via localStorage
 	const draftKey = {% if post %}'bear_draft_{{ post.uid }}'{% else %}'bear_draft_' + window.location.pathname{% endif %};
 
-	const DRAFT_TTL = 1 * 60 * 1000; // 1 minute
+	const DRAFT_TTL = 60 * 60 * 1000; // 1 hour
 
 	const saveDraft = (body) => {
 		try { localStorage.setItem(draftKey, JSON.stringify({ body, savedAt: Date.now() })); } catch (e) {}
