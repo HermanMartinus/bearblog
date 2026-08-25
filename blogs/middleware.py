@@ -4,7 +4,7 @@ import os
 import time
 from collections import defaultdict
 
-from blogs.helpers import trusted_client_ip
+from blogs.helpers import get_country, salt_and_hash, trusted_client_ip
 
 
 # Reject traffic reaching the dyno without going through Cloudflare.
@@ -126,3 +126,55 @@ class RateLimitMiddleware:
         return self.get_response(request)
 
 
+# Temporary: log hits on the upvote endpoint while tracking down bot upvoting
+class UpvoteLoggingMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path.rstrip('/') != '/upvote':
+            return self.get_response(request)
+
+        started = time.time()
+        response = self.get_response(request)
+
+        try:
+            print(self.log_line(request, response, time.time() - started))
+        except Exception as error:
+            print(f"UPVOTELOG error={error!r}")
+
+        return response
+
+    def log_line(self, request, response, duration):
+        ip = trusted_client_ip(request)
+        uid = request.POST.get('uid', '')
+        token = request.POST.get('token', '')
+
+        fields = {
+            'ip': ip,
+            'country': get_country(ip).get('country_code', ''),
+            'hash': salt_and_hash(request, 'year')[:12],
+            'method': request.method,
+            'status': response.status_code,
+            'ms': int(duration * 1000),
+            'uid': uid,
+            'token': 'missing' if not token else 'placeholder' if token == uid else 'signed',
+            'honeypot': bool(request.POST.get('title', '')),
+            'ua': request.META.get('HTTP_USER_AGENT', ''),
+            'referer': request.META.get('HTTP_REFERER', ''),
+            'origin': request.META.get('HTTP_ORIGIN', ''),
+            'lang': request.META.get('HTTP_ACCEPT_LANGUAGE', ''),
+            'accept': request.META.get('HTTP_ACCEPT', ''),
+            'encoding': request.META.get('HTTP_ACCEPT_ENCODING', ''),
+            'content_type': request.META.get('CONTENT_TYPE', ''),
+            'sec_fetch_site': request.META.get('HTTP_SEC_FETCH_SITE', ''),
+            'sec_fetch_mode': request.META.get('HTTP_SEC_FETCH_MODE', ''),
+            'sec_fetch_dest': request.META.get('HTTP_SEC_FETCH_DEST', ''),
+            'sec_ch_ua': request.META.get('HTTP_SEC_CH_UA', ''),
+            'sec_ch_ua_mobile': request.META.get('HTTP_SEC_CH_UA_MOBILE', ''),
+            'sec_ch_ua_platform': request.META.get('HTTP_SEC_CH_UA_PLATFORM', ''),
+            'cf_ray': request.META.get('HTTP_CF_RAY', ''),
+            'cf_country': request.META.get('HTTP_CF_IPCOUNTRY', ''),
+        }
+
+        return 'UPVOTELOG ' + ' '.join(f"{key}={value!r}" for key, value in fields.items())
