@@ -22,62 +22,57 @@ Staff dashboard  ʕง•ᴥ•ʔง
 
 {% block content %}
 <a href="{% url 'staff_actions' %}">Actions</a>
-| <a href="{% url 'review_opt_in' %}">Review {{ opt_in_blogs_count }} opt-in blogs</a>
-| <a href="{% url 'review_flagged' %}">Review {{ flagged_blogs_count }} flagged blogs</a>
+| <a href="{% url 'review_opt_in' %}">Review {{ opt_in_blogs_count }} opt-ins</a>
+| <a href="{% url 'review_flagged' %}">Review {{ flagged_blogs_count }} flags</a>
 | <a href="{% url 'review_dodgy' %}">Review {{ dodgy_blogs_count }} dodgy blogs</a>
 | <a href="{% url 'review_new' %}">Review {{ new_blogs_count }} new blogs</a>
 <main>
-    <p>
-        <h2>Blog review counter</h2>
-        <ul>
-        {% for week_start, count in reviewed_blogs.items %}
-            <li><b>Week starting {{ week_start }}</b>: {{ count }}</li>
-        {% endfor %}
-        </ul>
-    </p>
-
     {% if request.user.is_superuser %}
-    <p>
-        <h2>All time stats</h2>
-        <ul>
-            <li>Signups: {{ total_signups }}</li>
-            <li>Upgrades: {{ total_upgrades }}</li>
-            <li>Conversion rate: {{ total_conversion_rate }}</li>
-        </ul>
-    </p>
-    <p>
-        <h2>Past {{ days_filter }} days ({{ period|capfirst }})</h2>
-        <span>
-            <button onclick="window.location = '?days=7&amp;period={{ period }}'">Last week</button>
-            <button onclick="window.location = '?days=30&amp;period={{ period }}'">Last month</button>
-            <button onclick="window.location = '?days=60&amp;period={{ period }}'">Last 3 months</button>
-            <button onclick="window.location = '?days=180&amp;period={{ period }}'">Last 6 months</button>
-            <button onclick="window.location = '?days=365&amp;period={{ period }}'">Last year</button>
+    <hr style="margin: 20px 0">
+    <details>
+        <summary><b style="font-size: 25px;">Stats</b></summary>
+        <p>
+            <h3>All time stats</h3>
+            <ul>
+                <li>Signups: {{ total_signups }}</li>
+                <li>Upgrades: {{ total_upgrades }}</li>
+                <li>Conversion rate: {{ total_conversion_rate }}</li>
+            </ul>
+        </p>
+        <p>
+            <h3>Past {{ days_filter }} days ({{ period|capfirst }})</h3>
+            <span>
+                <button onclick="window.location = '?days=7&amp;period={{ period }}'">Last week</button>
+                <button onclick="window.location = '?days=30&amp;period={{ period }}'">Last month</button>
+                <button onclick="window.location = '?days=60&amp;period={{ period }}'">Last 3 months</button>
+                <button onclick="window.location = '?days=180&amp;period={{ period }}'">Last 6 months</button>
+                <button onclick="window.location = '?days=365&amp;period={{ period }}'">Last year</button>
+            </span>
+            <br>
+            <span>
+                <button onclick="window.location = '?days={{ days_filter }}&amp;period=days'">Days</button>
+                <button onclick="window.location = '?days={{ days_filter }}&amp;period=weeks'">Weeks</button>
+                <button onclick="window.location = '?days={{ days_filter }}&amp;period=months'">Months</button>
+            </span>
+            <ul>
+                <li>Signups: {{ signups }}</li>
+                <li>Upgrades: {{ upgrades }}</li>
+                <li>Conversion rate: {{ conversion_rate }}</li>
+            </ul>
+        </p>
+        <h3>Signups</h3>
+        <canvas id="signupChart"></canvas>
+        <span class="helptext" style="display: flex; justify-content:space-between;">
+            <span>{{ start_date|date:"j F Y" }}</span>
+            <span>{{ end_date|date:"j F Y" }}</span>
         </span>
-        <br>
-        <span>
-            <button onclick="window.location = '?days={{ days_filter }}&amp;period=days'">Days</button>
-            <button onclick="window.location = '?days={{ days_filter }}&amp;period=weeks'">Weeks</button>
-            <button onclick="window.location = '?days={{ days_filter }}&amp;period=months'">Months</button>
+        <h3>Upgrades</h3>
+        <canvas id="upgradeChart"></canvas>
+        <span class="helptext" style="display: flex; justify-content:space-between;">
+            <span>{{ start_date|date:"j F Y" }}</span>
+            <span>{{ end_date|date:"j F Y" }}</span>
         </span>
-        <ul>
-            <li>Signups: {{ signups }}</li>
-            <li>Upgrades: {{ upgrades }}</li>
-            <li>Conversion rate: {{ conversion_rate }}</li>
-        </ul>
-    </p>
-    <h2>Signups</h2>
-    <canvas id="signupChart"></canvas>
-    <span class="helptext" style="display: flex; justify-content:space-between;">
-        <span>{{ start_date|date:"j F Y" }}</span>
-        <span>{{ end_date|date:"j F Y" }}</span>
-    </span>
-    <h2>Upgrades</h2>
-    <canvas id="upgradeChart"></canvas>
-    <span class="helptext" style="display: flex; justify-content:space-between;">
-        <span>{{ start_date|date:"j F Y" }}</span>
-        <span>{{ end_date|date:"j F Y" }}</span>
-    </span>
+    </details>
 
     <h2>Blog lookup</h2>
     <form id="blog-lookup-form" class="full-width">

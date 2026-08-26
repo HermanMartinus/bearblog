@@ -126,29 +126,10 @@ def dashboard(request):
             'empty_blogs': all_empty_blogs,
             'days_filter': days_filter,
             'period': period,
-            'reviewed_blogs': get_weekly_reviews(),
             'heroku_slug_description': os.getenv('HEROKU_SLUG_DESCRIPTION'),
             'heroku_release_created_at': datetime.fromisoformat(os.getenv('HEROKU_RELEASE_CREATED_AT', timezone.now().isoformat()).replace('Z', '+00:00'))
         }
     )
-
-
-def get_weekly_reviews():
-    persistent_store = PersistentStore.load()
-    reviewed_blogs = persistent_store.reviewed_blogs
-
-     # Aggregate by week
-    weekly_reviews = {}
-    for date_str, count in reviewed_blogs.items():
-        date = datetime.strptime(date_str, '%Y-%m-%d')
-        # Find days since last Sunday (week starts at midnight before Monday)
-        days_since_sunday = (date.weekday() + 1) % 7
-        week_start = (date - timedelta(days=days_since_sunday)).strftime('%Y-%m-%d')
-        weekly_reviews[week_start] = weekly_reviews.get(week_start, 0) + count
-    
-    # Sort by week start date
-    weekly_reviews = dict(sorted(weekly_reviews.items()))
-    return weekly_reviews
 
 
 def new_upgrades():
@@ -592,17 +573,6 @@ def review_bulk(request):
         return redirect('staff_dashboard')
 
 
-def increment_reviewed():
-    persistent_store = PersistentStore.load()
-    today = timezone.now().date().isoformat()
-    
-    reviewed_blogs = persistent_store.reviewed_blogs
-    reviewed_blogs[today] = reviewed_blogs.get(today, 0) + 1
-    
-    persistent_store.reviewed_blogs = reviewed_blogs
-    persistent_store.save()
-
-
 @staff_member_required
 def approve(request, pk):
     if request.method == "POST":
@@ -637,8 +607,6 @@ def block(request, pk):
         blog.save()
         blog.user.save()
 
-        increment_reviewed()
-
         return HttpResponse("Blocked")
 
 
@@ -670,8 +638,6 @@ def ignore(request, pk):
         blog.to_review = False
         blog.save()
 
-        increment_reviewed()
-
         return HttpResponse("Ignored")
     
 
@@ -681,8 +647,6 @@ def flag(request, pk):
         blog = get_object_or_404(Blog, pk=pk)
         blog.flagged = True
         blog.save()
-
-        increment_reviewed()
 
         return HttpResponse("Flagged")
 
