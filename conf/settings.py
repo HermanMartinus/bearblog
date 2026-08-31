@@ -92,6 +92,7 @@ AUTHENTICATION_BACKENDS = (
 
 MIDDLEWARE = [
     'blogs.middleware.BlockHerokuAppMiddleware',
+    'blogs.middleware.BotScoreMiddleware',
     'blogs.middleware.RateLimitMiddleware',
     'blogs.middleware.MainSitePathProtectionMiddleware',
     'blogs.middleware.ConditionalXFrameOptionsMiddleware',
