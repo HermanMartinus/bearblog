@@ -33,24 +33,18 @@
             $upvoteButton.title = "Toasted"
         }
         $upvoteButton.ariaLabel += ` (${data.upvote_count})`
+
+        document.addEventListener('touchmove', interaction, {once: true});
+        document.addEventListener('mousemove', interaction, {once: true});
     });
 
-    let moved = false;
-    let pageLoaded = Date.now();
-
-    document.addEventListener('touchmove', () => moved = true);
-    document.addEventListener('mousemove', () => moved = true);
+    const interaction = () => {
+        document.querySelector('input[name="title"]').value = "";
+        document.querySelector('input[name="token"]').value = upvoteToken;
+    }
 
     document.querySelector('#upvote-form').addEventListener('submit', (e) => {
         e.preventDefault();
-
-        if (moved) {
-            document.querySelector('input[name="title"]').value = "";
-            document.querySelector('input[name="token"]').value = upvoteToken;
-        }
-        if (Date.now() - pageLoaded < 2000 || !moved) {
-            return;
-        }
 
         fetch(e.target.action, {
             method: 'post',

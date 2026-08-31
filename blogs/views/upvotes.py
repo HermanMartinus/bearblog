@@ -6,7 +6,7 @@ from requests.exceptions import RequestException
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.core.signing import BadSignature, TimestampSigner
+from django.core.signing import BadSignature, TimestampSigner, b62_decode
 
 from blogs.models import Post, Upvote
 from blogs.helpers import salt_and_hash, trusted_client_ip
@@ -17,15 +17,20 @@ upvote_signer = TimestampSigner(salt='upvote')
 # Tokens are minted per page load, so this only needs to outlast a reading session
 # Form is prepopulates with uid which is invalid, then gets swapped out with a valid one
 UPVOTE_TOKEN_MAX_AGE = 60 * 60 * 12
+UPVOTE_TOKEN_MIN_AGE = 5
 
 
-def valid_upvote_token(token, uid, hash_id):
+def valid_upvote_token_age(token, uid, hash_id):
     # Binding the hash to the token means a token minted for one visitor is
     # useless to another, so rotating IPs costs a fetch per upvote
     try:
-        return upvote_signer.unsign(token, max_age=UPVOTE_TOKEN_MAX_AGE) == f"{uid}:{hash_id}"
+        value = upvote_signer.unsign(token, max_age=UPVOTE_TOKEN_MAX_AGE)
+        if value != f"{uid}:{hash_id}":
+            return None
+        timestamp = token.rsplit(upvote_signer.sep, 2)[-2]
+        return time() - b62_decode(timestamp)
     except BadSignature:
-        return False
+        return None
 
 
 def get_upvote_info(request, uid):
@@ -53,18 +58,21 @@ def upvote(request):
         print("Not upvoting: Missing uid")
         return response
 
+    marked_reason = ''
     if request.POST.get("title", False):
-        print("Not upvoting: Honeypot filled")
-        return response
-
-    if _request_from_tor(request):
-        print("Not upvoting: Tor exit")
-        return response
+        marked_reason = 'Honeypot filled'
+    elif 'timezone' not in request.COOKIES:
+        marked_reason = 'Timezone cookie'
+    elif _request_from_tor(request):
+        marked_reason = 'Tor exit'
 
     hash_id = salt_and_hash(request, 'year')
-    if not valid_upvote_token(request.POST.get("token", ""), uid, hash_id):
-        print("Not upvoting: Invalid token")
-        return response
+    if not marked_reason:
+        token_age = valid_upvote_token_age(request.POST.get("token", ""), uid, hash_id)
+        if token_age is None:
+            marked_reason = 'Invalid token'
+        elif token_age < UPVOTE_TOKEN_MIN_AGE:
+            marked_reason = 'Quick submission'
 
     post = Post.objects.filter(uid=uid).first()
     if not post:
@@ -72,10 +80,17 @@ def upvote(request):
         return response
 
     try:
-        upvote, created = Upvote.objects.get_or_create(post=post, hash_id=hash_id)
+        upvote, created = Upvote.objects.get_or_create(
+            post=post,
+            hash_id=hash_id,
+            defaults={
+                'marked': bool(marked_reason),
+                'marked_reason': marked_reason,
+            },
+        )
 
         if created:
-            print("Upvoting", post)
+            print("Upvoting:", post, marked_reason)
         else:
             print("Not upvoting: Duplicate upvote")
     except Upvote.MultipleObjectsReturned:

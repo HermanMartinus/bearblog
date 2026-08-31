@@ -217,6 +217,8 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Upvote)
 class UpvoteAdmin(admin.ModelAdmin):
     raw_id_fields = ('post',)
+    list_filter = ('marked',)
+    list_display = ('post_id', 'hash_id', 'marked', 'marked_reason')
 
 
 @admin.register(Media)
@@ -255,4 +257,3 @@ class SubscriberAdmin(admin.ModelAdmin):
 
 admin.site.register(Stylesheet)
 admin.site.register(PersistentStore)
-
