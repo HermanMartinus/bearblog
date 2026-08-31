@@ -1,6 +1,6 @@
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -9,19 +9,23 @@ from zoneinfo import ZoneInfo
 
 import io
 from datetime import datetime
-from PIL import Image, UnidentifiedImageError, ImageOps
+from PIL import Image, ImageOps
+import pillow_heif
 import re
-import json
 import os
 import boto3
+import logging
 import threading
 
 from blogs.models import Blog, Media
 
+pillow_heif.register_heif_opener()
+
 bucket_name = os.getenv('SPACES_BUCKET', 'bear-images')
+logger = logging.getLogger(__name__)
 
 
-image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic']
+image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic', 'heif']
 video_types = ['mp4', 'webm', 'mkv']
 audio_types = ['mp3', 'ogg', 'wav', 'opus', 'flac']
 document_types = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'rtf', 'epub', 'ps', 'odt', 'ods', 'odp', 'odg', 'odf', 'mml', 'odb', 'uot', 'uos', 'uop', 'css']
@@ -30,6 +34,12 @@ font_types = ['woff', 'woff2', 'ttf', 'otf']
 file_types = image_types + video_types + audio_types + document_types + font_types
 
 file_size_limit = 10 * 1024 * 1024 # 10MB in bytes
+
+
+class UploadError(Exception):
+    def __init__(self, message, status_code=400):
+        super().__init__(message)
+        self.status_code = status_code
 
 
 @login_required
@@ -47,10 +57,10 @@ def media_center(request, id):
     # Upload media
     file_list = request.FILES.getlist('file')
     if request.method == "POST" and file_list and blog.user.settings.upgraded is True:
-        file_links = upload_files(blog, file_list)
-        for link in file_links:
-            if 'Error' in link:
-                error_messages.append(link)
+        try:
+            upload_files(blog, file_list)
+        except UploadError as error:
+            error_messages.append(str(error))
 
     # Prefill blogs with existing images on the bucket
     if not blog.media.exists():
@@ -88,14 +98,20 @@ def upload_image(request, id):
 
     if request.method == "POST" and blog.user.settings.upgraded is True:
         file_list = request.FILES.getlist('file')
+        if not file_list:
+            return JsonResponse({'error': 'No file provided.'}, status=400)
+
         optimise = True
         if request.POST.get('raw') == 'true':
             optimise = False
 
-        file_links = upload_files(blog, file_list, optimise)
+        try:
+            file_links = upload_files(blog, file_list, optimise)
+        except UploadError as error:
+            return JsonResponse({'error': str(error)}, status=error.status_code)
 
-        return JsonResponse(sorted(file_links), safe=False)
-    return HttpResponse('Failed', status=400, content_type='text/plain')
+        return JsonResponse({'urls': sorted(file_links)})
+    return JsonResponse({'error': 'Upload failed.'}, status=400)
 
 
 def upload_files(blog, file_list, optimise=True):
@@ -104,28 +120,27 @@ def upload_files(blog, file_list, optimise=True):
     for file in file_list:
         # Fair use limit
         if blog.media.count() > 20000:
-            file_links.append('Error: Fair usage limit exceeded. Contact site admin.')
-            return sorted(file_links)
+            raise UploadError('Fair usage limit exceeded. Contact site admin.', status_code=429)
 
         # Upload size limit
         if file.size > file_size_limit:
-            file_links.append(f'Error: File {file.name} exceeds 10MB limit')
-            break
+            raise UploadError(f'File {file.name} exceeds 10MB limit.', status_code=413)
         
-        # Only allowed file types but also explicitly excluding heic since Safari auto-converts it otherwise
-        if not file.name.lower().endswith(tuple(file_types)) or file.name.lower().endswith('heic'):
-            file_links.append(f'Error: File type not supported: {file.name}')
-            break
-        
-        extension = file.name.split('.')[-1].lower()
+        # Only allowed file types
+        extension = os.path.splitext(file.name)[1].lstrip('.').lower()
+        if extension not in file_types:
+            raise UploadError(f'File type not supported: {file.name}', status_code=415)
         
         # Strip metadata if the file is an image
-        if extension in image_types and not extension.endswith('svg') and not extension.endswith('gif'):
+        if extension in image_types and extension != 'svg' and extension != 'gif':
             try:
                 file = process_image(file, optimise)
-            except UnidentifiedImageError:
-                file_links.append(f'Error: The image file cannot be identified or is not a valid image.')
-                break
+            except (OSError, ValueError, Image.DecompressionBombError) as error:
+                logger.exception('Error processing image %s', file.name)
+                raise UploadError(
+                    'The image file cannot be identified or is not a valid image.',
+                    status_code=422,
+                ) from error
 
         file_name = slugify(file.name.split('.')[-2].lower())
         extension = file.name.split('.')[-1].lower()
@@ -140,16 +155,13 @@ def upload_files(blog, file_list, optimise=True):
         
         filepath = f'{blog.subdomain}/{file_name}.{extension}'
         url = f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/{filepath}'
-        file_links.append(url)
 
-        # Create Media object first
-        Media.objects.create(blog=blog, url=url)
-
-        # Read file data before starting thread
         file_data = file.read()
         content_type = file.content_type
 
-        # Move S3 upload to a thread
+        Media.objects.create(blog=blog, url=url)
+        file_links.append(url)
+
         thread = threading.Thread(
             target=upload_to_s3,
             args=(filepath, file_data, content_type)
@@ -169,16 +181,15 @@ def upload_to_s3(filepath, file_data, content_type):
         aws_secret_access_key=os.getenv('SPACES_SECRET'))
 
     try:
-        response = client.put_object(
+        client.put_object(
             Bucket=bucket_name,
             Key=filepath,
             Body=file_data,
             ContentType=content_type,
             ACL='public-read',
         )
-    except Exception as e:
-        print(f"Error uploading to S3: {str(e)}")
-        raise e
+    except Exception:
+        logger.exception('Error uploading %s to Spaces', filepath)
 
 
 def process_image(file, optimise):
@@ -308,4 +319,3 @@ def delete_selected_media(request, id):
             
         
     return redirect('media_center', id=id)
-

@@ -106,7 +106,7 @@ function upload() {
     uploadNextFile(0, files);
 }
 
-function uploadNextFile(index, files) {
+async function uploadNextFile(index, files) {
     $loadingDotty.innerText = `Uploading ${index + 1} of ${files.length}`
     const file = files[index];
     console.log(file.name)
@@ -120,8 +120,19 @@ function uploadNextFile(index, files) {
         return;
     }
 
+    let fileData;
+    try {
+        fileData = new Blob([await file.arrayBuffer()], {
+            type: file.type || 'application/octet-stream'
+        });
+    } catch (error) {
+        alert(`Upload of ${file.name} failed. Please try again.`);
+        nextOrReload();
+        return;
+    }
+
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", fileData, file.name);
     formData.append("raw", $rawCheckbox.checked);
 
     const target = "{% url 'upload_image' id=blog.subdomain %}";
@@ -130,6 +141,7 @@ function uploadNextFile(index, files) {
     const eventSource = xhr.upload || xhr;
 
     xhr.open("POST", target, true);
+    xhr.responseType = "json";
     xhr.setRequestHeader("X-CSRFToken", document.querySelector('#deleteForm [name="csrfmiddlewaretoken"]').value);
     xhr.send(formData);
 
@@ -146,7 +158,10 @@ function uploadNextFile(index, files) {
             console.log('uploaded')
         }
         else {
-            alert(`Upload of ${file.name} failed. This may be due to a slow connection. Consider resizing it and trying again.`);
+            const message = this.response && this.response.error
+                ? this.response.error
+                : `Upload of ${file.name} failed. This may be due to a slow connection. Consider resizing it and trying again.`;
+            alert(message);
         }
 
         nextOrReload();

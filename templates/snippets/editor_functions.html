@@ -205,7 +205,7 @@
 		uploadNextFile(0, files);
 	}
 
-	function uploadNextFile(index, files) {
+	async function uploadNextFile(index, files) {
 		const file = files[index];
 
 		if (file.size > 10000000) {
@@ -216,8 +216,19 @@
 			return;
 		}
 
+		let fileData;
+		try {
+			fileData = new Blob([await file.arrayBuffer()], {
+				type: file.type || 'application/octet-stream'
+			});
+		} catch (error) {
+			alert(`Upload of ${file.name} failed. Please try again.`);
+			nextFile();
+			return;
+		}
+
 		const formData = new FormData();
-		formData.append("file", file);
+		formData.append("file", fileData, file.name);
 
 		const target = "{% url 'upload_image' id=blog.subdomain %}";
 		const position = $textarea.selectionStart || 0;
@@ -230,16 +241,17 @@
 		const eventSource = xhr.upload || xhr;
 
 		xhr.open("POST", target, true);
+		xhr.responseType = "json";
 		xhr.setRequestHeader("X-CSRFToken", $form.querySelector('[name="csrfmiddlewaretoken"]').value);
 		xhr.send(formData);
 
 		xhr.onload = function() {
-			if (this.status === 200) {
-				const response = JSON.parse(this.responseText);
+			const response = this.response;
+			if (this.status === 200 && response && Array.isArray(response.urls)) {
 				const imageName = file.name.split('.')[0];
 				const fileExtension = file.name.split('.').pop().toLowerCase();
 
-				response.forEach(image => {
+				response.urls.forEach(image => {
 					let toInsert;
 
 					if (fileExtension === 'mp4') {
@@ -260,6 +272,10 @@
 					}
 				});
 			} else {
+				const message = response && response.error
+					? response.error
+					: `Upload of ${file.name} failed. Please try again.`;
+				alert(message);
 				replacePlaceholderWithError();
 			}
 

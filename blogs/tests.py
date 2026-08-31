@@ -1,9 +1,11 @@
+import io
 import json
 import os
 from datetime import timedelta
 from unittest import mock
 from zoneinfo import ZoneInfo
 
+import pillow_heif
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -11,6 +13,7 @@ from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import SafeString
+from PIL import Image
 
 from blogs.forms import BlogForm, AdvancedSettingsForm
 from blogs.helpers import salt_and_hash
@@ -416,6 +419,8 @@ class UploadCSRFTests(TestCase):
     def test_same_origin_upload_works_with_editor_token(self, mock_upload):
         token, editor_response = self._csrf_token_from_editor()
         self.assertContains(editor_response, 'xhr.setRequestHeader("X-CSRFToken"')
+        self.assertContains(editor_response, 'new Blob([await file.arrayBuffer()]')
+        self.assertContains(editor_response, 'formData.append("file", fileData, file.name)')
 
         response = self.client.post(
             self.upload_url,
@@ -434,6 +439,115 @@ class UploadCSRFTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'xhr.setRequestHeader("X-CSRFToken"')
+        self.assertContains(response, 'new Blob([await file.arrayBuffer()]')
+        self.assertContains(response, 'formData.append("file", fileData, file.name)')
+
+
+@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'lh.co,localhost'})
+class MediaUploadTests(TestCase):
+    def setUp(self):
+        Stylesheet.objects.create(title='Default', identifier='default', css='')
+        self.user = User.objects.create_user(username='media-user', password='pass')
+        self.user.settings.upgraded = True
+        self.user.settings.save()
+        self.blog = Blog.objects.create(
+            user=self.user,
+            title='Media Blog',
+            subdomain='media-blog',
+        )
+        self.client.login(username='media-user', password='pass')
+        self.upload_url = '/media-blog/dashboard/upload-image/'
+        pillow_heif.register_heif_opener()
+
+    def heif_file(self, name='camera.heic', truncate=False):
+        data = io.BytesIO()
+        Image.new('RGB', (16, 8), '#7a5cff').save(data, format='HEIF')
+        content = data.getvalue()
+        if truncate:
+            content = content[:-1]
+        content_type = 'image/heif' if name.endswith('.heif') else 'image/heic'
+        return SimpleUploadedFile(name, content, content_type=content_type)
+
+    @mock.patch('blogs.views.media.threading.Thread')
+    def test_optimised_heic_starts_background_webp_upload(self, mock_thread):
+        response = self.client.post(
+            self.upload_url,
+            {'file': self.heif_file()},
+            HTTP_HOST='lh.co',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        url = response.json()['urls'][0]
+        self.assertTrue(url.endswith('/media-blog/camera.webp'))
+        filepath, file_data, content_type = mock_thread.call_args.kwargs['args']
+        self.assertEqual(filepath, 'media-blog/camera.webp')
+        self.assertEqual(content_type, 'image/webp')
+        self.assertEqual(Image.open(io.BytesIO(file_data)).format, 'WEBP')
+        self.assertTrue(self.blog.media.filter(url=url).exists())
+        mock_thread.return_value.start.assert_called_once()
+
+    @mock.patch('blogs.views.media.threading.Thread')
+    def test_raw_heic_remains_heic(self, mock_thread):
+        response = self.client.post(
+            self.upload_url,
+            {'file': self.heif_file(), 'raw': 'true'},
+            HTTP_HOST='lh.co',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        url = response.json()['urls'][0]
+        self.assertTrue(url.endswith('/media-blog/camera.heic'))
+        filepath, file_data, content_type = mock_thread.call_args.kwargs['args']
+        self.assertEqual(filepath, 'media-blog/camera.heic')
+        self.assertEqual(content_type, 'image/heic')
+        self.assertEqual(Image.open(io.BytesIO(file_data)).format, 'HEIF')
+        self.assertTrue(self.blog.media.filter(url=url).exists())
+        mock_thread.return_value.start.assert_called_once()
+
+    @mock.patch('blogs.views.media.threading.Thread')
+    def test_raw_heif_remains_heif(self, mock_thread):
+        response = self.client.post(
+            self.upload_url,
+            {'file': self.heif_file(name='camera.heif'), 'raw': 'true'},
+            HTTP_HOST='lh.co',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        url = response.json()['urls'][0]
+        self.assertTrue(url.endswith('/media-blog/camera.heif'))
+        filepath, file_data, content_type = mock_thread.call_args.kwargs['args']
+        self.assertEqual(filepath, 'media-blog/camera.heif')
+        self.assertEqual(content_type, 'image/heif')
+        self.assertEqual(Image.open(io.BytesIO(file_data)).format, 'HEIF')
+        self.assertTrue(self.blog.media.filter(url=url).exists())
+        mock_thread.return_value.start.assert_called_once()
+
+    @mock.patch('blogs.views.media.threading.Thread')
+    def test_truncated_heic_returns_validation_error(self, mock_thread):
+        with mock.patch('blogs.views.media.logger.exception') as mock_log:
+            response = self.client.post(
+                self.upload_url,
+                {'file': self.heif_file(truncate=True)},
+                HTTP_HOST='lh.co',
+            )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertIn('not a valid image', response.json()['error'])
+        mock_log.assert_called_once_with('Error processing image %s', 'camera.heic')
+        mock_thread.assert_not_called()
+        self.assertFalse(self.blog.media.exists())
+
+    @mock.patch('blogs.views.media.threading.Thread')
+    def test_extension_must_match_exactly(self, mock_thread):
+        response = self.client.post(
+            self.upload_url,
+            {'file': SimpleUploadedFile('image.notheic', b'not an image', content_type='image/heic')},
+            HTTP_HOST='lh.co',
+        )
+
+        self.assertEqual(response.status_code, 415)
+        mock_thread.assert_not_called()
+        self.assertFalse(self.blog.media.exists())
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'lh.co,localhost'})
@@ -1123,12 +1237,14 @@ class ContentTypeTests(TestCase):
         response = self.client.post('/ctblog/dashboard/upload-image/', {'file': f})
         self.assertEqual(response.status_code, 200)
         self.assertIn('application/json', response['Content-Type'])
+        self.assertEqual(response.json(), {'urls': ['https://example.com/test.png']})
 
-    def test_upload_image_failure_returns_text_plain(self):
+    def test_upload_image_failure_returns_json(self):
         self.client.login(username='ctype_user', password='pass')
         response = self.client.post('/ctblog/dashboard/upload-image/')
         self.assertEqual(response.status_code, 400)
-        self.assertIn('text/plain', response['Content-Type'])
+        self.assertIn('application/json', response['Content-Type'])
+        self.assertEqual(response.json(), {'error': 'Upload failed.'})
 
     # --- email_list() export-txt ---
 
