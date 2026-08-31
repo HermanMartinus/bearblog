@@ -1,6 +1,6 @@
 <form class="email-signup" action="/email-subscribe/" method="post">
-    <input type="text" name="name" autocomplete="off" autocorrect='off' style="display: none;">
-    <input type="text" name="confirm" autocomplete="off" autocorrect='off' style="display: none;">
+    <input type="text" name="name" autocomplete="off" autocorrect="off" tabindex="-1" aria-hidden="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;">
+    <input type="hidden" name="confirm">
     <input type="email" placeholder="Email address..." name="email" required autocomplete="off" autocorrect='off' style="background-color: #eceff4; padding: 5px;">
     <br>
     <input type="submit" value="Subscribe">

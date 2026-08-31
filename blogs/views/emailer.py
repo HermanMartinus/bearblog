@@ -38,7 +38,10 @@ def email_list(request, id):
 
     email_addresses_text = ""
     if request.POST.get("email_addresses", ""):
-        email_addresses = re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", request.POST.get("email_addresses", ""))
+        email_addresses = re.findall(
+            r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+",
+            request.POST.get("email_addresses", "").lower(),
+        )
 
         subscribers_list = list(subscribers.values_list('email_address', flat=True))
         removed = list(set(subscribers_list) - set(email_addresses))
@@ -86,7 +89,7 @@ def email_subscribe(request):
         return not_found(request)
 
     if request.method == "POST":
-        email = request.POST.get("email")
+        email = request.POST.get("email", "").strip().lower()
         match = re.match(r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,10})$', email)
         if not match:
             return HttpResponse("Bad email address.", content_type='text/plain')
