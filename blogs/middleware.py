@@ -123,4 +123,8 @@ class RateLimitMiddleware:
             print(f"Rate limit: User agent {request.META.get('HTTP_USER_AGENT')}")
             return JsonResponse({'error': 'Rate limit exceeded'}, status=429)
 
+        print("Path:", full_path)
+        print("User-Agent:", request.META.get('HTTP_USER_AGENT'))
+        print("Accept-Language:", request.META.get('HTTP_ACCEPT_LANGUAGE'))
+
         return self.get_response(request)
