@@ -57,31 +57,6 @@ class ConditionalXFrameOptionsMiddleware:
         return response
 
 
-class BotScoreMiddleware:
-    BROWSER_HEADERS = (
-        'User-Agent',
-        'Accept',
-        'Accept-Language',
-        'Accept-Encoding',
-        'Upgrade-Insecure-Requests',
-        'Priority',
-    )
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        headers = {
-            name: request.headers.get(name)
-            for name in self.BROWSER_HEADERS
-        }
-        print(
-            f"BotScore method={request.method!r} path={request.path!r}"
-            f"headers={headers!r}"
-        )
-        return self.get_response(request)
-
-
 class RateLimitMiddleware:
     RATE_LIMIT = 10  # max requests per thread
     if os.getenv('ENVIRONMENT') == 'dev':
