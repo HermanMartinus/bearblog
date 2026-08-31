@@ -15,14 +15,11 @@ from blogs.helpers import salt_and_hash, trusted_client_ip
 upvote_signer = TimestampSigner(salt='upvote')
 
 # Tokens are minted per page load, so this only needs to outlast a reading session
-# Form is prepopulates with uid which is invalid, then gets swapped out with a valid one
 UPVOTE_TOKEN_MAX_AGE = 60 * 60 * 12
 UPVOTE_TOKEN_MIN_AGE = 3
 
 
 def valid_upvote_token_age(token, uid, hash_id):
-    # Binding the hash to the token means a token minted for one visitor is
-    # useless to another, so rotating IPs costs a fetch per upvote
     try:
         value = upvote_signer.unsign(token, max_age=UPVOTE_TOKEN_MAX_AGE)
         if value != f"{uid}:{hash_id}":
