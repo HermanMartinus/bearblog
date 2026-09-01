@@ -61,7 +61,7 @@ class ConditionalXFrameOptionsMiddleware:
 
 
 class ProtectedRouteMiddleware:
-    PROTECTED_PATHS = {'/blog', '/blog/'}
+    PROTECTED_PATHS = {'/blog', '/blog/', '/posts', '/posts/', '/archive', '/archive/', '/writing', '/writing/'}
     COOKIE_NAME = 'protected_route'
     COOKIE_MAX_AGE = 60 * 60 * 24
     COOKIE_SALT = 'blogs.protected_route.cookie'
