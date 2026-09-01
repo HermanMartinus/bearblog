@@ -97,6 +97,7 @@ MIDDLEWARE = [
     'blogs.middleware.ConditionalXFrameOptionsMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'blogs.middleware.ProtectedRouteMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',

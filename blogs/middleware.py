@@ -1,5 +1,8 @@
-from django.http import JsonResponse
+from django.conf import settings
+from django.core import signing
+from django.http import HttpResponse, JsonResponse
 
+import json
 import os
 import time
 from collections import defaultdict
@@ -54,6 +57,80 @@ class ConditionalXFrameOptionsMiddleware:
         if host in main_domains:
             response['X-Frame-Options'] = 'DENY'
 
+        return response
+
+
+class ProtectedRouteMiddleware:
+    PROTECTED_PATHS = {'/blog', '/blog/'}
+    COOKIE_NAME = 'protected_route'
+    COOKIE_MAX_AGE = 60 * 60 * 24
+    COOKIE_SALT = 'blogs.protected_route.cookie'
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path not in self.PROTECTED_PATHS or not request.META.get('QUERY_STRING'):
+            return self.get_response(request)
+
+        if self._has_valid_cookie(request):
+            return self.get_response(request)
+
+        if request.method in ('GET', 'HEAD'):
+            return self._challenge_response(request)
+
+        return self._uncacheable(JsonResponse({'error': 'Browser challenge required'}, status=403))
+
+    def _challenge_response(self, request):
+        cookie_value = signing.dumps(
+            {'host': request.get_host().lower()},
+            salt=self.COOKIE_SALT,
+        )
+        cookie = (
+            f'{self.COOKIE_NAME}={cookie_value}; '
+            f'Max-Age={self.COOKIE_MAX_AGE}; Path=/; SameSite=Lax'
+        )
+        if not settings.DEBUG:
+            cookie += '; Secure'
+
+        content = f'''<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checking your browser</title>
+</head>
+<body>
+    <p id="challenge-status">Checking your browser…</p>
+    <script>
+        document.cookie = {json.dumps(cookie)};
+        window.location.reload();
+    </script>
+</body>
+</html>'''
+        return self._uncacheable(HttpResponse(content, status=403, content_type='text/html'))
+
+    def _has_valid_cookie(self, request):
+        cookie_value = request.COOKIES.get(self.COOKIE_NAME)
+        if not cookie_value:
+            return False
+
+        try:
+            cookie_data = signing.loads(
+                cookie_value,
+                salt=self.COOKIE_SALT,
+                max_age=self.COOKIE_MAX_AGE,
+            )
+        except signing.BadSignature:
+            return False
+
+        return cookie_data == {'host': request.get_host().lower()}
+
+    @staticmethod
+    def _uncacheable(response):
+        response['Cache-Control'] = 'private, no-store, max-age=0'
+        response['Cloudflare-CDN-Cache-Control'] = 'no-store'
+        response['X-Robots-Tag'] = 'noindex, nofollow'
         return response
 
 
@@ -122,9 +199,5 @@ class RateLimitMiddleware:
             print(f"Rate limit: Exceeded for {client_ip_address} at {full_path}")
             print(f"Rate limit: User agent {request.META.get('HTTP_USER_AGENT')}")
             return JsonResponse({'error': 'Rate limit exceeded'}, status=429)
-
-        print("Path:", full_path)
-        print("User-Agent:", request.META.get('HTTP_USER_AGENT'))
-        print("Accept-Language:", request.META.get('HTTP_ACCEPT_LANGUAGE'))
 
         return self.get_response(request)
