@@ -120,5 +120,5 @@ Caddyfile.dev
 .agents
 AGENTS.md
 .codex
-/architecture.md
+architecture.md
 
