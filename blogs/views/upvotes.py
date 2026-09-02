@@ -30,6 +30,22 @@ def valid_upvote_token_age(token, uid, hash_id):
         return None
 
 
+def token_age_bucket(token_age):
+    if token_age is None:
+        return 'invalid'
+    if token_age < UPVOTE_TOKEN_MIN_AGE:
+        return 'under_3_seconds'
+    if token_age < 10:
+        return '3_to_10_seconds'
+    if token_age < 60:
+        return '10_to_60_seconds'
+    if token_age < 5 * 60:
+        return '1_to_5_minutes'
+    if token_age < 60 * 60:
+        return '5_to_60_minutes'
+    return '1_to_12_hours'
+
+
 def get_upvote_info(request, uid):
     post = get_object_or_404(Post.objects.only('upvotes'), uid=uid)
     hash_id = salt_and_hash(request, 'year')
@@ -55,21 +71,21 @@ def upvote(request):
         print("Not upvoting: Missing uid")
         return response
 
-    marked_reason = ''
+    marked_signals = []
     if request.POST.get("title", False):
-        marked_reason = 'Honeypot filled'
-    elif 'timezone' not in request.COOKIES:
-        marked_reason = 'Timezone cookie'
-    elif _request_from_tor(request):
-        marked_reason = 'Tor exit'
+        marked_signals.append('Honeypot filled')
+    if 'timezone' not in request.COOKIES:
+        marked_signals.append('Timezone cookie')
+    if _request_from_tor(request):
+        marked_signals.append('Tor exit')
 
     hash_id = salt_and_hash(request, 'year')
-    if not marked_reason:
-        token_age = valid_upvote_token_age(request.POST.get("token", ""), uid, hash_id)
-        if token_age is None:
-            marked_reason = 'Invalid token'
-        elif token_age < UPVOTE_TOKEN_MIN_AGE:
-            marked_reason = 'Quick submission'
+    token_age = valid_upvote_token_age(request.POST.get("token", ""), uid, hash_id)
+    age_bucket = token_age_bucket(token_age)
+    if token_age is None:
+        marked_signals.append('Invalid token')
+    elif token_age < UPVOTE_TOKEN_MIN_AGE:
+        marked_signals.append('Quick submission')
 
     post = Post.objects.filter(uid=uid).first()
     if not post:
@@ -81,13 +97,14 @@ def upvote(request):
             post=post,
             hash_id=hash_id,
             defaults={
-                'marked': bool(marked_reason),
-                'marked_reason': marked_reason,
+                'marked': bool(marked_signals),
+                'marked_signals': marked_signals,
+                'token_age_bucket': age_bucket,
             },
         )
 
         if created:
-            print("Upvoting:", post, marked_reason)
+            print("Upvoting:", post, marked_signals)
         else:
             print("Not upvoting: Duplicate upvote")
     except Upvote.MultipleObjectsReturned:

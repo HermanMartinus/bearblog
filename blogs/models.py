@@ -358,7 +358,8 @@ class Upvote(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     hash_id = models.CharField(max_length=200)
     marked = models.BooleanField(default=False)
-    marked_reason = models.CharField(max_length=200, blank=True, default='')
+    marked_signals = models.JSONField(default=list, blank=True)
+    token_age_bucket = models.CharField(max_length=32, blank=True, default='')
 
     def save(self, *args, **kwargs):
         # Save the Upvote instance
