@@ -202,8 +202,15 @@ STATICFILES_DIRS = [
 ]
 GEOIP_PATH = "geoip/"
 
-# Enable WhiteNoise's GZip compression of static assets.
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+# Enable WhiteNoise compression and cache-safe, hashed static asset names.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 

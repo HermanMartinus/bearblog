@@ -1,10 +1,10 @@
-boto3==1.36.24
-Django==6.0.6
+boto3==1.43.86
+Django==6.0.8
 django-allauth==65.14.3
 django-debug-toolbar==5.0.1
 django-ip==1.0.2
-feedgen==0.9.0
-geoip2==4.6.0
+feedgen==1.0.0
+geoip2==5.3.0
 gunicorn==23.0.0
 httpagentparser==1.9.2
 judoscale==1.7.5
@@ -17,4 +17,4 @@ psycopg2==2.9.10
 requests==2.33.0
 sentry-sdk==2.19.0
 tzdata>=2025.1 # Keeps the timezone data up to date
-whitenoise==5.0.1
+whitenoise==6.12.0

@@ -58,6 +58,7 @@ db.sqlite3
 dev.db
 dev.db.backup
 db.json
+/staticfiles/
 
 # Flask stuff:
 instance/
