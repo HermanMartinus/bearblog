@@ -121,4 +121,6 @@ Caddyfile.dev
 AGENTS.md
 .codex
 architecture.md
+.idea
+.vscode
 
