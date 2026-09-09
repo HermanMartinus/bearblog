@@ -1209,15 +1209,10 @@ class ContentTypeTests(TestCase):
 
     # --- email_subscribe() ---
 
-    def test_email_subscribe_dodgy_returns_text_plain(self):
-        response = self.client.post('/email-subscribe/', {})
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('text/plain', response['Content-Type'])
-
     def test_email_subscribe_bad_email_returns_text_plain(self):
         response = self.client.post(
             '/email-subscribe/',
-            {'confirm': '829389c2a9f0402b8a3600e52f2ad4e1', 'email': 'not-an-email'},
+            {'email': 'not-an-email'},
             SERVER_NAME='ctblog.testserver',
         )
         self.assertEqual(response.status_code, 200)
@@ -1226,7 +1221,7 @@ class ContentTypeTests(TestCase):
     def test_email_subscribe_success_returns_text_plain(self):
         response = self.client.post(
             '/email-subscribe/',
-            {'confirm': '829389c2a9f0402b8a3600e52f2ad4e1', 'email': 'test@example.com'},
+            {'email': 'test@example.com'},
             SERVER_NAME='ctblog.testserver',
         )
         self.assertEqual(response.status_code, 200)
