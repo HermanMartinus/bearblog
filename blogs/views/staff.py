@@ -350,8 +350,8 @@ def check_spam(request):
             'robots_txt': blog.robots_txt,
             'content': blog.content,
             'posts': posts,
-            'admin_usersettings_url': f'/mothership/blogs/usersettings/{blog.user.settings.pk}/change/',
-            'admin_blog_url': f'/mothership/blogs/blog/{blog.pk}/change/',
+            'admin_usersettings_url': f'/admin/blogs/usersettings/{blog.user.settings.pk}/change/',
+            'admin_blog_url': f'/admin/blogs/blog/{blog.pk}/change/',
         }
 
         return JsonResponse(data)

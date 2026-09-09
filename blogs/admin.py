@@ -229,7 +229,7 @@ class HitAdmin(admin.ModelAdmin):
     raw_id_fields = ('blog',)
     def blog_link(self, obj):
         if obj.blog:
-            return format_html('<a href="/mothership/blogs/blog/{id}/change/">{blog}</a>',
+            return format_html('<a href="/admin/blogs/blog/{id}/change/">{blog}</a>',
                            id=obj.blog.id,
                            blog=escape(obj.blog.subdomain))
         return None
@@ -237,7 +237,7 @@ class HitAdmin(admin.ModelAdmin):
     raw_id_fields = ('post',)
     def post_link(self, obj):
         if obj.post:
-            return format_html('<a href="/mothership/blogs/post/{id}/change/">{post}</a>',
+            return format_html('<a href="/admin/blogs/post/{id}/change/">{post}</a>',
                            id=obj.post.pk,
                            post=escape(obj.post))
         return None

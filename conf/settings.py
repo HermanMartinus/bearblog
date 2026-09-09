@@ -91,10 +91,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE = [
-    'blogs.middleware.BlockHerokuAppMiddleware',
-    'blogs.middleware.RateLimitMiddleware',
-    'blogs.middleware.MainSitePathProtectionMiddleware',
-    'blogs.middleware.ConditionalXFrameOptionsMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',

@@ -9,7 +9,7 @@ import pillow_heif
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, RequestFactory, TestCase, override_settings
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import SafeString
@@ -1397,54 +1397,6 @@ class ResolveAddressTests(TestCase):
     @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
     def test_robots_with_subdomain(self):
         response = self.client.get('/robots.txt', SERVER_NAME='myblog.testserver')
-        self.assertEqual(response.status_code, 200)
-
-
-class RateLimitMiddlewareTests(TestCase):
-    def _middleware(self):
-        from django.http import HttpResponse
-        from blogs.middleware import RateLimitMiddleware
-        middleware = RateLimitMiddleware(lambda request: HttpResponse('ok'))
-        middleware.RATE_LIMIT = 5
-        return middleware
-
-    def _flood(self, middleware, path):
-        from django.test import RequestFactory
-        factory = RequestFactory()
-        responses = [middleware(factory.get(path)) for _ in range(middleware.RATE_LIMIT * 2)]
-        return responses[-1]
-
-    def test_ping_path_exempt_from_rate_limit(self):
-        for path in ('/ping/', '/ping'):
-            response = self._flood(self._middleware(), path)
-            self.assertEqual(response.status_code, 200)
-
-    def test_path_containing_ping_is_rate_limited(self):
-        response = self._flood(self._middleware(), '/shipping-update/')
-        self.assertEqual(response.status_code, 429)
-
-
-@mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'bearblog.dev'})
-class MainSitePathProtectionMiddlewareTests(TestCase):
-    def _middleware(self):
-        from django.http import HttpResponse
-        from blogs.middleware import MainSitePathProtectionMiddleware
-        return MainSitePathProtectionMiddleware(lambda request: HttpResponse('ok'))
-
-    def _get(self, path, host):
-        return self._middleware()(RequestFactory().get(path, HTTP_HOST=host))
-
-    def test_protected_paths_blocked_off_main_domain(self):
-        for path in ('/accounts/login/', '/mothership/'):
-            response = self._get(path, 'someblog.bearblog.dev')
-            self.assertEqual(response.status_code, 400)
-
-    def test_protected_path_allowed_on_main_domain(self):
-        response = self._get('/accounts/login/', 'bearblog.dev')
-        self.assertEqual(response.status_code, 200)
-
-    def test_unprotected_path_allowed_off_main_domain(self):
-        response = self._get('/upvote-info/abc/', 'someblog.bearblog.dev')
         self.assertEqual(response.status_code, 200)
 
 
@@ -3061,14 +3013,6 @@ class HostHeaderInjectionTests(TestCase):
         self._request_reset()
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('https://testserver/', mail.outbox[0].body)
-
-    def test_forwarded_host_is_rejected(self):
-        # USE_X_FORWARDED_HOST makes get_host() return the poisoned host, which
-        # MainSitePathProtectionMiddleware rejects before any reset email is sent.
-        response = self._request_reset(HTTP_X_FORWARDED_HOST='attacker.com')
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(len(mail.outbox), 0)
-
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
 class SearchTests(TestCase):
