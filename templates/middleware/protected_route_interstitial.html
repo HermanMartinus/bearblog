@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Checking your browser</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        }
+
+        body {
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        main {
+            box-sizing: border-box;
+            max-width: 34rem;
+            padding: 2rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .spinner {
+            animation: spin 900ms linear infinite;
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            height: 1.25rem;
+            margin-bottom: 1rem;
+            width: 1.25rem;
+        }
+
+        p {
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .error {
+            color: #b42318;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .spinner { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <span class="spinner" aria-hidden="true"></span>
+        <p id="challenge-status" aria-live="polite">Checking your browser…</p>
+        <noscript>
+            <p class="error">Please enable JavaScript and cookies to continue.</p>
+        </noscript>
+    </main>
+
+    {{ challenge|json_script:"protected-route-challenge" }}
+    <script>
+        (() => {
+            const status = document.getElementById('challenge-status');
+            const config = JSON.parse(document.getElementById('protected-route-challenge').textContent);
+            const startedAt = performance.now();
+            const sliceDurationMs = 12;
+            let state = (0x9e3779b9 ^ Math.floor(performance.timeOrigin || Date.now())) >>> 0;
+
+            function showError() {
+                status.classList.add('error');
+                status.textContent = 'Please enable JavaScript and cookies, then reload this page.';
+            }
+
+            function work() {
+                const sliceStartedAt = performance.now();
+
+                do {
+                    state ^= state << 13;
+                    state ^= state >>> 17;
+                    state ^= state << 5;
+                    state >>>= 0;
+                } while (performance.now() - sliceStartedAt < sliceDurationMs);
+
+                if (performance.now() - startedAt < config.workDurationMs) {
+                    window.setTimeout(work, 0);
+                    return;
+                }
+
+                // Keep the result observable so the browser cannot discard the work.
+                document.documentElement.dataset.challengeResult = state.toString(16);
+
+                const cookieParts = [
+                    `${config.cookieName}=${config.cookieValue}`,
+                    `Max-Age=${config.cookieMaxAge}`,
+                    'Path=/',
+                    'SameSite=Lax',
+                ];
+                if (config.secure) {
+                    cookieParts.push('Secure');
+                }
+                document.cookie = cookieParts.join('; ');
+
+                const cookieWasSet = document.cookie
+                    .split('; ')
+                    .some(cookie => cookie.startsWith(`${config.cookieName}=`));
+                if (!cookieWasSet) {
+                    showError();
+                    return;
+                }
+
+                status.textContent = 'Done. Continuing…';
+                window.setTimeout(() => window.location.reload(), 50);
+            }
+
+            try {
+                work();
+            } catch (error) {
+                showError();
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.core import signing
 from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
 
-import json
 import os
 import time
 from collections import defaultdict
@@ -62,9 +62,10 @@ class ConditionalXFrameOptionsMiddleware:
 
 class ProtectedRouteMiddleware:
     PROTECTED_PATHS = {'/blog', '/blog/', '/posts', '/posts/', '/archive', '/archive/', '/writing', '/writing/'}
-    COOKIE_NAME = 'protected_route'
+    COOKIE_NAME = 'bear_clearance'
     COOKIE_MAX_AGE = 60 * 60 * 24
     COOKIE_SALT = 'blogs.protected_route.cookie'
+    WORK_DURATION_MS = 500
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -86,28 +87,18 @@ class ProtectedRouteMiddleware:
             {'host': request.get_host().lower()},
             salt=self.COOKIE_SALT,
         )
-        cookie = (
-            f'{self.COOKIE_NAME}={cookie_value}; '
-            f'Max-Age={self.COOKIE_MAX_AGE}; Path=/; SameSite=Lax'
+        content = render_to_string(
+            'middleware/protected_route_interstitial.html',
+            {
+                'challenge': {
+                    'cookieName': self.COOKIE_NAME,
+                    'cookieValue': cookie_value,
+                    'cookieMaxAge': self.COOKIE_MAX_AGE,
+                    'secure': not settings.DEBUG,
+                    'workDurationMs': self.WORK_DURATION_MS,
+                },
+            },
         )
-        if not settings.DEBUG:
-            cookie += '; Secure'
-
-        content = f'''<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Checking your browser</title>
-</head>
-<body>
-    <p id="challenge-status">Checking your browser…</p>
-    <script>
-        document.cookie = {json.dumps(cookie)};
-        window.location.reload();
-    </script>
-</body>
-</html>'''
         return self._uncacheable(HttpResponse(content, status=403, content_type='text/html'))
 
     def _has_valid_cookie(self, request):
