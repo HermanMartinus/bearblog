@@ -16,14 +16,7 @@ from django.utils.safestring import SafeString
 from PIL import Image
 
 from blogs.forms import BlogForm, AdvancedSettingsForm
-from blogs.helpers import salt_and_hash
 from blogs.models import Blog, Post, Stylesheet, Upvote
-from blogs.views.upvotes import (
-    UPVOTE_TOKEN_MAX_AGE,
-    UPVOTE_TOKEN_MIN_AGE,
-    token_age_bucket,
-    upvote_signer,
-)
 from blogs.templatetags.custom_tags import apply_filters, safe_title, plain_title, markdown, markdown_renderer, replace_inline_latex, escape_currency, fix_links, clean, element_replacement, excluding_pre
 
 
@@ -1127,16 +1120,7 @@ class ScriptTagTests(TestCase):
         self.assertIn('My Post', result)
 
 
-def upvote_token(uid, ip=None, age_seconds=UPVOTE_TOKEN_MIN_AGE + 1):
-    # Tokens are bound to the requester's hash, so mint one for the test client's identity
-    headers = {'HTTP_CF_CONNECTING_IP': ip} if ip else {}
-    signed_at = timezone.now().timestamp() - age_seconds
-    with mock.patch('django.core.signing.time.time', return_value=signed_at):
-        return upvote_signer.sign(f"{uid}:{salt_and_hash(RequestFactory().get('/', **headers), 'year')}")
-
-
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})
-@mock.patch('blogs.views.upvotes._tor_exit_ips', new=lambda: frozenset())
 class ContentTypeTests(TestCase):
     def setUp(self):
         Stylesheet.objects.create(title='Default', identifier='default', css='')
@@ -1179,7 +1163,6 @@ class ContentTypeTests(TestCase):
     def test_upvote_success_returns_text_plain(self):
         response = self.client.post('/upvote/', {
             'uid': 'ct1',
-            'token': upvote_token('ct1'),
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('text/plain', response['Content-Type'])
@@ -1325,10 +1308,8 @@ class ContentTypeTests(TestCase):
         self.assertIn('tags: django, python', content)
 
 
-@mock.patch('blogs.views.upvotes._tor_exit_ips', new=lambda: frozenset({'185.220.101.1'}))
-class UpvoteProtectionTests(TestCase):
+class UpvoteTests(TestCase):
     def setUp(self):
-        self.client.cookies['timezone'] = 'UTC'
         Stylesheet.objects.create(title='Default', identifier='default', css='')
         self.user = User.objects.create_user(username='upvote_user', password='pass')
         self.blog = Blog.objects.create(user=self.user, title='Upvote Blog', subdomain='upvoteblog')
@@ -1342,134 +1323,45 @@ class UpvoteProtectionTests(TestCase):
         )
 
     def _post(self, **overrides):
-        data = {'uid': 'uv1', 'token': upvote_token('uv1')}
+        data = {'uid': 'uv1'}
         data.update(overrides)
         return self.client.post('/upvote/', data)
 
-    def _assert_marked(self, response, signals, age_bucket='invalid'):
-        # Marked submissions must be indistinguishable from a successful upvote
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, b'Upvoted')
-        upvote = Upvote.objects.get(post=self.post)
-        self.assertTrue(upvote.marked)
-        self.assertEqual(upvote.marked_signals, signals)
-        self.assertEqual(upvote.token_age_bucket, age_bucket)
-        self.post.refresh_from_db()
-        self.assertEqual(self.post.upvotes, 0)
-
-    def test_valid_submission_records_upvote(self):
+    def test_submission_records_upvote(self):
         response = self._post()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'Upvoted')
-        upvote = Upvote.objects.get(post=self.post)
-        self.assertFalse(upvote.marked)
-        self.assertEqual(upvote.marked_signals, [])
-        self.assertEqual(upvote.token_age_bucket, '3_to_10_seconds')
+        self.assertTrue(Upvote.objects.filter(post=self.post).exists())
         self.post.refresh_from_db()
         self.assertEqual(self.post.upvotes, 1)
 
-    def test_filled_honeypot_marked(self):
-        self._assert_marked(
-            self._post(title='Upvote Post'),
-            ['Honeypot filled'],
-            '3_to_10_seconds',
-        )
+    def test_duplicate_submission_does_not_add_another_upvote(self):
+        self._post()
+        self._post()
 
-    def test_missing_token_marked(self):
-        self._assert_marked(self._post(token=''), ['Invalid token'])
-
-    def test_unsigned_token_marked(self):
-        self._assert_marked(self._post(token='uv1'), ['Invalid token'])
-
-    def test_token_for_another_post_marked(self):
-        self._assert_marked(
-            self._post(token=upvote_token('someotheruid')),
-            ['Invalid token'],
-        )
-
-    def test_token_for_another_visitor_marked(self):
-        # A token minted for one IP must not work from another, so rotating
-        # IPs costs a fresh /upvote-info/ fetch per upvote
-        info = self.client.get('/upvote-info/uv1/', HTTP_CF_CONNECTING_IP='203.0.113.9').json()
-        self._assert_marked(self._post(token=info['token']), ['Invalid token'])
-
-    def test_expired_token_marked(self):
-        token = upvote_token('uv1', age_seconds=UPVOTE_TOKEN_MAX_AGE + 60)
-        self._assert_marked(self._post(token=token), ['Invalid token'])
-
-    def test_quick_submission_marked(self):
-        token = upvote_token('uv1', age_seconds=1)
-        self._assert_marked(
-            self._post(token=token),
-            ['Quick submission'],
-            'under_3_seconds',
-        )
-
-    def test_all_triggered_signals_recorded(self):
-        self.client.cookies.pop('timezone')
-        response = self.client.post(
-            '/upvote/',
-            {'uid': 'uv1', 'title': 'Upvote Post', 'token': 'invalid'},
-            HTTP_CF_CONNECTING_IP='185.220.101.1',
-        )
-        self._assert_marked(response, [
-            'Honeypot filled',
-            'Timezone cookie',
-            'Tor exit',
-            'Invalid token',
-        ])
-
-    def test_token_age_buckets(self):
-        cases = (
-            (None, 'invalid'),
-            (1, 'under_3_seconds'),
-            (5, '3_to_10_seconds'),
-            (30, '10_to_60_seconds'),
-            (2 * 60, '1_to_5_minutes'),
-            (30 * 60, '5_to_60_minutes'),
-            (2 * 60 * 60, '1_to_12_hours'),
-        )
-        for age, expected in cases:
-            with self.subTest(age=age):
-                self.assertEqual(token_age_bucket(age), expected)
+        self.assertEqual(Upvote.objects.filter(post=self.post).count(), 1)
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.upvotes, 1)
 
     def test_unknown_post_rejected(self):
-        response = self._post(uid='nosuchuid', token=upvote_token('nosuchuid'))
+        response = self._post(uid='nosuchuid')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'Upvoted')
         self.assertFalse(Upvote.objects.exists())
 
-    def test_upvote_info_issues_usable_token(self):
+    def test_upvote_info_reports_count_and_visitor_state(self):
         info = self.client.get('/upvote-info/uv1/').json()
-        future = timezone.now().timestamp() + UPVOTE_TOKEN_MIN_AGE + 1
-        with mock.patch('blogs.views.upvotes.time', return_value=future):
-            response = self._post(token=info['token'])
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(Upvote.objects.get(post=self.post).marked)
+        self.assertEqual(info, {
+            'upvoted': False,
+            'upvote_count': 0,
+        })
 
-    def test_tor_exit_in_cf_connecting_ip_marked(self):
-        # Direct path: XFF[0] is spoofable but CF-Connecting-IP is not
-        response = self.client.post(
-            '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1', '185.220.101.1')},
-            HTTP_CF_CONNECTING_IP='185.220.101.1')
-        self._assert_marked(response, ['Tor exit'], '3_to_10_seconds')
-
-    def test_non_tor_ip_records_upvote(self):
-        response = self.client.post(
-            '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1', '203.0.113.9')},
-            HTTP_CF_CONNECTING_IP='203.0.113.9')
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(Upvote.objects.get(post=self.post).marked)
-
-    def test_fails_open_when_exit_list_unavailable(self):
-        # Identical to the CF-Connecting-IP rejection, but with an empty list the same
-        # request succeeds — proving the block is the only differentiator and it fails open
-        with mock.patch('blogs.views.upvotes._tor_exit_ips', new=lambda: frozenset()):
-            response = self.client.post(
-                '/upvote/', {'uid': 'uv1', 'token': upvote_token('uv1', '185.220.101.1')},
-                HTTP_CF_CONNECTING_IP='185.220.101.1')
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(Upvote.objects.get(post=self.post).marked)
+        self._post()
+        info = self.client.get('/upvote-info/uv1/').json()
+        self.assertEqual(info, {
+            'upvoted': True,
+            'upvote_count': 1,
+        })
 
 
 @mock.patch.dict(os.environ, {'MAIN_SITE_HOSTS': 'testserver'})

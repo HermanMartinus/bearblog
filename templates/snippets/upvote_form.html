@@ -1,8 +1,6 @@
 <form id="upvote-form" action="/upvote/" method="post" style="display: inline">
     <small>
         <input hidden name="uid" value="{{ post.uid }}" style="display:none">
-        <input hidden name="title" value="{{ post.title }}" style="display:none">
-        <input hidden name="token" value="{{ post.uid }}" style="display:none">
 
         <button
             class="upvote-button"
@@ -21,11 +19,9 @@
 <script>
     const $upvoteButton = document.querySelector('.upvote-button');
     const $upvoteCount =  document.querySelector('.upvote-count')
-    let upvoteToken = '';
 
     fetch('/upvote-info/{{ post.uid }}/').then(response => response.json()).then(data => {
         $upvoteCount.innerText = data.upvote_count;
-        upvoteToken = data.token;
         if (data.upvoted) {
             $upvoteButton.disabled = true
             $upvoteButton.style.color = "salmon"
@@ -33,15 +29,7 @@
             $upvoteButton.title = "Toasted"
         }
         $upvoteButton.ariaLabel += ` (${data.upvote_count})`
-
-        document.addEventListener('touchmove', interaction, {once: true});
-        document.addEventListener('mousemove', interaction, {once: true});
     });
-
-    const interaction = () => {
-        document.querySelector('input[name="title"]').value = "";
-        document.querySelector('input[name="token"]').value = upvoteToken;
-    }
 
     document.querySelector('#upvote-form').addEventListener('submit', (e) => {
         e.preventDefault();

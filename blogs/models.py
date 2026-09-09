@@ -303,7 +303,7 @@ class Post(models.Model):
         return hashlib.sha256(self.uid.encode()).hexdigest()[0:10]
 
     def update_score(self):
-        self.upvotes = self.upvote_set.filter(marked=False).count()
+        self.upvotes = self.upvote_set.count()
         upvotes = self.upvotes
 
         if upvotes > 1: 
@@ -357,9 +357,6 @@ class Upvote(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     hash_id = models.CharField(max_length=200)
-    marked = models.BooleanField(default=False)
-    marked_signals = models.JSONField(default=list, blank=True)
-    token_age_bucket = models.CharField(max_length=32, blank=True, default='')
 
     def save(self, *args, **kwargs):
         # Save the Upvote instance

@@ -217,8 +217,7 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Upvote)
 class UpvoteAdmin(admin.ModelAdmin):
     raw_id_fields = ('post',)
-    list_filter = ('marked', 'token_age_bucket')
-    list_display = ('post_id', 'hash_id', 'marked', 'marked_signals', 'token_age_bucket')
+    list_display = ('post_id', 'hash_id', 'created_date')
 
 
 @admin.register(Media)
