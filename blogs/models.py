@@ -82,9 +82,6 @@ class Blog(models.Model):
 
     analytics_active = models.BooleanField(default=True)
     fathom_site_id = models.CharField(max_length=8, blank=True)
-    
-    # TODO: Deprecate this
-    public_analytics = models.BooleanField(default=False)
 
     post_template = models.TextField(blank=True)
     robots_txt = models.TextField(blank=True, default="User-agent: *\nAllow: /")

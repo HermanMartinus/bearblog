@@ -7,19 +7,15 @@
 {% block custom_styles %}
     {% include 'styles/blog/default.css' %}
     {% include 'styles/dashboard.css' %}
-    {% if not public %}
     {{ request.user.settings.dashboard_styles | safe }}
-    {% endif %}
 {% endblock %}
 
 {% block nav %}
-{% if not public %}
 {% include '../snippets/dashboard_nav.html' %}
-{% endif %}
 {% endblock %}
 
 {% block content %}
-<h1>Analytics{% if public %} for {{ blog.title }}{% endif %}</h1>
+<h1>Analytics</h1>
 {% if request.user.settings.upgraded %}
 <p>
     <b>Reading now:</b> {{ on_site|intcomma }}
@@ -154,11 +150,7 @@
 
 
 {% block footer %}
-{% if public %}
-Powered by <a href="https://bearblog.dev">Bear <span role="img" class="bear" aria-label="ASCII bear logo">ʕ•ᴥ•ʔ</a></a>
-{% else %}
 {% include 'snippets/dashboard_footer.html' %}
-{% endif %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

@@ -23,10 +23,6 @@ def analytics(request, id):
     else:
         blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
-    return render_analytics(request, blog)
-
-
-def render_analytics(request, blog, public=False):
     now = timezone.now()
     post_filter = request.GET.get('post', False)
     referrer_filter = request.GET.get('referrer', False)
@@ -84,7 +80,6 @@ def render_analytics(request, blog, public=False):
     countries = base_hits.exclude(country='').values('country').annotate(count=Count('country')).order_by('-count').values('country', 'count')
 
     return render(request, 'studio/analytics.html', {
-        'public': public,
         'blog': blog,
         'posts': posts,
         'start_date': start_date,

@@ -5,7 +5,6 @@ from django.utils import timezone
 from django.db.models import Q
 from blogs.models import Blog, Post
 from blogs.helpers import unmark
-from blogs.views.analytics import render_analytics
 
 import json
 import os
@@ -214,17 +213,6 @@ def post(request, slug):
         response['Cache-Control'] = "public, s-maxage=43200, max-age=0"
 
     return response
-
-
-def public_analytics(request):
-    blog = resolve_address(request)
-    if not blog:
-        return not_found(request)
-
-    if not blog or not blog.user.settings.upgraded or not blog.public_analytics:
-        return not_found(request)
-
-    return render_analytics(request, blog, True)
 
 
 def not_found(request, *args, **kwargs):

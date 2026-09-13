@@ -108,8 +108,6 @@ urlpatterns = [
 
     path('sitemap.xml', blog.sitemap, name='sitemap'),
     path('robots.txt', blog.robots, name='robots'),
-    # TODO: Deprecate
-    path('public-analytics/', blog.public_analytics, name="public_analytics"),
     path('upvote/', upvotes.upvote, name='upvote'),
     path('upvote-info/<uid>/', upvotes.get_upvote_info, name='get_upvote_info'),
     path('hit/', analytics.hit, name='hit'),
