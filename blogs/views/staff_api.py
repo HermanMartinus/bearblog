@@ -33,7 +33,6 @@ def blog_data(b):
         'subdomain': b.subdomain,
         'domain': b.domain,
         'title': b.title,
-        'hidden': b.hidden,
         'flagged': b.flagged,
         'reviewed': b.reviewed,
         'reviewer_note': b.reviewer_note,
@@ -60,17 +59,15 @@ def post_data(p, content_limit=300):
         'upgraded': p.blog.user.settings.upgraded if hasattr(p.blog.user, 'settings') else False,
         'url': f"{p.blog.useful_domain}/{p.slug}/",
         'published_date': p.published_date.isoformat(),
-        'hidden': p.hidden,
         'make_discoverable': p.make_discoverable,
         'score': p.score,
         'upvotes': p.upvotes,
-        'shadow_votes': p.shadow_votes,
         'content': p.content if content_limit is None else p.content[:content_limit],
     }
 
 
-BLOG_UPDATABLE = {'hidden', 'flagged', 'reviewed', 'reviewer_note', 'permanent_ignore', 'to_review', 'domain', 'ignored_date'}
-POST_UPDATABLE = {'hidden', 'make_discoverable', 'shadow_votes'}
+BLOG_UPDATABLE = {'flagged', 'reviewed', 'reviewer_note', 'permanent_ignore', 'to_review', 'domain', 'ignored_date'}
+POST_UPDATABLE = {'make_discoverable'}
 
 
 @csrf_exempt

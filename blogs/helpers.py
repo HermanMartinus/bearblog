@@ -221,11 +221,9 @@ def random_post_link():
     post = _random_by_id(
         Post.objects.filter(
             blog__reviewed=True,
-            blog__hidden=False,
             publish=True,
             published_date__lte=timezone.now(),
             make_discoverable=True,
-            hidden=False,
             content__isnull=False,
         ).select_related('blog'),
         Post,
@@ -244,7 +242,6 @@ def random_blog_link():
     blog = _random_by_id(
         Blog.objects.filter(
             reviewed=True,
-            hidden=False,
             user__is_active=True,
         ),
         Blog,

@@ -95,7 +95,6 @@ class Blog(models.Model):
     permanent_ignore = models.BooleanField(default=False, db_index=True)
     to_review = models.BooleanField(default=False, db_index=True)
     reviewer_note = models.TextField(blank=True)
-    hidden = models.BooleanField(default=False, db_index=True)
     flagged = models.BooleanField(default=False, db_index=True)
     posts_in_last_12_hours = models.IntegerField(default=0, db_index=True)
 
@@ -282,9 +281,7 @@ class Post(models.Model):
 
     first_published_at = models.DateTimeField(blank=True, null=True, db_index=True)
     upvotes = models.IntegerField(default=0, db_index=True)
-    shadow_votes = models.IntegerField(default=0, db_index=True)
     score = models.FloatField(default=0, db_index=True)
-    hidden = models.BooleanField(default=False, db_index=True)
     content_length = models.IntegerField(default=0, db_index=True)
 
     @property
@@ -307,8 +304,6 @@ class Post(models.Model):
             # Cap upvotes so vote rings can't buy an unbounded stay at the top
             if upvotes > UPVOTE_CAP:
                 upvotes = UPVOTE_CAP
-
-            upvotes = max(upvotes + self.shadow_votes, 1)
 
             log_of_upvotes = log(upvotes, 10)
 

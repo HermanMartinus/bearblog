@@ -14,8 +14,8 @@ posts_per_page = 20
 max_page = 5000
 
 
-def get_base_query(user=None):
-    queryset = Post.objects.select_related("blog").filter(
+def get_base_query():
+    return Post.objects.select_related("blog").filter(
         publish=True,
         blog__reviewed=True,
         blog__user__is_active=True,
@@ -25,28 +25,10 @@ def get_base_query(user=None):
         content_length__gte=150
     )
 
-    if user and user.is_authenticated:
-        queryset = queryset.filter(
-            Q(hidden=False, blog__hidden=False) |
-            Q(blog__user=user)
-        )
-    else:
-        queryset = queryset.filter(hidden=False, blog__hidden=False)
-
-    return queryset
-
 
 def admin_actions(request):
     # admin actions
     if request.user.is_staff:
-        if request.POST.get("hide-post", False):
-            post = Post.objects.get(pk=request.POST.get("hide-post"))
-            post.hidden = True
-            post.save()
-        if request.POST.get("hide-blog", False):
-            post = Post.objects.get(pk=request.POST.get("hide-blog"))
-            post.blog.hidden = True
-            post.blog.save()
         if request.POST.get("block-blog", False):
             post = Post.objects.get(pk=request.POST.get("block-blog"))
             post.blog.user.is_active = False
@@ -54,7 +36,6 @@ def admin_actions(request):
         
         if request.POST.get("set-values", False):
             post = Post.objects.get(pk=request.POST.get("set-values"))
-            post.shadow_votes = int(request.POST.get("shadow-votes"))
             post.lang = request.POST.get('post-lang')
             post.save()
 
@@ -101,7 +82,7 @@ def discover(request):
     newest = request.GET.get("newest")
     random_feed = request.GET.get("random")
 
-    base_query = get_base_query(request.user)
+    base_query = get_base_query()
     
     # Get blog objects for display
     hide_list = None
@@ -249,7 +230,7 @@ def search(request):
     posts_to = posts_from + posts_per_page
 
     if search_string:
-        queryset = get_base_query(request.user)
+        queryset = get_base_query()
 
         # Every term has to match somewhere, so "rust async" finds posts with
         # both words regardless of the order they appear in

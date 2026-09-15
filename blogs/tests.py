@@ -256,7 +256,6 @@ class DiscoverCSRFTests(TestCase):
             title='Test Blog',
             subdomain='testblog',
             reviewed=True,
-            hidden=False,
         )
         self.post = Post.objects.create(
             blog=self.blog,
@@ -277,11 +276,11 @@ class DiscoverCSRFTests(TestCase):
         client.login(username='staffuser', password='pass')
         response = client.post(
             '/discover/',
-            {'hide-post': self.post.pk},
+            {'block-blog': self.post.pk},
         )
         self.assertEqual(response.status_code, 403)
-        self.post.refresh_from_db()
-        self.assertFalse(self.post.hidden)
+        self.blog_owner.refresh_from_db()
+        self.assertTrue(self.blog_owner.is_active)
 
     def _post_with_csrf(self, url, data):
         """POST with a valid CSRF token via cookie + form field."""
@@ -291,19 +290,32 @@ class DiscoverCSRFTests(TestCase):
         return self.client.post(url, data)
 
     def test_staff_post_with_csrf_token_succeeds(self):
-        """Staff POST with valid CSRF token should hide the post."""
+        """Staff POST with valid CSRF token should block the blog owner."""
         self.client.login(username='staffuser', password='pass')
-        response = self._post_with_csrf('/discover/', {'hide-post': self.post.pk})
+        response = self._post_with_csrf('/discover/', {'block-blog': self.post.pk})
         self.assertEqual(response.status_code, 200)
-        self.post.refresh_from_db()
-        self.assertTrue(self.post.hidden)
+        self.blog_owner.refresh_from_db()
+        self.assertFalse(self.blog_owner.is_active)
 
     def test_non_staff_post_does_not_execute_admin_action(self):
         """Non-staff user POST should not execute admin actions."""
         self.client.login(username='regularuser', password='pass')
-        self._post_with_csrf('/discover/', {'hide-post': self.post.pk})
+        self._post_with_csrf('/discover/', {'block-blog': self.post.pk})
+        self.blog_owner.refresh_from_db()
+        self.assertTrue(self.blog_owner.is_active)
+
+    def test_staff_can_update_languages(self):
+        self.client.force_login(self.staff_user)
+        response = self._post_with_csrf('/discover/', {
+            'set-values': self.post.pk,
+            'blog-lang': 'fr',
+            'post-lang': 'de',
+        })
+        self.assertEqual(response.status_code, 200)
         self.post.refresh_from_db()
-        self.assertFalse(self.post.hidden)
+        self.blog.refresh_from_db()
+        self.assertEqual(self.post.lang, 'de')
+        self.assertEqual(self.blog.lang, 'fr')
 
     # --- User hide list tests ---
 
@@ -596,7 +608,6 @@ class DiscoverRandomFeedTests(TestCase):
             title='Random Blog',
             subdomain='randomblog',
             reviewed=True,
-            hidden=False,
         )
         for i in range(3):
             Post.objects.create(
@@ -907,7 +918,6 @@ class StaffApiDiscoverPostsTests(TestCase):
             title='Discoverable Blog',
             subdomain='discoblog',
             reviewed=True,
-            hidden=False,
         )
         self.long_content = 'A' * 1500
         self.post = Post.objects.create(
@@ -918,7 +928,6 @@ class StaffApiDiscoverPostsTests(TestCase):
             published_date=timezone.now(),
             publish=True,
             make_discoverable=True,
-            hidden=False,
             content=self.long_content,
         )
         self.auth = {'HTTP_X_API_KEY': 'test-key'}
@@ -946,8 +955,8 @@ class StaffApiDiscoverPostsTests(TestCase):
         post_entry = [p for p in response.json()['posts'] if p['pk'] == self.post.pk][0]
         expected_keys = {
             'pk', 'title', 'slug', 'blog', 'upgraded', 'url',
-            'published_date', 'hidden', 'make_discoverable',
-            'score', 'upvotes', 'shadow_votes', 'content',
+            'published_date', 'make_discoverable',
+            'score', 'upvotes', 'content',
         }
         self.assertEqual(set(post_entry.keys()), expected_keys)
 
@@ -979,7 +988,6 @@ class DiscoverFeedMarkdownTests(TestCase):
             title='Feed MD Blog',
             subdomain='feedmd',
             reviewed=True,
-            hidden=False,
         )
 
     def _make_post(self, content):
@@ -1278,8 +1286,6 @@ class ContentTypeTests(TestCase):
         zf = self._read_zip(response)
         content = zf.read('ct-post.md').decode('utf-8')
         self.assertNotIn('upvotes', content)
-        self.assertNotIn('shadow_votes', content)
-        self.assertNotIn('hidden', content)
         self.assertNotIn('score', content)
 
     def test_export_duplicate_slugs_get_suffix(self):
@@ -1342,6 +1348,33 @@ class UpvoteTests(TestCase):
         self.assertEqual(Upvote.objects.filter(post=self.post).count(), 1)
         self.post.refresh_from_db()
         self.assertEqual(self.post.upvotes, 1)
+
+    def test_score_caps_votes_and_matches_bulk_recalculation(self):
+        from django.core.management import call_command
+        from blogs.models import UPVOTE_CAP
+
+        for vote_count in (2, UPVOTE_CAP, UPVOTE_CAP + 10):
+            with self.subTest(vote_count=vote_count):
+                self.post.upvote_set.all().delete()
+                Upvote.objects.bulk_create([
+                    Upvote(post=self.post, hash_id=f'voter-{i}')
+                    for i in range(vote_count)
+                ])
+                self.post.update_score()
+                self.assertEqual(self.post.upvotes, vote_count)
+                expected_score = self.post.score
+                if vote_count == UPVOTE_CAP:
+                    capped_score = expected_score
+                elif vote_count > UPVOTE_CAP:
+                    self.assertEqual(expected_score, capped_score)
+
+                Post.objects.filter(pk=self.post.pk).update(
+                    upvotes=vote_count, score=0,
+                )
+                call_command('recalculate_scores', stdout=io.StringIO())
+                self.post.refresh_from_db()
+                self.assertGreater(self.post.score, 0)
+                self.assertAlmostEqual(self.post.score, expected_score)
 
     def test_unknown_post_rejected(self):
         response = self._post(uid='nosuchuid')
@@ -2655,7 +2688,6 @@ class RandomRedirectTests(TestCase):
             title='Discoverable Blog',
             subdomain='discblog',
             reviewed=True,
-            hidden=False,
         )
         self.post = Post.objects.create(
             blog=self.blog,
@@ -2665,7 +2697,6 @@ class RandomRedirectTests(TestCase):
             published_date=timezone.now(),
             publish=True,
             make_discoverable=True,
-            hidden=False,
             content='x' * 150,
         )
 
@@ -2729,14 +2760,13 @@ class DiscoverContentLengthFilterTests(TestCase):
             title='DCF Blog',
             subdomain='dcfblog',
             reviewed=True,
-            hidden=False,
         )
 
     def test_discover_excludes_short_posts(self):
         Post.objects.create(
             blog=self.blog, uid='short1', title='Short', slug='short',
             published_date=timezone.now(), publish=True,
-            make_discoverable=True, hidden=False,
+            make_discoverable=True,
             content='A' * 100,
         )
         response = self.client.get('/discover/')
@@ -2746,7 +2776,7 @@ class DiscoverContentLengthFilterTests(TestCase):
         Post.objects.create(
             blog=self.blog, uid='long1', title='Long Post Title', slug='long',
             published_date=timezone.now(), publish=True,
-            make_discoverable=True, hidden=False,
+            make_discoverable=True,
             content='A' * 200,
         )
         response = self.client.get('/discover/')
@@ -3023,11 +3053,11 @@ class SearchTests(TestCase):
         self.user = User.objects.create_user(username='searchuser', password='pass')
         self.blog = Blog.objects.create(
             user=self.user, title='Bear Tracks', subdomain='beartracks',
-            reviewed=True, hidden=False,
+            reviewed=True,
         )
         self.custom = Blog.objects.create(
             user=self.user, title='Custom', subdomain='customsub',
-            domain='example.com', reviewed=True, hidden=False,
+            domain='example.com', reviewed=True,
         )
 
     def make_post(self, title='A Post', blog=None, slug=None, tags=None, content=None):
@@ -3036,7 +3066,7 @@ class SearchTests(TestCase):
             blog=blog or self.blog,
             uid=slug, title=title, slug=slug,
             published_date=timezone.now(),
-            publish=True, make_discoverable=True, hidden=False,
+            publish=True, make_discoverable=True,
             all_tags=json.dumps(tags or []),
             content=content if content is not None else 'A' * 200,
         )
@@ -3102,10 +3132,10 @@ class SearchTests(TestCase):
         self.make_post('Hidden Rust Post', blog=unreviewed)
         self.assertNotContains(self.search('rust'), 'Hidden Rust Post')
 
-    def test_excludes_hidden_posts(self):
-        post = self.make_post('Hidden Rust Result')
-        Post.objects.filter(pk=post.pk).update(hidden=True)
-        self.assertNotContains(self.search('rust'), 'Hidden Rust Result')
+    def test_excludes_non_discoverable_posts(self):
+        post = self.make_post('Private Rust Result')
+        Post.objects.filter(pk=post.pk).update(make_discoverable=False)
+        self.assertNotContains(self.search('rust'), 'Private Rust Result')
 
     def test_no_next_link_on_last_page(self):
         self.make_post('Only Rust Result')

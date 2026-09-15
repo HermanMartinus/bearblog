@@ -5,7 +5,7 @@ from blogs.models import BUOYANCY, UPVOTE_CAP
 
 SQL = """
 UPDATE blogs_post SET score =
-    log(10, GREATEST(LEAST(upvotes, %s) + shadow_votes, 1)::numeric)::double precision
+    log(10, LEAST(upvotes, %s)::numeric)::double precision
     + (EXTRACT(EPOCH FROM COALESCE(first_published_at, published_date)) - 1577811600)
       / (%s * 86400.0)
 WHERE upvotes > 1

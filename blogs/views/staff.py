@@ -344,7 +344,6 @@ def check_spam(request):
             'is_active': blog.user.is_active,
             'reviewed': blog.reviewed,
             'flagged': blog.flagged,
-            'hidden': blog.hidden,
             'dodginess_score': blog.dodginess_score,
             'reviewer_note': blog.reviewer_note,
             'robots_txt': blog.robots_txt,
@@ -580,8 +579,6 @@ def approve(request, pk):
         blog.reviewed = True
         blog.to_review = False
         blog.flagged = False
-        if request.POST.get("hide", False):
-            blog.hidden = True
 
         blog.save()
 

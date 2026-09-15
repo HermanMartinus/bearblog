@@ -87,8 +87,7 @@ Herman
         </textarea>
     </details>
     <br>
-    <input type="checkbox" class="hide" name="hide"> Hide
-    | <input type="checkbox" class="welcome-email" name="welcome-email"> Send welcome email
+    <input type="checkbox" class="welcome-email" name="welcome-email"> Send welcome email
     <br>
     <br>
     <div class="controls">
@@ -140,17 +139,13 @@ Herman
 
     function approveBlogWithEmail(pk) {
         const message = document.querySelector(`#blog-${pk} .message`).value;
-        const hide = document.querySelector(`#blog-${pk} .hide`).checked ? 'on' : '';
-
-        sendPostRequest(`/staff/review/approve/${pk}`, { message: message, hide: hide });
+        sendPostRequest(`/staff/review/approve/${pk}`, { message: message });
 
         document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
     }
 
     function approveBlog(pk) {
-        const hide = document.querySelector(`#blog-${pk} .hide`).checked ? 'on' : '';
-
-        sendPostRequest(`/staff/review/approve/${pk}`, { hide: hide });
+        sendPostRequest(`/staff/review/approve/${pk}`, {});
 
         document.querySelector(`#blog-${pk}`).style.background = "lightgreen";
     }

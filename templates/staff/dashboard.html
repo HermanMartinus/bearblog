@@ -165,12 +165,11 @@ Staff dashboard  ʕง•ᴥ•ʔง
                     ['Active', data.is_active],
                     ['Reviewed', data.reviewed],
                     ['Flagged', data.flagged],
-                    ['Hidden', data.hidden],
                 ];
                 flags.forEach(function(f) {
                     const badge = el('span', f[0] + ': ' + (f[1] ? 'Yes' : 'No'));
                     badge.style.marginRight = '12px';
-                    if (f[1] && (f[0] === 'Flagged' || f[0] === 'Hidden')) badge.style.color = 'red';
+                    if (f[1] && f[0] === 'Flagged') badge.style.color = 'red';
                     if (!f[1] && f[0] === 'Active') badge.style.color = 'red';
                     status.appendChild(badge);
                 });
