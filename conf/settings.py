@@ -1,25 +1,8 @@
 import sentry_sdk
 import os
 from pathlib import Path
-from urllib.parse import urlparse, unquote, parse_qs
 from conf.env_loader import load_dotenv
 
-
-def _parse_database_url(url, conn_max_age=0):
-    parsed = urlparse(url)
-    config = {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': unquote(parsed.path[1:]),
-        'USER': unquote(parsed.username or ''),
-        'PASSWORD': unquote(parsed.password or ''),
-        'HOST': parsed.hostname or '',
-        'PORT': parsed.port or '',
-        'CONN_MAX_AGE': conn_max_age,
-    }
-    options = {k: vs[-1] for k, vs in parse_qs(parsed.query).items()}
-    if options:
-        config['OPTIONS'] = options
-    return config
 
 load_dotenv()
 
@@ -78,7 +61,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'django.contrib.postgres',
     'blogs.apps.BlogsConfig',
     'allauth.account',
     'allauth.socialaccount',
@@ -151,9 +133,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'dev.db'),
     }
 }
-
-if os.getenv('DATABASE_URL'):
-    DATABASES['default'] = _parse_database_url(os.getenv('DATABASE_URL'), conn_max_age=600)
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 

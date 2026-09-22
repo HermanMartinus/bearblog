@@ -18,10 +18,7 @@ import httpagentparser
 
 @login_required
 def analytics(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     now = timezone.now()
     post_filter = request.GET.get('post', False)

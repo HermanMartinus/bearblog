@@ -1,5 +1,4 @@
-import django.contrib.postgres.search
-from django.db import migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -9,15 +8,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Add the search_vector field
+        # Historical field, removed in 0069; use a portable type for SQLite.
         migrations.AddField(
             model_name="post",
             name="search_vector",
-            field=django.contrib.postgres.search.SearchVectorField(null=True),
-        ),
-        # Add GIN index on the field
-        migrations.RunSQL(
-            sql="CREATE INDEX blogs_post_search_vector_gin ON blogs_post USING GIN (search_vector);",
-            reverse_sql="DROP INDEX IF EXISTS blogs_post_search_vector_gin;",
+            field=models.TextField(null=True),
         ),
     ]

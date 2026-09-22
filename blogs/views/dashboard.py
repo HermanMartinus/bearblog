@@ -19,10 +19,7 @@ from blogs.models import Blog, Post, Stylesheet
 
 @login_required
 def nav(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST":
         form = NavForm(request.POST, instance=blog)
@@ -42,10 +39,7 @@ def nav(request, id):
 
 @login_required
 def styles(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST":
         stylesheet = request.POST.get("stylesheet")
@@ -90,10 +84,7 @@ def blog_delete(request, id):
 
 @login_required
 def posts_edit(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     posts = Post.objects.filter(blog=blog, is_page=False).defer('content').order_by('-published_date')
 
@@ -106,10 +97,7 @@ def posts_edit(request, id):
 
 @login_required
 def pages_edit(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     posts = Post.objects.filter(blog=blog, is_page=True).defer('content').order_by('-published_date')
 
@@ -123,10 +111,7 @@ def pages_edit(request, id):
 @login_required
 def post_delete(request, id, uid):
     if request.method == "POST":
-        if request.user.is_superuser:
-            blog = get_object_or_404(Blog, subdomain=id)
-        else:
-            blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
         post = get_object_or_404(Post, blog=blog, uid=uid)
         is_page = post.is_page
@@ -185,10 +170,7 @@ def upgrade(request):
 
 @login_required
 def opt_in_review(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == 'POST':
         spam = request.POST.get("spam", "")
@@ -250,10 +232,7 @@ def export_markdown_zip(blog):
 
 @login_required
 def settings(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     error_messages = []
 

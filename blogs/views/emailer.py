@@ -12,10 +12,7 @@ from blogs.views.blog import resolve_address, not_found
 
 @login_required
 def email_list(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if not blog.user.settings.upgraded:
         return redirect('upgrade')

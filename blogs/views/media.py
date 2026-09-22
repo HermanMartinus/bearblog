@@ -44,10 +44,7 @@ class UploadError(Exception):
 
 @login_required
 def media_center(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
     
     if not blog.user.settings.upgraded:
         return redirect('upgrade')
@@ -91,10 +88,7 @@ def media_center(request, id):
 
 @login_required
 def upload_image(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
     if request.method == "POST" and blog.user.settings.upgraded is True:
         file_list = request.FILES.getlist('file')
@@ -288,10 +282,7 @@ def get_uploaded_images(blog):
 
 @login_required
 def delete_selected_media(request, id):
-    if request.user.is_superuser:
-        blog = get_object_or_404(Blog, subdomain=id)
-    else:
-        blog = get_object_or_404(Blog, user=request.user, subdomain=id)
+    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
     
     if request.method == "POST":
         selected_media = request.POST.getlist('selected_media')
