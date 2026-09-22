@@ -23,89 +23,9 @@ def get_int(value, default):
         return default
 
 
-def is_protected(subdomain):
-    protected_subdomains = [
-        'login',
-        'mg',
-        'www',
-        'api',
-        'signup',
-        'signin',
-        'profile',
-        'register',
-        'post',
-        'http',
-        'https',
-        'account',
-        'router',
-        'settings',
-        'support',
-        'eng',
-        'admin',
-        'dashboard',
-        'mail',
-        'static',
-        'blog',
-        'dev',
-        'beta',
-        'staging',
-        'secure',
-        'user',
-        'portal',
-        'help',
-        'contact',
-        'news',
-        'media',
-        'docs',
-        'auth',
-        'status',
-        'assets',
-        'bearblog.dev',
-        '*.bearblog.dev',
-        'router.bearblog.dev',
-        'www.bearblog.dev',
-        '_dmarc',
-        'domain-proxy',
-        'themes'
-    ]
-
-    return subdomain in protected_subdomains
-
-
-def caddy_proxy_ips():
-    return {ip.strip() for ip in os.getenv('CADDY_PROXY_IPS', '').split(',') if ip.strip()}
-
-
 # The visitor's real IP, on both subdomains and custom domains
 def trusted_client_ip(request):
-    ip = request.META.get('HTTP_CF_CONNECTING_IP', '').strip()
-    if not ip:
-        return client_ip(request) or request.META.get('REMOTE_ADDR', '')
-
-    proxies = caddy_proxy_ips()
-    if ip in proxies:
-        chain = [p.strip() for p in request.META.get('HTTP_X_FORWARDED_FOR', '').split(',') if p.strip()]
-        hits = [i for i, part in enumerate(chain) if part in proxies]
-        if hits and hits[-1] > 0:
-            return chain[hits[-1] - 1]
-
-    return ip
-
-
-def check_connection(blog):
-    if not blog.domain:
-        return
-    else:
-        try:
-            user_agent = os.environ.get("ADMIN_USER_AGENT", "")
-            response = requests.request("GET", blog.useful_domain, headers={"User-Agent": user_agent}, allow_redirects=False, timeout=3)
-            return (f'<meta name="{ blog.subdomain }" content="look-for-the-bear-necessities">' in response.text)
-        except ConnectionError:
-            return False
-        except ReadTimeout:
-            return False
-        except SystemExit:
-            return False
+    return client_ip(request) or request.META.get('REMOTE_ADDR', '')
 
 
 def salt_and_hash(request, duration='day'):

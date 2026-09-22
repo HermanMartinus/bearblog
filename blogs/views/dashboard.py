@@ -13,7 +13,7 @@ import zipfile
 import os
 
 from blogs.forms import NavForm, StyleForm
-from blogs.helpers import get_country, is_protected, trusted_client_ip
+from blogs.helpers import get_country, trusted_client_ip
 from blogs.models import Blog, Post, Stylesheet
 
 
@@ -265,14 +265,13 @@ def settings(request, id):
             error_messages.append(f'The language code "{lang}" is too long (max 10 characters)')
         elif subdomain:
             subdomain = slugify(subdomain.split('.')[0]).replace('_', '-')
-            if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).exists() and not is_protected(subdomain):
-                blog.invalidate_cloudflare_cache() # Gets rid of the cached version on old subdomain
+            if not Blog.objects.filter(subdomain=subdomain).exclude(pk=blog.pk).exists():
                 blog.subdomain = subdomain
                 blog.lang = lang
                 blog.save()
                 return redirect('settings', id=blog.subdomain)
             else:
-                error_messages.append(f'The subdomain "{subdomain}" is reserved')
+                error_messages.append(f'The subdomain "{subdomain}" is already in use')
 
     if request.GET.get("export-csv", ""):
         fields = ['uid', 'title', 'slug', 'alias', 'published_date', 'all_tags',

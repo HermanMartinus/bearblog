@@ -12,8 +12,6 @@ from math import log
 import random
 import string
 import hashlib
-import requests
-from threading import Thread
 
 
 class UserSettings(models.Model):
@@ -171,51 +169,6 @@ class Blog(models.Model):
                 all_tags.update(json.loads(tags_json))
         self.all_tags = json.dumps(sorted(all_tags))
 
-    def invalidate_cloudflare_cache(self):
-        # Purge in a background thread so the network round-trip doesn't block the save
-        Thread(target=self._purge_cloudflare_cache).start()
-
-    def _purge_cloudflare_cache(self):
-        if os.getenv('ENVIRONMENT') == 'dev':
-            # Don't invalidate on dev
-            return
-
-        cloudflare_api_key = os.getenv('CLOUDFLARE_API_KEY')
-        cloudflare_email = os.getenv('CLOUDFLARE_EMAIL')
-        cloudflare_zone_id = os.getenv('CLOUDFLARE_ZONE_ID')
-        
-        if not all([cloudflare_api_key, cloudflare_email, cloudflare_zone_id]):
-            return
-            
-        headers = {
-            'X-Auth-Email': cloudflare_email,
-            'Authorization': f'Bearer {cloudflare_api_key}',
-            'Content-Type': 'application/json',
-        }
-        
-        url = f"https://api.cloudflare.com/client/v4/zones/{cloudflare_zone_id}/purge_cache"
-        
-        data = {
-            "tags": [self.subdomain]
-        }
-        
-        try:
-            response = requests.post(url, headers=headers, json=data, timeout=5)
-            response.raise_for_status()
-            response_data = response.json()
-            if response_data.get('success') == True:
-                print(f"Invalidated Cloudflare cache for tag: {self.subdomain}")
-            else:
-                errors = response_data.get('errors', [])
-                print(f"Failed to invalidate Cloudflare cache for tag: {self.subdomain}")
-                print(f"Errors: {errors}")
-
-            return response_data
-        except Exception as e:
-            # Log the error but don't prevent the save operation
-            print(f"Error invalidating Cloudflare cache for {self.subdomain}: {str(e)}")
-            return None
-
     def save(self, *args, **kwargs):
         # Handle all tags
         self.update_all_tags()
@@ -245,10 +198,6 @@ class Blog(models.Model):
 
         # Save the blog
         super(Blog, self).save(*args, **kwargs)
-        
-        # Invalidate Cloudflare cache after saving
-        if self.pk:
-            self.invalidate_cloudflare_cache()
 
     def __str__(self):
         return f'{self.title} ({self.useful_domain})'

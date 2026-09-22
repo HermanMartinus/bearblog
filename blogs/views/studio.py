@@ -13,9 +13,8 @@ import json
 import random
 import string
 
-from blogs.backup import backup_in_thread
 from blogs.forms import AdvancedSettingsForm, BlogForm, DashboardCustomisationForm, PostTemplateForm
-from blogs.helpers import check_connection, is_protected, salt_and_hash
+from blogs.helpers import salt_and_hash
 from blogs.models import Blog, Post, Upvote
 from blogs.subscriptions import get_subscriptions, normalize_plan_type
 
@@ -34,13 +33,13 @@ def list(request):
             else:
                 subdomain = form.cleaned_data['subdomain']
 
-                if not is_protected(subdomain) and not Blog.objects.filter(subdomain=subdomain).exists():
+                if not Blog.objects.filter(subdomain=subdomain).exists():
                     blog_info = form.save(commit=False)
                     blog_info.user = request.user
                     blog_info.save()
                     return redirect('dashboard', id=blog_info.subdomain)
                 else:
-                    form.add_error('subdomain', 'This subdomain is already in use or protected.')
+                    form.add_error('subdomain', 'This subdomain is already in use.')
     else:
         form = BlogForm()
 
@@ -315,9 +314,6 @@ def post(request, id, uid=None):
             else:
                 post.save()
                 
-                # Backup blog
-                backup_in_thread(blog)
-                
                 if is_new:
                     # Self-upvote
                     upvote = Upvote(post=post, hash_id=salt_and_hash(request, 'year'))
@@ -525,10 +521,6 @@ def custom_domain_edit(request, id):
             blog.save()
         else:
             error_messages.append(f"{custom_domain} is already registered with another blog")
-
-    # If records not set correctly
-    if blog.domain and not check_connection(blog):
-        error_messages.append(f"The DNS records for { blog.domain } have not been set.")
 
     return render(request, 'studio/custom_domain_edit.html', {
         'blog': blog,
