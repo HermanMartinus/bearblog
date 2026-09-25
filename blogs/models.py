@@ -56,7 +56,6 @@ class Blog(models.Model):
     last_posted = models.DateTimeField(blank=True, null=True, db_index=True)
     subdomain = models.SlugField(max_length=100, unique=True, db_index=True)
     domain = models.CharField(max_length=128, blank=True, null=True, db_index=True)
-    auth_token = models.CharField(max_length=128, blank=True)
 
     nav = models.TextField(default="[Home](/) [Blog](/blog/)", blank=True)
     content = models.TextField(default="Hello World!", blank=True)
@@ -131,11 +130,6 @@ class Blog(models.Model):
     def tags(self):
         return sorted(json.loads(self.all_tags))
     
-    def generate_auth_token(self):
-        allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
-        self.auth_token = ''.join(random.choice(allowed_chars) for _ in range(30))
-        self.save()
-
     def determine_dodginess(self):
         persistent_store = PersistentStore.load()
         dodgy_term_count = 0

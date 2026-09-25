@@ -2,16 +2,12 @@ from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import Q
-from zoneinfo import ZoneInfo
 
 import io
-from datetime import datetime
 from PIL import Image, ImageOps
 import pillow_heif
-import re
 import os
 import boto3
 import threading
@@ -56,10 +52,6 @@ def media_center(request, id):
             upload_files(blog, file_list)
         except UploadError as error:
             error_messages.append(str(error))
-
-    # Prefill blogs with existing images on the bucket
-    if not blog.media.exists():
-        prefill_blog_media(blog)
 
     image_filter = Q()
     for ext in image_types + video_types:
@@ -221,50 +213,6 @@ def process_image(file, optimise):
         size=len(data.getvalue()),
         charset=None
     )
-
-
-def prefill_blog_media(blog):
-    uploaded_images = get_uploaded_images(blog)
-    # Create Media objects for existing images
-    for url in uploaded_images:
-        created_at = extract_date_from_url(url)
-        Media.objects.get_or_create(blog=blog, url=url, defaults={'created_at': created_at})
-
-
-def extract_date_from_url(url):
-    # Regular expression to match the timestamp in the image name
-    pattern = r'(?:.com/[^-]+-(\d+)(?:-\d+)?\.)'
-    match = re.search(pattern, url)
-    if match:
-        timestamp = int(match.group(1))
-        dt = datetime.fromtimestamp(timestamp, tz=ZoneInfo("UTC"))
-        return dt
-    else:
-        return timezone.now()
-    
-
-def get_uploaded_images(blog):
-    session = boto3.session.Session()
-    client = session.client(
-        's3',
-        endpoint_url='https://sfo2.digitaloceanspaces.com',
-        region_name='sfo2',
-        aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
-        aws_secret_access_key=os.getenv('SPACES_SECRET'))
-
-    prefix = f'{blog.subdomain}-'
-    response = client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
-
-    if 'Contents' not in response:
-        return []
-
-    image_urls = [
-        f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/{item["Key"]}'
-        for item in response['Contents']
-        if item['Key'].split('.')[-1].lower() in file_types
-    ]
-
-    return sorted(image_urls)
 
 
 @login_required
