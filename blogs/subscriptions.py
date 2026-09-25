@@ -12,7 +12,6 @@ from blogs.models import UserSettings
 import json
 import hashlib
 import hmac
-import sentry_sdk
 
 
 PLAN_TYPES = {'monthly', 'yearly', 'lifetime'}
@@ -34,7 +33,6 @@ def find_user_for_payment(data):
         except (TypeError, ValueError):
             user = None
         if user:
-            print(f'Found user {user} for payment, upgrading account...')
             return user
 
     email = data.get('email')
@@ -51,7 +49,6 @@ def find_user_for_payment(data):
     for queryset in candidates:
         user = queryset.order_by(F('last_login').desc(nulls_last=True)).first()
         if user:
-            print(f'Found user with email address {email}, upgrading account...')
             return user
     return None
 
@@ -86,7 +83,6 @@ def payment_webhook(request):
     event = data.get('event')
     if not isinstance(event, str):
         return HttpResponseBadRequest('Missing event')
-    print(f'Received payment event: {event}')
 
     if event in UPGRADE_EVENTS:
         plan_type = normalize_plan_type(data.get('plan_type'))
@@ -120,7 +116,6 @@ def payment_webhook(request):
         if not isinstance(email, str):
             email = ''
         payment_id = data.get('payment_id') or data.get('subscription_id') or data.get('id')
-        print(f'Could not match payment {payment_id} to a user (email: {email})')
         if email:
             send_async_mail(
                 "Your Bear Blog upgrade",
@@ -129,7 +124,6 @@ def payment_webhook(request):
                 [email],
                 ['Herman Martinus <herman@bearblog.dev>'],
             )
-        sentry_sdk.capture_message(f'Payment {payment_id} could not be matched to a user (email: {email})')
         return HttpResponse('No matching user found; purchaser notified')
 
     elif event in DOWNGRADE_EVENTS:

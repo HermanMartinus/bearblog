@@ -156,16 +156,16 @@ class MyRenderer(HTMLRenderer):
         # Skip rendering if there's a space before the closing dollar sign
         try:
             return latex2mathml.converter.convert(text)
-        except Exception as e:
-            print("LaTeX rendering error")
+        except Exception:
+            return ''
 
     
     def block_math(self, text):
         try:
             
             return latex2mathml.converter.convert(text).replace('display="inline"', 'display="block"')
-        except Exception as e:
-            print("LaTeX rendering error")
+        except Exception:
+            return ''
     
     def block_code(self, code, info=None):
         if info is None:
@@ -526,8 +526,7 @@ def format_date(date, format_string, lang=None, tz='UTC'):
     try:
         user_tz = ZoneInfo(tz)
         date = date.astimezone(user_tz)
-    except Exception as e:
-        print(e)
+    except Exception:
         pass
 
     if lang:

@@ -27,26 +27,19 @@ def upvote(request):
     response['X-Robots-Tag'] = 'noindex, nofollow'
 
     if not uid:
-        print("Not upvoting: Missing uid")
         return response
 
     hash_id = salt_and_hash(request, 'year')
     post = Post.objects.filter(uid=uid).first()
     if not post:
-        print("Not upvoting: Unknown post", uid)
         return response
 
     try:
-        upvote, created = Upvote.objects.get_or_create(
+        Upvote.objects.get_or_create(
             post=post,
             hash_id=hash_id,
         )
-
-        if created:
-            print("Upvoting:", post)
-        else:
-            print("Not upvoting: Duplicate upvote")
     except Upvote.MultipleObjectsReturned:
-        print("Not upvoting: Duplicate upvote")
+        pass
 
     return response

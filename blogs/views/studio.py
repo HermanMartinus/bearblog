@@ -465,7 +465,6 @@ def custom_domain_edit(request, id):
                 blog.save()
             except ValidationError:
                 error_messages.append(f'{custom_domain} is an invalid domain')
-                print("error")
         elif not custom_domain:
             blog.domain = ''
             blog.save()

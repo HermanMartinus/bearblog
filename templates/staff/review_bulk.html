@@ -127,14 +127,8 @@ Herman
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return response.text();
         })
-        .then(result => {
-            console.log('Success:', result);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        .catch(() => {});
     }
 
     function approveBlogWithEmail(pk) {

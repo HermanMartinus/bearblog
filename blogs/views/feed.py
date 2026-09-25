@@ -32,12 +32,7 @@ def feed(request):
     blog = resolve_address(request)
     if not blog:
         return not_found(request)
-    try:
-        feed = generate_feed(blog, feed_type, tag, page)
-    except Exception as e:
-        print(f'Feeds: Error generating feed for {blog.subdomain}: {e}')
-        feed = ''
-        raise e
+    feed = generate_feed(blog, feed_type, tag, page)
     
     response = HttpResponse(feed, content_type=f'application/{feed_type}+xml')
     return response

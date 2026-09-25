@@ -162,7 +162,7 @@ def hit(request):
         
         if blog_pk:
             try:
-                hit, create = Hit.objects.get_or_create(
+                Hit.objects.get_or_create(
                     blog_id=blog_pk,
                     post_id=post_pk,
                     hash_id=hash_id,
@@ -170,8 +170,6 @@ def hit(request):
                     country=country,
                     device=device,
                     browser=browser)
-                if create:
-                    print('Hit:', hit)
             except Hit.MultipleObjectsReturned:
                 pass
 

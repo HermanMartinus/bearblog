@@ -199,7 +199,6 @@ class BlogAdmin(admin.ModelAdmin):
         for blog in queryset:
             blog.user.is_active = False
             blog.user.save()
-            print(f"Blocked {blog} and banned {blog.user}")
 
     block_blog.short_description = "Block selected blogs"
 

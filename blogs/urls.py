@@ -2,7 +2,6 @@ from django.urls import path, re_path
 
 from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media, upvotes
 from blogs import subscriptions
-from conf import logger
 
 import os
 from functools import wraps
@@ -20,8 +19,6 @@ def main_site_only(view_func):
 
 urlpatterns = [
     path('', blog.home, name='home'),
-    path('logger-test/', logger.logger_test),
-    path('timeout-test/', logger.timout_test),
 
     # Staff dashboard
     path('staff/dashboard/', main_site_only(staff.dashboard), name='staff_dashboard'),

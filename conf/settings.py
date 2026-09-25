@@ -1,4 +1,3 @@
-import sentry_sdk
 import os
 from pathlib import Path
 from conf.env_loader import load_dotenv
@@ -16,27 +15,7 @@ PAYMENT_CHECKOUT_URL = os.getenv('PAYMENT_CHECKOUT_URL', '')
 
 DEBUG = (os.getenv('DEBUG') == 'True')
 
-if not DEBUG:
-    # Logging settings
-    def before_send(event, hint):
-        """Don't log django.DisallowedHost errors."""
-        if 'log_record' in hint:
-            if hint['log_record'].name == 'django.security.DisallowedHost':
-                return None
-        return event
-
-    sentry_sdk.init(
-        dsn=os.getenv("SENTRY_DSN"),
-        auto_session_tracking=False,
-        traces_sample_rate=0.001,
-        profiles_sample_rate=0.001,
-        send_default_pii=True,
-        before_send=before_send,
-        # Gunicorn aborts workers with sys.exit(1) when a slow client exceeds --timeout
-        ignore_errors=[SystemExit]
-    )
-
-    # ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
+ADMINS = (('Webmaster', os.getenv('ADMIN_EMAIL')),)
 
 
 # Host & proxy settings

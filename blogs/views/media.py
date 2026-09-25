@@ -14,7 +14,6 @@ import pillow_heif
 import re
 import os
 import boto3
-import logging
 import threading
 
 from blogs.models import Blog, Media
@@ -22,7 +21,6 @@ from blogs.models import Blog, Media
 pillow_heif.register_heif_opener()
 
 bucket_name = os.getenv('SPACES_BUCKET', 'bear-images')
-logger = logging.getLogger(__name__)
 
 
 image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic', 'heif']
@@ -130,7 +128,6 @@ def upload_files(blog, file_list, optimise=True):
             try:
                 file = process_image(file, optimise)
             except (OSError, ValueError, Image.DecompressionBombError) as error:
-                logger.exception('Error processing image %s', file.name)
                 raise UploadError(
                     'The image file cannot be identified or is not a valid image.',
                     status_code=422,
@@ -183,7 +180,7 @@ def upload_to_s3(filepath, file_data, content_type):
             ACL='public-read',
         )
     except Exception:
-        logger.exception('Error uploading %s to Spaces', filepath)
+        pass
 
 
 def process_image(file, optimise):
@@ -215,16 +212,6 @@ def process_image(file, optimise):
         content_type = file.content_type
 
     data.seek(0)
-
-    print('Stripped metadata')
-
-    original_size = file.size / 1024
-    new_size = len(data.getvalue()) / 1024
-    compression_rate = (original_size - new_size) / original_size * 100 if original_size != 0 else 0
-
-    print(f'Original size: {original_size:.2f} KB')
-    print(f'New size: {new_size:.2f} KB')
-    print(f'Compression rate: {compression_rate:.2f}%')
 
     return InMemoryUploadedFile(
         file=data,
@@ -295,14 +282,10 @@ def delete_selected_media(request, id):
             aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
             aws_secret_access_key=os.getenv('SPACES_SECRET')
         )
-        print(selected_media)
         for url in selected_media:
-            print(url)
             if Media.objects.filter(blog=blog, url=url).exists():
                 key = url.replace(f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/', '')
-                print(f"Deleting key: {key}")
-                response = client.delete_object(Bucket=bucket_name, Key=key)
-                # print("S3 Response:", response)
+                client.delete_object(Bucket=bucket_name, Key=key)
                 Media.objects.filter(blog=blog, url=url).delete()
             else:
                 return HttpResponseForbidden("Error: Attempted to delete unauthorized media")
