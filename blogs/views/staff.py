@@ -26,7 +26,6 @@ def dashboard(request):
     period = request.GET.get('period', 'weeks')
     start_date = (timezone.now() - timedelta(days=days_filter)).date()
     end_date = timezone.now().date()
-    opt_in_blogs_count = len(opt_in_blogs().values_list('id', flat=True))
     dodgy_blogs_count = len(dodgy_blogs().values_list('id', flat=True))
     flagged_blogs_count = len(flagged_blogs().values_list('id', flat=True))
     new_blogs_count = len(new_blogs().values_list('id', flat=True))
@@ -119,7 +118,6 @@ def dashboard(request):
             'upgrade_chart_data': json.dumps(upgrade_chart_data),
             'start_date': start_date,
             'end_date': end_date,
-            'opt_in_blogs_count': opt_in_blogs_count,
             'dodgy_blogs_count': dodgy_blogs_count,
             'flagged_blogs_count': flagged_blogs_count,
             'new_blogs_count': new_blogs_count,
@@ -345,7 +343,6 @@ def check_spam(request):
             'reviewed': blog.reviewed,
             'flagged': blog.flagged,
             'dodginess_score': blog.dodginess_score,
-            'reviewer_note': blog.reviewer_note,
             'robots_txt': blog.robots_txt,
             'content': blog.content,
             'posts': posts,
@@ -513,7 +510,6 @@ def new_blogs():
         permanent_ignore=False,
         reviewed=False,
         user__is_active=True,
-        to_review=False,
         flagged=False,
         created_date__lte=timezone.now() - timedelta(days=1)
     )
@@ -526,15 +522,9 @@ def new_blogs():
     return to_review
 
 
-def opt_in_blogs():
-    to_review = Blog.objects.filter(reviewed=False, user__is_active=True, to_review=True)
-    
-    return to_review
-
-
 def dodgy_blogs():
     to_review = Blog.objects.filter(
-        reviewed=False, user__is_active=True, to_review=False, flagged=False, dodginess_score__gt=2, ignored_date__isnull=True, permanent_ignore=False
+        reviewed=False, user__is_active=True, flagged=False, dodginess_score__gt=2, ignored_date__isnull=True, permanent_ignore=False
     ).prefetch_related('posts')
 
     return to_review
@@ -546,9 +536,7 @@ def flagged_blogs():
 
 @staff_member_required
 def review_bulk(request):
-    if 'opt-in' in request.path:
-        blogs = opt_in_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
-    elif 'new' in request.path:
+    if 'new' in request.path:
         blogs = new_blogs().select_related('user').prefetch_related('posts').order_by('created_date')[:100]
     elif 'dodgy' in request.path:
         blogs = dodgy_blogs().select_related('user').prefetch_related('posts').order_by('-dodginess_score')[:100]
@@ -577,7 +565,6 @@ def approve(request, pk):
     if request.method == "POST":
         blog = get_object_or_404(Blog, pk=pk)
         blog.reviewed = True
-        blog.to_review = False
         blog.flagged = False
 
         blog.save()
@@ -632,7 +619,6 @@ def ignore(request, pk):
                 )
         blog.ignored_date = timezone.now()
         blog.flagged = False
-        blog.to_review = False
         blog.save()
 
         return HttpResponse("Ignored")

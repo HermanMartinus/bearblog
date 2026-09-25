@@ -24,7 +24,6 @@ urlpatterns = [
     path('staff/dashboard/', main_site_only(staff.dashboard), name='staff_dashboard'),
     path('staff/actions/', main_site_only(staff.actions), name='staff_actions'),
     path('staff/review/new/', main_site_only(staff.review_bulk), name='review_new'),
-    path('staff/review/opt-in/', main_site_only(staff.review_bulk), name='review_opt_in'),
     path('staff/review/dodgy/', main_site_only(staff.review_bulk), name='review_dodgy'),
     path('staff/review/flagged/', main_site_only(staff.review_bulk), name='review_flagged'),
     path('staff/review/approve/<pk>', main_site_only(staff.approve), name='review_approve'),
@@ -65,7 +64,6 @@ urlpatterns = [
     # Analytics
     path('<id>/dashboard/analytics/', main_site_only(analytics.analytics), name='analytics'),
 
-    path('<id>/dashboard/opt-in-review/', main_site_only(dashboard.opt_in_review), name='opt_in_review'),
 
     path('<id>/dashboard/posts/', main_site_only(dashboard.posts_edit), name='posts_edit'),
     path('<id>/dashboard/pages/', main_site_only(dashboard.pages_edit), name='pages_edit'),

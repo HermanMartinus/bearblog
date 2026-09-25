@@ -22,7 +22,6 @@ Staff dashboard  ʕง•ᴥ•ʔง
 
 {% block content %}
 <a href="{% url 'staff_actions' %}">Actions</a>
-| <a href="{% url 'review_opt_in' %}">Review {{ opt_in_blogs_count }} opt-ins</a>
 | <a href="{% url 'review_flagged' %}">Review {{ flagged_blogs_count }} flags</a>
 | <a href="{% url 'review_dodgy' %}">Review {{ dodgy_blogs_count }} dodgy blogs</a>
 | <a href="{% url 'review_new' %}">Review {{ new_blogs_count }} new blogs</a>
@@ -176,13 +175,6 @@ Staff dashboard  ʕง•ᴥ•ʔง
                 status.appendChild(document.createElement('br'));
                 status.appendChild(el('b', 'Dodginess: ')); status.appendChild(document.createTextNode(data.dodginess_score));
                 results.appendChild(status);
-
-                // Reviewer note
-                if (data.reviewer_note) {
-                    const note = el('p', 'Reviewer note: ' + data.reviewer_note);
-                    note.style.color = 'darkgreen';
-                    results.appendChild(note);
-                }
 
                 // Robots.txt
                 if (data.robots_txt) {

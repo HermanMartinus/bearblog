@@ -170,21 +170,6 @@ def upgrade(request):
     })
 
 
-@login_required
-def opt_in_review(request, id):
-    blog = get_object_or_404(Blog, user=request.user, subdomain=id)
-
-    if request.method == 'POST':
-        spam = request.POST.get("spam", "")
-        note = request.POST.get("note", "")
-        if spam == 'on':
-            blog.reviewer_note = note
-            blog.to_review = True
-            blog.save()
-
-    return render(request, "dashboard/opt-in-review.html", {"blog": blog})
-
-
 def export_markdown_zip(blog):
     buf = io.BytesIO()
     seen = {}

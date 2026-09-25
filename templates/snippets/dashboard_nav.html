@@ -30,17 +30,12 @@
     <a href="{% url 'account' %}" class="account bear" title="Account"></a>
 </span>
 
-{% if not blog.reviewed and not blog.to_review and blog.posts.count > 0 %}
+{% if not blog.reviewed and blog.posts.count > 0 %}
 <p class="notification">
     <small>
     🐼 Your blog is currently hidden from search engines and the
     <a href="https://bearblog.dev/discover/" target="_blank">discover feed</a>.
-
-    {% if blog.is_after_cutoff %}
-        Upgrade to get discovered.
-    {% else %}
-        <a href="{% url 'opt_in_review' id=blog.subdomain %}">Submit your blog for review</a>.
-    {% endif %}
+    Upgrade to get discovered.
     </small>
 </p>
 {% endif %}

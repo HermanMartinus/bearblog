@@ -5,7 +5,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
-from zoneinfo import ZoneInfo
 import os
 import json
 from math import log
@@ -92,16 +91,9 @@ class Blog(models.Model):
     reviewed = models.BooleanField(default=False, db_index=True)
     ignored_date = models.DateTimeField(blank=True, null=True, db_index=True)
     permanent_ignore = models.BooleanField(default=False, db_index=True)
-    to_review = models.BooleanField(default=False, db_index=True)
-    reviewer_note = models.TextField(blank=True)
     flagged = models.BooleanField(default=False, db_index=True)
     posts_in_last_12_hours = models.IntegerField(default=0, db_index=True)
 
-    @property
-    def is_after_cutoff(self):
-        cutoff_date = timezone.datetime(2025, 4, 20, tzinfo=ZoneInfo('UTC'))
-        return self.created_date > cutoff_date
-    
     @property
     def contains_code(self):
         return "```" in self.content
