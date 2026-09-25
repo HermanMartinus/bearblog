@@ -16,7 +16,6 @@ import string
 from blogs.forms import AdvancedSettingsForm, BlogForm, DashboardCustomisationForm, PostTemplateForm
 from blogs.helpers import salt_and_hash
 from blogs.models import Blog, Post, Upvote
-from blogs.subscriptions import get_subscriptions, normalize_plan_type
 
 
 @login_required
@@ -43,47 +42,13 @@ def list(request):
     else:
         form = BlogForm()
 
-    subscription_cancelled = None
-    subscription_link = None
-    variant = None
-    upgrade_subscription_link = None
-
-    if request.user.settings.order_id and request.user.settings.plan_type != 'lifetime':
-        try:
-            subscription = get_subscriptions(request.user.settings.order_id)
-            if subscription and subscription['data']:
-                subscription_cancelled = subscription['data'][0]['attributes']['cancelled']
-                subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal']
-                upgrade_subscription_link = subscription['data'][0]['attributes']['urls']['customer_portal_update_subscription']
-                variant = subscription['data'][0]['attributes']['variant_name']
-                status = subscription['data'][0]['attributes']['status']
-                plan_type = normalize_plan_type(variant)
-                if plan_type and request.user.settings.plan_type != plan_type:
-                    request.user.settings.plan_type = plan_type
-                    request.user.settings.save()
-
-                if status in ('expired', 'paused') and request.user.settings.upgraded:
-                    request.user.settings.upgraded = False
-                    request.user.settings.upgraded_date = None
-                    request.user.settings.order_id = None
-                    request.user.settings.plan_type = None
-                    request.user.settings.save()
-                elif status == 'active' and not request.user.settings.upgraded:
-                    request.user.settings.upgraded = True
-                    request.user.settings.save()
-            else:
-                request.user.settings.plan_type = 'lifetime'
-                request.user.settings.save()
-        except Exception as e:
-            print('No sub found ', e)
+    settings = request.user.settings
 
     return render(request, 'studio/blog_list.html', {
         'blogs': blogs,
         'form': form,
-        'subscription_cancelled': subscription_cancelled,
-        'subscription_link': subscription_link,
-        'upgrade_subscription_link': upgrade_subscription_link,
-        'variant': variant
+        'payment_management_url': settings.payment_management_url,
+        'has_ongoing_subscription': settings.upgraded and settings.plan_type in ('monthly', 'yearly'),
     })
 
 

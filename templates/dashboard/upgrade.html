@@ -59,11 +59,11 @@
 </p>
 {% endif %}
 
+{% if checkout_url %}
 <p>
-    <button type="button" onclick="window.open('https://bear.lemonsqueezy.com/checkout/buy/2f0a4d87-10d9-4a74-b241-ba2c4d6b821b?checkout[custom][user_id]={{user.id}}')">
-        Upgrade
-    </button>
+    <a href="{{ checkout_url }}" target="_blank" rel="noopener">Continue to checkout</a>
 </p>
+{% endif %}
 
 <p>
     Let's take back control in an ever enshittifying Internet. 

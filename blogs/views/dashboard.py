@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.utils.text import slugify
 
 from django.http import HttpResponse
@@ -164,7 +165,8 @@ def upgrade(request):
         "country_name": country_name,
         "country_emoji": country_emoji,
         "discount": discount,
-        "promo_code": promo_code
+        "promo_code": promo_code,
+        "checkout_url": settings.PAYMENT_CHECKOUT_URL.replace('{user_id}', str(request.user.pk)),
     })
 
 

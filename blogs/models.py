@@ -21,6 +21,7 @@ class UserSettings(models.Model):
     upgraded_date = models.DateTimeField(blank=True, null=True, db_index=True)
     order_id = models.CharField(max_length=100, blank=True, null=True)
     order_email = models.CharField(max_length=100, blank=True, null=True)
+    payment_management_url = models.CharField(max_length=2000, blank=True)
     PLAN_TYPE_CHOICES = [
         ('monthly', 'monthly'),
         ('yearly', 'yearly'),

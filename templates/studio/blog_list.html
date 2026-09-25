@@ -84,24 +84,15 @@
     <a href="/accounts/password/change/">Change password</a>
 </p>
 
-{% if subscription_link %}
+{% if request.user.settings.upgraded %}
 <p>
-    You're currently on a <b>{{ variant }}</b> subscription.
-    <br>
-    Upgrade to
-    {% if variant == "Monthly" and upgrade_subscription_link %}
-    <a href="{{ upgrade_subscription_link }}" target="_blank">Yearly</a>
-    (4 months free) or {% endif %}
-    <a href="https://docs.bearblog.dev/upgrading-from-subscription-to-lifetime/" target="_blank">Lifetime</a>
-    (once-off purchase).  
-</p>
-<p>
-    <a href="{{ subscription_link }}" target="_blank">Manage subscription</a>
+    You're currently on the <b>{{ request.user.settings.plan_type|default:"paid" }}</b> plan.
+    {% if payment_management_url %}<br><a href="{{ payment_management_url }}" target="_blank" rel="noopener">Manage subscription</a>{% endif %}
 </p>
 {% endif %}
 
 <p>
-    {% if subscription_link and not subscription_cancelled %}
+    {% if has_ongoing_subscription %}
     <a onclick="alert('Please cancel your subscription before deleting your account.')">Delete account</a>
     {% else %}
     <a href="{% url 'user_delete' %}">Delete account</a>

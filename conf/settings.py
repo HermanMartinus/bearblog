@@ -11,7 +11,8 @@ PROJECT_NAME = "🐼 BEARBLOG 🐼"
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET')
-LEMONSQUEEZY_SIGNATURE = os.getenv('LEMONSQUEEZY_SIGNATURE')
+PAYMENT_WEBHOOK_SECRET = os.getenv('PAYMENT_WEBHOOK_SECRET', '')
+PAYMENT_CHECKOUT_URL = os.getenv('PAYMENT_CHECKOUT_URL', '')
 
 DEBUG = (os.getenv('DEBUG') == 'True')
 

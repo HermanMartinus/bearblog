@@ -1,6 +1,5 @@
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
-from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.db.models import Q
 from blogs.models import Blog, Post
@@ -47,24 +46,6 @@ def get_blog_with_domain(domain):
 
 def clean_domain(domain):
     return domain.strip().lower().removeprefix('www.')
-
-
-@csrf_exempt
-def ping(request):
-    domain = request.GET.get("domain", None)
-
-    if not domain:
-        return HttpResponse('Invalid domain', status=422, content_type='text/plain')
-
-    try:
-        if Blog.objects.filter(Q(domain=clean_domain(domain)) | Q(domain=f'www.{clean_domain(domain)}')).exists():
-            # print('Ping! Found correct blog. Issuing certificate for', domain)
-            return HttpResponse('Ping', status=200, content_type='text/plain')
-    except:
-        pass
-
-    # print("Ping! Invalid domain", domain)
-    return HttpResponse('Invalid domain', status=422, content_type='text/plain')
 
 
 def home(request):

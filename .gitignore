@@ -116,7 +116,6 @@ sync_data.sh
 *.mdc
 CLAUDE.md
 .claude*
-Caddyfile.dev
 .agents
 AGENTS.md
 .codex

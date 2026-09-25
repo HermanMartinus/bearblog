@@ -139,7 +139,7 @@ def get_posts(blog_id, start_date, post_filter=None, referrer_filter=None):
 
 @csrf_exempt
 def hit(request):
-    if request.GET.get('blog') and get_int(request.GET.get('score', 0), 0) > 50 and not request.GET.get('title') and not 'bot' in request.META.get('HTTP_USER_AGENT'):
+    if request.GET.get('blog'):
         user_agent = httpagentparser.detect(request.META.get('HTTP_USER_AGENT', None))
 
         # Prevent duplicates with ip hash + date

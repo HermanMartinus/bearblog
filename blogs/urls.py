@@ -80,7 +80,7 @@ urlpatterns = [
     path('<id>/dashboard/post-template/', main_site_only(studio.post_template), name="post_template"),
 
     # Webhook
-    path('lemon-webhook/', main_site_only(subscriptions.lemon_webhook), name='lemon_webhook'),
+    path('payment-webhook/', main_site_only(subscriptions.payment_webhook), name='payment_webhook'),
 
     # Discover
     path('discover/', main_site_only(discover.discover), name='discover'),
@@ -88,9 +88,6 @@ urlpatterns = [
     path('discover/search/', main_site_only(discover.search), name='search'),
     path('discover/random-post/', main_site_only(discover.random_post), name='random_post'),
     path('discover/random-blog/', main_site_only(discover.random_blog), name='random_blog'),
-
-    # Caddy validation
-    path('ping/', main_site_only(blog.ping), name='ping'),
 
     # Blog
     
