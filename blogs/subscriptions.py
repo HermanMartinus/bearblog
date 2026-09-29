@@ -1,12 +1,10 @@
 from django.db.models import F
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.conf import settings
 
-from blogs.helpers import send_async_mail
 from blogs.models import UserSettings
 
 import json
@@ -110,20 +108,7 @@ def payment_webhook(request):
                 blog.save()
             return HttpResponse(f'Upgraded {user}')
 
-        # No account matched; ask the purchaser to get in touch
-        email = data.get('email')
-        if not isinstance(email, str):
-            email = ''
-        payment_id = data.get('payment_id') or data.get('subscription_id') or data.get('id')
-        if email:
-            send_async_mail(
-                "Your Bear Blog upgrade",
-                render_to_string('emails/upgrade_unmatched.html'),
-                'Herman Martinus <herman@mg.bearblog.dev>',
-                [email],
-                ['Herman Martinus <herman@bearblog.dev>'],
-            )
-        return HttpResponse('No matching user found; purchaser notified')
+        return HttpResponse('No matching user found')
 
     elif event in DOWNGRADE_EVENTS:
         payment_id = data.get('payment_id') or data.get('subscription_id') or data.get('id')

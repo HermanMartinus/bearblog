@@ -170,12 +170,12 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 
 # Emailer
 ACCOUNT_EMAIL_SUBJECT_PREFIX = '' # Allauth email setting
-DEFAULT_FROM_EMAIL = "Bear Blog Admin <no-reply@mg.bearblog.dev>"
-SERVER_EMAIL = "Bear Blog Admin <no-reply@mg.bearblog.dev>"
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
+SERVER_EMAIL = os.getenv('SERVER_EMAIL', '')
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.eu.mailgun.org'
-EMAIL_HOST_USER = 'postmaster@mg.bearblog.dev'
-EMAIL_HOST_PASSWORD = os.getenv('MAILGUN_PASSWORD', '')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 

@@ -1,11 +1,9 @@
 from django.utils import timezone
-from django.core.mail import EmailMultiAlternatives
 from django.contrib.gis.geoip2 import GeoIP2
 from django.db.models import Max, Min
 import re
 import os
 import random
-import threading
 from requests.exceptions import ConnectionError, ReadTimeout
 import requests
 from time import time
@@ -87,34 +85,6 @@ def valid_xml_char_ordinal(c):
         0xE000 <= codepoint <= 0xFFFD or
         0x10000 <= codepoint <= 0x10FFFF
     )
-
-
-class EmailThread(threading.Thread):
-    def __init__(self, subject, html_message, from_email, recipient_list, reply_to=None):
-        self.subject = subject
-        self.html_message = html_message
-        self.from_email = from_email
-        self.recipient_list = recipient_list
-        self.reply_to = reply_to
-        threading.Thread.__init__(self)
-    
-    def run(self):
-        email = EmailMultiAlternatives(
-            subject=self.subject,
-            body=self.html_message,
-            from_email=self.from_email,
-            to=self.recipient_list,
-            reply_to=self.reply_to if self.reply_to else None,
-        )
-        email.attach_alternative(self.html_message, "text/html")
-        email.send(fail_silently=True)
-
-
-# Important! All members of the recipient list will see the other recipients in the 'To' field
-def send_async_mail(subject, html_message, from_email, recipient_list, reply_to=None):
-    if os.getenv('ENVIRONMENT') == 'dev':
-        return
-    EmailThread(subject, html_message, from_email, recipient_list, reply_to).start()
 
 
 _random_post_cache = {'url': '', 'expires': 0}
