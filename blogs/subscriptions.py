@@ -107,7 +107,6 @@ def payment_webhook(request):
                 user.settings.order_email = email
             user.settings.save()
             for blog in user.blogs.all():
-                blog.reviewed = True
                 blog.save()
             return HttpResponse(f'Upgraded {user}')
 

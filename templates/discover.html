@@ -120,44 +120,6 @@
                     </span>
                     {% endfor %}
                 </small> {% endcomment %}
-                {% if request.user.is_staff %}
-                <details style="font-family: sans-serif; border: 1px solid #eee; padding: 10px; border-radius: 4px; font-size: small;">
-                    <summary>
-                        {% if post.blog.user.settings.upgraded %}🐻{% else %}🌱{% endif %} 
-                        <strong>Blog lang:</strong> {{ post.blog.lang }} | <strong>Post lang:</strong> {{ post.lang }}
-                    </summary>
-
-                    <form method="POST">
-                        {% csrf_token %}
-                        <input hidden name="set-values" value="{{ post.pk }}">
-                        <br>
-                        <label>Blog Lang: 
-                            <input type="text" name="blog-lang" value="{{ post.blog.lang }}" style="width:50px;line-height:1;padding:0;">
-                        </label>
-                        <br><br>
-                        <label>Post Lang: 
-                            <input type="text" name="post-lang" value="{{ post.lang }}" style="width:50px;line-height:1;padding:0;">
-                        </label>
-                        <br><br>
-                        <button type="submit" style="display: block; margin-top: 5px;">Update Metadata</button>
-                    </form>
-
-                    <hr>
-
-                    <form method="POST">
-                        {% csrf_token %}
-                        <input hidden name="block-blog" value="{{ post.pk }}">
-                        <button onclick="event.preventDefault();if(confirm('Block this blog?')){this.form.submit()}" style="color: red;">Block Blog</button>
-                    </form>
-
-                    <p>
-                        <strong>Admin:</strong>
-                        <a href="/admin/blogs/blog/{{ post.blog.id }}/change/" target="_blank">Blog</a> | 
-                        <a href="/admin/blogs/post/{{ post.id }}/change/" target="_blank">Post</a> | 
-                        <a href="/admin/blogs/usersettings/{{ post.blog.user.settings.id }}/change/" target="_blank">User</a>
-                    </p>
-                </details>
-                {% endif %}
             </small>
         </div>
     </li>

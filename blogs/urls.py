@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, staff, signup_flow, media, upvotes
+from blogs.views import blog, dashboard, studio, feed, discover, analytics, emailer, signup_flow, media, upvotes
 from blogs import subscriptions
 
 import os
@@ -20,23 +20,6 @@ def main_site_only(view_func):
 urlpatterns = [
     path('', blog.home, name='home'),
 
-    # Staff dashboard
-    path('staff/dashboard/', main_site_only(staff.dashboard), name='staff_dashboard'),
-    path('staff/actions/', main_site_only(staff.actions), name='staff_actions'),
-    path('staff/review/new/', main_site_only(staff.review_bulk), name='review_new'),
-    path('staff/review/dodgy/', main_site_only(staff.review_bulk), name='review_dodgy'),
-    path('staff/review/flagged/', main_site_only(staff.review_bulk), name='review_flagged'),
-    path('staff/review/approve/<pk>', main_site_only(staff.approve), name='review_approve'),
-    path('staff/review/block/<pk>', main_site_only(staff.block), name='review_block'),
-    path('staff/review/ignore/<pk>', main_site_only(staff.ignore), name='review_ignore'),
-    path('staff/review/flag/<pk>', main_site_only(staff.flag), name='review_flag'),
-    path('staff/review/delete/<pk>', main_site_only(staff.delete), name='review_delete'),
-    path('staff/dashboard/delete-empty/', main_site_only(staff.delete_empty), name='delete_empty'),
-    path('staff/dashboard/migrate-blog/', main_site_only(staff.migrate_blog), name='migrate_blog'),
-    path('staff/dashboard/import-posts/', main_site_only(staff.import_posts), name='import_posts'),
-    path('staff/dashboard/check-spam/', main_site_only(staff.check_spam), name='check_spam'),
-    path('staff/playground/', main_site_only(staff.playground), name='playground'),
-    
     # User dashboard
     path('accounts/delete/', main_site_only(dashboard.delete_user), name='user_delete'),
     path('signup/', main_site_only(signup_flow.signup), name="signup_flow"),

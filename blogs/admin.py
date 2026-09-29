@@ -6,7 +6,7 @@ from django.utils.html import escape, format_html, format_html_join
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from blogs.models import Blog, PersistentStore, Post, Stylesheet, Upvote, Hit, Subscriber, UserSettings, Media
+from blogs.models import Blog, Post, Stylesheet, Upvote, Hit, Subscriber, UserSettings, Media
 
 
 admin.autodiscover()
@@ -124,7 +124,6 @@ class BlogAdmin(admin.ModelAdmin):
         'user_link',
         'subdomain_url',
         'domain_url',
-        'reviewed',
         'display_upgraded',
         'display_is_active',
         'post_count',
@@ -254,4 +253,3 @@ class SubscriberAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Stylesheet)
-admin.site.register(PersistentStore)

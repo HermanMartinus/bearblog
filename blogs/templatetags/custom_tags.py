@@ -28,43 +28,6 @@ from blogs.models import Post
 
 register = template.Library()
 
-HOST_WHITELIST = [
-    'www.youtube.com',
-    'www.youtube-nocookie.com',
-    'calendar.google.com',
-    'www.slideshare.net',
-    'player.vimeo.com',
-    'w.soundcloud.com',
-    'www.google.com',
-    'codepen.io',
-    'stackblitz.com',
-    'onedrive.live.com',
-    'docs.google.com',
-    'bandcamp.com',
-    'embed.music.apple.com',
-    'drive.google.com',
-    'share.transistor.fm',
-    'share.descript.com',
-    'mrkennedy.ca',
-    'open.spotify.com',
-    'umap.openstreetmap.fr',
-    'music.163.com',
-    'sheevcharan.substack.com',
-    'guestbooks.meadow.cafe',
-    'supercut.video',
-    'listenbrainz.org',
-    'api.listenbrainz.org',
-    'archive.org',
-    'panel.radiocast.net',
-    'embed.ente.io',
-    'app.hearthis.at',
-    'datawrapper.de',
-    'datawrapper.dwcdn.net',
-    'guestbooks.kamiscorner.xyz',
-    'lastfm-embed.vercel.app',
-    'ext.nicovideo.jp'
-]
-
 TYPOGRAPHIC_REPLACEMENTS = [
     ('(c)', '©'),
     ('(C)', '©'),
@@ -256,10 +219,6 @@ def markdown(content, blog=None, post=None, tz=None):
         processed_markup = markdown_renderer(content)
     except TypeError:
         return ''
-
-    # If not upgraded remove iframes and js
-    if not blog or not blog.user.settings.upgraded:
-        processed_markup = clean(processed_markup)
 
     # Replace {{ xyz }} elements
     if blog:
@@ -470,29 +429,6 @@ def plain_title(title):
     title = re.sub(r'\*+(.+?)\*+', r'\1', title)
     title = title.replace('&nbsp;', ' ')
     return title
-
-
-@register.filter
-def clean(markup):
-    cleaned_markup = re.sub(r'<script.*?>.*?</script>', '', markup, flags=re.DOTALL | re.IGNORECASE)
-    
-    cleaned_markup = re.sub(r'\son\w+="[^"]*"', '', cleaned_markup, flags=re.IGNORECASE)
-    cleaned_markup = re.sub(r'\son\w+=\'[^\']*\'', '', cleaned_markup, flags=re.IGNORECASE)
-    cleaned_markup = re.sub(r'\son\w+=\w+', '', cleaned_markup, flags=re.IGNORECASE)
-    cleaned_markup = re.sub(r'(<\w+\s+.*?)(href|src)\s*=\s*["\']?javascript:[^"\']*["\']?', r'\1', cleaned_markup, flags=re.IGNORECASE)
-    cleaned_markup = re.sub(r'<(object|embed|form|input|button).*?>', '', cleaned_markup, flags=re.IGNORECASE)
-    cleaned_markup = re.sub(r'</(object|embed|form|input|button)>', '', cleaned_markup, flags=re.IGNORECASE)
-    cleaned_markup = re.sub(r'<\w+\s*[^>]*\bon\w+\s*=\s*(".*?"|\'.*?\'|[^\s>]*)\s*[^>]*>', '', cleaned_markup, flags=re.IGNORECASE | re.DOTALL)
-    
-    def iframe_whitelisted(match):
-        src = match.group(2)
-        if any(host in src for host in HOST_WHITELIST):
-            return match.group(0)
-        return ''
-
-    cleaned_markup = re.sub(r'(<iframe.*?src=["\'])([^"\']*)(["\'].*?>.*?</iframe>)', iframe_whitelisted, cleaned_markup, flags=re.DOTALL | re.IGNORECASE)
-
-    return cleaned_markup
 
 
 STYLE_BREAKOUT_RE = re.compile(r'</\s*style', re.IGNORECASE)

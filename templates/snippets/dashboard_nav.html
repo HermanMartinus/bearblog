@@ -30,16 +30,6 @@
     <a href="{% url 'account' %}" class="account bear" title="Account"></a>
 </span>
 
-{% if not blog.reviewed and blog.posts.count > 0 %}
-<p class="notification">
-    <small>
-    🐼 Your blog is currently hidden from search engines and the
-    <a href="https://bearblog.dev/discover/" target="_blank">discover feed</a>.
-    Upgrade to get discovered.
-    </small>
-</p>
-{% endif %}
-
 {% if blog.domain and not blog.user.settings.upgraded %}
 <div class="notification" style="background-color:lightsalmon;border-radius:3px;padding:5px;margin-top:10px;font-size:small;text-align:center">
 

@@ -12,7 +12,6 @@
 {% block canonical %}<link rel="canonical" href="{{ canonical_url }}">{% endblock %}
 
 {% block seo %}
-    {% if not blog.reviewed %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
     <meta name="{{ blog.subdomain }}" content="look-for-the-bear-necessities">
     <meta name="token" content="{{ post.uid }}">

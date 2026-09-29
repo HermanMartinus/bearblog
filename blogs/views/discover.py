@@ -17,7 +17,6 @@ max_page = 5000
 def get_base_query():
     return Post.objects.select_related("blog").filter(
         publish=True,
-        blog__reviewed=True,
         blog__user__is_active=True,
         make_discoverable=True,
         published_date__lte=timezone.now(),
@@ -26,29 +25,7 @@ def get_base_query():
     )
 
 
-def admin_actions(request):
-    # admin actions
-    if request.user.is_staff:
-        if request.POST.get("block-blog", False):
-            post = Post.objects.get(pk=request.POST.get("block-blog"))
-            post.blog.user.is_active = False
-            post.blog.user.save()
-        
-        if request.POST.get("set-values", False):
-            post = Post.objects.get(pk=request.POST.get("set-values"))
-            post.lang = request.POST.get('post-lang')
-            post.save()
-
-            if post.blog.lang != request.POST.get('blog-lang'):
-                post.blog.lang = request.POST.get('blog-lang')
-                post.blog.save()
-
-        
-
-
 def discover(request):
-    admin_actions(request)
-
     # Handle hide/unhide actions
     if request.method == 'POST':
         subdomain = request.POST.get('subdomain')

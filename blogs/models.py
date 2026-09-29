@@ -44,8 +44,6 @@ class UserSettings(models.Model):
 @receiver(post_save, sender=User)
 def create_user_settings(sender, instance, **kwargs):
     user_settings, created = UserSettings.objects.get_or_create(user=instance)
-    if user_settings.upgraded:
-        user_settings.user.blogs.update(reviewed=True)
 
 
 class Blog(models.Model):
@@ -85,12 +83,6 @@ class Blog(models.Model):
     rss_alias = models.CharField(max_length=100, blank=True)
     codemirror_enabled = models.BooleanField(default=True)
     
-    # Discovery feed settings
-    dodginess_score = models.FloatField(default=0, db_index=True)
-    reviewed = models.BooleanField(default=False, db_index=True)
-    ignored_date = models.DateTimeField(blank=True, null=True, db_index=True)
-    permanent_ignore = models.BooleanField(default=False, db_index=True)
-    flagged = models.BooleanField(default=False, db_index=True)
     posts_in_last_12_hours = models.IntegerField(default=0, db_index=True)
 
     @property
@@ -130,25 +122,6 @@ class Blog(models.Model):
     def tags(self):
         return sorted(json.loads(self.all_tags))
     
-    def determine_dodginess(self):
-        persistent_store = PersistentStore.load()
-        dodgy_term_count = 0
-        blacklisted_term_count = 0
-        all_content = f"{self.title} {self.content}"
-        
-        if self.pk:
-            post = self.posts.first()
-            if post:
-                all_content += f"{post.title} {post.content}"
-
-        for term in persistent_store.highlight_terms:
-            dodgy_term_count += all_content.lower().count(term.lower())
-
-        for term in persistent_store.blacklist_terms:
-            blacklisted_term_count += all_content.lower().count(term.lower())
-
-        self.dodginess_score = dodgy_term_count + blacklisted_term_count * 10
-
     def update_all_tags(self):
         all_tags = set()
         if self.pk:
@@ -159,14 +132,6 @@ class Blog(models.Model):
     def save(self, *args, **kwargs):
         # Handle all tags
         self.update_all_tags()
-
-        # Upgraded blogs are auto-reviewed
-        if self.user.settings.upgraded:
-            self.reviewed = True
-        
-        # Determine how dodgy the blog is if it's not reviewed
-        if not self.reviewed:
-            self.determine_dodginess()
 
         # When custom styles is empty set it to default (legacy overwrite patch)
         if not self.custom_styles:
@@ -380,34 +345,3 @@ class Media(models.Model):
     def __str__(self):
         return f"{self.blog.subdomain} - {self.url} - {self.created_at}"
     
-
-# Singleton model to store Bear specific settings
-class PersistentStore(models.Model):
-    last_executed = models.DateTimeField(default=timezone.now)
-    review_ignore_terms = models.TextField(blank=True, default='[]')
-    review_highlight_terms = models.TextField(blank=True, default='[]')
-    review_blacklist_terms = models.TextField(blank=True, default='[]')
-
-    @property
-    def ignore_terms(self):
-        return sorted(json.loads(self.review_ignore_terms))
-    
-    @property
-    def highlight_terms(self):
-        return sorted(json.loads(self.review_highlight_terms))
-    
-    @property
-    def blacklist_terms(self):
-        return sorted(json.loads(self.review_blacklist_terms))
-    
-    @classmethod
-    def load(cls):
-        obj, created = cls.objects.get_or_create(pk=1)
-        return obj
-
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super(PersistentStore, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return self.last_executed.strftime('%d %B %Y, %I:%M %p')

@@ -138,7 +138,6 @@ def random_post_link():
         return _random_post_cache['url']
     post = _random_by_id(
         Post.objects.filter(
-            blog__reviewed=True,
             publish=True,
             published_date__lte=timezone.now(),
             make_discoverable=True,
@@ -159,7 +158,6 @@ def random_blog_link():
         return _random_blog_cache['url']
     blog = _random_by_id(
         Blog.objects.filter(
-            reviewed=True,
             user__is_active=True,
         ),
         Blog,
