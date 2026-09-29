@@ -24,7 +24,6 @@
 {% block imports %}
     {% if blog.user.settings.upgraded %}{{ blog.header_directive | safe }}{% endif %}
 
-    {% if blog.fathom_site_id %}<script src="https://cdn.usefathom.com/script.js" data-site="{{ blog.fathom_site_id }}" defer></script>{% endif %}
     {% if post.contains_code %}<style>{% include 'styles/blog/highlight.css' %}</style>{% endif %}
 {% endblock %}
 

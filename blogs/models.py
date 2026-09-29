@@ -76,8 +76,6 @@ class Blog(models.Model):
     date_format = models.CharField(max_length=32, default="d M, Y", blank=True)
 
     analytics_active = models.BooleanField(default=True)
-    fathom_site_id = models.CharField(max_length=8, blank=True)
-
     post_template = models.TextField(blank=True)
     robots_txt = models.TextField(blank=True, default="User-agent: *\nAllow: /")
     rss_alias = models.CharField(max_length=100, blank=True)
