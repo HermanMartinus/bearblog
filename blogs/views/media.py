@@ -16,7 +16,17 @@ from blogs.models import Blog, Media
 
 pillow_heif.register_heif_opener()
 
-bucket_name = os.getenv('SPACES_BUCKET', 'bear-images')
+
+def get_storage_config():
+    return {
+        'bucket': os.getenv('OBJECT_STORAGE_BUCKET'),
+        'public_url': os.getenv('OBJECT_STORAGE_PUBLIC_URL', '').rstrip('/'),
+        'endpoint_url': os.getenv('OBJECT_STORAGE_ENDPOINT_URL') or None,
+        'region': os.getenv('OBJECT_STORAGE_REGION') or None,
+        'access_key_id': os.getenv('OBJECT_STORAGE_ACCESS_KEY_ID') or None,
+        'secret_access_key': os.getenv('OBJECT_STORAGE_SECRET_ACCESS_KEY') or None,
+        'acl': os.getenv('OBJECT_STORAGE_ACL', ''),
+    }
 
 
 image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic', 'heif']
@@ -100,6 +110,9 @@ def upload_image(request, id):
 
 def upload_files(blog, file_list, optimise=True):
     file_links = []
+    storage_config = get_storage_config()
+    if not storage_config['bucket'] or not storage_config['public_url']:
+        raise UploadError('Object storage is not configured.', status_code=503)
 
     for file in file_list:
         # Fair use limit
@@ -137,7 +150,7 @@ def upload_files(blog, file_list, optimise=True):
         file_name = new_file_name
         
         filepath = f'{blog.subdomain}/{file_name}.{extension}'
-        url = f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/{filepath}'
+        url = f"{storage_config['public_url']}/{filepath}"
 
         file_data = file.read()
         content_type = file.content_type
@@ -146,7 +159,7 @@ def upload_files(blog, file_list, optimise=True):
         file_links.append(url)
 
         thread = threading.Thread(
-            target=upload_to_s3,
+            target=upload_to_object_storage,
             args=(filepath, file_data, content_type)
         )
         thread.start()
@@ -154,23 +167,26 @@ def upload_files(blog, file_list, optimise=True):
     return sorted(file_links)
 
 
-def upload_to_s3(filepath, file_data, content_type):
-    session = boto3.session.Session()
-    client = session.client(
+def upload_to_object_storage(filepath, file_data, content_type):
+    config = get_storage_config()
+    client = boto3.session.Session().client(
         's3',
-        endpoint_url='https://sfo2.digitaloceanspaces.com',
-        region_name='sfo2',
-        aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
-        aws_secret_access_key=os.getenv('SPACES_SECRET'))
+        endpoint_url=config['endpoint_url'],
+        region_name=config['region'],
+        aws_access_key_id=config['access_key_id'],
+        aws_secret_access_key=config['secret_access_key'],
+    )
 
     try:
-        client.put_object(
-            Bucket=bucket_name,
-            Key=filepath,
-            Body=file_data,
-            ContentType=content_type,
-            ACL='public-read',
-        )
+        params = {
+            'Bucket': config['bucket'],
+            'Key': filepath,
+            'Body': file_data,
+            'ContentType': content_type,
+        }
+        if config['acl']:
+            params['ACL'] = config['acl']
+        client.put_object(**params)
     except Exception:
         pass
 
@@ -221,19 +237,26 @@ def delete_selected_media(request, id):
     
     if request.method == "POST":
         selected_media = request.POST.getlist('selected_media')
-        
-        session = boto3.session.Session()
-        client = session.client(
+        config = get_storage_config()
+        if not config['bucket'] or not config['public_url']:
+            return HttpResponseForbidden("Error: Object storage is not configured")
+        client = boto3.session.Session().client(
             's3',
-            endpoint_url='https://sfo2.digitaloceanspaces.com',
-            region_name='sfo2',
-            aws_access_key_id=os.getenv('SPACES_ACCESS_KEY_ID'),
-            aws_secret_access_key=os.getenv('SPACES_SECRET')
+            endpoint_url=config['endpoint_url'],
+            region_name=config['region'],
+            aws_access_key_id=config['access_key_id'],
+            aws_secret_access_key=config['secret_access_key'],
         )
         for url in selected_media:
             if Media.objects.filter(blog=blog, url=url).exists():
-                key = url.replace(f'https://{bucket_name}.sfo2.cdn.digitaloceanspaces.com/', '')
-                client.delete_object(Bucket=bucket_name, Key=key)
+                try:
+                    prefix = f"{config['public_url']}/"
+                    if not url.startswith(prefix):
+                        raise ValueError
+                    key = url[len(prefix):]
+                except ValueError:
+                    return HttpResponseForbidden("Error: Media storage is not configured for this URL")
+                client.delete_object(Bucket=config['bucket'], Key=key)
                 Media.objects.filter(blog=blog, url=url).delete()
             else:
                 return HttpResponseForbidden("Error: Attempted to delete unauthorized media")
