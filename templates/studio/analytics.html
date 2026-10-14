@@ -1,14 +1,8 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 {% load humanize %}
 {% load custom_tags %}
 
 {% block title %}Analytics – Bear Blog{% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
 
 {% block nav %}
 {% include '../snippets/dashboard_nav.html' %}
@@ -39,7 +33,7 @@
 </div>
 
 <canvas id="hitsChart" height="200"></canvas>
-<span class="helptext" style="display: flex; justify-content:space-between;">
+<span class="helptext">
     <span>{{ start_date|date:"j F Y" }}</span>
     <span>{{ end_date|date:"j F Y" }}</span>
 </span>
@@ -62,12 +56,12 @@
 {% endif %}
 </p>
 
-<div style="display:flex;flex-flow:row wrap;justify-content:space-between; font-size: 12px;">
-    <div style="width: 340px">
+<div class="stat-lists wide">
+    <div>
         <h3>Pages</h3>
-        <ul style="padding: 0 12px 0 0;max-height: 300px;overflow-y: auto;">
+        <ul>
             {% for post in posts %}
-            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+            <li>
                 <span>
                     {% if post.hit_count > 0 %}
                     <a href="?days={{days_filter}}&post={{post.slug}}{% if referrer_filter %}&referrer={{referrer_filter}}{% endif %}">
@@ -86,11 +80,11 @@
             {% endfor %}
         </ul>
     </div>
-    <div style="width: 340px">
+    <div>
         <h3>Referrers</h3>
-        <ul style="padding: 0 12px 0 0;max-height: 300px;overflow-y: auto;word-break:break-all;">
+        <ul>
             {% for referrer in referrers %}
-            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+            <li>
                 <span>
                     <a href="?days={{ days_filter }}&referrer={{ referrer.referrer }}{% if post_filter %}&post={{ post_filter }}{% endif %}">{{ referrer.referrer }}</a>
                     <a href="{{ referrer.referrer }}" target="_blank">↪</a>
@@ -102,34 +96,34 @@
     </div>
 </div>
 
-<div style="padding-top:20px;display:flex; flex-flow: row wrap;justify-content:space-between; font-size: 12px;">
-    <div style="width:220px">
+<div class="stat-lists">
+    <div>
         <h3>Devices</h3>
-        <ul style="padding: 0 12px 0 0;max-height: 300px;overflow-y: auto">
+        <ul>
             {% for device in devices %}
-            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+            <li>
                 {{ device.device }}
                 <span>{{ device.count|intcomma }}</span>
             </li>
             {% endfor %}
         </ul>
     </div>
-    <div style="width:220px">
+    <div>
         <h3>Browsers</h3>
-        <ul style="padding: 0 12px 0 0;max-height: 300px;overflow-y: auto">
+        <ul>
             {% for browser in browsers %}
-            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+            <li>
                 {{ browser.browser }}
                 <span>{{ browser.count|intcomma }}</span>
             </li>
             {% endfor %}
         </ul>
     </div>
-    <div style="width:220px">
+    <div>
         <h3>Countries</h3>
-        <ul style="padding: 0 12px 0 0;max-height: 300px;overflow-y: auto">
+        <ul>
             {% for country in countries %}
-            <li style="display:flex;justify-content:space-between;padding:5px 0;">
+            <li>
                 {{ country.country }}
                 <span>{{ country.count|intcomma }}</span>
             </li>

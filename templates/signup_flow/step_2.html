@@ -9,7 +9,7 @@
 <button type="button" onclick="history.back()">Back</button>
 
 {% if error_messages %}
-<p style="color:lightsalmon">
+<p class="message error">
     {% for error_message in error_messages %}
         {{ error_message }}<br>
     {% endfor %}

@@ -1,12 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 
 {% block title %}Styling – Bear Blog {% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
 
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
@@ -69,7 +63,7 @@
   {% endfor %}
 </div>
 
-<form method="POST" class="post-form full-width">
+<form method="POST" id="styles-form" class="post-form full-width">
   <p class="sticky-controls">
     <span>
       <button type="submit" class="save btn btn-default">Publish</button>
@@ -81,38 +75,116 @@
   {% csrf_token %} {{ form.as_p }}
 </form>
 
-{% if blog.codemirror_enabled %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/css/css.min.js"></script>
 <style>
-	.CodeMirror {
-		height: unset;
-    background-color: #eceff4;
-    border: none;
-    outline: none;
-    border-top: 0;
-		padding: 10px;
+  .css-editor {
+    position: relative;
+  }
+
+  .css-editor textarea,
+  .css-editor pre {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 10px;
+    border: 0;
+    font: 16px/1.7 ui-monospace, Menlo, Consolas, monospace;
+    letter-spacing: normal;
+    tab-size: 4;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  /* The pre sizes the editor; the textarea is stretched over it */
+  .css-editor pre {
     min-height: 200px;
-	}
+    background: var(--surface);
+    border-radius: var(--radius);
+  }
+
+  .css-editor textarea {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    resize: none;
+    overflow: hidden;
+    background: transparent;
+    color: transparent;
+    caret-color: var(--text-color);
+  }
+
+  .hl-c { color: #5c6370; font-style: italic; }
+  .hl-s { color: #1b6b25; }
+  .hl-a { color: #6d2a91; }
+  .hl-p { color: #0d5596; }
+  .hl-n { color: #a13a12; }
+  .hl-v { color: #9c1c56; }
+
+  @media (prefers-color-scheme: dark) {
+    .hl-c { color: #a6c4cc; }
+    .hl-s { color: #b5e6b8; }
+    .hl-a { color: #e4c4ff; }
+    .hl-p { color: #a9dcf5; }
+    .hl-n { color: #ffc49e; }
+    .hl-v { color: #ffb5d5; }
+  }
 </style>
 <script>
-  var codemirror = CodeMirror.fromTextArea(document.querySelector('textarea'), {mode: "css"})
+  // Minimal CSS highlighter: a transparent textarea over a highlighted <pre>
+  (() => {
+    const textarea = document.querySelector('#styles-form textarea')
+    const editor = document.createElement('div')
+    const pre = document.createElement('pre')
+    editor.className = 'css-editor'
+    pre.setAttribute('aria-hidden', 'true')
+    textarea.before(editor)
+    editor.append(pre, textarea)
+    textarea.spellcheck = false
+    textarea.setAttribute('autocapitalize', 'off')
+    textarea.setAttribute('autocorrect', 'off')
+
+    // comment | string | at-rule | property | variable usage | colour or number
+    const TOKENS = /(\/\*[\s\S]*?(?:\*\/|$(?![\s\S])))|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?)|(@[\w-]+)|([\w-]+(?=\s*:[^{};]*(?:[;}]|$)))|(--[\w-]+)|(#[\da-f]{3,8}\b|\b\d*\.?\d+[a-z%]*)/gim
+    const CLASSES = ['c', 's', 'a', 'p', 'v', 'n']
+    const escape = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+
+    const highlight = src => {
+      let html = '', last = 0
+      for (const match of src.matchAll(TOKENS)) {
+        const cls = CLASSES[match.slice(1).findIndex(Boolean)]
+        html += escape(src.slice(last, match.index)) + `<span class="hl-${cls}">${escape(match[0])}</span>`
+        last = match.index + match[0].length
+      }
+      // Trailing newline gives an empty last line height, as it has in the textarea
+      return html + escape(src.slice(last)) + '\n'
+    }
+
+    const update = () => {
+      pre.innerHTML = highlight(textarea.value)
+    }
+
+    textarea.addEventListener('input', update)
+
+    // Tab indents; Escape then Tab moves focus out as usual
+    let tabEscapes = false
+    textarea.addEventListener('keydown', event => {
+      if (event.key === 'Escape') tabEscapes = true
+      else if (event.key === 'Tab' && !event.shiftKey && !tabEscapes) {
+        event.preventDefault()
+        document.execCommand('insertText', false, '    ')
+      } else tabEscapes = false
+    })
+    update()
+  })()
 
   setTimeout(() => {
     window.scrollTo(0, sessionStorage.getItem('scrollY'))
   }, 10)
-  
 
-	window.addEventListener("scroll", function(event) {
-		sessionStorage.setItem('scrollY', window.scrollY)
-	})
-
-  const preview = name => {
-    window.open('?preview=True&style=' + name)
-  }
+  window.addEventListener("scroll", function(event) {
+    sessionStorage.setItem('scrollY', window.scrollY)
+  })
 </script>
-{% endif %}
 
 {{ request.user.settings.dashboard_footer | safe }}
 

@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block custom_styles %}
+    {{ block.super }}
+    {% block page_styles %}{% endblock %}
+    {{ request.user.settings.dashboard_styles | safe }}
+{% endblock %}

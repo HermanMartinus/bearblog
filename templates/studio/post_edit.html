@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 {% load custom_tags %}
 
 {% block title %}
@@ -9,19 +9,18 @@ New post – Bear Blog
 {% endif %}
 {% endblock %}
 
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
-
 {% block content %}
 
 {% if error_messages %}
-<p style="color:lightsalmon">
+<p class="message error">
     {% for error_message in error_messages %}
         {{ error_message }}<br>
     {% endfor %}
+</p>
+{% endif %}
+{% if not post.published_date and blog.created_date|date:'Y-m-d' < '2026-10-06' %}
+<p class="message info">
+    Update: drafts stay un-dated until published (autosets current date and time), unless you set published_date.
 </p>
 {% endif %}
 <form method="POST" class="post-form full-width">
@@ -42,7 +41,7 @@ New post – Bear Blog
             <button
                 type="button"
                 id="delete-button"
-                style="color: red; float: right;"
+                class="danger float-right"
                 onclick="event.preventDefault(); deletePost();"
             >
                 Delete
@@ -51,7 +50,7 @@ New post – Bear Blog
         <button
             type="submit"
             {% if post.publish %}
-            style="color: lightsalmon;"
+            class="caution"
             id="unpublish-button"
             {% else %}
             id="save-button"
@@ -66,7 +65,7 @@ New post – Bear Blog
         </button>
     </p>
 
-    <details style="font-size: 12px; margin-bottom: 10px;">
+    <details class="attributes">
         <summary>
             Attributes
         </summary>
@@ -92,15 +91,14 @@ New post – Bear Blog
     <input type="text" name="publish" id="publish" value="{{ post.publish|lower }}" hidden>
     <div
         id="header_content"
-        class="editable"
+        class="editable editor-header"
         contenteditable="true"
-        style="margin-bottom:-1px; border-bottom: 1px solid lightgrey;"
     >
         {% if post %}
         <b>title:</b> {{ post.title }}<br>
         <b>link:</b> {{ post.slug }}{% if post.alias %}<br>
-        <b>alias:</b> {{ post.alias }}{% endif %}<br>
-        <b>published_date:</b> <span id="published-date">{% format_date post.published_date 'Y-m-d H:i' 'en' tz %}</span>{% if post.canonical_url %}<br>
+        <b>alias:</b> {{ post.alias }}{% endif %}{% if post.published_date %}<br>
+        <b>published_date:</b> <span id="published-date">{% format_date post.published_date 'Y-m-d H:i' 'en' tz %}</span>{% endif %}{% if post.canonical_url %}<br>
         <b>canonical_url:</b> {{ post.canonical_url }}{% endif %}{% if post.meta_description %}<br>
         <b>meta_description:</b> {{ post.meta_description }}{% endif %}{% if post.meta_image %}<br>
         <b>meta_image:</b> {{ post.meta_image }}{% endif %}{% if post.lang %}<br>
@@ -117,7 +115,7 @@ New post – Bear Blog
     <textarea
         name="body_content"
         id="body_content"
-        style="min-height: 500px;border-top: 1px solid lightgrey;"
+        class="editor-body"
         placeholder="..."
     >{% if post %}{{ post.content }}{% else %}{{ template_body }}{% endif %}</textarea>
 

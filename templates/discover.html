@@ -103,7 +103,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="subdomain" value="{{ post.blog.subdomain }}">
                         <input type="hidden" name="action" value="hide">
-                        <button type="submit" title="Hide blog" style="background: none; border: none; color: grey; padding: 0; cursor: pointer; text-decoration: none;">| hide</button>
+                        <button type="submit" title="Hide blog" class="link-button muted">| hide</button>
                     </form>
                 </a></small>
                 {% endif %}

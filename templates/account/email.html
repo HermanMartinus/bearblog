@@ -1,23 +1,14 @@
-{% extends 'base.html' %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
+{% extends 'dashboard/base.html' %}
 
 {% load i18n %}
 
 {% block head_title %}{% trans "Account" %}{% endblock %}
 
-{% block nav %}
-<nav>
-  <a href="/dashboard/">Back</a>
-</nav>
-{% endblock %}
-
 {% block content %}
     <h1>{% trans "Email addresses" %}</h1>
+    <p class="button-row">
+        <button type="button" onclick="event.preventDefault(); window.location = '/dashboard/'">&#8592; Back</button>
+    </p>
 {% if user.emailaddress_set.all %}
 <p>{% trans 'The following email addresses are associated with your account:' %}</p>
 

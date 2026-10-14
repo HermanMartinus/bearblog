@@ -1,10 +1,6 @@
-<p style="margin-top: -16px; width: 100%; text-align: left; ">
-    <a
-        href="{{ blog.useful_domain }}"
-        target="_blank"
-        style="font-weight: 400; font-size: 14px; color: inherit; width: fit-content"
-    >
-        {{ blog.blank_useful_domain }} 
+<p class="blog-domain">
+    <a href="{{ blog.useful_domain }}" target="_blank">
+        {{ blog.blank_useful_domain }}
     </a>
 </p>
 
@@ -18,7 +14,7 @@
     <a href="{% url 'email_list' id=blog.subdomain %}">Emails</a>
     {% endif %}
     {% if not blog.user.settings.upgraded %}
-    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade <span class="bear flex"></span></a>
+    <a href="{% url 'upgrade' %}" class="upgrade">Upgrade <span class="bear bear-flex"></span></a>
     {% endif %}
 </span>
 
@@ -31,8 +27,7 @@
 </span>
 
 {% if blog.domain and not blog.user.settings.upgraded %}
-<div class="notification" style="background-color:lightsalmon;border-radius:3px;padding:5px;margin-top:10px;font-size:small;text-align:center">
-
+<div class="message error">
     Your blog's custom domain is at risk of being disconnected.
     <br>
     <a href="{% url 'upgrade' %}">Upgrade</a> to ensure {{ blog.domain }} remains active, or
@@ -45,9 +40,7 @@
 
 
 {% comment %} {% if blog.domain %}
-<p class="notification">
-    <small>
-    🐼 Bear Blog is currently experiencing a DDoS attack and custom domains have been temporarily taken off line. This will be resolved soon. 
-    </small>
+<p class="message info">
+    Bear Blog is currently experiencing a DDoS attack and custom domains have been temporarily taken off line. This will be resolved soon. 
 </p>
 {% endif %} {% endcomment %}

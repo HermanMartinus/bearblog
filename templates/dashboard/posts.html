@@ -1,13 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 {% load custom_tags %}
 
 {% block title %}{% if pages %}Pages{% else %}Posts{% endif %} – Bear Blog{% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
 
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
@@ -34,7 +28,11 @@
     {% for post in posts %}
     <li>
         <span>
+            {% if post.published_date %}
             {% include '../snippets/formatted_date.html' with date=post.published_date %}
+            {% else %}
+            ---
+            {% endif %}
         </span>
         <a href="{% url 'post_edit' id=blog.subdomain  uid=post.uid %}">
             {{ post.title|safe_title }}

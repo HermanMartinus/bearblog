@@ -1,12 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 
 {% block title %}Upgrade – Bear Blog{% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
 
 {% block content %}
 <button type="button" onclick="window.history.back()">← Back</button>
@@ -40,7 +34,7 @@
 </p>
 <p>
     <b>
-        Upgrade for $6 per month, $49 per year <small style="color: grey;">(4 months free)</small>, or $189 once-off.
+        Upgrade for $6 per month, $49 per year <small class="muted">(4 months free)</small>, or $189 once-off.
         {% comment %} <br>
         <mark>
             <small>
@@ -52,7 +46,7 @@
 </p>
 
 {% if discount %}
-<p style="background-color: rgb(0,0,0,0.1); text-align: center; font-size: small">
+<p style="background-color: var(--surface); border-radius: var(--radius); padding: 8px 12px; text-align: center; font-size: small">
     Hey, it looks like you're from {{ country_name }} {{ country_emoji }}<br>
     We support <b>Purchasing Power Parity</b> to make Bear affordable to everyone.<br>
     Use the promo code <b>{{ promo_code }}</b> to get a <b>{{ discount }}% discount</b> when you upgrade.

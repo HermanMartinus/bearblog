@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'error.html' %}
 
 {% block title %}403{% endblock %}
 
@@ -8,17 +8,11 @@
 
 {% block nav %}{% endblock %}
 
-{% block content %}
-<div style="text-align: center; display: flex; flex-flow: column; justify-content: center; height: calc(100vh - 70px);">
-    <h1>403</h1>
-    <h2>ʕノ•ᴥ•ʔノ ︵ ┻━┻</h2>
-    <p>
-        It looks like you can't be here.
-        <br>
-        Let's get you
-        <a href="/">back home</a>.
-    </p>
-</div>
-{% endblock %}
+{% block code %}403{% endblock %}
 
-{% block footer %}{% endblock %}
+{% block message %}
+    It looks like you can't be here.
+    <br>
+    Let's get you
+    <a href="/">back home</a>.
+{% endblock %}

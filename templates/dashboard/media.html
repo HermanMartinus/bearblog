@@ -1,13 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 {% load custom_tags %}
 
 {% block title %}Media – Bear Blog{% endblock %}
-{% block custom_styles %}
-{% include 'styles/blog/default.css' %}
-{% include 'styles/dashboard.css' %}
-{{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
-
 {% block content %}
 <h1>Media</h1>
 
@@ -19,12 +13,15 @@
     <label for="raw" style="font-weight: normal">Upload raw</label>
 </small>
 
-<p style="color:lightsalmon">
-    <span id="loading">Uploading</span>
+<p><span id="loading">Uploading</span></p>
+
+{% if error_messages %}
+<p class="message error">
     {% for error_message in error_messages %}
         {{ error_message }}<br>
     {% endfor %}
 </p>
+{% endif %}
 
 <input id="fileSelect" type="file" name="file" multiple required style="display: none" accept="{{ accepted_file_types }}">
 

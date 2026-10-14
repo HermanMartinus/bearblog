@@ -1,14 +1,8 @@
 
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 
 {% block title %}
 Custom domain – Bear Blog
-{% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
 {% endblock %}
 
 {% block content %}
@@ -17,14 +11,14 @@ Custom domain – Bear Blog
     
     <form method="POST" class="post-form full-width">
         {% csrf_token %}
-        <p style="line-height: 0">
+        <p class="button-row">
             <button type="button" onclick="event.preventDefault(); window.location = '/{{ blog.subdomain}}/dashboard/settings/'">&#8592; Back</button>
             <button type="submit">Save</button>
             <button type="button" onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}');">View</button>
         </p>
 
         {% if error_messages %}
-        <p style="color:lightsalmon">
+        <p class="message error">
             {% for error_message in error_messages %}
                 {{ error_message }}<br>
             {% endfor %}
@@ -34,7 +28,7 @@ Custom domain – Bear Blog
         <p>
             <label>Domain:</label>
             <br>
-            <input type="text" name="custom-domain" value="{{ blog.domain }}" autocorrect="off" autocomplete="off" spellcheck="off">
+            <input type="text" name="custom-domain" value="{{ blog.domain|default_if_none:'' }}" autocorrect="off" autocomplete="off" spellcheck="off">
             <p class="helptext">
                 example.com or blog.example.com
             </p>

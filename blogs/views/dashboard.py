@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.db.models import F
 from django.utils.text import slugify
 
 from django.http import HttpResponse
@@ -87,7 +88,7 @@ def blog_delete(request, id):
 def posts_edit(request, id):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
-    posts = Post.objects.filter(blog=blog, is_page=False).defer('content').order_by('-published_date')
+    posts = Post.objects.filter(blog=blog, is_page=False).defer('content').order_by(F('published_date').desc(nulls_first=True))
 
     return render(request, 'dashboard/posts.html', {
         'pages': False,
@@ -100,7 +101,7 @@ def posts_edit(request, id):
 def pages_edit(request, id):
     blog = get_object_or_404(Blog, user=request.user, subdomain=id)
 
-    posts = Post.objects.filter(blog=blog, is_page=True).defer('content').order_by('-published_date')
+    posts = Post.objects.filter(blog=blog, is_page=True).defer('content').order_by(F('published_date').desc(nulls_first=True))
 
     return render(request, 'dashboard/posts.html', {
         'pages': True,
@@ -189,7 +190,8 @@ def export_markdown_zip(blog):
             lines.append(f'slug: {post.slug}')
             if post.alias:
                 lines.append(f'alias: {post.alias}')
-            lines.append(f'published_date: {post.published_date.isoformat()}')
+            if post.published_date:
+                lines.append(f'published_date: {post.published_date.isoformat()}')
             tags = sorted(json.loads(post.all_tags))
             if tags:
                 lines.append(f'tags: {", ".join(tags)}')

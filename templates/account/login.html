@@ -5,6 +5,20 @@
 
 {% block head_title %}{% trans "Log In" %}{% endblock %}
 
+{% block custom_styles %}
+  {{ block.super }}
+  /* the inputs have placeholders, so keep these labels for screen readers only */
+  label[for="id_login"],
+  label[for="id_password"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+{% endblock %}
+
 {% block content %}
 
 <h1>{% trans "Log In" %}</h1>

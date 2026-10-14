@@ -1,12 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 
 {% block title %}Settings – Bear Blog{% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
 
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
@@ -16,7 +10,7 @@
     <form method="POST" class="post-form full-width">
         {% csrf_token %}
         {% if error_messages %}
-        <p style="color:lightsalmon">
+        <p class="message error">
             {% for error_message in error_messages %}
                 {{ error_message }}<br>
             {% endfor %}
@@ -25,14 +19,13 @@
         <p>
             <label for="slug">Subdomain</label>
             <br>
-            <div style="display: flex;align-items:end">
+            <div class="subdomain-field">
                 <input
                     type="text" name="subdomain"
                     value="{{ blog.subdomain }}"
                     required autocorrect="off"
                     autocomplete="off"
                     spellcheck="false"
-                    style="max-width:200px; margin-right: 10px;"
                 />
                 <span class="helptext">.bearblog.dev</span>
             </div>
@@ -68,7 +61,7 @@
 
 <form method="post" action="{% url 'blog_delete' blog.subdomain %}">
     {% csrf_token %}
-    <button type="submit" onclick="return confirm('Are you sure you would like to delete {{ blog.subdomain }}? This cannot be undone.');">
+    <button type="submit" class="danger" onclick="return confirm('Are you sure you would like to delete {{ blog.subdomain }}? This cannot be undone.');">
         Delete blog
     </button>
 </form>

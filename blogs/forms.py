@@ -74,15 +74,10 @@ class StyleForm(forms.ModelForm):
         widget=forms.Textarea(),
         required=False
     )
-    codemirror_enabled = forms.BooleanField(
-        label="Enable CodeMirror",
-        required=False,
-        help_text="Enable to use CodeMirror for editing CSS"
-    )
 
     class Meta:
         model = Blog
-        fields = ('custom_styles', 'codemirror_enabled')
+        fields = ('custom_styles',)
 
 
 class AdvancedSettingsForm(forms.ModelForm):

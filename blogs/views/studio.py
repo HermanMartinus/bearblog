@@ -203,8 +203,9 @@ def post(request, id, uid=None):
                         value = value[:-1]
                     post.alias = value
                 elif name == 'published_date':
+                    # Left empty, the date stays unset until the post is published
                     if not value:
-                        post.published_date = timezone.now()
+                        post.published_date = None
                     else:
                         value = str(value).replace('/', '-')
                         try:
@@ -260,15 +261,14 @@ def post(request, id, uid=None):
 
             post.slug = unique_slug(blog, post, slug)
 
-            if not post.published_date:
-                post.published_date = timezone.now()
-
             post.content = body_content
 
             post.publish = request.POST.get("publish", False) == "true"
             post.last_modified = timezone.now()
 
             if preview:
+                if not post.published_date:
+                    post.published_date = timezone.now()
                 return post
             else:
                 post.save()

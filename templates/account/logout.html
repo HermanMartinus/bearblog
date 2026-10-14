@@ -1,18 +1,14 @@
-{% extends 'base.html' %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
+{% extends 'dashboard/base.html' %}
 
 {% load i18n %}
 
 {% block head_title %}{% trans "Sign out" %}{% endblock %}
 
 {% block content %}
-<a href='/dashboard/'>Back</a>
 <h1>{% trans "Sign out" %}</h1>
+<p class="button-row">
+    <button type="button" onclick="event.preventDefault(); window.location = '/dashboard/'">&#8592; Back</button>
+</p>
 <p>{% trans 'Are you sure you want to sign out?' %}</p>
 
 <form method="post" action="{% url 'account_logout' %}">

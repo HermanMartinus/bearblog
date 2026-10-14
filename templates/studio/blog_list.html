@@ -1,12 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 
 {% block title %}Blog list – Bear Blog{% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
 
 {% block nav %}{% endblock %}
 
@@ -15,15 +9,15 @@
 <h1>Your blogs</h1>
 
 {% if not request.user.settings.upgraded and request.user.blogs.all|length > 1 %}
-    <p style="color:lightsalmon">
+    <p class="message error">
         You've exceeded the number of blogs for the free plan.
-        Please <a href="{% url 'upgrade' %}" style="color:lightsalmon;text-decoration:underline">upgrade</a> to keep your blogs. 
+        Please <a href="{% url 'upgrade' %}">upgrade</a> to keep your blogs.
     </p>
 {% endif %}
 
 <ul style="list-style:none; padding:0; margin:0;">
 {% for blog in blogs %}
-    <li style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; padding:8px 0; border-bottom:1px solid #eee;">
+    <li style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; padding:8px 0; border-bottom:1px solid var(--border);">
         <a href="{% url 'dashboard' id=blog.subdomain %}" style="flex:1; min-width:150px;">{{ blog.title }}</a>
         <small style="white-space:nowrap;">
             <a href="{% url 'dashboard' id=blog.subdomain %}posts/">Posts</a>
@@ -36,11 +30,11 @@
 </ul>
 {% if request.user.blogs.all|length > 0 and not request.user.settings.upgraded %}
 <p>
-    <a href="{% url 'upgrade' %}" style="color:salmon;" class="upgrade">Upgrade to create up to 10 blogs <span class="bear flex"></span></a>
+    <a href="{% url 'upgrade' %}" class="upgrade">Upgrade to create up to 10 blogs <span class="bear bear-flex"></span></a>
 </p>
 {% else %}
 {% if error_messages %}
-<p style="color:lightsalmon">
+<p class="message error">
     {% for error_message in error_messages %}
         {{ error_message }}<br>
     {% endfor %}

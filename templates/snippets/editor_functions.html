@@ -29,7 +29,7 @@
 		} else {
 			// Recent unsaved changes — show restore banner
 			const $banner = document.createElement('p');
-			$banner.style.cssText = 'color:lightsalmon;margin:0;padding:4px 0;font-size:small;';
+			$banner.className = 'message info';
 			$banner.innerHTML = 'Unsaved draft detected. <a href="#" id="restore-draft">Restore</a> or <a href="#" id="dismiss-draft">dismiss</a>.';
 			const $controls = $form.querySelector('.sticky-controls');
 			$controls.insertAdjacentElement('afterend', $banner);

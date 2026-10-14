@@ -19,7 +19,7 @@
         --heading-color: #eee;
         --text-color: #ddd;
         --link-color: #8cc2dd;
-        --visited-color:  #8b6fcb;
+        --visited-color:  #a58fe0;
         --code-background-color: #000;
         --code-color: #ddd;
         --blockquote-color: #ccc;
@@ -52,7 +52,8 @@ a {
 }
 
 a:hover {
-    text-decoration: underline; 
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
 nav a {
@@ -87,15 +88,15 @@ img {
 
 code {
     font-family: monospace;
-    padding: 2px;
+    padding: 2px 4px;
     background-color: var(--code-background-color);
     color: var(--code-color);
-    border-radius: 3px;
 }
 
 blockquote {
     border-left: 1px solid #999;
-    color: var(--code-color);
+    border-left-color: color-mix(in srgb, var(--blockquote-color) 50%, transparent);
+    color: var(--blockquote-color);
     padding-left: 20px;
     font-style: italic;
 }
@@ -113,8 +114,7 @@ footer {
     font-size: 1.5em;
 }
 
-.highlight, .code {
-    padding: 1px 15px;
+.highlight {
     background-color: var(--code-background-color);
     color: var(--code-color);
     border-radius: 3px;

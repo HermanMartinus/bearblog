@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'error.html' %}
 
 {% block title %}429{% endblock %}
 
@@ -8,17 +8,11 @@
 
 {% block nav %}{% endblock %}
 
-{% block content %}
-<div style="text-align: center; display: flex; flex-flow: column; justify-content: center; height: calc(100vh - 70px);">
-    <h1>429</h1>
-    <h2>ʕノ•ᴥ•ʔノ ︵ ┻━┻</h2>
-    <p>
-        Too many requests.
-        <br>
-        Let's get you
-        <a href="/">back home</a>.
-    </p>
-</div>
-{% endblock %}
+{% block code %}429{% endblock %}
 
-{% block footer %}{% endblock %}
+{% block message %}
+    Too many requests.
+    <br>
+    Let's get you
+    <a href="/">back home</a>.
+{% endblock %}

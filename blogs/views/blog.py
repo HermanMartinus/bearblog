@@ -171,6 +171,10 @@ def post(request, slug):
     if post.publish is False and not request.GET.get('token') == post.token:
         return not_found(request)
 
+    # Undated drafts preview as if published now
+    if not post.published_date:
+        post.published_date = timezone.now()
+
     context = {
         'blog': blog,
         'post': post,

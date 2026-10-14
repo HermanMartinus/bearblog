@@ -1,12 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 
 {% block title %}Dashboard – Bear Blog{% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
 
 {% block nav %}{% include '../snippets/dashboard_nav.html' %}{% endblock %}
 
@@ -14,7 +8,7 @@
 <h1>Home</h1>
 
 {% if error_messages %}
-<p style="color:lightsalmon">
+<p class="message error">
     {% for error_message in error_messages %}
         {{ error_message }}<br>
     {% endfor %}
@@ -28,7 +22,7 @@
         <button type="button" onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}')">View</button>
         {% endif %}
     </p>
-    <details style="font-size: 12px; margin-bottom: 10px;">
+    <details class="attributes">
         <summary>
             Attributes
         </summary>
@@ -47,9 +41,8 @@
 
     <div
         id="header_content"
-        class="editable"
+        class="editable editor-header"
         contenteditable="true"
-        style="margin-bottom:-1px; border-bottom: 1px solid lightgrey;"
     >
         <b>title:</b> {{ blog.title }}{% if blog.favicon %}<br>
         <b>favicon:</b> {{ blog.favicon }}{% endif %}{% if blog.meta_description %}<br>
@@ -62,7 +55,7 @@
     <textarea
         id="body_content"
         name="body_content"
-        style="min-height: 500px;border-top: 1px solid lightgrey;"
+        class="editor-body"
         placeholder="..."
     >{{ blog.content }}</textarea>
 

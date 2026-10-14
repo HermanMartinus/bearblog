@@ -165,7 +165,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200, db_index=True)
     slug = models.CharField(max_length=200, db_index=True)
     alias = models.CharField(max_length=200, blank=True, db_index=True)
-    published_date = models.DateTimeField(blank=True, db_index=True)
+    published_date = models.DateTimeField(blank=True, null=True, db_index=True)
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     all_tags = models.TextField(default='[]')
     publish = models.BooleanField(default=True, db_index=True)
@@ -208,7 +208,7 @@ class Post(models.Model):
 
             posted_at = self.first_published_at or self.published_date
 
-            seconds = posted_at.timestamp()
+            seconds = posted_at.timestamp() if posted_at else 0
             if seconds > 0:
                 score = (log_of_upvotes) + ((seconds - 1577811600) / (BUOYANCY * 86400))
                 self.score = score
@@ -222,6 +222,10 @@ class Post(models.Model):
         if not self.uid:
             allowed_chars = string.ascii_letters.replace('O', '').replace('l', '')
             self.uid = ''.join(random.choice(allowed_chars) for _ in range(20))
+
+        # Drafts without a chosen date are dated when they're published
+        if self.publish and not self.published_date:
+            self.published_date = timezone.now()
 
         # Set first_published_at for score calculation
         if self.publish:

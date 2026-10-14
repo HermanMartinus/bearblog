@@ -1,19 +1,12 @@
-{% extends 'base.html' %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
-
-{% block nav %}
-<a href="/dashboard/">Back</a>
-{% endblock %}
+{% extends 'dashboard/base.html' %}
 
 {% block content %}
-<h1 class="title">Delete account</h1>
+<h1>Delete account</h1>
+<p class="button-row">
+    <button type="button" onclick="event.preventDefault(); window.location = '/dashboard/'">&#8592; Back</button>
+</p>
 <form action="" method="post">{% csrf_token %}
     <p>Are you sure you want to delete all information (including all blogs and content) related to <b>{{ request.user.email }}</b>?</p>
-    <input type="submit" value="Confirm">
+    <input type="submit" class="danger" value="Confirm">
 </form>
 {% endblock %}

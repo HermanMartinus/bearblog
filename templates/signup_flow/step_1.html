@@ -8,7 +8,7 @@
 <h1>Create your blog</h1>
 
 {% if error_messages %}
-<p style="color:lightsalmon">
+<p class="message error">
     {% for error_message in error_messages %}
         {{ error_message }}<br>
     {% endfor %}
@@ -25,7 +25,7 @@
         value="{{ title }}"
         maxlength="200"
     >
-    <p style="display: flex;align-items:end">
+    <p class="subdomain-field">
         <input
             type="text"
             required
@@ -35,7 +35,6 @@
             name="subdomain"
             placeholder="Preferred subdomain..."
             value="{{ subdomain }}"
-            style="max-width:200px; margin-right: 10px;"
             maxlength="100"
         >
         <span class="helptext">.bearblog.dev</span>

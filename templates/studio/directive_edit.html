@@ -1,14 +1,8 @@
 
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 
 {% block title %}
 Directives – Bear Blog
-{% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
 {% endblock %}
 
 {% block content %}
@@ -19,7 +13,7 @@ Directives – Bear Blog
     </p>
     <form method="POST" class="post-form full-width">
         {% csrf_token %}
-        <p style="line-height: 0">
+        <p class="button-row">
             <button type="button" onclick="event.preventDefault(); window.location = '/{{ blog.subdomain}}/dashboard/settings/'">&#8592; Back</button>
             <button type="submit">Save</button>
             <button type="button" onclick="event.preventDefault(); window.open('{{ blog.dynamic_useful_domain }}');">View</button>
@@ -28,7 +22,7 @@ Directives – Bear Blog
             <label>Head directive:</label>
             <br>
             <textarea name="header" style="height: 200px;">{{ blog.header_directive }}</textarea>
-            <p style="color:lightsalmon;font-size:small;display:none;" class="domain-error">
+            <p style="display:none;" class="message error">
                 ʕ ·ᴥ·ʔ The custom_domain attribute should be with the blog attributes on the <a href="{% url 'dashboard' id=blog.subdomain %}">home page</a>, not here. 
             </p>
         </p>

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align: center; display: flex; flex-flow: column; justify-content: center; height: calc(100vh - 70px);">
+    <h1>{% block code %}{% endblock %}</h1>
+    <h2>ʕノ•ᴥ•ʔノ ︵ ┻━┻</h2>
+    <p>
+        {% block message %}{% endblock %}
+    </p>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}

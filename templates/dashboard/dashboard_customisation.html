@@ -1,18 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 
 {% block title %}Customise dashboard – Bear Blog{% endblock %}
-
-{% block custom_styles %}
-    {% include 'styles/blog/default.css' %}
-    {% include 'styles/dashboard.css' %}
-    {{ request.user.settings.dashboard_styles | safe }}
-{% endblock %}
 
 
 {% block content %}
 <h1>Customise dashboard</h1>
 <form method="POST" class="post-form full-width">{% csrf_token %}
-    <p style="line-height: 0">
+    <p class="button-row">
         <button type="button" onclick="event.preventDefault(); window.location = '/dashboard/'">&#8592; Back</button>
         <button type="submit">Save</button>
     </p>

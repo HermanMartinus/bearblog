@@ -54,7 +54,7 @@
 {% block content %}
 
     {% if preview %}
-        <p style="width:100%;padding:10px;background-color:lightsalmon;color:white;display:flex;justify-content:space-between;line-height:15px;">
+        <p style="box-sizing:border-box;width:100%;padding:8px 12px;border-left:3px solid;border-radius:0 3px 3px 0;font-size:small;display:flex;justify-content:space-between;gap:10px;{% if error_message %}border-color:#e5484d;background-color:rgba(229,72,77,0.12);{% else %}border-color:#3273dc;background-color:rgba(50,115,220,0.12);{% endif %}">
             PREVIEW
                 {% if error_message %}<span>{{ error_message }}</span>{% endif %}
             <small>
