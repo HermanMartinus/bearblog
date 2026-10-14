@@ -6,8 +6,6 @@ from django.contrib.auth import get_user_model, login
 
 from blogs.models import Blog
 
-import random
-
 
 def signup(request):
     title = request.POST.get('title', '')
