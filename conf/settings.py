@@ -166,6 +166,9 @@ STORAGES = {
     },
 }
 
+# Cache unhashed static paths (favicons, og-image, stylesheet previews) for 24 hours
+WHITENOISE_MAX_AGE = 86400
+
 LOGIN_REDIRECT_URL = '/dashboard/'
 
 # Emailer

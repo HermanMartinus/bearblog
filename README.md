@@ -1,4 +1,4 @@
-# `ʕ•ᴥ•ʔ` Bear Blog
+# `ʕ•ᴥ•ʔ Bear Blog`
 
 **A calm home for your writing.** Start a free blog in minutes at [bearblog.dev](https://bearblog.dev).
 
