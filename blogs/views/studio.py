@@ -172,7 +172,7 @@ def post(request, id, uid=None):
             post.meta_description = ''
             post.meta_image = ''
             post.is_page = False
-            post.make_discoverable = True
+            post.discoverable = True
             post.lang = ''
             post.all_tags = '[]'
 
@@ -230,11 +230,11 @@ def post(request, id, uid=None):
                         if stripped_tag and stripped_tag not in tags:
                             tags.append(stripped_tag)
                     post.all_tags = json.dumps(tags)
-                elif name == 'make_discoverable':
+                elif name == 'discoverable':
                     if type(value) is bool:
-                        post.make_discoverable = value
+                        post.discoverable = value
                     else:
-                        error_messages.append('make_discoverable needs to be "true" or "false"')
+                        error_messages.append('discoverable needs to be "true" or "false"')
                 elif name == 'is_page':
                     if type(value) is bool:
                         post.is_page = value
@@ -350,7 +350,7 @@ def preview(request, id):
             post.meta_description = ''
             post.meta_image = ''
             post.is_page = False
-            post.make_discoverable = True
+            post.discoverable = True
             post.lang = ''
 
             # Parse and populate header data
@@ -374,8 +374,8 @@ def preview(request, id):
                     value = value.replace('/', '-')
                     if not str(post.published_date).startswith(value):
                         post.published_date = timezone.datetime.fromisoformat(value)
-                elif name == 'make_discoverable':
-                    post.make_discoverable = value
+                elif name == 'discoverable':
+                    post.discoverable = value
                 elif name == 'is_page':
                     post.is_page = value
                 elif name == 'class_name':

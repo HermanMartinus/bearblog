@@ -110,7 +110,7 @@ def random_post_link():
         Post.objects.filter(
             publish=True,
             published_date__lte=timezone.now(),
-            make_discoverable=True,
+            discoverable=True,
             content__isnull=False,
         ).select_related('blog'),
         Post,

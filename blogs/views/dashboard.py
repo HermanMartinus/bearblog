@@ -196,7 +196,7 @@ def export_markdown_zip(blog):
             if tags:
                 lines.append(f'tags: {", ".join(tags)}')
             lines.append(f'publish: {str(post.publish).lower()}')
-            lines.append(f'make_discoverable: {str(post.make_discoverable).lower()}')
+            lines.append(f'discoverable: {str(post.discoverable).lower()}')
             lines.append(f'is_page: {str(post.is_page).lower()}')
             if post.canonical_url:
                 lines.append(f'canonical_url: {post.canonical_url}')
@@ -243,7 +243,7 @@ def settings(request, id):
 
     if request.GET.get("export-csv", ""):
         fields = ['uid', 'title', 'slug', 'alias', 'published_date', 'all_tags',
-                  'publish', 'make_discoverable', 'is_page', 'content',
+                  'publish', 'discoverable', 'is_page', 'content',
                   'canonical_url', 'meta_description', 'meta_image', 'lang',
                   'class_name', 'first_published_at']
         return render_to_csv_response(blog.posts.values(*fields))

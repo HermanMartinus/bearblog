@@ -18,7 +18,7 @@ def get_base_query():
     return Post.objects.select_related("blog").filter(
         publish=True,
         blog__user__is_active=True,
-        make_discoverable=True,
+        discoverable=True,
         published_date__lte=timezone.now(),
         blog__posts_in_last_12_hours__lte=3,
         content_length__gte=150

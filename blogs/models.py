@@ -144,7 +144,7 @@ class Blog(models.Model):
             self.last_posted = self.posts.filter(publish=True, published_date__lt=timezone.now()).order_by('-published_date').values_list('published_date', flat=True).first()
 
             # Update posts in last 12 hours
-            self.posts_in_last_12_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=12), published_date__lte=timezone.now(), publish=True, make_discoverable=True).count()
+            self.posts_in_last_12_hours = self.posts.filter(published_date__gte=timezone.now() - timezone.timedelta(hours=12), published_date__lte=timezone.now(), publish=True, discoverable=True).count()
 
         # Save the blog
         super(Blog, self).save(*args, **kwargs)
@@ -169,7 +169,7 @@ class Post(models.Model):
     last_modified = models.DateTimeField(auto_now_add=True, blank=True)
     all_tags = models.TextField(default='[]')
     publish = models.BooleanField(default=True, db_index=True)
-    make_discoverable = models.BooleanField(default=True, db_index=True)
+    discoverable = models.BooleanField(default=True, db_index=True)
     is_page = models.BooleanField(default=False, db_index=True)
     content = models.TextField()
     canonical_url = models.CharField(max_length=200, blank=True)

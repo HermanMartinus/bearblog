@@ -26,6 +26,12 @@
     <a href="{% url 'account' %}" class="account bear" title="Account"></a>
 </span>
 
+{% if blog.posts.count == 0 %}
+<p class="message info">
+    Welcome to Bear! Everything you need to build a great blog is in <a href="https://docs.bearblog.dev" target="_blank">the docs</a>, including <a href="https://docs.bearblog.dev/migrate/" target="_blank">how to migrate an existing blog</a>.
+</p>
+{% endif %}
+
 {% if blog.domain and not blog.user.settings.upgraded %}
 <div class="message error">
     Your blog's custom domain is at risk of being disconnected.
