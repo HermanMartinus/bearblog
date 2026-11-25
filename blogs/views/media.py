@@ -2,19 +2,13 @@ from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import Q
 
-import io
-from PIL import Image, ImageOps
-import pillow_heif
 import os
 import boto3
 import threading
 
 from blogs.models import Blog, Media
-
-pillow_heif.register_heif_opener()
 
 
 def get_storage_config():
@@ -29,7 +23,7 @@ def get_storage_config():
     }
 
 
-image_types = ['png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico', 'heic', 'heif']
+image_types = ['png', 'jpg', 'jpeg', 'bmp', 'gif', 'svg', 'webp', 'avif', 'ico']
 video_types = ['mp4', 'webm', 'mkv']
 audio_types = ['mp3', 'ogg', 'wav', 'opus', 'flac']
 document_types = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'rtf', 'epub', 'ps', 'odt', 'ods', 'odp', 'odg', 'odf', 'mml', 'odb', 'uot', 'uos', 'uop', 'css']
@@ -95,12 +89,8 @@ def upload_image(request, id):
         if not file_list:
             return JsonResponse({'error': 'No file provided.'}, status=400)
 
-        optimise = True
-        if request.POST.get('raw') == 'true':
-            optimise = False
-
         try:
-            file_links = upload_files(blog, file_list, optimise)
+            file_links = upload_files(blog, file_list)
         except UploadError as error:
             return JsonResponse({'error': str(error)}, status=error.status_code)
 
@@ -108,7 +98,7 @@ def upload_image(request, id):
     return JsonResponse({'error': 'Upload failed.'}, status=400)
 
 
-def upload_files(blog, file_list, optimise=True):
+def upload_files(blog, file_list):
     file_links = []
     storage_config = get_storage_config()
     if not storage_config['bucket'] or not storage_config['public_url']:
@@ -128,16 +118,6 @@ def upload_files(blog, file_list, optimise=True):
         if extension not in file_types:
             raise UploadError(f'File type not supported: {file.name}', status_code=415)
         
-        # Strip metadata if the file is an image
-        if extension in image_types and extension != 'svg' and extension != 'gif':
-            try:
-                file = process_image(file, optimise)
-            except (OSError, ValueError, Image.DecompressionBombError) as error:
-                raise UploadError(
-                    'The image file cannot be identified or is not a valid image.',
-                    status_code=422,
-                ) from error
-
         file_name = slugify(file.name.split('.')[-2].lower())
         extension = file.name.split('.')[-1].lower()
 
@@ -189,46 +169,6 @@ def upload_to_object_storage(filepath, file_data, content_type):
         client.put_object(**params)
     except Exception:
         pass
-
-
-def process_image(file, optimise):
-    original_image = Image.open(file)
-    # Keeps orientation information
-    image = ImageOps.exif_transpose(original_image)
-
-    data = io.BytesIO()
-
-    if optimise:
-        max_width = 1200
-        if image.width > max_width:
-            # Calculate the new height to maintain the aspect ratio
-            ratio = max_width / float(image.width)
-            new_height = int(float(image.height) * ratio)
-            # Resize the image with high-quality resampling
-            image = image.resize((max_width, new_height), resample=Image.LANCZOS)
-
-        image.save(data, format='WEBP')
-        # Update file name and content type for WebP
-        file_name = os.path.splitext(file.name)[0] + '.webp'
-        content_type = 'image/webp'
-    else:
-        if image.mode == 'P':
-            image = image.convert('RGB')
-        # Save the image to strip metadata (EXIF, etc.)
-        image.save(data, format=original_image.format)
-        file_name = file.name
-        content_type = file.content_type
-
-    data.seek(0)
-
-    return InMemoryUploadedFile(
-        file=data,
-        field_name=None,
-        name=file_name,
-        content_type=content_type,
-        size=len(data.getvalue()),
-        charset=None
-    )
 
 
 @login_required
